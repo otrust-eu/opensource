@@ -3086,15 +3086,33 @@ app.get('/stats', async (req, res) => {
     const db = getDb();
     const claims = db.collection('claims');
     const signRequests = db.collection('sign_requests');
-    
-    const [total, confirmed, pending, signTotal, signCompleted, signConfirmed] = await Promise.all([
+    const proofs = db.collection('proofs');
+
+    const [
+      total,
+      confirmed,
+      pending,
+      signTotal,
+      signCompleted,
+      signConfirmed,
+      proofTotal,
+      activeProofs,
+      verifiedProofViews
+    ] = await Promise.all([
       claims.countDocuments(),
       claims.countDocuments({ blockchain_confirmed: true }),
       claims.countDocuments({ blockchain_confirmed: { $ne: true } }),
       signRequests.countDocuments(),
       signRequests.countDocuments({ status: 'completed' }),
-      signRequests.countDocuments({ blockchain_confirmed: true })
+      signRequests.countDocuments({ blockchain_confirmed: true }),
+      proofs.countDocuments(),
+      proofs.countDocuments({ status: { $ne: 'revoked' } }),
+      proofs.countDocuments({ verified_count: { $gt: 0 } })
     ]);
+
+    const totalRecords = total + signTotal + proofTotal;
+    const verifiedRecords = confirmed + signCompleted + activeProofs;
+    const anchoredRecords = confirmed + signConfirmed;
     
     // Get latest confirmed block (from both claims and sign_requests)
     const [latestClaim, latestSign] = await Promise.all([
@@ -3120,6 +3138,12 @@ app.get('/stats', async (req, res) => {
       total_signatures: signTotal,
       completed_signatures: signCompleted,
       confirmed_signatures: signConfirmed,
+      total_proofs: proofTotal,
+      active_proofs: activeProofs,
+      verified_proof_views: verifiedProofViews,
+      total_records: totalRecords,
+      verified_records: verifiedRecords,
+      anchored_records: anchoredRecords,
       latest_block: latestBlock
     });
   } catch (error) {
