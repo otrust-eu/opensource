@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "OTRUST - Blockchain Timestamp",
+  "version": "1.0.0",
+  "description": "Timestamp any webpage content on blockchain via OpenTimestamps",
+  "permissions": [
+    "activeTab",
+    "contextMenus",
+    "storage",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://www.otrust.eu/*",
+    "https://otrust.eu/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "OTRUST - Timestamp this page"
+  }
+}

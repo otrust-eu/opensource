@@ -1,0 +1,130 @@
+{
+  "name": "@otrust/sdk",
+  "version": "1.0.0",
+  "description": "Official SDK for OTRUST - Zero-knowledge timestamping, signing, identity proofs, and authentication",
+  "author": "Kris Ledel <kris@otrust.eu>",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./timestamp": {
+      "import": {
+        "types": "./dist/timestamp.d.ts",
+        "default": "./dist/timestamp.js"
+      },
+      "require": {
+        "types": "./dist/timestamp.d.cts",
+        "default": "./dist/timestamp.cjs"
+      }
+    },
+    "./sign": {
+      "import": {
+        "types": "./dist/sign.d.ts",
+        "default": "./dist/sign.js"
+      },
+      "require": {
+        "types": "./dist/sign.d.cts",
+        "default": "./dist/sign.cjs"
+      }
+    },
+    "./proof": {
+      "import": {
+        "types": "./dist/proof.d.ts",
+        "default": "./dist/proof.js"
+      },
+      "require": {
+        "types": "./dist/proof.d.cts",
+        "default": "./dist/proof.cjs"
+      }
+    },
+    "./auth": {
+      "import": {
+        "types": "./dist/auth.d.ts",
+        "default": "./dist/auth.js"
+      },
+      "require": {
+        "types": "./dist/auth.d.cts",
+        "default": "./dist/auth.cjs"
+      }
+    },
+    "./face": {
+      "import": {
+        "types": "./dist/face.d.ts",
+        "default": "./dist/face.js"
+      },
+      "require": {
+        "types": "./dist/face.d.cts",
+        "default": "./dist/face.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "pnpm run build"
+  },
+  "keywords": [
+    "otrust",
+    "timestamp",
+    "blockchain",
+    "bitcoin",
+    "opentimestamps",
+    "signing",
+    "e-signature",
+    "zero-knowledge",
+    "zkp",
+    "identity",
+    "authentication",
+    "oauth",
+    "sdk"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/otrust-eu/opensource.git",
+    "directory": "sdk-js"
+  },
+  "homepage": "https://otrust.eu",
+  "bugs": {
+    "url": "https://github.com/otrust-eu/opensource/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.4.0",
+    "vite": "^8.0.13",
+    "vitest": "^4.1.6"
+  },
+  "pnpm": {
+    "overrides": {
+      "esbuild": "^0.27.3",
+      "picomatch": "^4.0.4",
+      "postcss": "^8.5.10",
+      "rollup": "^4.60.4",
+      "vite": "^8.0.13"
+    }
+  },
+  "packageManager": "pnpm@10.0.0"
+}
