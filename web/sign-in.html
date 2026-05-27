@@ -91,6 +91,9 @@
   </script>
 
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script defer data-domain="otrust.eu" src="https://plausible.io/js/script.js"></script>
   <link rel="stylesheet" href="/otrust-polish.css?v=20260527-2">
 
@@ -725,10 +728,11 @@
           <a href="/proof" class="btn btn-primary">Create Identity Proof</a>
           <a href="/docs.html#proofauth" class="btn btn-secondary">Read Auth Docs</a>
         </div>
-        <div class="customer-strip customer-strip-compact" aria-label="Partner branding">
-          <span class="customer-label">Partner branding</span>
-          <strong>Your app</strong>
+        <div class="customer-strip customer-strip-compact" aria-label="Partner pilot">
+          <span class="customer-label">Partner pilot</span>
+          <strong>Hemsted</strong>
           <span>Branded login and proof creation flow</span>
+          <a href="/partners/hemsted">View preview</a>
         </div>
       </div>
 
@@ -870,20 +874,20 @@ if (result.ok && result.value.valid) {
       <div class="code-card">
         <div class="card">
           <h3>Save a theme</h3>
-          <pre><code>PUT /admin/auth-branding/acme_prod
+          <pre><code>PUT /admin/auth-branding/hemsted_prod
 X-Admin-Key: &lt;admin-key&gt;
 
 {
-  "logoUrl": "https://example.com/assets/logo.svg",
-  "backgroundColor": "#F8FAFC",
-  "primaryColor": "#12324A",
+  "logoUrl": "https://hemsted.se/assets/branding/logo.svg",
+  "backgroundColor": "#FAFAF7",
+  "primaryColor": "#0F1B2D",
   "textColor": "#0F1B2D",
   "fontFamily": "Inter",
   "borderRadius": 8,
   "spacingScale": "default",
-  "headline": "Sign in to Acme",
-  "subhead": "Secure verification with OTRUST Proof",
-  "footerText": "Acme uses OTRUST as identity provider",
+  "headline": "Logga in på Hemsted",
+  "subhead": "Säker inloggning med OTRUST Proof",
+  "footerText": "Hemsted AB med OTRUST som identity provider",
   "autoRedirectSeconds": 3
 }</code></pre>
         </div>
@@ -908,9 +912,11 @@ X-Admin-Key: &lt;admin-key&gt;
         <a href="/sign">Signed</a>
         <a href="/proof">Proof</a>
         <a href="/sign-in">Sign in</a>
-        <a href="/docs">Docs</a>
+          <a href="/docs">Docs</a>
         <a href="/about">About</a>
-        <a href="/privacy-policy">Privacy</a>
+      <a href="/transparency">Trust Log</a>
+      <a href="/notes/why-otrust">Technical Note</a>
+      <a href="/privacy-policy">Privacy</a>
         <a href="/terms">Terms</a>
         <a href="https://github.com/otrust-eu/opensource" rel="noopener noreferrer">GitHub</a>
       </div>

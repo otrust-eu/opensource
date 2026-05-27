@@ -51,6 +51,9 @@
     }
   }
   </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <script defer data-domain="otrust.eu" src="https://plausible.io/js/script.js"></script>
   <style>
@@ -472,6 +475,7 @@
         </span>
         <span class="nav-secondary" id="nav-secondary">
           <a href="/sign-in">Sign in</a>
+          <a href="/transparency">Trust Log</a>
           <a href="/docs" class="docs-trigger open" id="docs-trigger">Docs</a>
           <a href="/about">About</a>
         </span>
@@ -1095,7 +1099,7 @@ X-Admin-Key: &lt;admin-key&gt;
               <strong>Security:</strong> OTRUST disclosure, the OTRUST footer mark, and the DPO contact stay visible. The same theme follows <code>/proof?auth_challenge=...</code> when a user needs to create a proof first. Theme values are sanitized and all theme changes are written to the audit log.
             </div>
           </div>
-          
+
           <div class="card">
             <h2>React Component</h2>
             <pre><code>import { LoginButton } from '@otrust/react'
@@ -1346,7 +1350,7 @@ docker compose up --build
 <span class="comment"># Or run Node directly after MongoDB is available</span>
 npm run dev</code></pre>
           </div>
-          
+
           <div class="card">
             <h2>Verify Locally</h2>
             <pre><code><span class="comment"># Core crypto tests</span>
@@ -1386,8 +1390,10 @@ node cli/otrust.js verify 000000000000000000000000000000000000000000000000000000
       <a href="/sign">Signed</a>
       <a href="/proof">Proof</a>
       <a href="/sign-in">Sign in</a>
-      <a href="/docs">Docs</a>
+          <a href="/docs">Docs</a>
       <a href="/about">About</a>
+      <a href="/transparency">Trust Log</a>
+      <a href="/notes/why-otrust">Technical Note</a>
       <a href="/privacy-policy">Privacy</a>
       <a href="/terms">Terms</a>
       <a href="https://github.com/otrust-eu/opensource">GitHub</a>

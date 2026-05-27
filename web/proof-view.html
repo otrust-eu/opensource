@@ -15,6 +15,9 @@
   <link rel="manifest" href="/manifest.json">
   
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script defer data-domain="otrust.eu" src="https://plausible.io/js/script.js"></script>
   <!-- html2canvas with SRI hash for security -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" 
@@ -457,6 +460,57 @@
     .btn-secondary:hover {
       background: var(--bg-muted);
     }
+
+    .badge-share {
+      border-top: 1px solid var(--border);
+      padding: 1.2rem 1.5rem 1.5rem;
+    }
+
+    .badge-preview {
+      align-items: center;
+      background: var(--bg-muted);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      display: inline-flex;
+      gap: 0.55rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 0.85rem;
+      padding: 0.58rem 0.72rem;
+    }
+
+    .badge-mark {
+      background: var(--accent);
+      border-radius: 5px;
+      color: white;
+      font-size: 0.62rem;
+      letter-spacing: 0.05em;
+      padding: 0.2rem 0.36rem;
+    }
+
+    .badge-share label {
+      color: var(--text-dim);
+      display: block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.35rem;
+      text-transform: uppercase;
+    }
+
+    .badge-share textarea {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 0.72rem;
+      line-height: 1.45;
+      padding: 0.75rem;
+      resize: vertical;
+      width: 100%;
+    }
     
     /* Loading */
     .loading {
@@ -564,6 +618,7 @@
         </span>
         <span class="nav-secondary" id="nav-secondary">
           <a href="/sign-in">Sign in</a>
+          <a href="/transparency">Trust Log</a>
           <a href="/docs">Docs</a>
           <a href="/about">About</a>
         </span>
@@ -623,9 +678,19 @@
         <div class="actions">
           <button class="btn" id="btn-verify">Re-verify Proof</button>
           <button class="btn btn-secondary" id="btn-copy">Copy Link</button>
+          <button class="btn btn-secondary" id="btn-copy-badge">Copy Badge</button>
           <button class="btn btn-secondary" id="btn-apple-wallet" style="background: #000; color: white; display: none;">
             Apple Wallet
           </button>
+        </div>
+
+        <div class="badge-share" id="badge-share" style="display: none;">
+          <div class="badge-preview" id="badge-preview">
+            <span class="badge-mark">OTRUST</span>
+            <span>Verified proof</span>
+          </div>
+          <label for="badge-embed">Embeddable badge</label>
+          <textarea id="badge-embed" readonly rows="4"></textarea>
         </div>
         
         <div id="identity-actions" class="actions" style="display: none; border-top: 1px solid var(--border); padding-top: 1rem;">
@@ -651,6 +716,8 @@
       <a href="/sign-in">Sign in</a>
       <a href="/docs">Docs</a>
       <a href="/about">About</a>
+      <a href="/transparency">Trust Log</a>
+      <a href="/notes/why-otrust">Technical Note</a>
       <a href="/privacy-policy">Privacy</a>
       <a href="/terms">Terms</a>
       <a href="https://github.com/otrust-eu/opensource">GitHub</a>
@@ -780,9 +847,25 @@
       
       // Setup wallet buttons
       document.getElementById('btn-apple-wallet').onclick = () => downloadWallet('apple');
+      renderVerificationBadge(proof);
       
       // Verify
       verifyProof();
+    }
+
+    function renderVerificationBadge(proof) {
+      const share = document.getElementById('badge-share');
+      const preview = document.getElementById('badge-preview');
+      const embed = document.getElementById('badge-embed');
+      if (!share || !preview || !embed) return;
+
+      const proofUrl = window.location.href.split('?')[0];
+      const typeLabel = typeConfig[proof.type]?.label || 'Proof';
+      const proofId = String(proof.id || '').replace(/"/g, '&quot;');
+      const label = `Verified ${typeLabel}`;
+      preview.querySelector('span:last-child').textContent = label;
+      embed.value = `<a href="${proofUrl}" data-otrust-proof="${proofId}" style="display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #d9dfdc;border-radius:8px;color:#151817;text-decoration:none;font:600 13px Inter,system-ui,sans-serif;background:#ffffff;"><span style="background:#24543a;color:#fff;border-radius:5px;padding:3px 5px;font-size:10px;letter-spacing:.05em;">OTRUST</span><span>${label}</span></a>`;
+      share.style.display = 'block';
     }
     
     async function downloadWallet(format) {
@@ -1417,6 +1500,18 @@
         setTimeout(() => { btn.textContent = originalText; }, 2000);
       }
     }
+
+    function copyBadge() {
+      const embed = document.getElementById('badge-embed');
+      if (!embed) return;
+      navigator.clipboard.writeText(embed.value);
+      const btn = document.getElementById('btn-copy-badge');
+      if (btn) {
+        const originalText = btn.textContent;
+        btn.textContent = 'Badge Copied!';
+        setTimeout(() => { btn.textContent = originalText; }, 2000);
+      }
+    }
     
     function showError(title, message) {
       document.getElementById('loading').style.display = 'none';
@@ -1434,6 +1529,7 @@
     // Setup button handlers
     document.getElementById('btn-verify').addEventListener('click', verifyProof);
     document.getElementById('btn-copy').addEventListener('click', copyLink);
+    document.getElementById('btn-copy-badge').addEventListener('click', copyBadge);
     document.getElementById('btn-apple-wallet').addEventListener('click', () => downloadWallet('apple'));
     document.getElementById('btn-report-lost').addEventListener('click', reportLost);
     

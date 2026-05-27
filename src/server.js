@@ -2606,6 +2606,10 @@ app.get('/sign-in', serveHtmlWithNonce(path.join(__dirname, '../web/sign-in.html
 app.get(['/signin', '/login'], (req, res) => res.redirect(301, '/sign-in'));
 app.get('/about.html', serveHtmlWithNonce(path.join(__dirname, '../web/about.html')));
 app.get('/about', serveHtmlWithNonce(path.join(__dirname, '../web/about.html')));
+app.get('/transparency.html', serveHtmlWithNonce(path.join(__dirname, '../web/transparency.html')));
+app.get('/transparency', serveHtmlWithNonce(path.join(__dirname, '../web/transparency.html')));
+app.get('/notes/why-otrust', serveHtmlWithNonce(path.join(__dirname, '../web/notes-why-otrust.html')));
+app.get(['/why-otrust', '/notes/why-otrust.html'], (req, res) => res.redirect(301, '/notes/why-otrust'));
 app.get('/api-docs.html', serveHtmlWithNonce(path.join(__dirname, '../web/api-docs.html')));
 app.get('/api-docs', serveHtmlWithNonce(path.join(__dirname, '../web/api-docs.html')));
 app.get(['/api.html', '/api-reference', '/api-reference.html'], (req, res) => res.redirect(301, '/api-docs'));

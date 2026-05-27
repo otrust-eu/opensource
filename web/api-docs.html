@@ -51,6 +51,9 @@
     }
   }
   </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <!-- Privacy-respecting analytics (no cookies, no personal data) -->
   <script defer data-domain="otrust.eu" src="https://plausible.io/js/script.js"></script>
@@ -684,6 +687,7 @@
         </span>
         <span class="nav-secondary" id="nav-secondary">
           <a href="/sign-in">Sign in</a>
+          <a href="/transparency">Trust Log</a>
           <a href="/docs" class="docs-trigger open" id="docs-trigger">Docs</a>
           <a href="/about">About</a>
         </span>
@@ -775,8 +779,8 @@
           <p>Create a short-lived hosted-login challenge for a partner application. The response includes the OTRUST login URL; if a <code>clientId</code> has approved branding, the hosted login and proof creation screens use that theme.</p>
           <h3>Request Body</h3>
           <pre><code>{
-  <span class="property">"clientId"</span>: <span class="string">"acme_prod"</span>,
-  <span class="property">"redirectUri"</span>: <span class="string">"https://app.example/auth/callback"</span>,
+  <span class="property">"clientId"</span>: <span class="string">"hemsted_prod"</span>,
+  <span class="property">"redirectUri"</span>: <span class="string">"https://hemsted.se/auth/callback"</span>,
   <span class="property">"scope"</span>: [<span class="string">"identity"</span>],
   <span class="property">"state"</span>: <span class="string">"opaque-csrf-state"</span>
 }</code></pre>
@@ -1006,8 +1010,10 @@ curl https://www.otrust.eu/proof/ot_abc123xyz?format=ots \
       <a href="/sign">Signed</a>
       <a href="/proof">Proof</a>
       <a href="/sign-in">Sign in</a>
-      <a href="/docs">Docs</a>
+          <a href="/docs">Docs</a>
       <a href="/about">About</a>
+      <a href="/transparency">Trust Log</a>
+      <a href="/notes/why-otrust">Technical Note</a>
       <a href="/privacy-policy">Privacy</a>
       <a href="/terms">Terms</a>
       <a href="https://github.com/otrust-eu/opensource">GitHub</a>

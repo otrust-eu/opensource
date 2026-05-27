@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Why OTRUST Exists | Technical Note by Kris Ledel</title>
+  <meta name="description" content="A technical note by Kris Ledel on OTRUST, blind notary architecture, OpenTimestamps, identity proofs, and partner-branded verification flows.">
+  <link rel="canonical" href="https://www.otrust.eu/notes/why-otrust">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#2d5a3d">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://www.otrust.eu/notes/why-otrust">
+  <meta property="og:title" content="Why OTRUST Exists">
+  <meta property="og:description" content="A technical note on cryptographic proof infrastructure, blind notarization, and proof-first identity.">
+  <meta property="og:image" content="https://www.otrust.eu/og-image.svg">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <script defer data-domain="otrust.eu" src="https://plausible.io/js/script.js"></script>
+  <link rel="stylesheet" href="/otrust-polish.css?v=20260527-2">
+  <style>
+    .note-page {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 3.5rem 2rem 4rem;
+    }
+
+    .note-head {
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+    }
+
+    .note-kicker {
+      color: var(--accent);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .note-head h1 {
+      font-size: clamp(2.7rem, 6vw, 5rem);
+      line-height: 0.98;
+      margin: 0.8rem 0 1rem;
+      max-width: 11ch;
+    }
+
+    .note-head p {
+      color: var(--text-dim);
+      font-size: 1.05rem;
+      line-height: 1.7;
+      max-width: 50rem;
+    }
+
+    .note-meta {
+      color: var(--text-dim);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      font-size: 0.78rem;
+      margin-top: 1.1rem;
+    }
+
+    .note-meta span {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.28rem 0.58rem;
+    }
+
+    .note-layout {
+      display: grid;
+      gap: 2rem;
+      grid-template-columns: minmax(0, 1fr) 17rem;
+      align-items: start;
+    }
+
+    .note-body {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: clamp(1.2rem, 3vw, 2rem);
+    }
+
+    .note-body h2 {
+      font-size: 1.05rem;
+      margin: 1.8rem 0 0.65rem;
+    }
+
+    .note-body h2:first-child {
+      margin-top: 0;
+    }
+
+    .note-body p,
+    .note-body li {
+      color: var(--text-dim);
+      font-size: 0.96rem;
+      line-height: 1.75;
+    }
+
+    .note-body ul {
+      margin: 0.75rem 0 0;
+      padding-left: 1.2rem;
+    }
+
+    .note-side {
+      background: color-mix(in srgb, var(--bg-card) 90%, var(--accent-light));
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      position: sticky;
+      top: 5rem;
+    }
+
+    .note-side strong {
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 0.55rem;
+    }
+
+    .note-side p {
+      color: var(--text-dim);
+      font-size: 0.82rem;
+      line-height: 1.55;
+      margin-bottom: 0.85rem;
+    }
+
+    .note-side a {
+      display: block;
+      font-size: 0.82rem;
+      margin-top: 0.45rem;
+    }
+
+    @media (max-width: 860px) {
+      .note-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .note-side {
+        position: static;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <nav role="navigation" aria-label="Main navigation">
+    <div class="nav-container">
+      <a href="/" class="logo">OTRUST</a>
+      <div class="nav-links">
+        <span class="nav-primary">
+          <a href="/">Timestamp</a>
+          <a href="/sign">Signed</a>
+          <a href="/proof">Proof</a>
+        </span>
+        <span class="nav-secondary" id="nav-secondary">
+          <a href="/sign-in">Sign in</a>
+          <a href="/transparency">Trust Log</a>
+          <a href="/docs" class="docs-trigger" id="docs-trigger">Docs</a>
+          <a href="/about">About</a>
+        </span>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle color theme" title="Toggle color theme"></button>
+        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu" title="Menu"><span></span></button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="docs-submenu-bar" id="docs-submenu-bar">
+    <div class="docs-submenu-container">
+      <a href="/docs">Documentation</a>
+      <a href="/api-docs">API Reference</a>
+      <a href="/playground/">SDK Playground</a>
+      <a href="https://github.com/otrust-eu/opensource" target="_blank" rel="noopener noreferrer">GitHub</a>
+    </div>
+  </div>
+
+  <main id="main-content" class="note-page">
+    <header class="note-head">
+      <span class="note-kicker">Founder technical note</span>
+      <h1>Why OTRUST exists.</h1>
+      <p>OTRUST is built around a simple idea: useful trust infrastructure should prove specific facts without demanding unnecessary custody over the underlying material.</p>
+      <div class="note-meta">
+        <span>Kris Ledel</span>
+        <span>Updated May 27, 2026</span>
+        <span>Blind notary architecture</span>
+      </div>
+    </header>
+
+    <div class="note-layout">
+      <article class="note-body">
+        <h2>Proof before platform</h2>
+        <p>Most product trust problems are not solved by asking users to believe another dashboard. They are solved by producing artifacts that can be checked later: hashes, signatures, timestamps, proof packages, and callback records.</p>
+        <p>OTRUST starts from those artifacts. The UI exists to make proof creation usable, but the core object is the record that survives the UI.</p>
+
+        <h2>Blind notarization</h2>
+        <p>The timestamping flow hashes content in the browser. The service receives the hash, signature, public key, timestamps, and proof metadata. It does not need the raw document to prove that the document existed.</p>
+        <ul>
+          <li>The user keeps the original file.</li>
+          <li>The public record can still be verified later.</li>
+          <li>The service minimizes what it must know to be useful.</li>
+        </ul>
+
+        <h2>Anchors and independence</h2>
+        <p>OpenTimestamps gives OTRUST a path to external anchoring without pretending that a hosted service alone is the source of truth. A record can be useful immediately and stronger once it is anchored externally.</p>
+
+        <h2>Proof-first identity</h2>
+        <p>Identity is not only login. In B2B flows, the important question is often narrower: does this user control an approved proof, and can the relying party verify that fact without seeing more personal data than needed?</p>
+        <p>That is why OTRUST Proof and hosted partner login keep the provider boundary visible. The partner experience can be branded, but the proof processor should remain clear.</p>
+
+        <h2>Why the boundary matters</h2>
+        <p>A trust product should not hide who performs the trust-sensitive step. OTRUST keeps URLs, disclosures, proof links, and privacy notes explicit so users know when they are interacting with OTRUST and when they return to a partner.</p>
+      </article>
+
+      <aside class="note-side">
+        <strong>Related surfaces</strong>
+        <p>These are the product areas this note refers to.</p>
+        <a href="/transparency">Transparency log</a>
+        <a href="/proof">OTRUST Proof</a>
+        <a href="/sign-in">Hosted sign in</a>
+        <a href="/docs#selfhost">Self-hosting docs</a>
+      </aside>
+    </div>
+  </main>
+
+  <div class="footer-wrapper">
+    <footer role="contentinfo">
+      <div class="footer-links">
+        <a href="/">Timestamp</a>
+        <a href="/sign">Signed</a>
+        <a href="/proof">Proof</a>
+        <a href="/sign-in">Sign in</a>
+        <a href="/docs">Docs</a>
+        <a href="/about">About</a>
+      <a href="/transparency">Trust Log</a>
+      <a href="/notes/why-otrust">Technical Note</a>
+        <a href="/privacy-policy">Privacy</a>
+        <a href="/terms">Terms</a>
+        <a href="https://github.com/otrust-eu/opensource" rel="noopener noreferrer">GitHub</a>
+      </div>
+      <div class="footer-copy">OTRUST - MIT License</div>
+    </footer>
+  </div>
+
+  <script src="/otrust-polish.js?v=20260527-2" defer></script>
+</body>
+</html>

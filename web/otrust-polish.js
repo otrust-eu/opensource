@@ -30,6 +30,7 @@
     if ((current === '/api-docs' || current === '/api-docs.html') && (hrefPath === '/api-docs' || hrefPath === '/api-docs.html')) return true;
     if (current.startsWith('/playground') && hrefPath.startsWith('/playground')) return true;
     if ((current === '/about' || current === '/about.html') && (hrefPath === '/about' || hrefPath === '/about.html')) return true;
+    if (normalizedHref === normalizedCurrent) return true;
 
     return false;
   }

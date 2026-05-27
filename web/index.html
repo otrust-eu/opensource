@@ -659,6 +659,85 @@
     .proof-row:nth-child(4) span:last-child {
       width: 48%;
     }
+
+    .sample-proof-demo {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-card);
+      margin: 0 0 1.6rem;
+      overflow: hidden;
+    }
+
+    .sample-proof-head {
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 0.75rem;
+      justify-content: space-between;
+      padding: 0.85rem 0.9rem;
+    }
+
+    .sample-proof-title {
+      min-width: 0;
+    }
+
+    .sample-proof-title strong {
+      display: block;
+      font-size: 0.82rem;
+      line-height: 1.2;
+    }
+
+    .sample-proof-title span {
+      color: var(--text-dim);
+      display: block;
+      font-size: 0.68rem;
+      line-height: 1.4;
+      margin-top: 0.2rem;
+    }
+
+    .sample-proof-demo .btn {
+      min-height: 2.2rem;
+      white-space: nowrap;
+    }
+
+    .sample-proof-output {
+      display: none;
+      padding: 0.9rem;
+    }
+
+    .sample-proof-output.visible {
+      display: block;
+    }
+
+    .sample-proof-grid {
+      display: grid;
+      gap: 0.42rem;
+    }
+
+    .sample-proof-field {
+      align-items: start;
+      color: var(--text-dim);
+      display: grid;
+      font-size: 0.68rem;
+      gap: 0.55rem;
+      grid-template-columns: 4.8rem minmax(0, 1fr);
+    }
+
+    .sample-proof-field code {
+      color: var(--text);
+      font-size: 0.66rem;
+      overflow-wrap: anywhere;
+    }
+
+    .sample-proof-status {
+      align-items: center;
+      color: var(--success);
+      display: flex;
+      font-size: 0.72rem;
+      font-weight: 700;
+      gap: 0.35rem;
+      margin-top: 0.75rem;
+    }
     
     /* Left column sections */
     .left-col .stats {
@@ -1726,6 +1805,7 @@
         </span>
         <span class="nav-secondary" id="nav-secondary">
           <a href="/sign-in">Sign in</a>
+          <a href="/transparency">Trust Log</a>
           <a href="/docs" class="docs-trigger" id="docs-trigger">Docs</a>
           <a href="/about">About</a>
         </span>
@@ -1789,6 +1869,25 @@
           <div class="proof-row"><span>OTS proof</span><span></span></div>
         </div>
       </div>
+
+      <section class="sample-proof-demo" aria-labelledby="sample-proof-heading">
+        <div class="sample-proof-head">
+          <div class="sample-proof-title">
+            <strong id="sample-proof-heading">Local proof demo</strong>
+            <span>Generates a browser-only sample receipt. Nothing is submitted.</span>
+          </div>
+          <button class="btn btn-secondary" type="button" id="sample-proof-btn">Generate sample</button>
+        </div>
+        <div class="sample-proof-output" id="sample-proof-output" aria-live="polite">
+          <div class="sample-proof-grid">
+            <div class="sample-proof-field"><span>Receipt</span><code id="sample-proof-id">-</code></div>
+            <div class="sample-proof-field"><span>Hash</span><code id="sample-proof-hash">-</code></div>
+            <div class="sample-proof-field"><span>Pubkey</span><code id="sample-proof-pubkey">-</code></div>
+            <div class="sample-proof-field"><span>Signature</span><code id="sample-proof-signature">-</code></div>
+          </div>
+          <div class="sample-proof-status"><span>Verified locally</span><span id="sample-proof-time"></span></div>
+        </div>
+      </section>
       
       <!-- Flow -->
       <section class="info-section" id="flow">
@@ -2032,6 +2131,11 @@
           <strong>Sign in</strong>
           <p>Authenticate from a proof with partner branding for global identity flows.</p>
         </a>
+        <a href="/transparency" class="platform-card">
+          <span>05</span>
+          <strong>Trust log</strong>
+          <p>Inspect public counts, privacy posture, anchoring, and open source status.</p>
+        </a>
       </div>
     </div>
   </section>
@@ -2169,6 +2273,19 @@
           <h3>SDK Playground</h3>
           <p>Interactive playground to test the TypeScript/JavaScript SDK. Try all API functions live.</p>
         </a>
+
+        <a href="/notes/why-otrust" class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 19.5V4a2 2 0 0 1 2-2h9l5 5v12.5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/>
+              <path d="M14 2v6h6"/>
+              <path d="M8 13h8"/>
+              <path d="M8 17h5"/>
+            </svg>
+          </div>
+          <h3>Technical Note</h3>
+          <p>Why OTRUST uses blind notarization, visible trust boundaries, and proof-first identity.</p>
+        </a>
         
         <a href="/api-docs.html" class="feature-card">
           <div class="feature-icon">
@@ -2197,6 +2314,8 @@
       <a href="/sign-in">Sign in</a>
       <a href="/docs">Docs</a>
       <a href="/about">About</a>
+      <a href="/transparency">Trust Log</a>
+      <a href="/notes/why-otrust">Technical Note</a>
       <a href="/privacy-policy">Privacy</a>
       <a href="/terms">Terms</a>
       <a href="https://github.com/otrust-eu/opensource" rel="noopener noreferrer">GitHub</a>
@@ -3022,6 +3141,38 @@
     
     // Run on page load
     handleUrlHash();
+
+    // ========== LOCAL SAMPLE PROOF DEMO ==========
+    const sampleProofBtn = document.getElementById('sample-proof-btn');
+    const sampleProofOutput = document.getElementById('sample-proof-output');
+
+    sampleProofBtn?.addEventListener('click', async () => {
+      const originalText = sampleProofBtn.textContent;
+      sampleProofBtn.disabled = true;
+      sampleProofBtn.textContent = 'Generating...';
+
+      try {
+        const payload = `OTRUST local sample proof\n${new Date().toISOString()}\n${crypto.randomUUID()}`;
+        const hash = bytesToHex(sha256(new TextEncoder().encode(payload)));
+        const privateKey = ed.utils.randomPrivateKey();
+        const publicKey = await ed.getPublicKeyAsync(privateKey);
+        const signature = await ed.signAsync(hash, privateKey);
+        const isValid = await ed.verifyAsync(signature, hash, publicKey);
+
+        document.getElementById('sample-proof-id').textContent = `demo_${hash.slice(0, 12)}`;
+        document.getElementById('sample-proof-hash').textContent = hash;
+        document.getElementById('sample-proof-pubkey').textContent = bytesToHex(publicKey);
+        document.getElementById('sample-proof-signature').textContent = bytesToHex(signature);
+        document.getElementById('sample-proof-time').textContent = isValid ? new Date().toLocaleTimeString() : 'failed';
+        sampleProofOutput?.classList.add('visible');
+      } catch (error) {
+        document.getElementById('sample-proof-time').textContent = error.message;
+        sampleProofOutput?.classList.add('visible');
+      } finally {
+        sampleProofBtn.disabled = false;
+        sampleProofBtn.textContent = originalText;
+      }
+    });
     
     // ========== DOWNLOAD FUNCTIONS ==========
     // These must be global for onclick handlers in dynamically generated HTML

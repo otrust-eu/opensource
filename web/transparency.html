@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OTRUST Transparency Log | Public Trust Metrics</title>
+  <meta name="description" content="Public OTRUST transparency log with live record counts, verified records, anchored records, latest Bitcoin block, privacy notes, and open source links.">
+  <link rel="canonical" href="https://www.otrust.eu/transparency">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#2d5a3d">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.otrust.eu/transparency">
+  <meta property="og:title" content="OTRUST Transparency Log">
+  <meta property="og:description" content="Live trust metrics, privacy posture, and open source status for OTRUST.">
+  <meta property="og:image" content="https://www.otrust.eu/og-image.svg">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <script defer data-domain="otrust.eu" src="https://plausible.io/js/script.js"></script>
+  <link rel="stylesheet" href="/otrust-polish.css?v=20260527-2">
+  <style>
+    .trust-page {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 3.5rem 2rem 4rem;
+    }
+
+    .trust-hero {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(18rem, 1.1fr);
+      gap: clamp(2rem, 5vw, 4rem);
+      align-items: end;
+      margin-bottom: 2.25rem;
+    }
+
+    .trust-kicker {
+      color: var(--accent);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .trust-hero h1 {
+      font-size: clamp(2.6rem, 5vw, 4.5rem);
+      line-height: 0.98;
+      margin: 0.8rem 0 1rem;
+      max-width: 10ch;
+    }
+
+    .trust-hero p {
+      color: var(--text-dim);
+      line-height: 1.65;
+      max-width: 42rem;
+    }
+
+    .ledger-visual {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--bg-card) 92%, var(--accent-light));
+      box-shadow: var(--surface-shadow);
+      padding: 1rem;
+    }
+
+    .ledger-row {
+      display: grid;
+      grid-template-columns: 4.8rem 1fr auto;
+      gap: 0.8rem;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding: 0.72rem 0;
+      font-size: 0.78rem;
+    }
+
+    .ledger-row:last-child {
+      border-bottom: 0;
+    }
+
+    .ledger-row code {
+      color: var(--text);
+      overflow-wrap: anywhere;
+    }
+
+    .ledger-pill {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--accent);
+      font-size: 0.66rem;
+      font-weight: 700;
+      padding: 0.22rem 0.48rem;
+    }
+
+    .metric-grid {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      margin: 1.5rem 0 2rem;
+    }
+
+    .metric-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+    }
+
+    .metric-card strong {
+      display: block;
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      line-height: 1;
+      margin-bottom: 0.55rem;
+    }
+
+    .metric-card span {
+      color: var(--text-dim);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .trust-sections {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .trust-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.2rem;
+    }
+
+    .trust-section h2 {
+      font-size: 1rem;
+      margin-bottom: 0.7rem;
+    }
+
+    .trust-section p,
+    .trust-section li {
+      color: var(--text-dim);
+      font-size: 0.86rem;
+      line-height: 1.6;
+    }
+
+    .trust-section ul {
+      margin: 0.8rem 0 0;
+      padding-left: 1.1rem;
+    }
+
+    .trust-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 1.25rem;
+    }
+
+    @media (max-width: 880px) {
+      .trust-hero,
+      .metric-grid,
+      .trust-sections {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <nav role="navigation" aria-label="Main navigation">
+    <div class="nav-container">
+      <a href="/" class="logo">OTRUST</a>
+      <div class="nav-links">
+        <span class="nav-primary">
+          <a href="/">Timestamp</a>
+          <a href="/sign">Signed</a>
+          <a href="/proof">Proof</a>
+        </span>
+        <span class="nav-secondary" id="nav-secondary">
+          <a href="/sign-in">Sign in</a>
+          <a href="/transparency">Trust Log</a>
+          <a href="/docs" class="docs-trigger" id="docs-trigger">Docs</a>
+          <a href="/about">About</a>
+        </span>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle color theme" title="Toggle color theme"></button>
+        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu" title="Menu"><span></span></button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="docs-submenu-bar" id="docs-submenu-bar">
+    <div class="docs-submenu-container">
+      <a href="/docs">Documentation</a>
+      <a href="/api-docs">API Reference</a>
+      <a href="/playground/">SDK Playground</a>
+      <a href="https://github.com/otrust-eu/opensource" target="_blank" rel="noopener noreferrer">GitHub</a>
+    </div>
+  </div>
+
+  <main id="main-content" class="trust-page">
+    <section class="trust-hero">
+      <div>
+        <span class="trust-kicker">Transparency</span>
+        <h1>Public trust log.</h1>
+        <p>OTRUST publishes operational trust signals so users can distinguish real cryptographic records from marketing claims. The counters below are served from the live system.</p>
+        <div class="trust-actions">
+          <a href="/stats" class="btn btn-secondary">Open raw stats</a>
+          <a href="https://github.com/otrust-eu/opensource" class="btn btn-primary" rel="noopener noreferrer">Open source repo</a>
+        </div>
+      </div>
+      <div class="ledger-visual" aria-label="Example trust log rows">
+        <div class="ledger-row"><span>record</span><code>sha256:3b7f...a91c</code><span class="ledger-pill">stored</span></div>
+        <div class="ledger-row"><span>proof</span><code>zk:id_8f1e...c2</code><span class="ledger-pill">verified</span></div>
+        <div class="ledger-row"><span>anchor</span><code id="latest-block-row">bitcoin:block -</code><span class="ledger-pill">public</span></div>
+      </div>
+    </section>
+
+    <section class="metric-grid" aria-label="Live OTRUST metrics">
+      <div class="metric-card"><strong id="metric-total">-</strong><span>Total records</span></div>
+      <div class="metric-card"><strong id="metric-verified">-</strong><span>Verified records</span></div>
+      <div class="metric-card"><strong id="metric-anchored">-</strong><span>Anchored records</span></div>
+      <div class="metric-card"><strong id="metric-block">-</strong><span>Latest Bitcoin block</span></div>
+    </section>
+
+    <section class="trust-sections">
+      <article class="trust-section">
+        <h2>What is counted</h2>
+        <p>Records include timestamp claims, signing packages, and proof packages. Verified records are records with a completed or active verification state.</p>
+        <ul>
+          <li>No artificial baseline is added.</li>
+          <li>Usage events are tracked separately from records.</li>
+          <li>Counts are returned by the public <code>/stats</code> endpoint.</li>
+        </ul>
+      </article>
+      <article class="trust-section">
+        <h2>Privacy posture</h2>
+        <p>The product is designed around hashes, signatures, proof metadata, and explicit user-controlled sharing. Raw content is not needed for public verification.</p>
+        <ul>
+          <li>File timestamping hashes in the browser.</li>
+          <li>Optional notification emails are stored separately.</li>
+          <li>Identity proof views do not reveal underlying personal data.</li>
+        </ul>
+      </article>
+      <article class="trust-section">
+        <h2>Independent verification</h2>
+        <p>OTRUST uses open proof formats where possible and keeps the provider boundary visible. Production can be used hosted or self-hosted from the public repository.</p>
+        <ul>
+          <li>OpenTimestamps support for Bitcoin anchoring.</li>
+          <li>Public proof URLs and downloadable receipts.</li>
+          <li>MIT-licensed open source implementation.</li>
+        </ul>
+      </article>
+    </section>
+  </main>
+
+  <div class="footer-wrapper">
+    <footer role="contentinfo">
+      <div class="footer-links">
+        <a href="/">Timestamp</a>
+        <a href="/sign">Signed</a>
+        <a href="/proof">Proof</a>
+        <a href="/sign-in">Sign in</a>
+        <a href="/docs">Docs</a>
+        <a href="/about">About</a>
+      <a href="/transparency">Trust Log</a>
+      <a href="/notes/why-otrust">Technical Note</a>
+        <a href="/privacy-policy">Privacy</a>
+        <a href="/terms">Terms</a>
+        <a href="https://github.com/otrust-eu/opensource" rel="noopener noreferrer">GitHub</a>
+      </div>
+      <div class="footer-copy">OTRUST - MIT License</div>
+    </footer>
+  </div>
+
+  <script nonce="PLACEHOLDER">
+    const formatNumber = (value) => new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 }).format(Number(value || 0));
+
+    fetch('/stats')
+      .then((response) => response.json())
+      .then((stats) => {
+        document.getElementById('metric-total').textContent = formatNumber(stats.total_records);
+        document.getElementById('metric-verified').textContent = formatNumber(stats.verified_records);
+        document.getElementById('metric-anchored').textContent = formatNumber(stats.anchored_records);
+        document.getElementById('metric-block').textContent = stats.latest_block ? formatNumber(stats.latest_block) : 'Pending';
+        document.getElementById('latest-block-row').textContent = `bitcoin:block ${stats.latest_block || 'pending'}`;
+      })
+      .catch(() => {
+        document.querySelectorAll('.metric-card strong').forEach((el) => { el.textContent = 'Unavailable'; });
+      });
+  </script>
+  <script src="/otrust-polish.js?v=20260527-2" defer></script>
+</body>
+</html>
