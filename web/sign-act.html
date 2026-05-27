@@ -1,0 +1,2137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Document – OTRUST Signed by Kris Ledel</title>
+  <meta name="description" content="Verify and sign a document with blockchain-backed proof. Created by Kris Ledel.">
+  <meta name="author" content="Kris Ledel">
+  <meta name="robots" content="noindex">
+  
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <style>
+    :root {
+      --bg: #fafaf9;
+      --bg-card: #ffffff;
+      --bg-muted: #f5f5f4;
+      --border: #e5e5e5;
+      --text: #1a1a1a;
+      --text-dim: #737373;
+      --accent: #2d5a3d;
+      --accent-hover: #1e4029;
+      --accent-light: #e8f0eb;
+      --orange: #b45309;
+      --success: #2d5a3d;
+      --error: #dc2626;
+      --warning: #d97706;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0f0f0e;
+      --bg-card: #1a1a19;
+      --bg-muted: #262625;
+      --border: #4a4a49;
+      --text: #ffffff;
+      --text-dim: #d4d4d4;
+      --accent: #5cb85c;
+      --accent-hover: #6fcf6f;
+      --accent-light: #1e3a24;
+      --orange: #ff9800;
+      --success: #5cb85c;
+      --error: #f87171;
+      --warning: #fbbf24;
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    
+    .theme-toggle {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      font-family: monospace;
+      transition: all 0.2s;
+    }
+
+    .theme-toggle::after {
+      content: 'I';
+    }
+
+    [data-theme="dark"] .theme-toggle::after {
+      content: 'O';
+    }
+    
+    .theme-toggle:hover {
+      background: var(--bg-muted);
+      border-color: var(--accent);
+    }
+    
+    /* Accessibility: Skip link */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: var(--accent);
+      color: white;
+      padding: 8px 16px;
+      z-index: 1000;
+      text-decoration: none;
+      font-size: 0.85rem;
+    }
+    .skip-link:focus { top: 0; }
+    
+    nav {
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      overflow: visible;
+    }
+    
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0.875rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .logo {
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    
+    .nav-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.8rem;
+      transition: color 0.2s;
+    }
+    
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a.active { color: var(--accent); font-weight: 500; }
+
+    /* Mobile Navigation */
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-direction: column;
+      gap: 4px;
+      padding: 8px;
+    }
+
+    .mobile-menu-btn::before,
+    .mobile-menu-btn::after,
+    .mobile-menu-btn span {
+      content: '';
+      display: block;
+      width: 16px;
+      height: 2px;
+      background: var(--text);
+      border-radius: 1px;
+    }
+
+    .mobile-menu-btn:hover {
+      background: var(--bg-muted);
+    }
+
+    .nav-links .nav-primary {
+      display: contents;
+    }
+
+    .nav-links .nav-secondary {
+      display: contents;
+    }
+
+    @media (max-width: 600px) {
+      .nav-container {
+        padding: 0.875rem 1rem;
+      }
+      
+      .mobile-menu-btn {
+        display: flex;
+      }
+      
+      .nav-links .nav-secondary {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 1rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 0.5rem;
+        flex-direction: column;
+        gap: 0;
+        min-width: 140px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      }
+      
+      .nav-links .nav-secondary.open {
+        display: flex;
+      }
+      
+      .nav-links .nav-secondary a {
+        padding: 0.6rem 1rem;
+        border-radius: 6px;
+      }
+      
+      .nav-links .nav-secondary a:hover {
+        background: var(--bg-muted);
+      }
+      
+      nav {
+        position: relative;
+      }
+    }
+    
+    .main-layout {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 2rem 3rem 3rem;
+    }
+    
+    @media (max-width: 900px) {
+      .main-layout { padding: 1.5rem; }
+      .nav-container { padding: 0.875rem 1.5rem; }
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-dim);
+    }
+    
+    .error-state {
+      text-align: center;
+      padding: 3rem;
+    }
+    
+    .error-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .error-state h2 { margin-bottom: 0.5rem; }
+    .error-state p { color: var(--text-dim); margin-bottom: 1rem; }
+    
+    .sign-card {
+      background: var(--bg-card);
+      border-radius: 16px;
+      box-shadow: 
+        0 0 0 1px rgba(0,0,0,0.03),
+        0 2px 4px rgba(0,0,0,0.02),
+        0 12px 40px rgba(0,0,0,0.06);
+      overflow: hidden;
+    }
+    
+    .sign-card-header {
+      background: var(--accent-light);
+      padding: 1.5rem;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .sign-card-header h1 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    
+    .sign-card-header p {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+    
+    .sign-card-body {
+      padding: 1.5rem;
+    }
+    
+    .role-badge {
+      display: inline-block;
+      background: var(--accent);
+      color: white;
+      font-size: 0.65rem;
+      font-weight: 500;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+    
+    .doc-info {
+      background: var(--bg-muted);
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .doc-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    
+    .doc-filename {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin-bottom: 0.75rem;
+    }
+    
+    .doc-hash-label {
+      font-size: 0.7rem;
+      color: var(--success);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-bottom: 0.25rem;
+    }
+    
+    .doc-hash-container {
+      display: flex;
+      gap: 0.5rem;
+      align-items: stretch;
+    }
+    
+    .doc-hash {
+      flex: 1;
+      font-family: monospace;
+      font-size: 0.65rem;
+      word-break: break-all;
+      background: var(--bg);
+      padding: 0.5rem;
+      border-radius: 6px;
+      border: 2px solid var(--success);
+    }
+    
+    .copy-hash-btn {
+      background: var(--bg-muted);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.5rem 0.75rem;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+    
+    .copy-hash-btn:hover {
+      background: var(--accent-light);
+      border-color: var(--accent);
+    }
+    
+    .copy-hash-btn.copied {
+      background: var(--success);
+      color: white;
+    }
+    
+    .doc-hash-hint {
+      font-size: 0.75rem;
+      color: var(--warning);
+      margin-top: 0.5rem;
+      font-weight: 500;
+    }
+    
+    .existing-hash-info {
+      margin-top: 0.75rem;
+      padding: 0.75rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+    }
+    
+    .existing-hash-info.timestamp-info {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #065f46;
+    }
+    
+    .existing-hash-info .info-title {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    
+    .existing-hash-info .info-details {
+      font-size: 0.75rem;
+      opacity: 0.9;
+    }
+    
+    /* Progress bar */
+    .signing-progress {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      margin: 1.5rem 0;
+      padding: 1rem;
+      background: var(--bg-muted);
+      border-radius: 10px;
+    }
+    
+    .progress-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      min-width: 60px;
+    }
+    
+    .progress-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-dim);
+    }
+    
+    .progress-step.active .progress-dot {
+      background: var(--accent);
+      color: white;
+    }
+    
+    .progress-step.completed .progress-dot {
+      background: var(--success);
+      color: white;
+    }
+    
+    .progress-line {
+      width: 30px;
+      height: 2px;
+      background: var(--border);
+    }
+    
+    .progress-step.completed + .progress-line,
+    .progress-line:has(+ .progress-step.completed),
+    .progress-line:has(+ .progress-step.active) {
+      background: var(--accent);
+    }
+    
+    /* Action cards */
+    .action-card {
+      background: var(--bg-muted);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      animation: slideIn 0.3s ease;
+    }
+    
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .action-card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    
+    .action-card-header h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin: 0;
+    }
+    
+    .action-card p {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin-bottom: 1rem;
+    }
+    
+    .step-badge {
+      background: var(--accent);
+      color: white;
+      font-size: 0.65rem;
+      font-weight: 600;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    
+    .step-badge.success {
+      background: var(--success);
+    }
+    
+    /* Auto-verify status */
+    .auto-verify-status {
+      background: #f0f9ff;
+      border: 1px solid #0ea5e9;
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 0.5rem 0;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .auto-verify-status.fetching {
+      background: #f0f9ff;
+      border-color: #0ea5e9;
+    }
+    
+    .auto-verify-status.hashing {
+      background: #fef3c7;
+      border-color: #f59e0b;
+    }
+    
+    .auto-verify-status.success {
+      background: #f0fdf4;
+      border-color: #22c55e;
+      color: #166534;
+      font-weight: 600;
+    }
+    
+    .auto-verify-status.manual {
+      background: #f5f5f5;
+      border-color: #d4d4d4;
+      color: #666;
+    }
+    
+    .auto-verify-icon {
+      font-size: 1.2rem;
+    }
+    
+    .btn-link {
+      background: none;
+      border: none;
+      color: var(--accent);
+      cursor: pointer;
+      font-size: 0.8rem;
+      padding: 0;
+    }
+    
+    .btn-link:hover {
+      text-decoration: underline;
+    }
+    
+    /* Auto-verified banner (server-side verification) */
+    .auto-verified-banner {
+      background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+      border: 2px solid #22c55e;
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      animation: slideIn 0.3s ease;
+    }
+    
+    .verified-badge {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    
+    .verified-icon {
+      font-size: 1.5rem;
+    }
+    
+    .verified-text {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    
+    .verified-text strong {
+      color: #166534;
+      font-size: 1rem;
+    }
+    
+    .verified-text span {
+      color: #166534;
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+    
+    .verified-download-box {
+      background: white;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 0.75rem;
+      text-align: center;
+    }
+    
+    .verified-download-box p {
+      margin: 0 0 0.75rem 0;
+      font-size: 0.9rem;
+      color: #333;
+    }
+    
+    .verified-download-box .btn {
+      margin-bottom: 0.5rem;
+    }
+    
+    .download-hint {
+      font-size: 0.75rem !important;
+      color: #666 !important;
+      margin-top: 0.5rem !important;
+      margin-bottom: 0 !important;
+    }
+    
+    .btn-small {
+      padding: 0.5rem 1rem;
+      font-size: 0.8rem;
+    }
+    
+    .btn-large {
+      padding: 1rem 2rem;
+      font-size: 1rem;
+    }
+    
+    .btn-secondary {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      width: 100%;
+    }
+    
+    .btn-secondary:hover {
+      background: var(--bg-muted);
+    }
+    
+    .message-box {
+      background: #fef3c7;
+      border: 1px solid #fcd34d;
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.85rem;
+    }
+    
+    [data-theme="dark"] .message-box {
+      background: #78350f;
+      border-color: #92400e;
+    }
+    
+    #no-doc-url-warning {
+      background: #fef2f2;
+      border-color: #fecaca;
+    }
+    
+    [data-theme="dark"] #no-doc-url-warning {
+      background: #450a0a;
+      border-color: #7f1d1d;
+    }
+    
+    .message-box strong {
+      display: block;
+      font-size: 0.75rem;
+      margin-bottom: 0.35rem;
+      color: var(--warning);
+    }
+    
+    .step-section {
+      margin-bottom: 1.5rem;
+    }
+    
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    
+    .step-num {
+      width: 1.75rem;
+      height: 1.75rem;
+      background: var(--border);
+      color: var(--text-dim);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    
+    .step-num.active {
+      background: var(--accent);
+      color: white;
+    }
+    
+    .step-num.completed {
+      background: var(--success);
+      color: white;
+    }
+    
+    .step-title {
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+    
+    .step-content {
+      margin-left: 2.5rem;
+    }
+    
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: var(--bg);
+    }
+    
+    .drop-zone:hover, .drop-zone.drag-over {
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+    
+    .drop-zone-icon { font-size: 1.5rem; margin-bottom: 0.35rem; }
+    
+    .drop-zone-text {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+    
+    .drop-zone-text strong { color: var(--accent); }
+    
+    .verify-result {
+      padding: 0.75rem;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+    }
+    
+    .verify-result.show { display: flex; }
+    
+    .verify-result.success {
+      background: var(--accent-light);
+      color: var(--success);
+      border: 1px solid var(--accent);
+    }
+    
+    .verify-result.error {
+      background: #fef2f2;
+      color: var(--error);
+      border: 1px solid #fecaca;
+    }
+    
+    [data-theme="dark"] .verify-result.error {
+      background: #450a0a;
+      border-color: #7f1d1d;
+    }
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.8rem 1.5rem;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      width: 100%;
+    }
+    
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+    
+    .btn-primary:hover { background: var(--accent-hover); }
+    
+    .btn-primary:disabled {
+      background: var(--border);
+      cursor: not-allowed;
+    }
+    
+    .btn-danger {
+      background: #fef2f2;
+      color: var(--error);
+      border: 1px solid #fecaca;
+    }
+    
+    [data-theme="dark"] .btn-danger {
+      background: #450a0a;
+      border-color: #7f1d1d;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+    
+    .action-buttons .btn { flex: 1; }
+    
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid transparent;
+      border-top-color: currentColor;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    .completed-section {
+      text-align: center;
+      padding: 2rem;
+    }
+    
+    .completed-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .completed-section h2 { margin-bottom: 0.5rem; }
+    .completed-section p { color: var(--text-dim); font-size: 0.85rem; }
+    
+    .already-acted {
+      text-align: center;
+      padding: 2rem;
+    }
+    
+    .already-acted h2 { margin-bottom: 0.5rem; }
+    .already-acted p { color: var(--text-dim); }
+    
+    .deadline-warning {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 10px;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      font-size: 0.8rem;
+      color: var(--error);
+      text-align: center;
+    }
+    
+    [data-theme="dark"] .deadline-warning {
+      background: #450a0a;
+      border-color: #7f1d1d;
+    }
+    
+    .file-expiry-warning {
+      background: #fefce8;
+      border: 1px solid #fde047;
+      border-radius: 10px;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      font-size: 0.8rem;
+      color: #854d0e;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    
+    .file-expiry-warning .countdown-icon {
+      font-size: 1rem;
+    }
+    
+    .file-expiry-warning .countdown-time {
+      font-weight: 600;
+      font-family: monospace;
+    }
+    
+    .file-expiry-warning.urgent {
+      background: #fef2f2;
+      border-color: #fecaca;
+      color: var(--error);
+      animation: pulse 1s ease-in-out infinite;
+    }
+    
+    .file-expiry-warning.expired {
+      background: #f3f4f6;
+      border-color: #d1d5db;
+      color: #6b7280;
+    }
+    
+    [data-theme="dark"] .file-expiry-warning {
+      background: #422006;
+      border-color: #854d0e;
+      color: #fde047;
+    }
+    
+    [data-theme="dark"] .file-expiry-warning.urgent {
+      background: #450a0a;
+      border-color: #7f1d1d;
+      color: #fca5a5;
+    }
+    
+    [data-theme="dark"] .file-expiry-warning.expired {
+      background: #1f2937;
+      border-color: #374151;
+      color: #9ca3af;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    
+    .footer-wrapper {
+      border-top: 1px solid var(--border);
+      margin-top: auto;
+    }
+    
+    footer {
+      padding: 2rem 3rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    
+    .footer-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.75rem;
+    }
+    
+    .footer-links a:hover { color: var(--accent); }
+    
+    .footer-copy {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+    }
+    
+    @media (max-width: 600px) {
+      footer {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+        padding: 1.5rem 1rem;
+      }
+      .footer-links { justify-content: center; }
+    }
+    
+    #file-input { display: none; }
+    
+    .not-your-turn {
+      background: var(--bg-muted);
+      border-radius: 10px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+    
+    .not-your-turn h3 { font-size: 0.9rem; margin-bottom: 0.35rem; }
+    .not-your-turn p { font-size: 0.8rem; color: var(--text-dim); }
+  </style>
+  <link rel="stylesheet" href="/otrust-polish.css?v=20260527-1">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <nav role="navigation" aria-label="Main navigation">
+    <div class="nav-container">
+      <a href="/" class="logo">OTRUST</a>
+      <div class="nav-links">
+        <span class="nav-primary">
+          <a href="/">Timestamp</a>
+          <a href="/sign">Signed</a>
+          <a href="/proof">Proof</a>
+        </span>
+        <span class="nav-secondary" id="nav-secondary">
+          <a href="/sign-in">Sign in</a>
+          <a href="/docs">Docs</a>
+          <a href="/about">About</a>
+        </span>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode"></button>
+        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu" title="Menu"><span></span></button>
+      </div>
+    </div>
+  </nav>
+  
+  <main id="main-content" class="main-layout" role="main">
+    <div id="loading" class="loading">
+      Loading document...
+    </div>
+    
+    <div id="error" class="error-state" style="display: none;">
+      <div class="error-icon">✗</div>
+      <h2 id="error-title">Invalid Link</h2>
+      <p id="error-message">This signing link is invalid or has expired.</p>
+      <a href="/sign" class="btn btn-primary" style="display: inline-flex; width: auto;">Create New Request</a>
+    </div>
+    
+    <div id="content" style="display: none;">
+      <div class="sign-card">
+        <div class="sign-card-header">
+          <span class="role-badge" id="role-badge">Signer</span>
+          <h1>You've been asked to sign a document</h1>
+          <p>Verify the document matches before signing</p>
+        </div>
+        
+        <div class="sign-card-body">
+          <div id="deadline-warning" class="deadline-warning" style="display: none;">
+            ⚠️ Deadline: <span id="deadline-date"></span>
+          </div>
+          
+          <div id="file-expiry-warning" class="file-expiry-warning" style="display: none;">
+            <span class="countdown-icon"></span>
+            File auto-deletes in: <span id="file-countdown-time" class="countdown-time">--:--</span>
+          </div>
+          
+          <div class="doc-info">
+            <div class="doc-title" id="doc-title">Document Title</div>
+            <div class="doc-filename" id="doc-filename"></div>
+            <div class="doc-hash-label">Document Fingerprint (SHA-256) — THIS IS THE PROOF</div>
+            <div class="doc-hash-container">
+              <div class="doc-hash" id="doc-hash"></div>
+              <button class="copy-hash-btn" id="copy-hash-btn" title="Copy hash">Copy</button>
+            </div>
+            <div class="doc-hash-hint">
+              ⚠️ By signing, you confirm this EXACT document. Verify the hash matches your file!
+            </div>
+            <div id="existing-hash-info" class="existing-hash-info" style="display: none;"></div>
+          </div>
+          
+          <div id="message-box" class="message-box" style="display: none;">
+            <strong>Message from sender:</strong>
+            <span id="sender-message"></span>
+          </div>
+          
+          <!-- Streamlined steps with progress -->
+          <div class="signing-progress" id="signing-progress">
+            <div class="progress-step completed" id="progress-step-0">
+              <span class="progress-dot">✓</span>
+              <span>View request</span>
+            </div>
+            <div class="progress-line"></div>
+            <div class="progress-step active" id="progress-step-1">
+              <span class="progress-dot">1</span>
+              <span>Get document</span>
+            </div>
+            <div class="progress-line"></div>
+            <div class="progress-step" id="progress-step-2">
+              <span class="progress-dot">2</span>
+              <span>Verify</span>
+            </div>
+            <div class="progress-line"></div>
+            <div class="progress-step" id="progress-step-3">
+              <span class="progress-dot">3</span>
+              <span>Sign</span>
+            </div>
+          </div>
+          
+          <div id="doc-url-section" class="action-card" style="display: none;">
+            <div class="action-card-header">
+              <span class="step-badge">Auto</span>
+              <h3>Verifying Document...</h3>
+            </div>
+            
+            <div id="auto-verify-status" class="auto-verify-status" style="display: none;">
+              <span class="auto-verify-icon"></span> Checking...
+            </div>
+            
+            <p style="margin-top: 1rem; font-size: 0.9rem; color: #666;">
+              Or verify manually:
+            </p>
+            <a href="" id="doc-url" target="_blank" class="btn btn-secondary" onclick="markDownloaded()">
+              Download Document
+            </a>
+            <button class="btn btn-link" id="already-have-btn" onclick="skipToVerify()" style="margin-top: 0.5rem;">
+              I already have the document →
+            </button>
+          </div>
+          
+          <div id="no-doc-url-section" class="action-card" style="display: none;">
+            <div class="action-card-header">
+              <span class="step-badge">Step 1</span>
+              <h3>Locate Your Document</h3>
+            </div>
+            <p>The sender hasn't attached a download link. You should have received the document separately (e.g., via email from <strong id="sender-hint-inline"></strong>).</p>
+            <button class="btn btn-primary" onclick="skipToVerify()">
+              ✓ I have the document
+            </button>
+          </div>
+          
+          <div id="verify-section" class="action-card" style="display: none;">
+            <div class="action-card-header">
+              <span class="step-badge">Step 2</span>
+              <h3>Verify Your Document</h3>
+            </div>
+            <p>Drop your file here. We'll check if it matches the expected hash.</p>
+            <div class="drop-zone" id="drop-zone">
+              <div class="drop-zone-icon"></div>
+              <div class="drop-zone-text">
+                <strong>Drop file here</strong> or click to browse
+              </div>
+            </div>
+            <input type="file" id="file-input">
+            <div class="verify-result" id="verify-result">
+              <span id="verify-icon"></span>
+              <span id="verify-text"></span>
+            </div>
+          </div>
+          
+          <!-- Document hosted by OTRUST - show download and verify section -->
+          <div id="auto-verified-section" style="display: none;">
+            <div class="action-card" style="margin-bottom: 1rem;">
+              <div class="action-card-header">
+                <span class="step-badge">Step 1</span>
+                <h3>Download & Review Document</h3>
+              </div>
+              <p><strong>Review the document before <span id="action-word-before">signing</span>:</strong></p>
+              <a href="" id="verified-download-link" class="btn btn-primary" target="_blank" style="margin: 1rem 0;">
+                Download Document
+              </a>
+              <p class="download-hint" id="action-hint" style="font-size: 0.8rem; color: var(--text-dim);">By signing, you confirm you have read and agree to this exact document.</p>
+            </div>
+            
+            <!-- Verify hash section -->
+            <div class="action-card">
+              <div class="action-card-header">
+                <span class="step-badge">Step 2</span>
+                <h3>Verify Document Hash</h3>
+              </div>
+              <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1rem;">
+                Drop the downloaded file here to verify it has the correct fingerprint.
+              </p>
+              
+              <div style="margin-bottom: 1rem; padding: 0.75rem; background: var(--bg); border-radius: 8px; border: 1px solid var(--border);">
+                <div style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Expected Hash (SHA-256)</div>
+                <code id="expected-hash-display" style="font-size: 0.65rem; word-break: break-all; color: var(--text);"></code>
+              </div>
+              
+              <div class="drop-zone" id="manual-drop-zone" style="padding: 1.5rem;">
+                <div class="drop-zone-icon"></div>
+                <div class="drop-zone-text">
+                  <strong>Drop file here</strong> to verify hash
+                </div>
+              </div>
+              <input type="file" id="manual-file-input" style="display: none;">
+              
+              <div id="manual-verify-result" class="verify-result" style="display: none; margin-top: 1rem;">
+                <span id="manual-verify-icon"></span>
+                <span id="manual-verify-text"></span>
+              </div>
+              
+              <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+                <div style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.5rem;">Or paste a hash to check:</div>
+                <div style="display: flex; gap: 0.5rem;">
+                  <input type="text" id="manual-hash-input" placeholder="Enter SHA-256 hash..." 
+                         style="flex: 1; padding: 0.5rem; border-radius: 6px; border: 1px solid var(--border); font-family: monospace; font-size: 0.7rem; background: var(--bg); color: var(--text);">
+                  <button class="btn btn-secondary" onclick="verifyManualHash()" style="padding: 0.5rem 1rem; font-size: 0.75rem;">Check</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div id="sign-section" class="action-card" style="display: none;">
+            <div class="action-card-header">
+              <span class="step-badge success">Step 3</span>
+              <h3 id="sign-section-title">Sign the Document</h3>
+            </div>
+            <p id="sign-section-desc">By clicking below, you cryptographically sign this document with your personal key.</p>
+            
+            <!-- Signing key info -->
+            <div id="signing-key-info" style="margin-bottom: 1rem; padding: 0.75rem; background: var(--bg); border-radius: 8px; border: 1px solid var(--border);">
+              <div style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Your Signing Key (Ed25519)</div>
+              <code id="signing-pubkey" style="font-size: 0.6rem; word-break: break-all; color: var(--text);"></code>
+              <div style="font-size: 0.65rem; color: var(--text-dim); margin-top: 0.5rem;">
+                This is your cryptographic identity. The signature proves <strong>you</strong> signed this exact document.
+              </div>
+            </div>
+            
+            <!-- OTRUST Proof verification (required by sender OR optional) -->
+            <div id="otrust-proof-section" style="margin-bottom: 1rem; padding: 1rem; background: var(--accent-light); border-radius: 8px; border: 1px solid var(--accent);">
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+                <span id="proof-required-indicator" style="display: none; font-size: 0.7rem; background: #dc2626; color: white; padding: 2px 8px; border-radius: 10px;">Required</span>
+                <input type="checkbox" id="use-otrust-proof" style="width: 18px; height: 18px; accent-color: var(--accent);">
+                <label for="use-otrust-proof" style="font-weight: 600; font-size: 0.9rem; cursor: pointer;">
+                  🔐 Verify with OTRUST Proof
+                </label>
+                <span id="proof-optional-badge" style="font-size: 0.7rem; background: var(--accent); color: white; padding: 2px 8px; border-radius: 10px;">Optional</span>
+              </div>
+              <p id="proof-description" style="font-size: 0.8rem; color: var(--text-dim); margin-bottom: 0.75rem;">
+                Link your verified identity to this signature. Proves you are a unique verified human.
+              </p>
+              <div id="otrust-proof-fields" style="display: none;">
+                <div style="margin-bottom: 0.75rem;">
+                  <label style="font-size: 0.75rem; font-weight: 500; display: block; margin-bottom: 0.25rem;">Proof ID</label>
+                  <input type="text" id="sign-proof-id" placeholder="id_abc123..." style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; background: var(--bg-card); color: var(--text);">
+                </div>
+                <div>
+                  <label style="font-size: 0.75rem; font-weight: 500; display: block; margin-bottom: 0.25rem;">PIN (6 digits)</label>
+                  <input type="password" id="sign-proof-pin" inputmode="numeric" pattern="[0-9]{6}" minlength="6" maxlength="6" placeholder="••••••" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 6px; font-size: 1.2rem; letter-spacing: 0.5em; text-align: center; background: var(--bg-card); color: var(--text);" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6)">
+                </div>
+                <div id="otrust-proof-error" style="display: none; margin-top: 0.5rem; padding: 0.5rem; background: #fee2e2; color: #dc2626; border-radius: 4px; font-size: 0.8rem;"></div>
+                <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.5rem;">
+                  Don't have a proof? <a href="/proof" target="_blank" style="color: var(--accent);">Create one here</a>
+                </p>
+              </div>
+            </div>
+            
+            <div class="action-buttons">
+              <button class="btn btn-primary btn-large" id="sign-btn">
+                <span class="btn-text">Sign Document</span>
+                <span class="spinner" style="display: none;"></span>
+              </button>
+              <button class="btn btn-danger" id="decline-btn">
+                Decline to Sign
+              </button>
+            </div>
+          </div>
+          
+          
+          <!-- Not your turn -->
+          <div id="not-your-turn" class="not-your-turn" style="display: none;">
+            <h3>Not your turn yet</h3>
+            <p>This document requires sequential signing. You'll be notified when it's your turn.</p>
+          </div>
+          
+          <!-- Already acted -->
+          <div id="already-acted" class="already-acted" style="display: none;">
+            <div class="completed-icon" id="acted-icon">✓</div>
+            <h2 id="acted-title">Already Signed</h2>
+            <p id="acted-message">You've already completed your action on this document.</p>
+          </div>
+          
+          <!-- Completed -->
+          <div id="completed-section" class="completed-section" style="display: none;">
+            <div class="completed-icon">✓</div>
+            <h2 id="completed-title">Document Signed!</h2>
+            <p id="completed-message">Your signature has been recorded and will be anchored to the Bitcoin blockchain.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <div class="footer-wrapper">
+  <footer role="contentinfo">
+    <div class="footer-links">
+      <a href="/">Timestamp</a>
+      <a href="/sign">Signed</a>
+      <a href="/proof">Proof</a>
+      <a href="/sign-in">Sign in</a>
+      <a href="/docs">Docs</a>
+      <a href="/about">About</a>
+      <a href="/privacy-policy">Privacy</a>
+      <a href="/terms">Terms</a>
+      <a href="https://github.com/otrust-eu/opensource">GitHub</a>
+    </div>
+    <div class="footer-copy">OTRUST - MIT License</div>
+  </footer>
+  </div>
+  
+  <script type="module" nonce="{{CSP_NONCE}}">
+    // Ed25519 for cryptographic signatures
+    import { bytesToHex } from 'https://esm.sh/@noble/hashes@1.3.3/utils';
+    import * as ed from 'https://esm.sh/@noble/ed25519@2.1.0';
+    
+    // Key management - same pattern as Timestamp
+    let keys = null;
+    const KEYS_STORAGE_KEY = 'otrust_sign_keys';
+    
+    async function loadKeys() {
+      const stored = localStorage.getItem(KEYS_STORAGE_KEY);
+      if (stored) {
+        keys = JSON.parse(stored);
+      } else {
+        await generateKeys();
+      }
+    }
+    
+    async function generateKeys() {
+      const privateKey = ed.utils.randomPrivateKey();
+      const publicKey = await ed.getPublicKeyAsync(privateKey);
+      keys = {
+        privateKey: bytesToHex(privateKey),
+        publicKey: bytesToHex(publicKey)
+      };
+      localStorage.setItem(KEYS_STORAGE_KEY, JSON.stringify(keys));
+    }
+    
+    async function signHash(hash) {
+      if (!keys) await loadKeys();
+      const sig = await ed.signAsync(hash, keys.privateKey);
+      return bytesToHex(sig);
+    }
+    
+    function updatePubkeyDisplay() {
+      const el = document.getElementById('signing-pubkey');
+      if (el && keys) {
+        el.textContent = keys.publicKey;
+      }
+    }
+    
+    let proofRequired = false; // Set by sender
+    
+    async function showSignSection() {
+      await loadKeys();
+      updatePubkeyDisplay();
+      updateProgress(3);
+      
+      // Setup OTRUST Proof requirement based on sender's settings
+      const signData = window.signData;
+      proofRequired = signData && signData.requireOtrustProof;
+      
+      const proofSection = document.getElementById('otrust-proof-section');
+      const proofCheckbox = document.getElementById('use-otrust-proof');
+      const proofFields = document.getElementById('otrust-proof-fields');
+      const proofRequiredIndicator = document.getElementById('proof-required-indicator');
+      const proofOptionalBadge = document.getElementById('proof-optional-badge');
+      const proofDescription = document.getElementById('proof-description');
+      
+      if (proofRequired) {
+        // Proof is REQUIRED by sender
+        proofRequiredIndicator.style.display = 'inline';
+        proofOptionalBadge.style.display = 'none';
+        proofCheckbox.checked = true;
+        proofCheckbox.disabled = true; // Can't uncheck
+        proofCheckbox.style.display = 'none'; // Hide checkbox completely
+        proofFields.style.display = 'block';
+        proofDescription.textContent = 'The sender requires you to verify your identity with an OTRUST Proof before signing.';
+        proofSection.style.borderColor = '#dc2626';
+        proofSection.style.background = '#fef2f2';
+      } else {
+        // Proof is optional
+        proofRequiredIndicator.style.display = 'none';
+        proofOptionalBadge.style.display = 'inline';
+        proofCheckbox.checked = false;
+        proofCheckbox.disabled = false;
+        proofCheckbox.style.display = 'inline';
+        proofFields.style.display = 'none';
+      }
+      
+      document.getElementById('sign-section').style.display = 'block';
+      document.getElementById('sign-section').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    
+    // Initialize keys early
+    loadKeys();
+    
+    // Theme toggle
+    const themeToggle = document.querySelector('.theme-toggle');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const savedTheme = localStorage.getItem('theme');
+    
+    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      themeToggle.textContent = '';
+    }
+    
+    themeToggle.addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+      localStorage.setItem('theme', isDark ? 'light' : 'dark');
+      themeToggle.textContent = isDark ? '' : '';
+    });
+
+    // Mobile menu toggle
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const navSecondary = document.getElementById('nav-secondary');
+
+    mobileMenuBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      navSecondary.classList.toggle('open');
+      
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.nav-links')) {
+        navSecondary?.classList.remove('open');
+      }
+    });
+    
+    // Get params from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const signId = urlParams.get('id');
+    const token = urlParams.get('token');
+    
+    let csrfToken = null;
+    let expectedHash = null;
+    let verifiedHash = null;
+    let partyRole = 'signer';
+    let partyStatus = 'pending';
+    
+    async function getCsrfToken() {
+      try {
+        const res = await fetch('/csrf-token');
+        const data = await res.json();
+        csrfToken = data.token;
+      } catch (e) {
+        console.error('Failed to get CSRF token:', e);
+      }
+    }
+    
+    async function loadSignRequest() {
+      if (!signId || !token) {
+        showError('Invalid Link', 'This signing link is missing required parameters.');
+        return;
+      }
+      
+      try {
+        const res = await fetch('/sign/' + signId + '/act?token=' + encodeURIComponent(token));
+        
+        if (!res.ok) {
+          const data = await res.json();
+          showError('Invalid Link', data.message || 'This signing link is invalid or has expired.');
+          return;
+        }
+        
+        const data = await res.json();
+        renderSignRequest(data);
+        
+      } catch (e) {
+        console.error('Failed to load sign request:', e);
+        showError('Error', 'Failed to load the signing request. Please try again.');
+      }
+    }
+    
+    function showError(title, message) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('error-title').textContent = title;
+      document.getElementById('error-message').textContent = message;
+      document.getElementById('error').style.display = 'block';
+    }
+    
+    // Check if this document hash already has timestamps
+    async function checkExistingHashInfo(hash) {
+      const infoEl = document.getElementById('existing-hash-info');
+      infoEl.style.display = 'none';
+      infoEl.innerHTML = '';
+      infoEl.className = 'existing-hash-info';
+      
+      try {
+        const res = await fetch('/lookup/' + hash);
+        const data = await res.json();
+        
+        if (data.exists && data.timestamp) {
+          infoEl.classList.add('timestamp-info');
+          const date = new Date(data.timestamp.created_at).toLocaleString();
+          const status = data.timestamp.blockchain_confirmed ? '✓ Blockchain confirmed' : 'Pending confirmation';
+          infoEl.innerHTML = `
+            <div class="info-title">✓ This document was timestamped</div>
+            <div class="info-details">
+              ${date} • ${status}<br>
+              <a href="/proof/${data.timestamp.receipt_id}" target="_blank" style="color: inherit;">View timestamp proof →</a>
+            </div>
+          `;
+          infoEl.style.display = 'block';
+        }
+      } catch (e) {
+        console.error('Lookup failed:', e);
+      }
+    }
+    
+    function renderSignRequest(data) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+      
+      expectedHash = data.document_hash;
+      partyRole = data.my_role;
+      partyStatus = data.already_acted ? data.my_action : 'pending';
+      
+      // Store data globally for later use
+      window.signData = data;
+      
+      // Role badge
+      const roleBadge = document.getElementById('role-badge');
+      roleBadge.textContent = partyRole.charAt(0).toUpperCase() + partyRole.slice(1);
+      
+      // Update all text based on role
+      const headerH1 = document.querySelector('.sign-card-header h1');
+      const headerP = document.querySelector('.sign-card-header p');
+      const actionWordBefore = document.getElementById('action-word-before');
+      const actionHint = document.getElementById('action-hint');
+      
+      if (partyRole === 'approver') {
+        headerH1.textContent = "You've been asked to approve a document";
+        headerP.textContent = 'Review the document before approving';
+        document.getElementById('sign-section-title').textContent = 'Approve the Document';
+        document.getElementById('sign-btn').querySelector('.btn-text').textContent = '✓ Approve Document';
+        document.getElementById('sign-section-desc').textContent = 'By clicking below, you approve this exact document.';
+        if (actionWordBefore) actionWordBefore.textContent = 'approving';
+        if (actionHint) actionHint.textContent = 'By approving, you confirm you have reviewed and approve this exact document.';
+      } else if (partyRole === 'viewer') {
+        headerH1.textContent = "You've been sent a document to view";
+        headerP.textContent = 'Review the document to confirm receipt';
+        document.getElementById('sign-section-title').textContent = 'Confirm Viewed';
+        document.getElementById('sign-btn').querySelector('.btn-text').textContent = 'Confirm Viewed';
+        document.getElementById('sign-section-desc').textContent = 'By clicking below, you confirm you have received and viewed this document.';
+        document.getElementById('decline-btn').style.display = 'none';
+        if (actionWordBefore) actionWordBefore.textContent = 'confirming';
+        if (actionHint) actionHint.textContent = 'By confirming, you acknowledge you have received and viewed this document.';
+      } else {
+        // Default: signer
+        if (actionWordBefore) actionWordBefore.textContent = 'signing';
+        if (actionHint) actionHint.textContent = 'By signing, you confirm you have read and agree to this exact document.';
+      }
+      
+      // Document info
+      document.getElementById('doc-title').textContent = data.title;
+      if (data.filename) {
+        document.getElementById('doc-filename').textContent = data.filename;
+      }
+      document.getElementById('doc-hash').textContent = data.document_hash;
+      
+      // Check if this document has existing timestamps
+      checkExistingHashInfo(data.document_hash);
+      
+      // Message
+      if (data.message) {
+        document.getElementById('message-box').style.display = 'block';
+        document.getElementById('sender-message').textContent = data.message;
+      }
+      
+      // Deadline
+      if (data.deadline) {
+        const deadlineDate = new Date(data.deadline);
+        const now = new Date();
+        const daysLeft = Math.ceil((deadlineDate - now) / (1000 * 60 * 60 * 24));
+        
+        if (daysLeft <= 3) {
+          document.getElementById('deadline-warning').style.display = 'block';
+          document.getElementById('deadline-date').textContent = deadlineDate.toLocaleDateString() + 
+            (daysLeft === 1 ? ' (tomorrow!)' : daysLeft === 0 ? ' (today!)' : ` (${daysLeft} days left)`);
+        }
+      }
+      
+      // File expiry countdown
+      if (data.file_expires_at) {
+        document.getElementById('file-expiry-warning').style.display = 'flex';
+        initFileCountdown(new Date(data.file_expires_at), data.file_ttl_hours);
+      }
+      
+      // Check status
+      if (data.status === 'cancelled') {
+        showError('Request Cancelled', 'This signing request has been cancelled by the sender.');
+        return;
+      }
+      
+      if (data.status === 'expired') {
+        showError('Request Expired', 'This signing request has expired.');
+        return;
+      }
+      
+      // Check if already acted
+      if (partyStatus !== 'pending') {
+        document.getElementById('signing-progress').style.display = 'none';
+        document.getElementById('already-acted').style.display = 'block';
+        
+        if (partyStatus === 'signed') {
+          document.getElementById('acted-icon').textContent = '✓';
+          document.getElementById('acted-title').textContent = 'Already Signed';
+          document.getElementById('acted-message').textContent = 'You have already signed this document.';
+        } else if (partyStatus === 'approved') {
+          document.getElementById('acted-icon').textContent = '✓';
+          document.getElementById('acted-title').textContent = 'Already Approved';
+          document.getElementById('acted-message').textContent = 'You have already approved this document.';
+        } else if (partyStatus === 'viewed') {
+          document.getElementById('acted-icon').textContent = '✓';
+          document.getElementById('acted-title').textContent = 'Already Viewed';
+          document.getElementById('acted-message').textContent = 'You have already confirmed viewing this document.';
+        } else if (partyStatus === 'declined') {
+          document.getElementById('acted-icon').textContent = '✗';
+          document.getElementById('acted-title').textContent = 'Declined';
+          document.getElementById('acted-message').textContent = 'You declined to sign this document.';
+        }
+        return;
+      }
+      
+      // Check if it's their turn (sequential)
+      if (!data.is_my_turn) {
+        document.getElementById('signing-progress').style.display = 'none';
+        document.getElementById('not-your-turn').style.display = 'block';
+        return;
+      }
+      
+      // Check if file is already verified by server (document hosted by OTRUST)
+      if (data.file_verified) {
+        // Document verified automatically - go straight to signing!
+        verifiedHash = data.document_hash;
+        document.getElementById('signing-progress').style.display = 'none';
+        document.getElementById('auto-verified-section').style.display = 'block';
+        showSignSection();
+        
+        // Set download link with auth tokens (always available for auto-verified docs)
+        if (data.document_url) {
+          // Append token and sign_id for secure file access
+          const downloadUrl = new URL(data.document_url, window.location.origin);
+          downloadUrl.searchParams.set('token', token);
+          downloadUrl.searchParams.set('sign_id', signId);
+          document.getElementById('verified-download-link').href = downloadUrl.toString();
+        }
+        
+        // Setup inline manual verification
+        document.getElementById('expected-hash-display').textContent = expectedHash;
+        setupManualDropZone();
+        
+        return;
+      }
+      
+      // Show the manual signing flow
+      const senderHint = data.creator_email_hint || 'the sender';
+      
+      if (data.document_url) {
+        // Has download URL - try to auto-fetch and verify
+        document.getElementById('doc-url-section').style.display = 'block';
+        
+        // Append token and sign_id for secure file access
+        const downloadUrl = new URL(data.document_url, window.location.origin);
+        downloadUrl.searchParams.set('token', token);
+        downloadUrl.searchParams.set('sign_id', signId);
+        document.getElementById('doc-url').href = downloadUrl.toString();
+        
+        // Attempt auto-verification (for external URLs)
+        attemptAutoVerify(downloadUrl.toString(), data.document_hash);
+      } else {
+        // No URL - show "I have the document" step
+        document.getElementById('no-doc-url-section').style.display = 'block';
+        document.getElementById('sender-hint-inline').textContent = senderHint;
+      }
+    }
+    
+    // Auto-fetch and verify document from URL
+    async function attemptAutoVerify(url, expectedHash) {
+      const autoStatus = document.getElementById('auto-verify-status');
+      if (autoStatus) autoStatus.style.display = 'block';
+      
+      try {
+        // Show progress
+        updateAutoStatus('fetching', 'Fetching document...');
+        
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('Could not fetch document');
+        
+        updateAutoStatus('hashing', 'Calculating hash...');
+        
+        const buffer = await res.arrayBuffer();
+        const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        
+        if (hash === expectedHash) {
+          verifiedHash = hash;
+          updateAutoStatus('success', 'Document automatically verified!');
+          
+          // Skip to sign section after brief celebration
+          setTimeout(() => {
+            updateProgress(3);
+            document.getElementById('doc-url-section').style.display = 'none';
+            document.getElementById('verify-section').style.display = 'none';
+            showSignSection();
+          }, 1200);
+          
+        } else {
+          throw new Error('Hash mismatch - manual verification required');
+        }
+        
+      } catch (err) {
+        console.log('Auto-verify failed:', err.message);
+        updateAutoStatus('manual', 'Auto-verify unavailable. Please verify manually below.');
+        
+        // Show manual flow normally
+        setTimeout(() => {
+          if (autoStatus) autoStatus.style.display = 'none';
+        }, 3000);
+      }
+    }
+    
+    function updateAutoStatus(status, message) {
+      const autoStatus = document.getElementById('auto-verify-status');
+      if (!autoStatus) return;
+      
+      autoStatus.className = 'auto-verify-status ' + status;
+      autoStatus.innerHTML = `<span class="auto-verify-icon">${
+        status === 'fetching' ? '' :
+        status === 'hashing' ? '' :
+        status === 'success' ? '✓' :
+        status === 'manual' ? '' : ''
+      }</span> ${message}`;
+    }
+    
+    // Progress helpers
+    function updateProgress(step) {
+      for (let i = 0; i <= 3; i++) {
+        const el = document.getElementById('progress-step-' + i);
+        if (!el) continue;
+        el.classList.remove('active', 'completed');
+        if (i < step) el.classList.add('completed');
+        if (i === step) el.classList.add('active');
+      }
+    }
+    
+    // Called when download is clicked
+    function markDownloaded() {
+      setTimeout(() => {
+        updateProgress(2);
+        document.getElementById('doc-url-section').style.display = 'none';
+        document.getElementById('verify-section').style.display = 'block';
+        document.getElementById('verify-section').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 500);
+    }
+    
+    // Skip to verify (already have doc)
+    function skipToVerify() {
+      updateProgress(2);
+      document.getElementById('doc-url-section').style.display = 'none';
+      document.getElementById('no-doc-url-section').style.display = 'none';
+      document.getElementById('verify-section').style.display = 'block';
+      document.getElementById('verify-section').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    
+    // Manual verification functions (inline on same page)
+    function verifyManualHash() {
+      const input = document.getElementById('manual-hash-input').value.trim().toLowerCase();
+      const result = document.getElementById('manual-verify-result');
+      const icon = document.getElementById('manual-verify-icon');
+      const text = document.getElementById('manual-verify-text');
+      
+      result.style.display = 'flex';
+      
+      if (!input) {
+        result.className = 'verify-result show error';
+        icon.textContent = '✗';
+        text.textContent = 'Please enter a hash';
+        return;
+      }
+      
+      if (input === expectedHash.toLowerCase()) {
+        result.className = 'verify-result show success';
+        icon.textContent = '✓';
+        text.textContent = '✓ Hash matches! Document verified.';
+      } else {
+        result.className = 'verify-result show error';
+        icon.textContent = '✗';
+        text.innerHTML = `<strong>Mismatch!</strong> Your: ${input.substring(0, 12)}... Expected: ${expectedHash.substring(0, 12)}...`;
+      }
+    }
+    
+    let manualDropZoneSetup = false;
+    function setupManualDropZone() {
+      if (manualDropZoneSetup) return;
+      manualDropZoneSetup = true;
+      
+      const dropZone = document.getElementById('manual-drop-zone');
+      const fileInput = document.getElementById('manual-file-input');
+      
+      if (!dropZone || !fileInput) return;
+      
+      dropZone.addEventListener('click', () => fileInput.click());
+      
+      dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('drag-over');
+      });
+      
+      dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('drag-over');
+      });
+      
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+        if (e.dataTransfer.files.length) {
+          handleManualFile(e.dataTransfer.files[0]);
+        }
+      });
+      
+      fileInput.addEventListener('change', () => {
+        if (fileInput.files.length) {
+          handleManualFile(fileInput.files[0]);
+        }
+      });
+    }
+    
+    async function handleManualFile(file) {
+      const result = document.getElementById('manual-verify-result');
+      const icon = document.getElementById('manual-verify-icon');
+      const text = document.getElementById('manual-verify-text');
+      
+      result.style.display = 'flex';
+      result.className = 'verify-result show';
+      icon.textContent = '';
+      text.textContent = 'Calculating hash...';
+      
+      try {
+        const buffer = await file.arrayBuffer();
+        const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        
+        // Show calculated hash in input field
+        document.getElementById('manual-hash-input').value = hash;
+        
+        if (hash === expectedHash) {
+          result.className = 'verify-result show success';
+          icon.textContent = '✓';
+          text.textContent = '✓ Hash matches! Document verified.';
+        } else {
+          result.className = 'verify-result show error';
+          icon.textContent = '✗';
+          text.innerHTML = `<strong>Mismatch!</strong> Your file: ${hash.substring(0, 12)}... Expected: ${expectedHash.substring(0, 12)}...`;
+        }
+      } catch (e) {
+        console.error('Hash error:', e);
+        result.className = 'verify-result show error';
+        icon.textContent = '✗';
+        text.textContent = 'Error calculating hash';
+      }
+    }
+    
+    // Copy hash to clipboard
+    document.getElementById('copy-hash-btn').addEventListener('click', async () => {
+      const hash = document.getElementById('doc-hash').textContent;
+      const btn = document.getElementById('copy-hash-btn');
+      try {
+        await navigator.clipboard.writeText(hash);
+        btn.textContent = '✓';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      } catch (e) {
+        console.error('Copy failed:', e);
+      }
+    });
+    
+    // File handling
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    
+    dropZone.addEventListener('click', () => fileInput.click());
+    
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('drag-over');
+    });
+    
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('drag-over');
+    });
+    
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('drag-over');
+      if (e.dataTransfer.files.length) {
+        handleFile(e.dataTransfer.files[0]);
+      }
+    });
+    
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length) {
+        handleFile(fileInput.files[0]);
+      }
+    });
+    
+    async function handleFile(file) {
+      const verifyResult = document.getElementById('verify-result');
+      const verifyIcon = document.getElementById('verify-icon');
+      const verifyText = document.getElementById('verify-text');
+      
+      verifyResult.className = 'verify-result show';
+      verifyIcon.textContent = '';
+      verifyText.textContent = 'Verifying...';
+      
+      try {
+        const buffer = await file.arrayBuffer();
+        const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        
+        if (hash === expectedHash) {
+          verifiedHash = hash;
+          verifyResult.className = 'verify-result show success';
+          verifyIcon.textContent = '✓';
+          verifyText.textContent = `Document verified! Hash matches: ${hash.substring(0, 12)}...`;
+          
+          // Show sign section after brief delay
+          setTimeout(() => {
+            showSignSection();
+          }, 800);
+          
+        } else {
+          verifyResult.className = 'verify-result show error';
+          verifyIcon.textContent = '✗';
+          verifyText.innerHTML = `<strong>Hash mismatch!</strong> This is NOT the same document.<br>
+            <small style="opacity: 0.8">Your file: ${hash.substring(0, 16)}...<br>Expected: ${expectedHash.substring(0, 16)}...</small>`;
+          verifiedHash = null;
+        }
+        
+      } catch (e) {
+        console.error('Hash error:', e);
+        verifyResult.className = 'verify-result show error';
+        verifyIcon.textContent = '✗';
+        verifyText.textContent = 'Error verifying document';
+      }
+    }
+    
+    // Toggle OTRUST Proof fields visibility
+    document.getElementById('use-otrust-proof').addEventListener('change', (e) => {
+      document.getElementById('otrust-proof-fields').style.display = e.target.checked ? 'block' : 'none';
+    });
+    
+    // Verify OTRUST Proof (returns proof data if valid)
+    async function verifyOtrustProof(proofId, pin) {
+      const errorDiv = document.getElementById('otrust-proof-error');
+      errorDiv.style.display = 'none';
+      
+      try {
+        const res = await fetch('/api/proof/verify', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': csrfToken
+          },
+          body: JSON.stringify({ proofId, pin })
+        });
+        
+        const data = await res.json();
+        
+        if (!res.ok) {
+          errorDiv.textContent = data.message || 'Failed to verify OTRUST Proof';
+          errorDiv.style.display = 'block';
+          return null;
+        }
+        
+        return data; // { valid: true, proofId, verifiedAt }
+      } catch (e) {
+        errorDiv.textContent = 'Error connecting to server';
+        errorDiv.style.display = 'block';
+        return null;
+      }
+    }
+    
+    // Sign/Approve button
+    document.getElementById('sign-btn').addEventListener('click', async () => {
+      if (!verifiedHash) return;
+      
+      const signBtn = document.getElementById('sign-btn');
+      const useOtrustProof = document.getElementById('use-otrust-proof').checked || proofRequired;
+      
+      // Verify OTRUST Proof first if required or enabled
+      let otrustProofData = null;
+      if (useOtrustProof) {
+        const proofId = document.getElementById('sign-proof-id').value.trim();
+        const pin = document.getElementById('sign-proof-pin').value;
+        const errorDiv = document.getElementById('otrust-proof-error');
+        
+        if (!proofId || !pin) {
+          errorDiv.textContent = proofRequired 
+            ? 'OTRUST Proof verification is required. Enter your Proof ID and PIN.'
+            : 'Enter Proof ID and PIN';
+          errorDiv.style.display = 'block';
+          return;
+        }
+        
+        // Strict PIN validation: exactly 6 digits
+        if (!/^\d{6}$/.test(pin)) {
+          errorDiv.textContent = 'PIN must be exactly 6 digits';
+          errorDiv.style.display = 'block';
+          return;
+        }
+        
+        // Validate Proof ID format
+        if (!proofId.startsWith('id_') || proofId.length < 10) {
+          errorDiv.textContent = 'Invalid Proof ID format';
+          errorDiv.style.display = 'block';
+          return;
+        }
+        
+        signBtn.disabled = true;
+        signBtn.querySelector('.btn-text').textContent = 'Verifying OTRUST Proof...';
+        
+        otrustProofData = await verifyOtrustProof(proofId, pin);
+        if (!otrustProofData) {
+          signBtn.disabled = false;
+          signBtn.querySelector('.btn-text').textContent = 'Sign Document';
+          return;
+        }
+      }
+      
+      signBtn.disabled = true;
+      signBtn.querySelector('.btn-text').style.display = 'none';
+      signBtn.querySelector('.spinner').style.display = 'inline-block';
+      
+      let action = 'signed';
+      if (partyRole === 'approver') action = 'approved';
+      if (partyRole === 'viewer') action = 'viewed';
+      
+      try {
+        // Create cryptographic signature (for signers and approvers)
+        let signature = null;
+        let pubkey = null;
+        
+        if (action === 'signed' || action === 'approved') {
+          await loadKeys();
+          signature = await signHash(verifiedHash);
+          pubkey = keys.publicKey;
+        }
+        
+        const res = await fetch('/sign/' + signId + '/complete', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': csrfToken
+          },
+          body: JSON.stringify({
+            token,
+            document_hash: verifiedHash,
+            action,
+            signature,  // Ed25519 signature
+            pubkey,     // Ed25519 public key
+            otrustProof: otrustProofData  // Optional: verified OTRUST Proof
+          })
+        });
+        
+        const data = await res.json();
+        
+        if (!res.ok) {
+          throw new Error(data.message || 'Failed to complete action');
+        }
+        
+        // Show success
+        document.getElementById('signing-progress').style.display = 'none';
+        document.getElementById('verify-section').style.display = 'none';
+        document.getElementById('sign-section').style.display = 'none';
+        document.getElementById('completed-section').style.display = 'block';
+        document.getElementById('completed-section').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        if (action === 'approved') {
+          document.getElementById('completed-title').textContent = 'Document Approved!';
+          document.getElementById('completed-message').textContent = 'Your approval has been recorded and will be anchored to the Bitcoin blockchain.';
+        } else if (action === 'viewed') {
+          document.getElementById('completed-title').textContent = 'Viewing Confirmed!';
+          document.getElementById('completed-message').textContent = 'Your confirmation has been recorded.';
+        }
+        
+      } catch (e) {
+        alert(e.message);
+        signBtn.disabled = false;
+        signBtn.querySelector('.btn-text').style.display = 'inline';
+        signBtn.querySelector('.spinner').style.display = 'none';
+      }
+    });
+    
+    // Decline button
+    document.getElementById('decline-btn').addEventListener('click', async () => {
+      if (!confirm('Are you sure you want to decline? This will notify the sender.')) {
+        return;
+      }
+      
+      try {
+        const res = await fetch('/sign/' + signId + '/complete', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': csrfToken
+          },
+          body: JSON.stringify({
+            token,
+            document_hash: expectedHash,
+            action: 'declined'
+          })
+        });
+        
+        const data = await res.json();
+        
+        if (!res.ok) {
+          throw new Error(data.message || 'Failed to decline');
+        }
+        
+        // Show declined state
+        document.getElementById('signing-progress').style.display = 'none';
+        document.getElementById('verify-section').style.display = 'none';
+        document.getElementById('sign-section').style.display = 'none';
+        document.getElementById('completed-section').style.display = 'block';
+        document.getElementById('completed-section').querySelector('.completed-icon').textContent = '✗';
+        document.getElementById('completed-title').textContent = 'Declined';
+        document.getElementById('completed-message').textContent = 'You have declined to sign this document. The sender has been notified.';
+        
+      } catch (e) {
+        alert(e.message);
+      }
+    });
+    
+    // File countdown timer
+    let fileCountdownInterval = null;
+    
+    function initFileCountdown(expiresAt, ttlHours) {
+      const countdownEl = document.getElementById('file-countdown-time');
+      const warningEl = document.getElementById('file-expiry-warning');
+      
+      function updateCountdown() {
+        const now = new Date();
+        const diff = expiresAt - now;
+        
+        if (diff <= 0) {
+          countdownEl.textContent = 'File deleted';
+          warningEl.classList.remove('urgent');
+          warningEl.classList.add('expired');
+          if (fileCountdownInterval) {
+            clearInterval(fileCountdownInterval);
+          }
+          return;
+        }
+        
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        
+        if (hours > 0) {
+          countdownEl.textContent = `${hours}h ${minutes}m ${seconds}s`;
+        } else if (minutes > 0) {
+          countdownEl.textContent = `${minutes}m ${seconds}s`;
+        } else {
+          countdownEl.textContent = `${seconds}s`;
+        }
+        
+        // Add urgent class when less than 10 minutes
+        if (diff < 10 * 60 * 1000) {
+          warningEl.classList.add('urgent');
+        }
+      }
+      
+      updateCountdown();
+      fileCountdownInterval = setInterval(updateCountdown, 1000);
+    }
+    
+    // Init
+    getCsrfToken();
+    loadSignRequest();
+  </script>
+  <script src="/otrust-polish.js" defer></script>
+</body>
+</html>

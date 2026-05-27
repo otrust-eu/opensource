@@ -1,0 +1,43 @@
+# OTRUST robots.txt
+# Allow all legitimate crawlers for indexing
+# Block known malicious/spam bots
+
+# Allow all by default
+User-agent: *
+Allow: /
+
+# Block spam and malicious bots
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: BLEXBot
+Disallow: /
+
+User-agent: MegaIndex
+Disallow: /
+
+User-agent: Sogou
+Disallow: /
+
+User-agent: YandexBot
+Disallow: /
+
+User-agent: PetalBot
+Disallow: /
+
+# Protect API and admin endpoints from crawling
+Disallow: /api/
+Disallow: /admin/
+Disallow: /setup
+Disallow: /install
+
+Sitemap: https://www.otrust.eu/sitemap.xml

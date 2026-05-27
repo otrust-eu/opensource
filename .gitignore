@@ -11,6 +11,10 @@ __pycache__/
 .env
 .env.*
 !.env.example
+config.json
+data/
+uploads/
+tmp/
 
 *.log
 npm-debug.log*
@@ -24,3 +28,6 @@ Thumbs.db
 
 test-results/
 playwright-report/
+
+web/partners-hemsted.html
+web/partners-hemsted.css

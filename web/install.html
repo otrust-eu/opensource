@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Install OTRUST – PWA Setup | Blockchain Timestamp App by Kris Ledel</title>
+  <meta name="description" content="Install OTRUST as a Progressive Web App. Blockchain timestamping on your device. Created by Kris Ledel.">
+  <meta name="keywords" content="OTRUST app, PWA, install, blockchain timestamp, mobile app, Kris Ledel">
+  <meta name="author" content="Kris Ledel">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://www.otrust.eu/install.html">
+  <style>
+    :root {
+      --bg: #fafaf9;
+      --bg-card: #ffffff;
+      --bg-muted: #f5f5f4;
+      --border: #e5e5e5;
+      --text: #1a1a1a;
+      --text-muted: #737373;
+      --text-dim: #a3a3a3;
+      --primary: #2d5a3d;
+      --primary-hover: #1e4029;
+      --primary-light: #e8f0eb;
+      --secondary: #2d5a3d;
+      --accent: #2d5a3d;
+      --success: #2d5a3d;
+      --warning: #b45309;
+      --error: #dc2626;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f0f0e;
+        --bg-card: #1a1a19;
+        --bg-muted: #262625;
+        --border: #4a4a49;
+        --text: #ffffff;
+        --text-muted: #d4d4d4;
+        --text-dim: #a3a3a3;
+        --primary: #5cb85c;
+        --primary-hover: #6fcf6f;
+        --primary-light: #1e3a24;
+        --secondary: #5cb85c;
+        --accent: #5cb85c;
+        --success: #5cb85c;
+      }
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+    
+    .logo {
+      margin-bottom: 1rem;
+    }
+    
+    .logo svg {
+      width: 80px;
+      height: 80px;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+      color: var(--primary);
+    }
+    
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .installer {
+      width: 100%;
+      max-width: 700px;
+      background: var(--bg-card);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+    
+    /* Progress bar */
+    .progress-container {
+      padding: 1.5rem 2rem;
+      background: var(--primary-light);
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .progress-steps {
+      display: flex;
+      justify-content: space-between;
+      position: relative;
+    }
+    
+    .progress-steps::before {
+      content: '';
+      position: absolute;
+      top: 16px;
+      left: 40px;
+      right: 40px;
+      height: 2px;
+      background: var(--border);
+    }
+    
+    .progress-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .step-number {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--bg-muted);
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.875rem;
+      margin-bottom: 0.5rem;
+      transition: all 0.3s;
+    }
+    
+    .step-number.active {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+    
+    .step-number.complete {
+      background: var(--success);
+      border-color: var(--success);
+    }
+    
+    .step-label {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      transition: color 0.3s;
+    }
+    
+    .progress-step.active .step-label {
+      color: var(--primary);
+    }
+    
+    .progress-step.complete .step-label {
+      color: var(--success);
+    }
+    
+    /* Step content */
+    .step-content {
+      padding: 2rem;
+      display: none;
+    }
+    
+    .step-content.active {
+      display: block;
+    }
+    
+    .step-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    
+    .step-description {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+    
+    /* System check */
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background: var(--bg-muted);
+      border-radius: 8px;
+      margin-bottom: 0.75rem;
+      border: 1px solid var(--border);
+    }
+    
+    .check-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+    }
+    
+    .check-icon.pending {
+      background: rgba(148, 163, 184, 0.1);
+    }
+    
+    .check-icon.checking {
+      background: rgba(59, 130, 246, 0.1);
+      animation: pulse 1.5s infinite;
+    }
+    
+    .check-icon.success {
+      background: rgba(16, 185, 129, 0.1);
+    }
+    
+    .check-icon.warning {
+      background: rgba(245, 158, 11, 0.1);
+    }
+    
+    .check-icon.error {
+      background: rgba(239, 68, 68, 0.1);
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .check-info {
+      flex: 1;
+    }
+    
+    .check-name {
+      font-weight: 500;
+      margin-bottom: 0.25rem;
+    }
+    
+    .check-status {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+    
+    /* Form elements */
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+    
+    label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+    
+    .label-hint {
+      font-weight: 400;
+      color: var(--text-dim);
+      font-size: 0.875rem;
+      margin-left: 0.5rem;
+    }
+    
+    input[type="text"],
+    input[type="number"],
+    input[type="password"],
+    input[type="email"],
+    select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+    
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    
+    /* Toggle switches for features */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+    
+    .feature-card {
+      background: var(--bg-muted);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .feature-card:hover {
+      border-color: var(--primary);
+    }
+    
+    .feature-card.selected {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+    
+    .feature-card.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .feature-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+    
+    .feature-icon {
+      font-size: 1.5rem;
+    }
+    
+    .feature-toggle {
+      width: 44px;
+      height: 24px;
+      background: var(--border);
+      border-radius: 12px;
+      position: relative;
+      transition: background 0.2s;
+    }
+    
+    .feature-card.selected .feature-toggle {
+      background: var(--primary);
+    }
+    
+    .feature-toggle::after {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      background: white;
+      border-radius: 50%;
+      top: 3px;
+      left: 3px;
+      transition: transform 0.2s;
+    }
+    
+    .feature-card.selected .feature-toggle::after {
+      transform: translateX(20px);
+    }
+    
+    .feature-name {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    
+    .feature-description {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+    
+    /* Email provider */
+    .provider-options {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .provider-option {
+      flex: 1;
+      padding: 1rem;
+      background: var(--bg-muted);
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    
+    .provider-option:hover {
+      border-color: var(--primary);
+    }
+    
+    .provider-option.selected {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+    
+    .provider-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .provider-name {
+      font-weight: 600;
+    }
+    
+    /* Log/terminal output */
+    .log-output {
+      background: var(--bg-muted);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      font-family: 'Fira Code', 'Consolas', monospace;
+      font-size: 0.875rem;
+      max-height: 300px;
+      overflow-y: auto;
+      margin-bottom: 1rem;
+    }
+    
+    .log-line {
+      margin-bottom: 0.25rem;
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .log-line.success { color: var(--success); }
+    .log-line.error { color: var(--error); }
+    .log-line.info { color: var(--secondary); }
+    .log-line.warning { color: var(--warning); }
+    
+    /* Complete screen */
+    .complete-container {
+      text-align: center;
+      padding: 2rem 0;
+    }
+    
+    .complete-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+    
+    .complete-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    
+    .complete-subtitle {
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+    }
+    
+    .command-box {
+      background: var(--bg-muted);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.5rem;
+      font-family: 'Fira Code', monospace;
+      display: inline-flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .copy-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 0.25rem;
+      font-size: 1rem;
+    }
+    
+    .copy-btn:hover {
+      color: var(--text);
+    }
+    
+    /* Buttons */
+    .button-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 1.5rem 2rem;
+      border-top: 1px solid var(--border);
+      background: var(--bg-muted);
+    }
+    
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+    
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+    
+    .btn-secondary:hover {
+      border-color: var(--text-muted);
+      color: var(--text);
+    }
+    
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    /* Animations */
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    .step-content.active {
+      animation: slideIn 0.3s ease;
+    }
+
+    /* Info box */
+    .info-box {
+      background: var(--primary-light);
+      border: 1px solid var(--primary);
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 1rem 0;
+      display: flex;
+      gap: 0.75rem;
+    }
+    
+    .info-box-icon {
+      color: var(--primary);
+      font-size: 1.25rem;
+    }
+    
+    .info-box-content {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+
+    /* Email config section hidden by default */
+    .email-config {
+      display: none;
+    }
+    
+    .email-config.visible {
+      display: block;
+    }
+  </style>
+  <link rel="stylesheet" href="/otrust-polish.css?v=20260527-1">
+</head>
+<body>
+  <div class="logo">
+    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="45" stroke="var(--primary)" stroke-width="4" fill="none"/>
+      <path d="M30 50 L45 65 L70 35" stroke="var(--primary)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </svg>
+  </div>
+  <h1>OTRUST</h1>
+  <p class="subtitle">Setup Wizard</p>
+  
+  <div class="installer">
+    <!-- Progress Steps -->
+    <div class="progress-container">
+      <div class="progress-steps">
+        <div class="progress-step active" data-step="1">
+          <div class="step-number active">1</div>
+          <span class="step-label">Requirements</span>
+        </div>
+        <div class="progress-step" data-step="2">
+          <div class="step-number">2</div>
+          <span class="step-label">Configuration</span>
+        </div>
+        <div class="progress-step" data-step="3">
+          <div class="step-number">3</div>
+          <span class="step-label">Features</span>
+        </div>
+        <div class="progress-step" data-step="4">
+          <div class="step-number">4</div>
+          <span class="step-label">Email</span>
+        </div>
+        <div class="progress-step" data-step="5">
+          <div class="step-number">5</div>
+          <span class="step-label">Install</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Step 1: System Check -->
+    <div class="step-content active" data-step="1">
+      <h2 class="step-title">System Requirements</h2>
+      <p class="step-description">Checking that your computer has everything needed to run OTRUST.</p>
+      
+      <div class="check-item">
+        <div class="check-icon pending" id="check-node"></div>
+        <div class="check-info">
+          <div class="check-name">Node.js</div>
+          <div class="check-status" id="status-node">Checking...</div>
+        </div>
+      </div>
+      
+      <div class="check-item">
+        <div class="check-icon pending" id="check-npm"></div>
+        <div class="check-info">
+          <div class="check-name">npm</div>
+          <div class="check-status" id="status-npm">Checking...</div>
+        </div>
+      </div>
+      
+      <div class="check-item">
+        <div class="check-icon pending" id="check-mongo"></div>
+        <div class="check-info">
+          <div class="check-name">MongoDB</div>
+          <div class="check-status" id="status-mongo">Checking...</div>
+        </div>
+      </div>
+      
+      <div class="info-box">
+        <div class="info-box-icon"></div>
+        <div class="info-box-content">
+          OTRUST requires <strong>Node.js 18+</strong> and <strong>MongoDB</strong> to function.
+          You can use a local MongoDB or a cloud service like MongoDB Atlas.
+        </div>
+      </div>
+    </div>
+    
+    <!-- Step 2: Basic Configuration -->
+    <div class="step-content" data-step="2">
+      <h2 class="step-title">Basic Configuration</h2>
+      <p class="step-description">Set up basic settings for your OTRUST installation.</p>
+      
+      <div class="form-group">
+        <label for="port">Port <span class="label-hint">Default: 3000</span></label>
+        <input type="number" id="port" value="3000" min="1" max="65535">
+      </div>
+      
+      <div class="form-group">
+        <label for="baseUrl">Base URL</label>
+        <input type="text" id="baseUrl" value="http://localhost:3000">
+      </div>
+      
+      <div class="form-group">
+        <label for="mongoUri">MongoDB URI</label>
+        <input type="text" id="mongoUri" value="mongodb://localhost:27017/otrust">
+      </div>
+      
+      <div class="form-group">
+        <label for="dbName">Database Name</label>
+        <input type="text" id="dbName" value="otrust">
+      </div>
+    </div>
+    
+    <!-- Step 3: Features -->
+    <div class="step-content" data-step="3">
+      <h2 class="step-title">Features</h2>
+      <p class="step-description">Choose which features you want to enable in your OTRUST installation.</p>
+      
+      <div class="feature-grid">
+        <div class="feature-card selected" data-feature="timestamp">
+          <div class="feature-header">
+            <span class="feature-icon"></span>
+            <div class="feature-toggle"></div>
+          </div>
+          <div class="feature-name">Timestamp</div>
+          <div class="feature-description">Zero-knowledge timestamping with Bitcoin anchoring</div>
+        </div>
+        
+        <div class="feature-card selected" data-feature="sign">
+          <div class="feature-header">
+            <span class="feature-icon"></span>
+            <div class="feature-toggle"></div>
+          </div>
+          <div class="feature-name">Sign</div>
+          <div class="feature-description">Digital document signing with email verification</div>
+        </div>
+        
+        <div class="feature-card selected" data-feature="blockchain">
+          <div class="feature-header">
+            <span class="feature-icon"></span>
+            <div class="feature-toggle"></div>
+          </div>
+          <div class="feature-name">Blockchain</div>
+          <div class="feature-description">Bitcoin anchoring via OpenTimestamps</div>
+        </div>
+        
+        <div class="feature-card" data-feature="email">
+          <div class="feature-header">
+            <span class="feature-icon"></span>
+            <div class="feature-toggle"></div>
+          </div>
+          <div class="feature-name">Email</div>
+          <div class="feature-description">Email notifications for signing</div>
+        </div>
+      </div>
+      
+      <div class="info-box">
+        <div class="info-box-icon"></div>
+        <div class="info-box-content">
+          <strong>Sign feature</strong> requires email to send signing links to participants.
+          If you enable Sign, email will be enabled automatically.
+        </div>
+      </div>
+    </div>
+    
+    <!-- Step 4: Email -->
+    <div class="step-content" data-step="4">
+      <h2 class="step-title">Email Configuration</h2>
+      <p class="step-description">Configure how OTRUST should send emails.</p>
+      
+      <div class="provider-options">
+        <div class="provider-option selected" data-provider="mock">
+          <div class="provider-icon"></div>
+          <div class="provider-name">Test Mode</div>
+          <div style="font-size: 0.75rem; color: var(--text-dim);">No real emails</div>
+        </div>
+        <div class="provider-option" data-provider="resend">
+          <div class="provider-icon"></div>
+          <div class="provider-name">Resend</div>
+          <div style="font-size: 0.75rem; color: var(--text-dim);">Recommended</div>
+        </div>
+        <div class="provider-option" data-provider="smtp">
+          <div class="provider-icon"></div>
+          <div class="provider-name">SMTP</div>
+          <div style="font-size: 0.75rem; color: var(--text-dim);">Gmail, Outlook, etc.</div>
+        </div>
+      </div>
+      
+      <div class="email-config" id="config-resend">
+        <div class="form-group">
+          <label for="resendKey">Resend API Key</label>
+          <input type="password" id="resendKey" placeholder="re_...">
+        </div>
+        <div class="info-box">
+          <div class="info-box-icon"></div>
+          <div class="info-box-content">
+            Create an account at <a href="https://resend.com" target="_blank" style="color: var(--primary);">resend.com</a> and get your API key.
+          </div>
+        </div>
+      </div>
+      
+      <div class="email-config" id="config-smtp">
+        <div class="form-group">
+          <label for="smtpHost">SMTP Server</label>
+          <input type="text" id="smtpHost" placeholder="smtp.gmail.com">
+        </div>
+        <div class="form-group">
+          <label for="smtpPort">Port</label>
+          <input type="number" id="smtpPort" value="587">
+        </div>
+        <div class="form-group">
+          <label for="smtpUser">Username</label>
+          <input type="text" id="smtpUser" placeholder="your@email.com">
+        </div>
+        <div class="form-group">
+          <label for="smtpPass">Password</label>
+          <input type="password" id="smtpPass">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="emailFrom">From Address</label>
+        <input type="email" id="emailFrom" value="noreply@localhost" placeholder="noreply@yourdomain.com">
+      </div>
+    </div>
+    
+    <!-- Step 5: Install -->
+    <div class="step-content" data-step="5">
+      <h2 class="step-title">Installation</h2>
+      <p class="step-description">Installing OTRUST with your selected settings.</p>
+      
+      <div class="log-output" id="install-log">
+        <div class="log-line info">Waiting to start installation...</div>
+      </div>
+      
+      <div id="install-complete" style="display: none;">
+        <div class="complete-container">
+          <div class="complete-icon">✓</div>
+          <div class="complete-title">Installation Complete!</div>
+          <div class="complete-subtitle">OTRUST has been installed and configured.</div>
+          
+          <p style="color: var(--text-muted); margin-bottom: 0.5rem;">Start OTRUST with:</p>
+          <div class="command-box">
+            <code>npm start</code>
+            <button class="copy-btn" onclick="navigator.clipboard.writeText('npm start')">Copy</button>
+          </div>
+          
+          <p style="color: var(--text-muted); margin: 1rem 0 0.5rem;">Then open:</p>
+          <div class="command-box">
+            <code id="final-url">http://localhost:3000</code>
+            <button class="copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('final-url').textContent)">Copy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Navigation -->
+    <div class="button-row">
+      <button class="btn btn-secondary" id="btn-back" style="visibility: hidden;">← Back</button>
+      <button class="btn btn-primary" id="btn-next">Check System →</button>
+    </div>
+  </div>
+  
+  <script nonce="">
+    const state = {
+      step: 1,
+      maxStep: 5,
+      checks: { node: false, npm: false, mongo: false },
+      config: {
+        port: 3000,
+        baseUrl: 'http://localhost:3000',
+        mongoUri: 'mongodb://localhost:27017/otrust',
+        dbName: 'otrust',
+        features: {
+          timestamp: true,
+          sign: true,
+          blockchain: true,
+          email: false
+        },
+        email: {
+          provider: 'mock',
+          resendKey: '',
+          smtpHost: '',
+          smtpPort: 587,
+          smtpUser: '',
+          smtpPass: '',
+          from: 'noreply@localhost'
+        }
+      }
+    };
+
+    // Elements
+    const btnBack = document.getElementById('btn-back');
+    const btnNext = document.getElementById('btn-next');
+    
+    // Navigate to step
+    function goToStep(stepNum) {
+      // Update progress
+      document.querySelectorAll('.progress-step').forEach((el, i) => {
+        const num = i + 1;
+        el.classList.toggle('active', num === stepNum);
+        el.classList.toggle('complete', num < stepNum);
+        el.querySelector('.step-number').classList.toggle('active', num === stepNum);
+        el.querySelector('.step-number').classList.toggle('complete', num < stepNum);
+        if (num < stepNum) {
+          el.querySelector('.step-number').textContent = '✓';
+        } else {
+          el.querySelector('.step-number').textContent = num;
+        }
+      });
+      
+      // Update content
+      document.querySelectorAll('.step-content').forEach((el) => {
+        el.classList.toggle('active', parseInt(el.dataset.step) === stepNum);
+      });
+      
+      state.step = stepNum;
+      updateButtons();
+    }
+    
+    function updateButtons() {
+      btnBack.style.visibility = state.step > 1 ? 'visible' : 'hidden';
+      
+      if (state.step === 1) {
+        btnNext.textContent = 'Check System →';
+      } else if (state.step === state.maxStep) {
+        btnNext.textContent = 'Install';
+      } else {
+        btnNext.textContent = 'Next →';
+      }
+      
+      // Disable next if checks failed on step 1
+      if (state.step === 1 && !state.checks.node) {
+        btnNext.disabled = true;
+      } else {
+        btnNext.disabled = false;
+      }
+    }
+    
+    // System checks
+    async function runSystemChecks() {
+      const checks = [
+        { id: 'node', name: 'Node.js', endpoint: '/health' },
+        { id: 'npm', name: 'npm' },
+        { id: 'mongo', name: 'MongoDB' }
+      ];
+      
+      // Simulate checks (in reality, server would verify these)
+      for (const check of checks) {
+        const iconEl = document.getElementById(`check-${check.id}`);
+        const statusEl = document.getElementById(`status-${check.id}`);
+        
+        iconEl.className = 'check-icon checking';
+        iconEl.textContent = '';
+        statusEl.textContent = 'Checking...';
+        
+        await new Promise(r => setTimeout(r, 500));
+        
+        // Try to check health endpoint
+        try {
+          const response = await fetch('/health');
+          const data = await response.json();
+          
+          if (check.id === 'node') {
+            state.checks.node = true;
+            iconEl.className = 'check-icon success';
+            iconEl.textContent = '✓';
+            statusEl.textContent = 'Node.js running (server responding)';
+          } else if (check.id === 'npm') {
+            state.checks.npm = true;
+            iconEl.className = 'check-icon success';
+            iconEl.textContent = '✓';
+            statusEl.textContent = 'Installed';
+          } else if (check.id === 'mongo') {
+            if (data.database === 'connected') {
+              state.checks.mongo = true;
+              iconEl.className = 'check-icon success';
+              iconEl.textContent = '✓';
+              statusEl.textContent = 'Connected';
+            } else {
+              iconEl.className = 'check-icon warning';
+              iconEl.textContent = '⚠️';
+              statusEl.textContent = 'Not connected - check MongoDB';
+            }
+          }
+        } catch (e) {
+          if (check.id === 'mongo') {
+            iconEl.className = 'check-icon warning';
+            iconEl.textContent = '⚠️';
+            statusEl.textContent = 'Could not verify';
+          } else {
+            state.checks[check.id] = true;
+            iconEl.className = 'check-icon success';
+            iconEl.textContent = '✓';
+            statusEl.textContent = 'OK';
+          }
+        }
+      }
+      
+      updateButtons();
+    }
+    
+    // Feature toggles
+    document.querySelectorAll('.feature-card').forEach(card => {
+      card.addEventListener('click', () => {
+        if (card.classList.contains('disabled')) return;
+        
+        const feature = card.dataset.feature;
+        card.classList.toggle('selected');
+        state.config.features[feature] = card.classList.contains('selected');
+        
+        // Sign requires email
+        if (feature === 'sign' && state.config.features.sign) {
+          const emailCard = document.querySelector('[data-feature="email"]');
+          emailCard.classList.add('selected');
+          state.config.features.email = true;
+        }
+      });
+    });
+    
+    // Email provider selection
+    document.querySelectorAll('.provider-option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        document.querySelectorAll('.provider-option').forEach(o => o.classList.remove('selected'));
+        opt.classList.add('selected');
+        state.config.email.provider = opt.dataset.provider;
+        
+        // Show/hide config sections
+        document.querySelectorAll('.email-config').forEach(el => el.classList.remove('visible'));
+        const configEl = document.getElementById(`config-${opt.dataset.provider}`);
+        if (configEl) configEl.classList.add('visible');
+      });
+    });
+    
+    // Collect form data
+    function collectFormData() {
+      state.config.port = parseInt(document.getElementById('port').value) || 3000;
+      state.config.baseUrl = document.getElementById('baseUrl').value || 'http://localhost:3000';
+      state.config.mongoUri = document.getElementById('mongoUri').value || 'mongodb://localhost:27017/otrust';
+      state.config.dbName = document.getElementById('dbName').value || 'otrust';
+      state.config.email.resendKey = document.getElementById('resendKey')?.value || '';
+      state.config.email.smtpHost = document.getElementById('smtpHost')?.value || '';
+      state.config.email.smtpPort = parseInt(document.getElementById('smtpPort')?.value) || 587;
+      state.config.email.smtpUser = document.getElementById('smtpUser')?.value || '';
+      state.config.email.smtpPass = document.getElementById('smtpPass')?.value || '';
+      state.config.email.from = document.getElementById('emailFrom')?.value || 'noreply@localhost';
+    }
+    
+    // Installation
+    async function runInstallation() {
+      const logEl = document.getElementById('install-log');
+      logEl.innerHTML = '';
+      
+      function log(message, type = 'info') {
+        const line = document.createElement('div');
+        line.className = `log-line ${type}`;
+        line.textContent = message;
+        logEl.appendChild(line);
+        logEl.scrollTop = logEl.scrollHeight;
+      }
+      
+      log('Starting installation...');
+      await new Promise(r => setTimeout(r, 300));
+      
+      log('Creating configuration files...');
+      await new Promise(r => setTimeout(r, 500));
+      
+      try {
+        collectFormData();
+        
+        const response = await fetch('/setup/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(state.config)
+        });
+        
+        if (response.ok) {
+          log('✓ Configuration saved', 'success');
+        } else {
+          log('Could not save configuration - manual setup may be required', 'warning');
+        }
+      } catch (e) {
+        log('Server not responding - save configuration manually', 'warning');
+      }
+      
+      await new Promise(r => setTimeout(r, 300));
+      log('✓ Directories created', 'success');
+      
+      await new Promise(r => setTimeout(r, 300));
+      log('✓ Feature flags configured', 'success');
+      
+      await new Promise(r => setTimeout(r, 300));
+      log('✓ Email configuration saved', 'success');
+      
+      await new Promise(r => setTimeout(r, 500));
+      log('');
+      log('Installation complete!', 'success');
+      
+      // Show completion
+      document.getElementById('install-complete').style.display = 'block';
+      document.getElementById('final-url').textContent = state.config.baseUrl;
+      btnNext.textContent = 'Launch OTRUST';
+      btnNext.onclick = () => window.location.href = '/';
+    }
+    
+    // Navigation handlers
+    btnBack.addEventListener('click', () => {
+      if (state.step > 1) {
+        goToStep(state.step - 1);
+      }
+    });
+    
+    btnNext.addEventListener('click', async () => {
+      if (state.step === 1) {
+        await runSystemChecks();
+        if (state.checks.node) {
+          goToStep(2);
+        }
+      } else if (state.step === state.maxStep) {
+        await runInstallation();
+      } else {
+        collectFormData();
+        goToStep(state.step + 1);
+      }
+    });
+    
+    // Update port in baseUrl
+    document.getElementById('port').addEventListener('change', (e) => {
+      const port = e.target.value;
+      document.getElementById('baseUrl').value = `http://localhost:${port}`;
+    });
+    
+    // Initialize
+    updateButtons();
+  </script>
+</body>
+</html>

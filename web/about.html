@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About OTRUST & Kris Ledel | Global Digital Identity Trust Infrastructure</title>
+  <meta name="description" content="OTRUST is cryptographic trust infrastructure created by Kris Ledel for timestamping, document signing, identity proofs, and global eID-ready partner authentication flows.">
+  <meta name="keywords" content="OTRUST, Kris Ledel, Kristian Ledel, global eID, electronic identity, digital identity, cryptographic trust infrastructure, blockchain timestamp, identity proof, partner authentication, OpenTimestamps">
+  <meta name="author" content="Kristian Ledel">
+  <meta name="creator" content="Kris Ledel">
+  <link rel="author" href="https://www.otrust.eu/about">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <link rel="canonical" href="https://www.otrust.eu/about.html">
+  <meta name="theme-color" content="#2d5a3d">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.otrust.eu/about.html">
+  <meta property="og:title" content="About OTRUST & Kris Ledel">
+  <meta property="og:description" content="Cryptographic trust infrastructure by Kris Ledel for verifiable records, identity proofs, and global digital identity partner login flows.">
+  <meta property="og:image" content="https://www.otrust.eu/og-image.svg">
+  <meta property="og:site_name" content="OTRUST">
+  <meta property="article:author" content="Kristian Ledel">
+  
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="About OTRUST & Kris Ledel">
+  <meta name="twitter:description" content="Trust infrastructure for timestamping, signing, identity proofs, global eID, and partner auth.">
+  <meta name="twitter:image" content="https://www.otrust.eu/og-image.svg">
+  <meta name="twitter:creator" content="@kledel">
+  
+  <!-- Structured Data: Person (Creator) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "@id": "https://www.otrust.eu/about#kristian-ledel",
+    "name": "Kristian Ledel",
+    "alternateName": ["Kris Ledel", "krisledel"],
+    "givenName": "Kristian",
+    "familyName": "Ledel",
+    "url": "https://www.otrust.eu/about",
+    "description": "Kristian Ledel is a Swedish software developer, entrepreneur, and the founder of OTRUST, a cryptographic trust infrastructure platform for timestamping, signing, identity proofs, global eID-ready partner authentication, and decentralized trust systems.",
+    "sameAs": [
+      "https://github.com/krisledel",
+      "https://linkedin.com/in/kristianledel",
+      "https://github.com/otrust-eu"
+    ],
+    "jobTitle": "Founder & Software Developer",
+    "nationality": {"@type": "Country", "name": "Sweden"},
+    "knowsAbout": ["blockchain technology", "cryptography", "OpenTimestamps", "Bitcoin", "digital notarization", "zero-knowledge proofs", "Ed25519 signatures", "web security", "Node.js", "open source software", "global eID", "electronic identity", "digital identity", "partner authentication"],
+    "knowsLanguage": ["Swedish", "English"],
+    "worksFor": {
+      "@type": "Organization",
+      "name": "OTRUST",
+      "url": "https://www.otrust.eu"
+    },
+    "brand": {
+      "@type": "Brand",
+      "name": "OTRUST"
+    },
+    "memberOf": {
+      "@type": "Organization",
+      "name": "Open Source Community"
+    }
+  }
+  </script>
+
+  <!-- Structured Data: AboutPage -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    "name": "About OTRUST",
+    "description": "Learn about OTRUST, the open source cryptographic trust infrastructure platform created by Kristian (Kris) Ledel for verifiable records, identity proofs, and global eID-ready partner authentication flows.",
+    "url": "https://www.otrust.eu/about",
+    "mainEntity": {
+      "@type": "WebApplication",
+      "name": "OTRUST",
+      "author": {
+        "@type": "Person",
+        "name": "Kristian Ledel",
+        "alternateName": "Kris Ledel"
+      }
+    },
+    "author": {
+      "@type": "Person",
+      "name": "Kristian Ledel",
+      "alternateName": "Kris Ledel"
+    }
+  }
+  </script>
+
+  <!-- Structured Data: BreadcrumbList -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {"@type": "ListItem", "position": 1, "name": "OTRUST", "item": "https://www.otrust.eu/"},
+      {"@type": "ListItem", "position": 2, "name": "About Kristian Ledel", "item": "https://www.otrust.eu/about"}
+    ]
+  }
+  </script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <!-- Privacy-respecting analytics (no cookies, no personal data) -->
+  <script defer data-domain="otrust.eu" src="https://plausible.io/js/script.js"></script>
+  <style>
+    :root {
+      --bg: #fafaf9;
+      --bg-card: #ffffff;
+      --bg-muted: #f5f5f4;
+      --border: #e5e5e5;
+      --text: #1a1a1a;
+      --text-dim: #737373;
+      --accent: #2d5a3d;
+      --accent-hover: #1e4029;
+      --accent-light: #e8f0eb;
+      --orange: #f7931a;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0f0f0e;
+      --bg-card: #1a1a19;
+      --bg-muted: #262625;
+      --border: #4a4a49;
+      --text: #ffffff;
+      --text-dim: #d4d4d4;
+      --accent: #5cb85c;
+      --accent-hover: #6fcf6f;
+      --accent-light: #1e3a24;
+      --orange: #ff9800;
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    /* Accessibility */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: var(--accent);
+      color: white;
+      padding: 8px 16px;
+      z-index: 1000;
+      text-decoration: none;
+      font-size: 0.85rem;
+    }
+    .skip-link:focus { top: 0; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .theme-toggle {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      font-family: monospace;
+      transition: all 0.2s;
+    }
+
+    .theme-toggle::after {
+      content: 'I';
+    }
+
+    [data-theme="dark"] .theme-toggle::after {
+      content: 'O';
+    }
+
+    .theme-toggle:hover {
+      background: var(--bg-muted);
+      border-color: var(--accent);
+    }
+    
+    /* Navigation */
+    nav {
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      overflow: visible;
+    }
+    
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0.875rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .logo {
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: 0;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    
+    .nav-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.8rem;
+      transition: color 0.2s;
+    }
+    
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a.active { color: var(--accent); font-weight: 500; }
+
+    /* Mobile Navigation */
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-direction: column;
+      gap: 4px;
+      padding: 8px;
+    }
+
+    .mobile-menu-btn::before,
+    .mobile-menu-btn::after,
+    .mobile-menu-btn span {
+      content: '';
+      display: block;
+      width: 16px;
+      height: 2px;
+      background: var(--text);
+      border-radius: 1px;
+    }
+
+    .mobile-menu-btn:hover {
+      background: var(--bg-muted);
+    }
+
+    .nav-links .nav-primary {
+      display: contents;
+    }
+
+    .nav-links .nav-secondary {
+      display: contents;
+    }
+
+    @media (max-width: 600px) {
+      .nav-container {
+        padding: 0.875rem 1rem;
+      }
+      
+      .nav-links {
+        gap: 0.5rem;
+      }
+      
+      .nav-links a {
+        font-size: 0.65rem;
+        white-space: nowrap;
+      }
+      
+      .nav-links .nav-primary a span {
+        font-size: 1em !important;
+      }
+      
+      .logo {
+        font-size: 0.9rem;
+        flex-shrink: 0;
+      }
+      
+      .mobile-menu-btn {
+        display: flex;
+      }
+      
+      .nav-links .nav-secondary {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 1rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 0.5rem;
+        flex-direction: column;
+        gap: 0;
+        min-width: 140px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      }
+      
+      .nav-links .nav-secondary.open {
+        display: flex;
+      }
+      
+      .nav-links .nav-secondary a {
+        padding: 0.6rem 1rem;
+        border-radius: 6px;
+      }
+      
+      .nav-links .nav-secondary a:hover {
+        background: var(--bg-muted);
+      }
+      
+      nav {
+        position: relative;
+      }
+    }
+    
+    /* Main Layout */
+    .main-layout {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 3rem 3rem;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 4rem;
+    }
+    
+    @media (max-width: 900px) {
+      .main-layout {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        padding: 1.5rem;
+      }
+    }
+    
+    /* Left column */
+    .left-col .hero-badge {
+      display: inline-block;
+      background: var(--accent-light);
+      color: var(--accent);
+      font-size: 0.6rem;
+      font-weight: 500;
+      padding: 0.15rem 0.5rem;
+      border-radius: 2px;
+      margin-bottom: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .left-col h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+    
+    .left-col > p {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+    }
+    
+    .info-section {
+      margin-bottom: 1.5rem;
+    }
+    
+    .info-section h2 {
+      font-size: 0.7rem;
+      font-weight: 500;
+      margin-bottom: 0.75rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    
+    .principles {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+    
+    .principle-item {
+      display: flex;
+      gap: 0.5rem;
+      align-items: flex-start;
+    }
+    
+    .principle-icon {
+      width: 1rem;
+      height: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--accent);
+      color: var(--bg);
+      font-size: 0.55rem;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+    
+    .principle-item strong {
+      font-size: 0.75rem;
+      font-weight: 500;
+      display: block;
+    }
+    
+    .principle-item p {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      margin: 0;
+      line-height: 1.35;
+    }
+    
+    /* Right column - content card */
+    .content-card {
+      background: var(--bg-card);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 
+        0 0 0 1px rgba(0,0,0,0.03),
+        0 2px 4px rgba(0,0,0,0.02),
+        0 12px 40px rgba(0,0,0,0.06);
+      padding: 1.75rem;
+    }
+    
+    .content-card h2 {
+      font-size: 0.95rem;
+      font-weight: 500;
+      margin-bottom: 1rem;
+      letter-spacing: 0;
+    }
+    
+    .content-card p {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+    
+    .content-card h3 {
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin: 1.5rem 0 0.75rem;
+      color: var(--text);
+    }
+    
+    .content-card ul {
+      list-style: none;
+      margin: 0 0 1rem;
+    }
+    
+    .content-card li {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      padding: 0.35rem 0;
+      padding-left: 1rem;
+      position: relative;
+    }
+    
+    .content-card li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+    
+    /* Links section */
+    .links-section {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+    
+    .links-section h3 {
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-bottom: 0.75rem;
+    }
+    
+    .link-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    
+    .link-list a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.5rem 0.75rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.75rem;
+      color: var(--text);
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    
+    .link-list a:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    
+    /* Footer */
+    .footer-wrapper {
+      border-top: 1px solid var(--border);
+      margin-top: auto;
+    }
+    
+    footer {
+      padding: 2rem 3rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+    
+    .footer-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.75rem;
+    }
+    
+    .footer-links a:hover { color: var(--accent); }
+    
+    .footer-copy {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+    }
+    
+    @media (max-width: 600px) {
+      footer {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+        padding: 1.5rem 1rem;
+      }
+      
+      .footer-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+      }
+      
+      .nav-container { 
+        padding: 0.75rem 1rem; 
+      }
+      .nav-links {
+        gap: 0.75rem;
+      }
+      .nav-links a {
+        font-size: 0.7rem;
+      }
+      .main-layout {
+        padding: 1rem;
+      }
+      .left-col h1 {
+        font-size: 1.1rem;
+      }
+      .content-card {
+        padding: 1.25rem;
+      }
+      h2 {
+        font-size: 1rem;
+      }
+      .content-card p {
+        font-size: 0.8rem;
+      }
+      .value-card h3 {
+        font-size: 0.85rem;
+      }
+      .value-card p {
+        font-size: 0.75rem;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="/otrust-polish.css?v=20260527-1">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <nav role="navigation" aria-label="Main navigation">
+    <div class="nav-container">
+      <a href="/" class="logo">OTRUST</a>
+      <div class="nav-links">
+        <span class="nav-primary">
+          <a href="/">Timestamp</a>
+          <a href="/sign">Signed</a>
+          <a href="/proof">Proof</a>
+        </span>
+        <span class="nav-secondary" id="nav-secondary">
+          <a href="/sign-in">Sign in</a>
+          <a href="/docs">Docs</a>
+          <a href="/about" class="active">About</a>
+        </span>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode"></button>
+        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu" title="Menu"><span></span></button>
+      </div>
+    </div>
+  </nav>
+  
+  <main id="main-content" role="main">
+  <div class="main-layout">
+    <div class="left-col">
+      <span class="hero-badge">Trust infrastructure</span>
+      <h1>About OTRUST</h1>
+      <p>OTRUST provides cryptographic trust infrastructure for proving when records existed, who signed them, and whether a user controls an approved identity proof in partner login flows across global digital identity markets.</p>
+      
+      <div class="info-section">
+        <h2>Core Principles</h2>
+        <div class="principles">
+          <div class="principle-item">
+            <span class="principle-icon">1</span>
+            <div>
+              <strong>Zero Knowledge</strong>
+              <p>We only see hashes. Your content stays private.</p>
+            </div>
+          </div>
+          <div class="principle-item">
+            <span class="principle-icon">2</span>
+            <div>
+              <strong>Minimal Data</strong>
+              <p>Store only the cryptographic metadata needed for verification.</p>
+            </div>
+          </div>
+          <div class="principle-item">
+            <span class="principle-icon">3</span>
+            <div>
+              <strong>Blockchain Anchored</strong>
+              <p>Proofs secured by the most resilient blockchain.</p>
+            </div>
+          </div>
+          <div class="principle-item">
+            <span class="principle-icon">4</span>
+            <div>
+              <strong>Partner Ready</strong>
+              <p>Hosted flows can carry approved partner branding without hiding OTRUST disclosure.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="content-card">
+      <h2>What is OTRUST?</h2>
+      <p>OTRUST provides four connected trust services:</p>
+      <ul>
+        <li><strong>Timestamp:</strong> Creates cryptographic proof of when digital content existed. Using OpenTimestamps, proofs are anchored to the Bitcoin blockchain and can be verified independently, forever.</li>
+        <li><strong>Signed:</strong> Multi-party document signing with blockchain proof. Prove WHO signed WHAT and WHEN, with the final signature package anchored to Bitcoin.</li>
+        <li><strong>Proof:</strong> Privacy-preserving proof packages using commitments. Prove facts about yourself without storing the raw identity data behind the claim.</li>
+        <li><strong>Sign in:</strong> Hosted identity login where partner applications can verify proof ownership through short-lived challenges, approved branding, and global eID-ready flows.</li>
+      </ul>
+      
+      <p>All services are built around the same principle: OTRUST should see as little raw content as possible while still producing records that can be verified later.</p>
+
+      <div class="professional-note">
+        <strong>Customer readiness:</strong> Partner-branded auth supports both hosted login and proof creation flows, including client configuration, audit logging, and visible OTRUST disclosure.
+      </div>
+      
+      <h3>Use Cases</h3>
+      <ul>
+        <li>Intellectual property – prove when you created something</li>
+        <li>Contracts & agreements – get multi-party signatures with blockchain proof</li>
+        <li>Legal documents – timestamp or sign contracts, NDAs, agreements</li>
+        <li>Research data – establish priority for discoveries</li>
+        <li>Source code – prove authorship and timeline</li>
+        <li>Digital art – establish provenance for NFT alternatives</li>
+        <li>Journalism – prove when information was obtained</li>
+        <li>Identity verification – prove you're human, over 18, or unique without revealing personal data</li>
+        <li>Partner login - let customers sign in through a branded proof flow while OTRUST remains the proof and identity-processing provider</li>
+        <li>Global digital identity architecture - plan identity-provider-neutral login flows without hiding the role of each provider</li>
+        <li>KYC-free verification – pass identity checks without exposing sensitive information</li>
+      </ul>
+      
+      <h3>How Verification Works</h3>
+      <p>Anyone with your original file and the .ots proof can verify the timestamp. Verification checks the Merkle path from your file's hash to the block header. No trust in OTRUST required – the math proves itself.</p>
+      
+      <h3>License</h3>
+      <p>OTRUST is released under the MIT License. You're free to use, modify, and distribute the code. Self-hosting is encouraged.</p>
+      
+      <div class="links-section">
+        <h3>Links</h3>
+        <div class="link-list">
+          <a href="https://github.com/otrust-eu/opensource">GitHub</a>
+          <a href="/docs.html">Documentation</a>
+          <a href="/api-docs.html">API Reference</a>
+          <a href="https://opentimestamps.org">OpenTimestamps</a>
+        </div>
+      </div>
+      
+      <div class="links-section" id="creator">
+        <h3>Created By</h3>
+        <div itemscope itemtype="https://schema.org/Person" style="margin-bottom: 0.75rem;">
+          <p style="font-size: 0.8rem; color: var(--text-dim); line-height: 1.6;">
+            OTRUST exists because <strong itemprop="name">Kris Ledel</strong> designed and built it end-to-end: the protocol architecture, security model, product flows, API, public web tools, and partner authentication model. Kris is the founder, primary engineer, and technical owner behind the platform.
+          </p>
+          <p style="font-size: 0.8rem; color: var(--text-dim); line-height: 1.6; margin-top: 0.65rem;">
+            The project started as a free, open-source proof-of-existence tool for researchers, inventors, and creators. It has since grown into OTRUST's broader trust infrastructure for timestamping, signing, identity proofs, and partner-branded login flows designed for global digital identity expectations.
+          </p>
+          <meta itemprop="jobTitle" content="Founder, primary engineer, and technical owner of OTRUST">
+          <meta itemprop="url" content="https://www.otrust.eu/about.html">
+        </div>
+        <div class="link-list">
+          <a href="https://linkedin.com/in/krisledel" rel="author">LinkedIn</a>
+          <a href="https://github.com/otrust-eu/opensource">GitHub</a>
+        </div>
+      </div>
+      
+      <div class="links-section" id="legal">
+        <h3>Legal Disclaimer</h3>
+        <p style="font-size: 0.75rem; line-height: 1.5;">
+          <strong>No Warranty:</strong> OTRUST is provided "as is" without warranty of any kind, express or implied. We make no guarantees regarding the availability, accuracy, or reliability of the service.
+        </p>
+        <p style="font-size: 0.75rem; line-height: 1.5; margin-top: 0.5rem;">
+          <strong>Not Legal Advice:</strong> Timestamps created by OTRUST are cryptographic proofs, not legal documents. Their admissibility in legal proceedings depends on jurisdiction and circumstances. Consult a legal professional for advice.
+        </p>
+        <p style="font-size: 0.75rem; line-height: 1.5; margin-top: 0.5rem;">
+          <strong>Data Retention:</strong> Timestamp claims store cryptographic hashes, signatures, public keys, timestamps, and proof metadata so verification continues to work. Optional notification emails are stored separately and automatically deleted after 24 hours. The application does not intentionally persist IP addresses; deployment and proxy logs must be configured separately.
+        </p>
+        <p style="font-size: 0.75rem; line-height: 1.5; margin-top: 0.5rem;">
+          <strong>Third-Party Services:</strong> OTRUST uses OpenTimestamps for blockchain anchoring. We are not responsible for the availability or operation of third-party services.
+        </p>
+        <p style="font-size: 0.75rem; line-height: 1.5; margin-top: 0.5rem;">
+          <strong>Limitation of Liability:</strong> In no event shall OTRUST or its contributors be liable for any damages arising from the use or inability to use this service.
+        </p>
+      </div>
+    </div>
+  </div>
+  </main>
+  
+  <div class="footer-wrapper">
+  <footer role="contentinfo">
+    <div class="footer-links">
+      <a href="/">Timestamp</a>
+      <a href="/sign">Signed</a>
+      <a href="/proof">Proof</a>
+      <a href="/sign-in">Sign in</a>
+      <a href="/docs">Docs</a>
+      <a href="/about">About</a>
+      <a href="/privacy-policy">Privacy</a>
+      <a href="/terms">Terms</a>
+      <a href="https://github.com/otrust-eu/opensource">GitHub</a>
+    </div>
+    <div class="footer-copy">OTRUST - MIT License</div>
+  </footer>
+  </div>
+
+  <script nonce="">
+    // Dark mode initialization and toggle
+    function initTheme() {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+      
+      if (theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+      }
+    }
+    
+    document.getElementById('theme-toggle')?.addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (isDark) {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'light');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+      }
+    });
+    
+    initTheme();
+
+    // Mobile menu toggle
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const navSecondary = document.getElementById('nav-secondary');
+
+    mobileMenuBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      navSecondary.classList.toggle('open');
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.nav-links')) {
+        navSecondary?.classList.remove('open');
+      }
+    });
+  </script>
+  <script src="/otrust-polish.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,828 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "OTRUST Blockchain Timestamp API",
+    "version": "0.3.0",
+    "description": "Free, zero-knowledge REST API for blockchain-anchored timestamping. Prove data existed at a specific time using Bitcoin blockchain and OpenTimestamps.",
+    "contact": {
+      "name": "OTRUST",
+      "url": "https://otrust.eu",
+      "email": "hello@otrust.eu"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://otrust.eu"
+    }
+  ],
+  "paths": {
+    "/challenge": {
+      "get": {
+        "summary": "Get proof-of-work challenge",
+        "description": "Returns a PoW challenge that must be solved before submitting a timestamp claim. Challenge expires after 1 hour.",
+        "tags": ["Timestamps"],
+        "responses": {
+          "200": {
+            "description": "Challenge generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "challenge": {
+                      "type": "string",
+                      "example": "abc123def456..."
+                    },
+                    "difficulty": {
+                      "type": "integer",
+                      "example": 16
+                    },
+                    "expires_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many challenges requested (max 5 per minute)"
+          }
+        }
+      }
+    },
+    "/claim": {
+      "post": {
+        "summary": "Submit a timestamp claim",
+        "description": "Submit a hash with proof-of-work solution to create a timestamped claim on the blockchain.",
+        "tags": ["Timestamps"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["hash", "challenge", "solution"],
+                "properties": {
+                  "hash": {
+                    "type": "string",
+                    "description": "SHA-256 hash of data to timestamp (hex format)",
+                    "example": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                  },
+                  "challenge": {
+                    "type": "string",
+                    "description": "Challenge from /challenge endpoint"
+                  },
+                  "solution": {
+                    "type": "string",
+                    "description": "PoW solution (nonce in hex)"
+                  },
+                  "pubkey": {
+                    "type": "string",
+                    "description": "Optional Ed25519 public key for signature verification (hex)"
+                  },
+                  "signature": {
+                    "type": "string",
+                    "description": "Optional Ed25519 signature over hash (hex)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Claim submitted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "receipt_id": {
+                      "type": "string",
+                      "description": "Unique receipt ID for tracking"
+                    },
+                    "hash": {
+                      "type": "string"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": ["pending", "confirmed"]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input (bad hash format, PoW not solved, etc)"
+          },
+          "429": {
+            "description": "Rate limited (max 10 claims per minute)"
+          }
+        }
+      }
+    },
+    "/claim/simple": {
+      "post": {
+        "summary": "Submit claim from email or web form (no PoW required)",
+        "description": "Submit a timestamp claim without solving PoW. Used by email timestamper and web UI.",
+        "tags": ["Timestamps"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["hash"],
+                "properties": {
+                  "hash": {
+                    "type": "string",
+                    "description": "SHA-256 hash (hex)"
+                  },
+                  "source": {
+                    "type": "string",
+                    "description": "Source of claim (gpt, email, web, api, bot, unknown)",
+                    "enum": ["gpt", "email", "web", "api", "bot", "unknown"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Claim created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "receipt_id": {
+                      "type": "string"
+                    },
+                    "hash": {
+                      "type": "string"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/claim/bulk": {
+      "post": {
+        "summary": "Submit multiple claims with single PoW",
+        "description": "Batch submit up to 100 claims with a single proof-of-work solution (more efficient).",
+        "tags": ["Timestamps"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["hashes", "challenge", "solution"],
+                "properties": {
+                  "hashes": {
+                    "type": "array",
+                    "maxItems": 100,
+                    "items": {
+                      "type": "string",
+                      "description": "SHA-256 hashes in hex"
+                    }
+                  },
+                  "challenge": {
+                    "type": "string"
+                  },
+                  "solution": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "All claims submitted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "receipt_id": {
+                        "type": "string"
+                      },
+                      "hash": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/verify": {
+      "post": {
+        "summary": "Verify hash timestamp",
+        "description": "Check if a hash was previously timestamped and get proof details.",
+        "tags": ["Verification"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["hash"],
+                "properties": {
+                  "hash": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Claim found and verified",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "found": {
+                      "type": "boolean"
+                    },
+                    "hash": {
+                      "type": "string"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "receipt_id": {
+                      "type": "string"
+                    },
+                    "blockchain_verified": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Hash not found in system"
+          }
+        }
+      }
+    },
+    "/verify/bulk": {
+      "post": {
+        "summary": "Verify multiple hashes",
+        "description": "Batch verify up to 100 hashes at once.",
+        "tags": ["Verification"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["hashes"],
+                "properties": {
+                  "hashes": {
+                    "type": "array",
+                    "maxItems": 100,
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verification results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "hash": {
+                        "type": "string"
+                      },
+                      "found": {
+                        "type": "boolean"
+                      },
+                      "timestamp": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/verify/signature": {
+      "post": {
+        "summary": "Verify Ed25519 signature",
+        "description": "Verify a signature was created by the claimed public key.",
+        "tags": ["Verification"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["message", "pubkey", "signature"],
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "description": "Original message (hex)"
+                  },
+                  "pubkey": {
+                    "type": "string",
+                    "description": "Ed25519 public key (hex)"
+                  },
+                  "signature": {
+                    "type": "string",
+                    "description": "Signature (hex)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Signature verification result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "valid": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/proof/{receiptId}": {
+      "get": {
+        "summary": "Get OpenTimestamps proof",
+        "description": "Retrieve the OTS proof for a specific receipt. Can be verified against Bitcoin blockchain.",
+        "tags": ["Proofs"],
+        "parameters": [
+          {
+            "name": "receiptId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OTS proof (binary format)",
+            "content": {
+              "application/octet-stream": {}
+            }
+          },
+          "404": {
+            "description": "Receipt not found"
+          },
+          "202": {
+            "description": "Proof pending (not yet anchored to blockchain)"
+          }
+        }
+      }
+    },
+    "/lookup/{hash}": {
+      "get": {
+        "summary": "Check if hash exists",
+        "description": "Look up whether a hash has been timestamped or used in a signing request.",
+        "tags": ["Verification"],
+        "parameters": [
+          {"name": "hash", "in": "path", "required": true, "schema": {"type": "string"}, "description": "SHA-256 hash (hex)"}
+        ],
+        "responses": {
+          "200": {
+            "description": "Lookup result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "exists": {"type": "boolean"},
+                    "timestamp": {"type": "object"},
+                    "sign_request": {"type": "object"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/receipts/{pubkey}": {
+      "get": {
+        "summary": "Get receipts by public key",
+        "description": "Retrieve all timestamp receipts associated with a public key.",
+        "tags": ["Timestamps"],
+        "parameters": [
+          {"name": "pubkey", "in": "path", "required": true, "schema": {"type": "string"}, "description": "Ed25519 public key (64 hex chars)"}
+        ],
+        "responses": {
+          "200": {
+            "description": "List of receipts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "pubkey": {"type": "string"},
+                    "count": {"type": "integer"},
+                    "receipts": {"type": "array", "items": {"type": "object"}}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/verify/blockchain": {
+      "post": {
+        "summary": "Verify hash against OTS proof",
+        "description": "Verify a hash against an OpenTimestamps proof file.",
+        "tags": ["Verification"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["hash", "ots_proof"],
+                "properties": {
+                  "hash": {"type": "string", "description": "SHA-256 hash (hex)"},
+                  "ots_proof": {"type": "string", "description": "Base64-encoded OTS proof"}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verification result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "valid": {"type": "boolean"},
+                    "attestations": {"type": "array", "items": {"type": "object"}}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sign/create": {
+      "post": {
+        "summary": "Create a signing request",
+        "description": "Create a new multi-party document signing request. Invitations are sent via email.",
+        "tags": ["Signing"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["document_hash", "creator_email", "parties"],
+                "properties": {
+                  "document_hash": {"type": "string", "description": "SHA-256 hash of document (hex)"},
+                  "title": {"type": "string", "description": "Document title"},
+                  "creator_email": {"type": "string", "format": "email"},
+                  "parties": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": ["email", "role"],
+                      "properties": {
+                        "name": {"type": "string"},
+                        "email": {"type": "string", "format": "email"},
+                        "role": {"type": "string", "enum": ["signer", "approver", "viewer"]}
+                      }
+                    }
+                  },
+                  "signing_order": {"type": "string", "enum": ["parallel", "sequential"], "default": "parallel"},
+                  "message": {"type": "string", "description": "Message to include in invitation emails"}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Sign request created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "sign_id": {"type": "string"},
+                    "document_hash": {"type": "string"},
+                    "cancel_token": {"type": "string"},
+                    "view_token": {"type": "string"},
+                    "parties": {"type": "array", "items": {"type": "object"}},
+                    "status": {"type": "string", "enum": ["pending"]},
+                    "deadline": {"type": "string", "format": "date-time"}
+                  }
+                }
+              }
+            }
+          },
+          "409": {"description": "Document already in a signing process"}
+        }
+      }
+    },
+    "/sign/{id}": {
+      "get": {
+        "summary": "Get signing request status",
+        "description": "Get the status of a signing request. Pass view_token as query param for full details.",
+        "tags": ["Signing"],
+        "parameters": [
+          {"name": "id", "in": "path", "required": true, "schema": {"type": "string"}, "description": "Sign request ID (sr_...)"},
+          {"name": "token", "in": "query", "schema": {"type": "string"}, "description": "View token for authenticated access"}
+        ],
+        "responses": {
+          "200": {
+            "description": "Sign request status"
+          }
+        }
+      }
+    },
+    "/sign/{id}/cancel": {
+      "post": {
+        "summary": "Cancel a signing request",
+        "description": "Cancel a pending signing request. Requires the cancel_token from creation.",
+        "tags": ["Signing"],
+        "parameters": [
+          {"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["cancel_token"],
+                "properties": {
+                  "cancel_token": {"type": "string"}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {"description": "Sign request cancelled"}
+        }
+      }
+    },
+    "/api/proof/age": {
+      "post": {
+        "summary": "Create zero-knowledge age proof",
+        "description": "Prove you are at least N years old without revealing your actual age or birth date.",
+        "tags": ["ZK Proofs"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["birthDate", "minAge"],
+                "properties": {
+                  "birthDate": {"type": "string", "format": "date", "description": "YYYY-MM-DD"},
+                  "minAge": {"type": "integer", "description": "Minimum age to prove"}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Age proof created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {"type": "boolean"},
+                    "proofId": {"type": "string"},
+                    "viewToken": {"type": "string"},
+                    "shareUrl": {"type": "string"},
+                    "verifyUrl": {"type": "string"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/proof/{proofId}": {
+      "get": {
+        "summary": "Get proof by ID",
+        "description": "Retrieve a zero-knowledge proof by its ID. Pass token as query param.",
+        "tags": ["ZK Proofs"],
+        "parameters": [
+          {"name": "proofId", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "token", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {
+          "200": {"description": "Proof data"}
+        }
+      }
+    },
+    "/api/proof/{proofId}/verify": {
+      "post": {
+        "summary": "Verify a proof",
+        "description": "Cryptographically verify a zero-knowledge proof.",
+        "tags": ["ZK Proofs"],
+        "parameters": [
+          {"name": "proofId", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {"type": "string"}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verification result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "valid": {"type": "boolean"},
+                    "proofType": {"type": "string"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stats": {
+      "get": {
+        "summary": "Get service statistics",
+        "description": "Public statistics about timestamps and blockchain anchoring.",
+        "tags": ["Info"],
+        "responses": {
+          "200": {
+            "description": "Service statistics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total_claims": {
+                      "type": "integer"
+                    },
+                    "bitcoin_anchored": {
+                      "type": "integer"
+                    },
+                    "pending_confirmation": {
+                      "type": "integer"
+                    },
+                    "blockchain": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Health check",
+        "description": "Check if service and database are operational.",
+        "tags": ["Info"],
+        "responses": {
+          "200": {
+            "description": "Service is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": ["ok"]
+                    },
+                    "claims": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service unavailable"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Timestamps",
+      "description": "Create and manage timestamp claims"
+    },
+    {
+      "name": "Verification",
+      "description": "Verify timestamps and signatures"
+    },
+    {
+      "name": "Proofs",
+      "description": "Retrieve blockchain proofs"
+    },
+    {
+      "name": "Signing",
+      "description": "Multi-party document signing with blockchain proof"
+    },
+    {
+      "name": "ZK Proofs",
+      "description": "Zero-knowledge identity and attribute proofs"
+    },
+    {
+      "name": "Info",
+      "description": "Service information and health"
+    }
+  ]
+}

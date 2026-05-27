@@ -1,0 +1,1715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OTRUST Proof – Zero-Knowledge Identity Verification | Blockchain</title>
+  <meta name="description" content="Prove things about yourself without revealing the underlying data. Age verification, income proofs, and membership verification using zero-knowledge cryptography.">
+  
+  <!-- SEO Meta Tags -->
+  <meta name="keywords" content="zero-knowledge proof, commitment proof, age verification, income proof, privacy, identity verification, OTRUST, blockchain">
+  <meta name="author" content="Kristian Ledel">
+  <meta name="creator" content="Kris Ledel">
+  <link rel="author" href="https://www.otrust.eu/about">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <link rel="canonical" href="https://www.otrust.eu/proof">
+  <meta name="theme-color" content="#2d5a3d">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.otrust.eu/proof">
+  <meta property="og:title" content="OTRUST Proof – Zero-Knowledge Identity Verification">
+  <meta property="og:description" content="Create privacy-preserving identity proof packages using commitments and selective disclosure.">
+  <meta property="og:image" content="https://www.otrust.eu/og-image.svg">
+  <meta property="og:site_name" content="OTRUST by Kristian Ledel">
+  <meta property="article:author" content="Kristian Ledel">
+  <meta property="og:locale" content="en_US">
+  
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://www.otrust.eu/proof">
+  <meta name="twitter:title" content="OTRUST Proof – Zero-Knowledge Identity Verification">
+  <meta name="twitter:description" content="Prove things about yourself without revealing the underlying data.">
+  <meta name="twitter:image" content="https://www.otrust.eu/og-image.svg">
+  <meta name="twitter:creator" content="@kledel">
+  
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "OTRUST Proof",
+    "url": "https://www.otrust.eu/proof",
+    "description": "Zero-knowledge identity proofs. Prove age, income, or membership without revealing your data.",
+    "applicationCategory": "SecurityApplication",
+    "author": {
+      "@type": "Person",
+      "name": "Kristian Ledel",
+      "alternateName": "Kris Ledel",
+      "url": "https://www.otrust.eu/about",
+      "sameAs": ["https://github.com/krisledel", "https://linkedin.com/in/kristianledel"]
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
+  
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <script defer data-domain="otrust.eu" src="https://plausible.io/js/script.js"></script>
+  <style>
+    html {
+    }
+    
+    :root {
+      --bg: #fafaf9;
+      --bg-card: #ffffff;
+      --bg-muted: #f5f5f4;
+      --border: #e5e5e5;
+      --text: #1a1a1a;
+      --text-dim: #737373;
+      --accent: #2d5a3d;
+      --accent-hover: #1e4029;
+      --accent-light: #e8f0eb;
+      --orange: #b45309;
+      --success: #2d5a3d;
+      --purple: #7c3aed;
+      --purple-light: #ede9fe;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0f0f0e;
+      --bg-card: #1a1a19;
+      --bg-muted: #262625;
+      --border: #4a4a49;
+      --text: #ffffff;
+      --text-dim: #d4d4d4;
+      --accent: #5cb85c;
+      --accent-hover: #6fcf6f;
+      --accent-light: #1e3a24;
+      --orange: #ff9800;
+      --success: #5cb85c;
+      --purple: #a78bfa;
+      --purple-light: #2e1065;
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    /* Accessibility: Skip link */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: var(--accent);
+      color: white;
+      padding: 8px 16px;
+      z-index: 1000;
+      text-decoration: none;
+      font-size: 0.85rem;
+    }
+    .skip-link:focus { top: 0; }
+    
+    /* Accessibility: Focus visible */
+    :focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 2px var(--accent);
+    }
+    button:focus-visible, a:focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 2px var(--accent);
+    }
+    
+    body {
+      font-family: var(--partner-font-family, 'Inter', system-ui, -apple-system, sans-serif);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    
+    /* Dark mode toggle */
+    .theme-toggle {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      font-family: monospace;
+      transition: all 0.2s;
+    }
+
+    .theme-toggle::after {
+      content: 'I';
+    }
+
+    [data-theme="dark"] .theme-toggle::after {
+      content: 'O';
+    }
+    
+    .theme-toggle:hover {
+      background: var(--bg-muted);
+      border-color: var(--accent);
+    }
+    
+    /* Navigation */
+    nav {
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      overflow: visible;
+    }
+    
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0.875rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .logo {
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: 0;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    
+    .nav-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.8rem;
+      transition: color 0.2s;
+    }
+    
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a.active { color: var(--accent); font-weight: 500; }
+    
+    /* Mobile Navigation */
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-direction: column;
+      gap: 4px;
+      padding: 8px;
+    }
+
+    .mobile-menu-btn::before,
+    .mobile-menu-btn::after,
+    .mobile-menu-btn span {
+      content: '';
+      display: block;
+      width: 16px;
+      height: 2px;
+      background: var(--text);
+      border-radius: 1px;
+    }
+    
+    .mobile-menu-btn:hover {
+      background: var(--bg-muted);
+    }
+    
+    .nav-links .nav-primary {
+      display: contents;
+    }
+    
+    .nav-links .nav-secondary {
+      display: contents;
+    }
+    
+    @media (max-width: 600px) {
+      .nav-container {
+        padding: 0.875rem 1rem;
+      }
+      
+      .nav-links {
+        gap: 0.5rem;
+      }
+      
+      .nav-links a {
+        font-size: 0.65rem;
+        white-space: nowrap;
+      }
+      
+      .nav-links .nav-primary a span {
+        font-size: 1em !important;
+      }
+      
+      .logo {
+        font-size: 0.9rem;
+        flex-shrink: 0;
+      }
+      
+      .mobile-menu-btn {
+        display: flex;
+      }
+      
+      .nav-links .nav-secondary {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 1rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 0.5rem;
+        flex-direction: column;
+        gap: 0;
+        min-width: 140px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      }
+      
+      .nav-links .nav-secondary.open {
+        display: flex;
+      }
+      
+      .nav-links .nav-secondary a {
+        padding: 0.6rem 1rem;
+        border-radius: 6px;
+      }
+      
+      .nav-links .nav-secondary a:hover {
+        background: var(--bg-muted);
+      }
+      
+      nav {
+        position: relative;
+      }
+    }
+
+    /* Hero */
+    .main-layout {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 3rem 3rem;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 4rem;
+      align-items: stretch;
+    }
+    
+    @media (max-width: 900px) {
+      .main-layout {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        padding: 1.5rem;
+      }
+    }
+    
+    .hero {
+      padding: 0;
+      max-width: none;
+      margin: 0;
+    }
+    
+    .hero-badge {
+      display: inline-block;
+      background: var(--purple-light);
+      color: var(--purple);
+      font-size: 0.6rem;
+      font-weight: 500;
+      padding: 0.15rem 0.5rem;
+      border-radius: 2px;
+      margin-bottom: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .hero h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+    
+    .hero p {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+    }
+    
+    /* Left column sections */
+    .info-section {
+      margin-bottom: 0;
+    }
+    
+    .info-section h2 {
+      font-size: 0.7rem;
+      font-weight: 500;
+      margin-bottom: 0.75rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+    
+    .step-item {
+      display: flex;
+      gap: 0.5rem;
+      align-items: flex-start;
+    }
+    
+    .step-num {
+      width: 1rem;
+      height: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--accent);
+      color: var(--bg);
+      font-size: 0.55rem;
+      font-weight: 600;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+    
+    .step-item strong {
+      font-size: 0.75rem;
+      font-weight: 500;
+      display: block;
+      margin-bottom: 0;
+    }
+    
+    .step-item p {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      margin: 0;
+      line-height: 1.35;
+    }
+    
+    /* Use cases */
+    .use-cases {
+      margin-top: 1.5rem;
+    }
+    
+    .use-case {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      padding: 0.5rem 0;
+    }
+    
+    .use-case .icon {
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    
+    .use-case .claim {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--success);
+    }
+    
+    .use-case .note {
+      font-size: 0.65rem;
+      color: var(--text-dim);
+    }
+    
+    /* Main Card */
+    .claim-section {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .claim-card {
+      background: var(--bg-card);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 
+        0 0 0 1px rgba(0,0,0,0.03),
+        0 2px 4px rgba(0,0,0,0.02),
+        0 12px 40px rgba(0,0,0,0.06);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      contain: layout;
+    }
+    
+    .tabs {
+      display: flex;
+      gap: 0.25rem;
+      padding: 0.75rem 0.75rem 0;
+      background: var(--bg-muted);
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .tab {
+      padding: 0.55rem 0.875rem;
+      background: transparent;
+      border: none;
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: color 0.2s, background-color 0.2s;
+      border-radius: 10px 10px 0 0;
+      white-space: nowrap;
+      position: relative;
+    }
+    
+    .tab:hover { 
+      color: var(--text); 
+    }
+    
+    .tab.active { 
+      color: var(--text); 
+      background: var(--bg-card);
+      font-weight: 600;
+      box-shadow: 
+        0 -1px 0 var(--border),
+        -1px 0 0 var(--border),
+        1px 0 0 var(--border);
+    }
+    
+    .tab-content {
+      display: none;
+      padding: 1.75rem;
+      flex: 1;
+    }
+    
+    .tab-content.active { 
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* Form Elements */
+    .form-group {
+      margin-bottom: 0.875rem;
+    }
+    
+    .form-group label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 500;
+      margin-bottom: 0.35rem;
+      color: var(--text);
+    }
+    
+    input[type="text"], input[type="email"], input[type="date"], input[type="number"], select {
+      width: 100%;
+      padding: 0.7rem 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-family: inherit;
+      background: var(--bg);
+      color: var(--text);
+    }
+    
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 
+        0 0 0 3px var(--accent-light),
+        0 2px 8px rgba(45, 90, 61, 0.1);
+    }
+    
+    input::placeholder {
+      color: var(--text-dim);
+      opacity: 0.5;
+    }
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.8rem 1.5rem;
+      border-radius: 10px;
+      font-weight: 500;
+      font-size: 0.8rem;
+      cursor: pointer;
+      border: none;
+      width: 100%;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+      color: white;
+      box-shadow: 
+        0 2px 4px rgba(45, 90, 61, 0.2),
+        0 6px 16px rgba(45, 90, 61, 0.15);
+    }
+    
+    .btn-primary:hover { 
+      transform: translateY(-2px);
+      box-shadow: 
+        0 4px 8px rgba(45, 90, 61, 0.25),
+        0 12px 24px rgba(45, 90, 61, 0.2);
+    }
+    
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+    
+    .btn-primary:disabled { 
+      background: linear-gradient(135deg, #a3a3a3 0%, #8a8a8a 100%);
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+    
+    .btn-secondary {
+      background: var(--bg-card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    
+    .btn-secondary:hover { 
+      background: var(--bg-muted);
+      transform: translateY(-1px);
+    }
+    
+    /* Privacy notice */
+    .privacy-notice {
+      background: var(--bg-muted);
+      border-radius: 8px;
+      padding: 0.6rem 0.75rem;
+      margin-top: 0.75rem;
+      font-size: 0.7rem;
+      display: flex;
+      gap: 0.4rem;
+      align-items: flex-start;
+    }
+    
+    .privacy-notice p {
+      color: var(--text-dim);
+      margin: 0;
+    }
+    
+    .privacy-notice strong {
+      color: var(--text);
+    }
+    
+    /* Result */
+    .result {
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-top: 1rem;
+    }
+
+    [data-theme="dark"] .result {
+      background: #1e3a24;
+      border: 1px solid #2d5a3d;
+    }
+    
+    .result h4 {
+      color: var(--success);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+    }
+    
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      padding: 0.25rem 0;
+    }
+    
+    .result-row .label { color: var(--text-dim); }
+    .result-row .value { font-family: monospace; font-weight: 500; color: var(--text); word-break: break-all; }
+    
+    .result-actions {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    
+    .result-actions .btn {
+      width: auto;
+      padding: 0.5rem 1rem;
+      font-size: 0.75rem;
+    }
+    
+    /* Warning box */
+    .warning-box {
+      background: #fef3c7;
+      border: 1px solid #fcd34d;
+      border-radius: 8px;
+      padding: 0.75rem;
+      margin-top: 0.75rem;
+      font-size: 0.7rem;
+    }
+    
+    [data-theme="dark"] .warning-box {
+      background: #3a2f1f;
+      border: 1px solid #664d26;
+    }
+    
+    .warning-box strong {
+      color: var(--orange);
+    }
+    
+    .warning-box code {
+      display: block;
+      margin-top: 0.4rem;
+      padding: 0.4rem;
+      background: var(--bg-card);
+      border-radius: 4px;
+      font-size: 0.6rem;
+      word-break: break-all;
+    }
+    
+    /* Proof type selector */
+    .proof-types {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    @media (max-width: 600px) {
+      .proof-types {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .proof-type {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    
+    .proof-type:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+    
+    .proof-type.selected {
+      border-color: var(--accent);
+      background: var(--accent-light);
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+    
+    .proof-type .icon {
+      font-size: 1.5rem;
+      margin-bottom: 0.4rem;
+    }
+    
+    .proof-type h3 {
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 0.15rem;
+    }
+    
+    .proof-type p {
+      color: var(--text-dim);
+      font-size: 0.65rem;
+    }
+    
+    /* Upload zone */
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: var(--bg);
+    }
+    
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+    
+    .upload-zone .upload-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .upload-zone p {
+      margin: 0.25rem 0;
+    }
+    
+    .upload-zone .upload-hint {
+      color: var(--text-dim);
+      font-size: 0.75rem;
+    }
+    
+    /* Document preview */
+    .document-preview {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+    
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      background: var(--bg-muted);
+      font-size: 0.8rem;
+    }
+    
+    .btn-small {
+      background: none;
+      border: 1px solid var(--border);
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      cursor: pointer;
+      color: var(--text-dim);
+    }
+    
+    .btn-small:hover {
+      background: var(--bg-card);
+      color: var(--text);
+    }
+    
+    .preview-image-container {
+      max-height: 200px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-muted);
+    }
+    
+    .preview-image-container img {
+      max-width: 100%;
+      max-height: 200px;
+      object-fit: contain;
+    }
+    
+    .ocr-status {
+      padding: 0.75rem 1rem;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* Parsed data */
+    .parsed-data {
+      background: var(--accent-light);
+      border: 1px solid var(--accent);
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .parsed-data h4 {
+      font-size: 0.85rem;
+      margin-bottom: 0.75rem;
+      color: var(--accent);
+    }
+    
+    .parsed-field {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    
+    .parsed-field label {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+    
+    .parsed-field input {
+      flex: 1;
+      min-width: 150px;
+    }
+    
+    .confidence {
+      font-size: 0.7rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      background: var(--bg);
+    }
+    
+    .confidence.high {
+      color: var(--success);
+      background: #ecfdf5;
+    }
+    
+    .confidence.medium {
+      color: var(--orange);
+      background: #fef3c7;
+    }
+    
+    .confidence.low {
+      color: #dc2626;
+      background: #fee2e2;
+    }
+    
+    .parsed-notice {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      margin-top: 0.75rem;
+    }
+    
+    .income-input-group {
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+    
+    .income-input-group .currency {
+      background: var(--bg-muted);
+      border: 1px solid var(--border);
+      border-right: none;
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px 0 0 8px;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+    
+    .income-input-group input {
+      border-radius: 0 8px 8px 0;
+      flex: 1;
+    }
+    
+    /* Verification Steps */
+    .verification-step {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      background: var(--bg);
+      transition: all 0.3s;
+    }
+    
+    .verification-step.active {
+      border-color: var(--accent);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    
+    .verification-step.completed {
+      border-color: var(--success);
+      background: #f0fdf4;
+    }
+    
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    
+    .step-number {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    
+    .verification-step.completed .step-number {
+      background: var(--success);
+    }
+    
+    .step-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    
+    .step-badge {
+      font-size: 0.65rem;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      background: var(--bg-muted);
+      color: var(--text-dim);
+      margin-left: auto;
+    }
+    
+    .step-badge.optional {
+      background: #fef3c7;
+      color: var(--orange);
+    }
+    
+    /* Webcam / Selfie */
+    .selfie-container {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    
+    .webcam-box {
+      position: relative;
+      width: 280px;
+      height: 210px;
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    .webcam-box video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1); /* Mirror */
+    }
+    
+    .face-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    
+    .webcam-status {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 0.5rem;
+      font-size: 0.75rem;
+      text-align: center;
+    }
+    
+    .liveness-instructions {
+      flex: 1;
+      min-width: 200px;
+      padding: 1rem;
+      background: var(--bg-muted);
+      border-radius: 12px;
+    }
+    
+    .liveness-instructions h4 {
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .liveness-instructions p {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin-bottom: 0.5rem;
+    }
+    
+    .blink-progress {
+      display: flex;
+      gap: 0.5rem;
+      margin: 1rem 0;
+    }
+    
+    .blink-dot {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      transition: all 0.3s;
+    }
+    
+    .blink-dot.detected {
+      background: var(--success);
+      border-color: var(--success);
+    }
+    
+    .liveness-status {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+    
+    .liveness-status.success {
+      color: var(--success);
+      font-weight: 600;
+    }
+    
+    /* NFC */
+    .nfc-container {
+      text-align: center;
+      padding: 1rem;
+    }
+    
+    .nfc-icon {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .nfc-container p {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      margin-bottom: 0.5rem;
+    }
+    
+    .nfc-hint {
+      font-size: 0.75rem;
+    }
+    
+    .nfc-status {
+      margin: 1rem 0;
+      font-size: 0.8rem;
+    }
+    
+    .btn-link {
+      background: none;
+      border: none;
+      color: var(--accent);
+      cursor: pointer;
+      font-size: 0.8rem;
+      padding: 0.5rem;
+    }
+    
+    .btn-link:hover {
+      text-decoration: underline;
+    }
+    
+    /* Verification Summary */
+    .verification-summary {
+      background: #f0fdf4;
+      border: 1px solid var(--success);
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .verification-summary h4 {
+      color: var(--success);
+      font-size: 0.85rem;
+      margin-bottom: 0.75rem;
+    }
+    
+    .verification-checks {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .verification-check {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+    }
+    
+    .verification-check .icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+    }
+    
+    .verification-check.passed .icon {
+      background: var(--success);
+      color: white;
+    }
+    
+    .verification-check.skipped .icon {
+      background: var(--bg-muted);
+      color: var(--text-dim);
+    }
+    
+    .verification-level {
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+    
+    .verification-level strong {
+      color: var(--success);
+    }
+    
+    /* Proof form */
+    .proof-form {
+      display: none;
+    }
+    
+    .proof-form.active {
+      display: block;
+    }
+    
+    .proof-form h3 {
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .auth-partner-banner {
+      display: none;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-card);
+    }
+
+    body.auth-themed .auth-partner-banner {
+      display: block;
+    }
+
+    .auth-partner-banner[hidden] {
+      display: none;
+    }
+
+    .auth-partner-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1.1rem 3rem;
+      display: grid;
+      grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .auth-partner-logo {
+      max-width: 180px;
+      max-height: 46px;
+      object-fit: contain;
+      object-position: left center;
+    }
+
+    .auth-partner-copy {
+      min-width: 0;
+    }
+
+    .auth-partner-eyebrow {
+      color: var(--accent);
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 0.15rem;
+    }
+
+    .auth-partner-copy h2 {
+      color: var(--text);
+      font-size: clamp(1.05rem, 4vw, 1.45rem);
+      line-height: 1.15;
+      margin: 0;
+    }
+
+    .auth-partner-copy p {
+      color: var(--text-dim);
+      font-size: 0.82rem;
+      margin: 0.35rem 0 0;
+    }
+
+    .auth-partner-disclosure {
+      color: var(--text) !important;
+    }
+
+    .auth-partner-disclosure a {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    body.auth-themed .claim-card,
+    body.auth-themed .proof-type,
+    body.auth-themed .upload-zone,
+    body.auth-themed input,
+    body.auth-themed select,
+    body.auth-themed .btn,
+    body.auth-themed .privacy-notice,
+    body.auth-themed .result,
+    body.auth-themed .warning-box,
+    body.auth-themed .verification-step,
+    body.auth-themed .document-preview {
+      border-radius: var(--partner-radius, 8px);
+    }
+
+    body.auth-themed .claim-card {
+      box-shadow: 0 20px 54px rgba(15, 27, 45, 0.12);
+    }
+
+    .auth-return-action {
+      margin-top: 1rem;
+      padding: 1rem;
+      border: 1px solid var(--accent);
+      border-radius: var(--partner-radius, 8px);
+      background: var(--accent-light);
+    }
+
+    .auth-return-action p {
+      color: var(--text);
+      font-size: 0.85rem;
+      margin: 0 0 0.75rem;
+    }
+
+    /* Footer */
+    .footer-wrapper {
+      border-top: 1px solid var(--border);
+      margin-top: auto;
+    }
+    
+    footer {
+      padding: 2rem 3rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+    
+    .footer-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.75rem;
+    }
+    
+    .footer-links a:hover { color: var(--accent); }
+    
+    .footer-copy {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+    }
+    
+    @media (max-width: 600px) {
+      footer {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+        padding: 1.5rem 1rem;
+      }
+      .footer-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+      }
+
+      .auth-partner-inner {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+      }
+
+      .auth-partner-logo {
+        max-width: 160px;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="/otrust-polish.css?v=20260527-1">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <nav role="navigation" aria-label="Main navigation">
+    <div class="nav-container">
+      <a href="/" class="logo">OTRUST</a>
+      <div class="nav-links">
+        <span class="nav-primary">
+          <a href="/">Timestamp</a>
+          <a href="/sign">Signed</a>
+          <a href="/proof" class="active">Proof</a>
+        </span>
+        <span class="nav-secondary" id="nav-secondary">
+          <a href="/sign-in">Sign in</a>
+          <a href="/docs">Docs</a>
+          <a href="/about">About</a>
+        </span>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode"></button>
+        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu" title="Menu"><span></span></button>
+      </div>
+    </div>
+  </nav>
+
+  <section class="auth-partner-banner" id="authPartnerBanner" hidden>
+    <div class="auth-partner-inner">
+      <img id="authPartnerLogo" class="auth-partner-logo" alt="" crossorigin="anonymous" referrerpolicy="no-referrer" hidden>
+      <div class="auth-partner-copy">
+        <p class="auth-partner-eyebrow">Hosted identity setup</p>
+        <h2 id="authPartnerHeadline">Create your OTRUST identity proof</h2>
+        <p id="authPartnerSubhead">Create a reusable identity proof, then return to the partner login flow.</p>
+        <p class="auth-partner-disclosure">Secure identity setup via OTRUST. GDPR and DPO contact: <a href="mailto:dpo@otrust.eu">dpo@otrust.eu</a>.</p>
+      </div>
+    </div>
+  </section>
+  
+  <main id="main-content" role="main">
+  <div class="main-layout">
+    <div class="left-col">
+      <section class="hero">
+        <span class="hero-badge" id="proofHeroBadge">Privacy Proofs</span>
+        <h1 id="proofHeroTitle">Prove without revealing</h1>
+        <p id="proofHeroCopy">Zero-knowledge proofs let you prove facts about yourself without exposing the underlying data. Cryptographically verified, privacy preserved.</p>
+      </section>
+      
+      <!-- Flow -->
+      <section class="info-section">
+        <h2>Flow</h2>
+        <div class="steps">
+          <div class="step-item">
+            <span class="step-num">1</span>
+            <div>
+              <strong>Commit</strong>
+              <p>Your data is hashed into a commitment.</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <span class="step-num">2</span>
+            <div>
+              <strong>Prove</strong>
+              <p>A commitment proof shows the condition is met without exposing the underlying data.</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <span class="step-num">3</span>
+            <div>
+              <strong>Verify</strong>
+              <p>Anyone can verify without seeing data.</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <span class="step-num">4</span>
+            <div>
+              <strong>Share</strong>
+              <p>Share your proof URL with verifiers.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+    
+    <!-- Main Card -->
+    <section class="claim-section">
+    <div class="claim-card">
+      <div class="tabs">
+        <button class="tab active" data-tab="create">Create Proof</button>
+        <button class="tab" data-tab="verify">Verify</button>
+      </div>
+      
+      <!-- Create Proof Tab -->
+      <div id="tab-create" class="tab-content active">
+        <div class="proof-types">
+          <div class="proof-type selected" data-type="identity" id="proof-type-identity">
+            <div class="icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="12" r="2"/><path d="M14 10h4M14 14h4"/></svg></div>
+            <h3>Unique Identity</h3>
+            <p>Prove you're a unique human (one proof per person)</p>
+          </div>
+          
+          <div class="proof-type" data-type="age" id="proof-type-age" style="display:none;">
+            <div class="icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M12 3v4M8 7V5M16 7V5"/></svg></div>
+            <h3>Age</h3>
+            <p>Upload ID to prove your age</p>
+          </div>
+          
+          <div class="proof-type" data-type="income" id="proof-type-income" style="display:none;">
+            <div class="icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M9 9h6M9 15h6"/></svg></div>
+            <h3>Income</h3>
+            <p>Upload tax return or payslip</p>
+          </div>
+        </div>
+        
+        <!-- Identity Proof Form (replaces Age Proof) -->
+        <div id="form-identity" class="proof-form" style="display:block;">
+          <h3>Unique Identity Proof</h3>
+          
+          <!-- Step 1: Upload ID -->
+          <div id="age-step-1" class="verification-step active">
+            <div class="step-header">
+              <span class="step-number">1</span>
+              <span class="step-title">Upload ID Document</span>
+            </div>
+            <div class="upload-zone" id="age-upload-zone">
+              <div class="upload-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg></div>
+              <p><strong>Upload ID Document</strong></p>
+              <p class="upload-hint">Passport, driver's license, or national ID card</p>
+              <p class="upload-hint">Drag & drop or click to browse</p>
+              <input type="file" id="age-file-input" accept="image/*" hidden>
+            </div>
+            
+            <div id="age-preview" class="document-preview" style="display: none;">
+              <div class="preview-header">
+                <span>Document uploaded</span>
+                <button class="btn-small" id="age-clear-doc">× Clear</button>
+              </div>
+              <div class="preview-image-container">
+                <img id="age-preview-img" alt="Document preview">
+              </div>
+              <div id="age-ocr-status" class="ocr-status">
+                <span class="spinner"></span> Scanning document...
+              </div>
+              <div id="age-face-status" class="ocr-status" style="display: none;">
+                <span class="spinner"></span> Detecting face on ID...
+              </div>
+            </div>
+          </div>
+          
+          <!-- Step 2: Selfie Verification -->
+          <div id="age-step-2" class="verification-step" style="display: none;">
+            <div class="step-header">
+              <span class="step-number">2</span>
+              <span class="step-title">Verify Your Identity</span>
+            </div>
+            
+            <div class="selfie-container">
+              <div class="webcam-box">
+                <video id="age-webcam" autoplay playsinline muted></video>
+                <canvas id="age-overlay" class="face-overlay"></canvas>
+                <div id="age-webcam-status" class="webcam-status">
+                  <span class="spinner"></span> Starting camera...
+                </div>
+              </div>
+              
+              <div id="liveness-instructions" class="liveness-instructions">
+                <h4>Liveness Check</h4>
+                <p>Please <strong>blink twice</strong> to prove you're a real person</p>
+                <div class="blink-progress">
+                  <div class="blink-dot" id="blink-1"></div>
+                  <div class="blink-dot" id="blink-2"></div>
+                </div>
+                <p id="liveness-status" class="liveness-status">Waiting for face...</p>
+              </div>
+            </div>
+            
+            <button class="btn btn-secondary" id="btn-skip-liveness" style="margin-top: 0.5rem;">
+              Skip verification (lower trust)
+            </button>
+          </div>
+          
+          <!-- Step 3: NFC (optional) -->
+          <div id="age-step-3" class="verification-step" style="display: none;">
+            <div class="step-header">
+              <span class="step-number">3</span>
+              <span class="step-title">NFC Chip (Optional)</span>
+              <span class="step-badge optional">Optional</span>
+            </div>
+            
+            <div class="nfc-container">
+              <div class="nfc-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 7a5 5 0 015-5h10a5 5 0 015 5v10a5 5 0 01-5 5H7a5 5 0 01-5-5z"/><path d="M8.5 15.5l3-3 4 4M7 11a4 4 0 014-4"/></svg></div>
+              <p>For highest security, read the NFC chip in your passport</p>
+              <p class="nfc-hint">Hold your passport against your phone's NFC reader</p>
+              <div id="nfc-status" class="nfc-status"></div>
+              <button class="btn btn-secondary" id="btn-read-nfc">Read NFC Chip</button>
+              <button class="btn btn-link" id="btn-skip-nfc">Skip this step →</button>
+            </div>
+          </div>
+          
+          <!-- Final: Generate Proof -->
+          <div id="age-step-final" class="verification-step" style="display: none;">
+            <div class="step-header">
+              <span class="step-number">✓</span>
+              <span class="step-title">Identity Verified</span>
+            </div>
+            
+            <div class="verification-summary" id="age-verification-summary">
+              <!-- Filled dynamically -->
+            </div>
+            
+            <div id="age-parsed-data" class="parsed-data">
+              <h4>Extracted Information</h4>
+              <div class="parsed-field" id="name-field" style="display: none;">
+                <label>Name:</label>
+                <input type="text" id="extracted-name" readonly style="background: var(--bg-muted); cursor: not-allowed;">
+                <span class="confidence" id="name-confidence">✓ From ID</span>
+              </div>
+              <div class="parsed-field" id="pnr-field" style="display: none;">
+                <label>Personnummer:</label>
+                <input type="text" id="extracted-pnr" readonly style="background: var(--bg-muted); cursor: not-allowed; font-family: monospace;">
+                <span class="confidence" id="pnr-confidence">✓ Verified</span>
+              </div>
+              <div class="parsed-field">
+                <label>Birth Date:</label>
+                <input type="date" id="birth-date" required>
+                <span class="confidence" id="age-confidence"></span>
+              </div>
+            </div>
+            
+            <!-- Age select hidden - now used for unique identity -->
+            <div class="form-group" id="age-min-select" style="display: none;">
+              <label>Prove you are at least:</label>
+              <select id="min-age">
+                <option value="18">18 years old</option>
+              </select>
+            </div>
+            
+            <div class="privacy-notice">
+              <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span>
+              <p><strong>Privacy:</strong> Your document and face data are processed locally. Your personnummer is hashed (one-way) to prevent duplicates - we cannot see or store it.</p>
+            </div>
+            
+            <div class="form-group" style="margin-top: 1rem;">
+              <label for="proof-pin">Choose a 6-digit PIN code</label>
+              <input type="password" id="proof-pin" inputmode="numeric" pattern="[0-9]{6}" minlength="6" maxlength="6" placeholder="••••••" style="letter-spacing: 0.5em; text-align: center; font-size: 1.5rem; padding: 0.75rem;" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6)">
+              <p class="hint" style="font-size: 0.8rem; color: var(--text-dim); margin-top: 0.5rem;">🔐 PIN used to unlock your identity when logging in. Choose something memorable!</p>
+            </div>
+            
+            <button class="btn btn-primary" id="btn-generate-age" style="margin-top: 1rem;">
+              Create Unique Identity Proof
+            </button>
+          </div>
+          
+          <div id="result-age"></div>
+        </div>
+        
+        <!-- Income Proof Form -->
+        <div id="form-income" class="proof-form">
+          <h3>Income Verification</h3>
+          
+          <div class="upload-zone" id="income-upload-zone">
+            <div class="upload-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg></div>
+            <p><strong>Upload Income Document</strong></p>
+            <p class="upload-hint">Tax return, payslip, or bank statement</p>
+            <p class="upload-hint">Drag & drop or click to browse</p>
+            <input type="file" id="income-file-input" accept="image/*,.pdf" hidden>
+          </div>
+          
+          <div id="income-preview" class="document-preview" style="display: none;">
+            <div class="preview-header">
+              <span>Document uploaded</span>
+              <button class="btn-small" id="income-clear-doc">× Clear</button>
+            </div>
+            <div class="preview-image-container">
+              <img id="income-preview-img" alt="Document preview">
+            </div>
+            <div id="income-ocr-status" class="ocr-status">
+              <span class="spinner"></span> Scanning document...
+            </div>
+          </div>
+          
+          <div id="income-parsed-data" class="parsed-data" style="display: none;">
+            <h4>Extracted Information</h4>
+            <div class="parsed-field">
+              <label>Annual Income Found:</label>
+              <div class="income-input-group">
+                <span class="currency">$</span>
+                <input type="number" id="income-amount" placeholder="0">
+              </div>
+              <span class="confidence" id="income-confidence"></span>
+            </div>
+            <p class="parsed-notice">Please verify this is correct before generating proof</p>
+          </div>
+          
+          <div class="form-group" id="income-min-select" style="display: none;">
+            <label>Prove income is at least:</label>
+            <select id="min-income">
+              <option value="20000">$20,000 / year</option>
+              <option value="30000">$30,000 / year</option>
+              <option value="50000">$50,000 / year</option>
+              <option value="75000">$75,000 / year</option>
+              <option value="100000">$100,000 / year</option>
+            </select>
+          </div>
+          
+          <div class="privacy-notice">
+            <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span>
+            <p><strong>Privacy:</strong> Your document is processed locally. Your exact income is NEVER revealed - only that it meets the minimum requirement.</p>
+          </div>
+          
+          <button class="btn btn-primary" id="btn-generate-income" style="margin-top: 1rem; display: none;">
+            Generate Income Proof
+          </button>
+          
+          <div id="result-income"></div>
+        </div>
+      </div>
+      
+      <!-- Verify Tab -->
+      <div id="tab-verify" class="tab-content">
+        <div class="form-group">
+          <label>Proof ID or URL</label>
+          <input type="text" id="verify-id" placeholder="Enter proof ID or paste URL">
+        </div>
+        
+        <button class="btn btn-primary" id="btn-verify">
+          Verify Proof
+        </button>
+        
+        <div id="verify-result"></div>
+      </div>
+    </div>
+    </section>
+  </div>
+  </main>
+  
+  <!-- Load Document OCR Library -->
+  <script src="/js/document-ocr.js?v=4"></script>
+  <!-- Load Face Verification Library -->
+  <script src="/js/face-verify.js?v=4"></script>
+  <!-- Load ZK Proof Library -->
+  <script src="/js/zkproof.js"></script>
+  <!-- Load Proof Page JavaScript -->
+  <script src="/js/proof-page.js?v=5"></script>
+
+  <div class="footer-wrapper">
+  <footer role="contentinfo">
+    <div class="footer-links">
+      <a href="/">Timestamp</a>
+      <a href="/sign">Signed</a>
+      <a href="/proof">Proof</a>
+      <a href="/sign-in">Sign in</a>
+      <a href="/docs">Docs</a>
+      <a href="/about">About</a>
+      <a href="/privacy-policy">Privacy</a>
+      <a href="/terms">Terms</a>
+      <a href="https://github.com/otrust-eu/opensource">GitHub</a>
+    </div>
+    <div class="footer-copy">OTRUST - MIT License</div>
+    <div class="footer-copy" style="font-size: 0.7rem; opacity: 0.6; margin-top: 0.5rem;">Cryptographic proof of identity claims. Raw identity data is not shown to verifiers. <a href="/terms" style="color: inherit;">Terms</a></div>
+  </footer>
+  </div>
+  <script src="/otrust-polish.js" defer></script>
+</body>
+</html>

@@ -83,7 +83,7 @@ export interface ProofDetails {
 }
 
 /** Wallet format */
-export type WalletFormat = 'apple' | 'google';
+export type WalletFormat = 'apple';
 
 /** Options for identity verification with face recognition */
 export interface IdentityVerifyOptions {

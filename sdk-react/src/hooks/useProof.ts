@@ -15,7 +15,7 @@ export interface UseProofReturn {
   /** Get proof details */
   getProof: (proofId: string) => Promise<ProofDetails | null>;
   /** Get wallet pass URL */
-  getWalletPass: (proofId: string, platform: 'apple' | 'google') => Promise<string | null>;
+  getWalletPass: (proofId: string, platform: 'apple') => Promise<string | null>;
   /** Loading state */
   isLoading: boolean;
   /** Error state */
@@ -131,7 +131,7 @@ export function useProof(): UseProofReturn {
 
   const getWalletPass = useCallback(async (
     proofId: string,
-    platform: 'apple' | 'google'
+    platform: 'apple'
   ): Promise<string | null> => {
     setIsLoading(true);
     setError(null);

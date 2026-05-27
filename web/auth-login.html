@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login with OTRUST - Secure Authentication</title>
+  <meta name="description" content="Secure login with OTRUST. Privacy-first authentication without passwords.">
+  <meta name="author" content="Kris Ledel">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <style>
+    :root {
+      --partner-bg: #f5f7fa;
+      --partner-primary: #2d5a3d;
+      --partner-text: #0f1b2d;
+      --partner-radius: 8px;
+      --partner-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --muted-text: #5f6f85;
+      --panel-border: #dbe4ef;
+      --panel-bg: rgba(255, 255, 255, 0.96);
+      --soft-bg: #f7fafc;
+      --stack-gap: 20px;
+      --section-gap: 24px;
+    }
+
+    :root[data-spacing="tight"] {
+      --stack-gap: 16px;
+      --section-gap: 20px;
+    }
+
+    :root[data-spacing="loose"] {
+      --stack-gap: 24px;
+      --section-gap: 30px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-width: 0;
+      background: var(--partner-bg);
+    }
+
+    body {
+      min-width: 0;
+      min-height: 100vh;
+      margin: 0;
+      color: var(--partner-text);
+      font-family: var(--partner-font-family);
+      background:
+        radial-gradient(circle at top left, rgba(45, 90, 61, 0.12), transparent 32rem),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.68), rgba(255, 255, 255, 0.18)),
+        var(--partner-bg);
+    }
+
+    body,
+    input,
+    button {
+      letter-spacing: 0;
+    }
+
+    a {
+      color: var(--partner-primary);
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    .auth-shell {
+      width: 100%;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: clamp(16px, 4vw, 40px);
+    }
+
+    .container {
+      width: min(100%, 460px);
+      min-width: 0;
+      padding: clamp(22px, 5vw, 36px);
+      border: 1px solid rgba(15, 27, 45, 0.08);
+      border-radius: calc(var(--partner-radius) + 10px);
+      background: var(--panel-bg);
+      box-shadow: 0 22px 60px rgba(15, 27, 45, 0.16);
+    }
+
+    .brand-header {
+      display: grid;
+      gap: 12px;
+      margin-bottom: var(--section-gap);
+    }
+
+    .partner-logo {
+      max-width: min(240px, 100%);
+      max-height: 60px;
+      object-fit: contain;
+      object-position: left center;
+    }
+
+    .default-brand,
+    .footer-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--partner-text);
+      font-weight: 700;
+    }
+
+    .default-brand svg {
+      width: 44px;
+      height: 44px;
+      flex: 0 0 auto;
+    }
+
+    .default-brand.partner-text-brand {
+      min-height: 44px;
+      width: fit-content;
+      padding: 0 16px;
+      border: 1px solid rgba(15, 27, 45, 0.16);
+      border-radius: var(--partner-radius);
+      background: rgba(255, 255, 255, 0.88);
+      color: var(--partner-text);
+    }
+
+    .default-brand.partner-text-brand svg {
+      display: none;
+    }
+
+    .footer-brand svg {
+      width: 22px;
+      height: 22px;
+      flex: 0 0 auto;
+    }
+
+    .brand-header h1 {
+      margin: 4px 0 0;
+      color: var(--partner-text);
+      font-size: clamp(1.65rem, 6vw, 2.2rem);
+      line-height: 1.08;
+      font-weight: 720;
+    }
+
+    .brand-header p {
+      margin: 0;
+      color: var(--muted-text);
+      font-size: 0.98rem;
+      line-height: 1.5;
+    }
+
+    .otrust-disclosure {
+      padding: 10px 12px;
+      border: 1px solid rgba(15, 27, 45, 0.1);
+      border-radius: var(--partner-radius);
+      background: rgba(255, 255, 255, 0.72);
+      color: var(--partner-text) !important;
+      font-size: 0.9rem !important;
+    }
+
+    .info-blurb {
+      padding: 12px 14px;
+      border-left: 3px solid var(--partner-primary);
+      border-radius: var(--partner-radius);
+      background: color-mix(in srgb, var(--partner-primary) 8%, white);
+      color: var(--partner-text) !important;
+    }
+
+    .client-info {
+      display: grid;
+      gap: 10px;
+      min-width: 0;
+      margin-bottom: var(--section-gap);
+      padding: 16px;
+      border: 1px solid var(--panel-border);
+      border-radius: var(--partner-radius);
+      background: var(--soft-bg);
+    }
+
+    .identity-methods {
+      display: grid;
+      gap: 10px;
+      min-width: 0;
+      margin-bottom: var(--section-gap);
+      padding: 16px;
+      border: 1px solid var(--panel-border);
+      border-radius: var(--partner-radius);
+      background: var(--soft-bg);
+    }
+
+    .method-grid {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: 1fr;
+    }
+
+    .method-choice {
+      align-items: center;
+      display: grid;
+      gap: 4px;
+      min-height: 64px;
+      padding: 12px;
+      border: 1px solid var(--panel-border);
+      border-radius: var(--partner-radius);
+      background: #fff;
+      color: var(--partner-text);
+      cursor: pointer;
+      font: inherit;
+      text-align: left;
+    }
+
+    .method-choice strong {
+      font-size: 0.94rem;
+    }
+
+    .method-choice span {
+      color: var(--muted-text);
+      font-size: 0.78rem;
+    }
+
+    .method-choice.selected,
+    .method-choice:focus-visible {
+      border-color: var(--partner-primary);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--partner-primary) 14%, transparent);
+      outline: 0;
+    }
+
+    .method-disclosure {
+      align-items: center;
+      color: var(--muted-text);
+      display: flex;
+      flex-wrap: wrap;
+      font-size: 0.82rem;
+      gap: 8px;
+    }
+
+    .method-logo {
+      border: 1px solid rgba(15, 27, 45, 0.16);
+      border-radius: 5px;
+      color: var(--partner-text);
+      font-size: 0.76rem;
+      font-weight: 900;
+      padding: 0.22rem 0.48rem;
+    }
+
+    .eyebrow {
+      margin: 0;
+      color: var(--muted-text);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .client-name {
+      min-width: 0;
+      overflow-wrap: anywhere;
+      color: var(--partner-text);
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .scope {
+      display: grid;
+      gap: 8px;
+      min-width: 0;
+      color: var(--muted-text);
+      font-size: 0.9rem;
+    }
+
+    .scope-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .scope-item {
+      max-width: 100%;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--partner-primary) 10%, white);
+      color: var(--partner-primary);
+      font-size: 0.8rem;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    .error,
+    .success {
+      margin-bottom: var(--stack-gap);
+      padding: 12px 14px;
+      border-radius: var(--partner-radius);
+      font-size: 0.92rem;
+      line-height: 1.45;
+    }
+
+    .error {
+      border: 1px solid #fecaca;
+      background: #fee2e2;
+      color: #9f1239;
+    }
+
+    .success {
+      border: 1px solid #a7f3d0;
+      background: #d1fae5;
+      color: #047857;
+    }
+
+    .loading {
+      display: grid;
+      gap: 12px;
+      justify-items: center;
+      padding: 18px;
+      color: var(--muted-text);
+    }
+
+    .loading p {
+      margin: 0;
+    }
+
+    .spinner {
+      width: 38px;
+      height: 38px;
+      border: 3px solid #e1e8f0;
+      border-top-color: var(--partner-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    form {
+      display: grid;
+      gap: var(--stack-gap);
+    }
+
+    .form-group {
+      display: grid;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    label {
+      color: var(--partner-text);
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    input {
+      width: 100%;
+      min-width: 0;
+      padding: 14px 15px;
+      border: 1px solid var(--panel-border);
+      border-radius: var(--partner-radius);
+      background: #fff;
+      color: var(--partner-text);
+      font: inherit;
+      font-size: 1rem;
+      transition: border-color 0.18s, box-shadow 0.18s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--partner-primary);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--partner-primary) 16%, transparent);
+    }
+
+    input::placeholder {
+      color: #99a6b8;
+    }
+
+    .pin-input {
+      text-align: center;
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .hint {
+      color: var(--muted-text);
+      font-size: 0.82rem;
+      line-height: 1.4;
+    }
+
+    details {
+      min-width: 0;
+      padding: 12px 14px;
+      border: 1px solid var(--panel-border);
+      border-radius: var(--partner-radius);
+      background: #fff;
+    }
+
+    summary {
+      cursor: pointer;
+      color: var(--muted-text);
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    details .form-group {
+      margin-top: 14px;
+    }
+
+    .btn {
+      width: 100%;
+      min-height: 52px;
+      padding: 14px 16px;
+      border: 0;
+      border-radius: var(--partner-radius);
+      background: var(--partner-primary);
+      color: #fff;
+      font: inherit;
+      font-size: 1rem;
+      font-weight: 750;
+      cursor: pointer;
+      transition: transform 0.18s, box-shadow 0.18s, opacity 0.18s;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 24px color-mix(in srgb, var(--partner-primary) 26%, transparent);
+    }
+
+    .btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.65;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: var(--section-gap) 0 16px;
+      color: var(--muted-text);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--panel-border);
+    }
+
+    .no-proof {
+      display: grid;
+      gap: 8px;
+      padding: 16px;
+      border-radius: var(--partner-radius);
+      background: var(--soft-bg);
+      text-align: center;
+    }
+
+    .no-proof p {
+      margin: 0;
+      color: var(--muted-text);
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
+    .no-proof a {
+      font-weight: 750;
+      text-decoration: none;
+    }
+
+    .footer {
+      display: grid;
+      gap: 8px;
+      margin-top: var(--section-gap);
+      padding-top: var(--section-gap);
+      border-top: 1px solid var(--panel-border);
+      color: var(--muted-text);
+      font-size: 0.78rem;
+      line-height: 1.45;
+      text-align: center;
+    }
+
+    .footer p {
+      margin: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .footer-brand {
+      justify-content: center;
+      color: var(--partner-text);
+    }
+
+    .footer a {
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    body.partner-theme {
+      --muted-text: rgba(15, 27, 45, 0.68);
+      --panel-border: rgba(15, 27, 45, 0.14);
+      --panel-bg: rgba(255, 255, 255, 0.94);
+      --soft-bg: rgba(238, 240, 232, 0.7);
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(238, 240, 232, 0.76)),
+        var(--partner-bg);
+    }
+
+    body.partner-theme .container {
+      border-color: rgba(15, 27, 45, 0.14);
+      box-shadow: 0 28px 80px rgba(15, 27, 45, 0.14);
+    }
+
+    body.partner-theme .brand-header {
+      padding-bottom: var(--section-gap);
+      border-bottom: 1px solid rgba(15, 27, 45, 0.1);
+    }
+
+    body.partner-theme .brand-header h1 {
+      max-width: 12ch;
+      font-size: clamp(2rem, 7vw, 2.75rem);
+      line-height: 1.03;
+    }
+
+    body.partner-theme .otrust-disclosure {
+      background: rgba(255, 255, 255, 0.78);
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @media (max-width: 520px) {
+      .auth-shell {
+        align-items: start;
+        place-items: start center;
+        padding: 12px;
+      }
+
+      .container {
+        padding: 20px;
+        border-radius: calc(var(--partner-radius) + 6px);
+        box-shadow: 0 16px 38px rgba(15, 27, 45, 0.13);
+      }
+
+      .brand-header h1 {
+        font-size: 1.62rem;
+      }
+
+      .method-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .client-info,
+      .no-proof {
+        padding: 14px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .container {
+        padding: 16px;
+      }
+
+      .btn {
+        min-height: 50px;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="/otrust-polish.css?v=20260527-1">
+</head>
+<body>
+  <main class="auth-shell" aria-labelledby="headline">
+    <section class="container">
+      <header class="brand-header">
+        <img id="partnerLogo" class="partner-logo" alt="" crossorigin="anonymous" referrerpolicy="no-referrer" hidden>
+        <div id="defaultBrand" class="default-brand" aria-label="OTRUST">
+          <svg viewBox="0 0 100 100" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="45" fill="currentColor"/>
+            <path d="M30 55 L45 70 L75 35" stroke="white" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>OTRUST</span>
+        </div>
+        <h1 id="headline">Login with OTRUST</h1>
+        <p id="subhead">Secure authentication with your OTRUST identity proof.</p>
+        <p class="otrust-disclosure" id="otrustDisclosure">Secure login via OTRUST. You are on otrust.eu because OTRUST handles the identity flow.</p>
+        <p id="infoBlurb" class="info-blurb" hidden></p>
+      </header>
+
+      <div class="client-info" id="clientInfo">
+        <p class="eyebrow">Signing in to</p>
+        <div class="client-name" id="clientName">Loading...</div>
+        <div class="scope" id="scopeContainer">
+          <span>Requesting access to</span>
+          <div class="scope-items" id="scopeItems"></div>
+        </div>
+      </div>
+
+      <div class="error" id="error" role="alert" hidden></div>
+      <div class="success" id="success" role="status" hidden></div>
+
+      <section class="identity-methods" id="identityMethods" aria-label="Identity methods" hidden>
+        <p class="eyebrow">Identity method</p>
+        <div class="method-grid">
+          <button type="button" class="method-choice selected" data-proof-method="otrust-proof">
+            <strong>OTRUST Proof</strong>
+            <span>Anv&auml;nd ditt verifierade Proof ID och PIN.</span>
+          </button>
+        </div>
+        <div class="method-disclosure" id="methodDisclosure" hidden>
+          <span class="method-logo">OTRUST Proof</span>
+          <span>Prim&auml;r identitetsmetod f&ouml;r detta partner-theme.</span>
+        </div>
+      </section>
+
+      <div class="loading" id="loading" hidden>
+        <div class="spinner" aria-hidden="true"></div>
+        <p>Verifying your identity...</p>
+      </div>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="proofId">Your Proof ID</label>
+          <input type="text" id="proofId" name="proofId" placeholder="id_abc123..." autocomplete="username" required>
+        </div>
+
+        <div class="form-group">
+          <label for="pin">Your PIN Code</label>
+          <input class="pin-input" type="password" id="pin" name="pin" inputmode="numeric" maxlength="6" placeholder="PIN" autocomplete="current-password" required>
+          <span class="hint">The 4-6 digit PIN you chose when creating your identity.</span>
+        </div>
+
+        <details>
+          <summary>Use backup secret key instead</summary>
+          <div class="form-group">
+            <label for="secret">Secret Key (backup)</label>
+            <input type="password" id="secret" name="secret" placeholder="Your secret from backup email" autocomplete="one-time-code">
+          </div>
+        </details>
+
+        <button type="submit" class="btn" id="submitBtn">Verify and Continue</button>
+      </form>
+
+      <div class="divider"><span>Do not have a proof?</span></div>
+
+      <div class="no-proof">
+        <p>Create a verified identity proof to use Login with OTRUST.</p>
+        <a href="/proof.html" id="createProofLink">Create Identity Proof</a>
+      </div>
+
+      <footer class="footer">
+        <p id="partnerFooter">Powered by OTRUST</p>
+        <div class="footer-brand" aria-label="OTRUST identity provider">
+          <svg viewBox="0 0 100 100" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="45" fill="currentColor"/>
+            <path d="M30 55 L45 70 L75 35" stroke="white" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>OTRUST</span>
+        </div>
+        <p>Identity flow secured by <a href="/">OTRUST</a> | GDPR and DPO contact: <a href="mailto:dpo@otrust.eu">dpo@otrust.eu</a></p>
+      </footer>
+    </section>
+  </main>
+
+  <script nonce="">
+    const urlParams = new URLSearchParams(window.location.search);
+    const challengeId = urlParams.get('challenge');
+    const requestedThemeId = urlParams.get('theme_id') || urlParams.get('themeId') || '';
+    const returnedProofId = urlParams.get('proof_id');
+
+    const SYSTEM_FONT = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    const DEFAULT_BRANDING = {
+      logoUrl: null,
+      logoAlt: '',
+      themeId: 'default',
+      backgroundColor: '#F5F7FA',
+      primaryColor: '#2D5A3D',
+      textColor: '#0F1B2D',
+      fontFamily: 'system',
+      borderRadius: 8,
+      spacingScale: 'default',
+      headline: 'Login with OTRUST',
+      subhead: 'Secure authentication with your OTRUST identity proof.',
+      footerText: 'Powered by OTRUST',
+      infoBlurb: '',
+      allowedIdentityMethods: ['proof'],
+      autoRedirectSeconds: 3
+    };
+
+    const CSS_COLOR_RE = /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$|^rgba?\(\s*(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\s*,\s*(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\s*,\s*(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(?:\s*,\s*(0|1|0?\.\d+))?\s*\)$/i;
+    const FONT_RE = /^[a-zA-Z0-9 ,.'"-]{1,80}$/;
+    const THEME_ID_RE = /^[a-zA-Z0-9_.:-]{1,80}$/;
+
+    let challengeData = null;
+
+    updateCreateProofLink();
+    prefillReturnedProof();
+
+    async function loadChallenge() {
+      if (!challengeId) {
+        showError('Invalid login link. Please start the login process from the application.');
+        document.getElementById('loginForm').hidden = true;
+        return;
+      }
+
+      try {
+        const metadataUrl = new URL(`/api/v1/auth/challenge/${encodeURIComponent(challengeId)}`, window.location.origin);
+        if (requestedThemeId) {
+          if (!THEME_ID_RE.test(requestedThemeId)) {
+            throw new Error('The requested theme is invalid.');
+          }
+          metadataUrl.searchParams.set('theme_id', requestedThemeId);
+        }
+
+        const response = await fetch(`${metadataUrl.pathname}${metadataUrl.search}`, {
+          headers: { Accept: 'application/json' }
+        });
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || 'This login link is invalid or expired.');
+        }
+
+        challengeData = data;
+        document.getElementById('clientName').textContent = data.clientId || 'External application';
+        renderScopes(data.scope);
+        applyBranding(data.branding || {});
+      } catch (error) {
+        showError(error.message);
+        document.getElementById('loginForm').hidden = true;
+      }
+    }
+
+    function applyBranding(branding) {
+      const theme = { ...DEFAULT_BRANDING, ...branding };
+      const root = document.documentElement;
+      const themeId = String(theme.themeId || '');
+      const hasPartnerBrand = themeId !== 'default' || Boolean(theme.logoUrl || theme.logoAlt);
+      document.body.classList.toggle('partner-theme', hasPartnerBrand);
+
+      if (isCssColor(theme.backgroundColor)) {
+        root.style.setProperty('--partner-bg', theme.backgroundColor);
+      }
+      if (isCssColor(theme.primaryColor)) {
+        root.style.setProperty('--partner-primary', theme.primaryColor);
+      }
+      if (isCssColor(theme.textColor)) {
+        root.style.setProperty('--partner-text', theme.textColor);
+      }
+
+      const radius = Number(theme.borderRadius);
+      if (Number.isFinite(radius) && radius >= 4 && radius <= 12) {
+        root.style.setProperty('--partner-radius', `${radius}px`);
+      }
+
+      if (['tight', 'default', 'loose'].includes(theme.spacingScale)) {
+        root.dataset.spacing = theme.spacingScale;
+      }
+
+      if (theme.fontFamily && theme.fontFamily !== 'system' && FONT_RE.test(theme.fontFamily)) {
+        root.style.setProperty('--partner-font-family', `${theme.fontFamily}, ${SYSTEM_FONT}`);
+      } else {
+        root.style.setProperty('--partner-font-family', SYSTEM_FONT);
+      }
+
+      setText('headline', theme.headline || DEFAULT_BRANDING.headline);
+      setText('subhead', theme.subhead || DEFAULT_BRANDING.subhead);
+      setText('partnerFooter', theme.footerText || DEFAULT_BRANDING.footerText);
+      setText('otrustDisclosure', 'Secure login via OTRUST. You are on otrust.eu because OTRUST handles the identity flow.');
+      document.title = `${theme.headline || DEFAULT_BRANDING.headline} | OTRUST`;
+      renderIdentityMethods(theme.allowedIdentityMethods || DEFAULT_BRANDING.allowedIdentityMethods, themeId);
+
+      const infoBlurb = document.getElementById('infoBlurb');
+      if (theme.infoBlurb) {
+        infoBlurb.textContent = theme.infoBlurb;
+        infoBlurb.hidden = false;
+      } else {
+        infoBlurb.textContent = '';
+        infoBlurb.hidden = true;
+      }
+
+      const partnerLogo = document.getElementById('partnerLogo');
+      const defaultBrand = document.getElementById('defaultBrand');
+      const defaultBrandText = defaultBrand.querySelector('span');
+      if (isSafeHttpsUrl(theme.logoUrl)) {
+        partnerLogo.src = theme.logoUrl;
+        partnerLogo.alt = theme.logoAlt || `${challengeData?.clientId || 'Partner'} logo`;
+        partnerLogo.hidden = false;
+        defaultBrand.hidden = true;
+      } else {
+        partnerLogo.removeAttribute('src');
+        partnerLogo.alt = '';
+        partnerLogo.hidden = true;
+        defaultBrand.hidden = false;
+        if (theme.logoAlt) {
+          defaultBrand.classList.add('partner-text-brand');
+          defaultBrandText.textContent = theme.logoAlt;
+        } else {
+          defaultBrand.classList.remove('partner-text-brand');
+          defaultBrandText.textContent = 'OTRUST';
+        }
+      }
+    }
+
+    function renderIdentityMethods(methods, themeId = '') {
+      const container = document.getElementById('identityMethods');
+      const methodDisclosure = document.getElementById('methodDisclosure');
+      if (!container || !methodDisclosure) return;
+
+      const normalized = Array.isArray(methods) ? methods.map(String) : [];
+      const usesProof = normalized.includes('proof') || normalized.includes('all') || normalized.length === 0;
+      container.hidden = !usesProof;
+      methodDisclosure.hidden = !usesProof;
+
+      if (usesProof) {
+        document.getElementById('submitBtn').textContent = 'Verify with OTRUST Proof';
+        document.querySelectorAll('[data-proof-method]').forEach(button => button.classList.add('selected'));
+      } else {
+        document.getElementById('submitBtn').textContent = 'Verify and Continue';
+      }
+    }
+
+    function renderScopes(scope) {
+      const scopeItems = document.getElementById('scopeItems');
+      scopeItems.replaceChildren();
+
+      const items = Array.isArray(scope) && scope.length ? scope : ['identity'];
+      items.slice(0, 12).forEach(item => {
+        const pill = document.createElement('span');
+        pill.className = 'scope-item';
+        pill.textContent = readableScope(item);
+        scopeItems.appendChild(pill);
+      });
+    }
+
+    function readableScope(scope) {
+      const labels = {
+        identity: 'Identity verification',
+        profile: 'Profile access',
+        email: 'Email verification',
+        signing: 'Document signing'
+      };
+      return labels[scope] || String(scope).replace(/[_:-]+/g, ' ');
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const proofId = document.getElementById('proofId').value.trim();
+      const pin = document.getElementById('pin').value.trim();
+      const secret = document.getElementById('secret')?.value?.trim() || '';
+
+      if (!challengeData) {
+        showError('This login link is not ready. Please reload the page or start again from the application.');
+        return;
+      }
+
+      if (!proofId) {
+        showError('Please enter your Proof ID.');
+        return;
+      }
+
+      if (!pin && !secret) {
+        showError('Please enter your PIN code or backup secret key.');
+        return;
+      }
+
+      document.getElementById('loginForm').hidden = true;
+      document.getElementById('loading').hidden = false;
+      hideError();
+
+      try {
+        const response = await fetch('/api/v1/auth/prove', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            challengeId,
+            proofId,
+            pin: pin || undefined,
+            secret: secret || undefined
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || data.error || 'Authentication failed.');
+        }
+        if (!data.redirectUrl) {
+          throw new Error('The application did not provide a return URL.');
+        }
+
+        showSuccess('Identity verified. Redirecting back to the application...');
+        document.getElementById('loading').hidden = true;
+
+        const delaySeconds = Number(challengeData.branding?.autoRedirectSeconds ?? DEFAULT_BRANDING.autoRedirectSeconds);
+        const delayMs = Math.min(Math.max(Number.isFinite(delaySeconds) ? delaySeconds : 3, 0), 10) * 1000;
+        setTimeout(() => {
+          window.location.href = data.redirectUrl;
+        }, delayMs);
+      } catch (error) {
+        document.getElementById('loading').hidden = true;
+        document.getElementById('loginForm').hidden = false;
+        showError(error.message);
+      }
+    });
+
+    function isCssColor(value) {
+      return typeof value === 'string' && CSS_COLOR_RE.test(value);
+    }
+
+    function isSafeHttpsUrl(value) {
+      if (!value || typeof value !== 'string') return false;
+      try {
+        const parsed = new URL(value);
+        return parsed.protocol === 'https:';
+      } catch {
+        return false;
+      }
+    }
+
+    function setText(id, value) {
+      document.getElementById(id).textContent = value;
+    }
+
+    function updateCreateProofLink() {
+      const link = document.getElementById('createProofLink');
+      if (!link || !challengeId) return;
+
+      const proofUrl = new URL('/proof', window.location.origin);
+      proofUrl.searchParams.set('auth_challenge', challengeId);
+      if (requestedThemeId && THEME_ID_RE.test(requestedThemeId)) {
+        proofUrl.searchParams.set('theme_id', requestedThemeId);
+      }
+      link.href = `${proofUrl.pathname}${proofUrl.search}`;
+    }
+
+    function prefillReturnedProof() {
+      if (!returnedProofId || !/^[a-zA-Z0-9_-]{3,100}$/.test(returnedProofId)) return;
+      const proofInput = document.getElementById('proofId');
+      if (proofInput) proofInput.value = returnedProofId;
+    }
+
+    function showError(message) {
+      const el = document.getElementById('error');
+      el.textContent = message;
+      el.hidden = false;
+    }
+
+    function hideError() {
+      document.getElementById('error').hidden = true;
+    }
+
+    function showSuccess(message) {
+      const el = document.getElementById('success');
+      el.textContent = message;
+      el.hidden = false;
+    }
+
+    document.getElementById('partnerLogo').addEventListener('error', () => {
+      document.getElementById('partnerLogo').hidden = true;
+      const defaultBrand = document.getElementById('defaultBrand');
+      const defaultBrandText = defaultBrand.querySelector('span');
+      defaultBrand.hidden = false;
+      if (challengeData?.branding?.logoAlt) {
+        defaultBrand.classList.add('partner-text-brand');
+        defaultBrandText.textContent = challengeData.branding.logoAlt;
+      }
+    });
+
+    document.querySelectorAll('[data-proof-method]').forEach(button => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('[data-proof-method]').forEach(item => item.classList.remove('selected'));
+        button.classList.add('selected');
+      });
+    });
+
+    loadChallenge();
+  </script>
+</body>
+</html>

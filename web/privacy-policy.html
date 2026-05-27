@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy – OTRUST by Kristian Ledel (Kris Ledel) | Zero-Knowledge Architecture</title>
+  <meta name="description" content="OTRUST privacy policy. Zero-knowledge architecture means we never see your data - only cryptographic hashes. Created by Kristian (Kris) Ledel.">
+  <meta name="keywords" content="privacy policy, zero-knowledge, data privacy, GDPR, cryptographic hashes, OTRUST, Kris Ledel, Kristian Ledel">
+  <meta name="author" content="Kristian Ledel">
+  <meta name="creator" content="Kris Ledel">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://www.otrust.eu/privacy-policy">
+  <link rel="author" href="https://www.otrust.eu/about">
+  <meta property="og:title" content="Privacy Policy – OTRUST by Kristian Ledel">
+  <meta property="og:description" content="Zero-knowledge privacy. We never see your data. By Kristian Ledel.">
+  <meta property="og:url" content="https://www.otrust.eu/privacy-policy">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="OTRUST by Kristian Ledel">
+  <meta property="article:author" content="Kristian Ledel">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Privacy Policy – OTRUST",
+    "url": "https://www.otrust.eu/privacy-policy",
+    "description": "Privacy policy for OTRUST, a zero-knowledge blockchain service by Kristian Ledel.",
+    "author": {
+      "@type": "Person",
+      "name": "Kristian Ledel",
+      "alternateName": "Kris Ledel",
+      "url": "https://www.otrust.eu/about"
+    },
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "OTRUST",
+      "url": "https://www.otrust.eu"
+    }
+  }
+  </script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <style>
+    :root {
+      --bg: #fafaf9;
+      --bg-card: #ffffff;
+      --bg-muted: #f5f5f4;
+      --border: #e5e5e5;
+      --text: #1a1a1a;
+      --text-dim: #737373;
+      --accent: #2d5a3d;
+      --accent-hover: #1e4029;
+      --accent-light: #e8f0eb;
+      --red-light: #fef2f2;
+      --red: #dc2626;
+      --green-light: #f0fdf4;
+      --green: #16a34a;
+      --orange: #b45309;
+      --warning: #d97706;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0f0f0e;
+      --bg-card: #1a1a19;
+      --bg-muted: #262625;
+      --border: #4a4a49;
+      --text: #ffffff;
+      --text-dim: #d4d4d4;
+      --accent: #5cb85c;
+      --accent-hover: #6fcf6f;
+      --accent-light: #1e3a24;
+      --red-light: #3a0f0f;
+      --red: #ff6b6b;
+      --green-light: #0f3a0f;
+      --green: #5cb85c;
+      --orange: #ff9800;
+      --warning: #fbbf24;
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .theme-toggle {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      font-family: monospace;
+      transition: all 0.2s;
+    }
+
+    .theme-toggle::after {
+      content: 'I';
+    }
+
+    [data-theme="dark"] .theme-toggle::after {
+      content: 'O';
+    }
+
+    .theme-toggle:hover {
+      background: var(--bg-muted);
+      border-color: var(--accent);
+    }
+    
+    /* Accessibility: Skip link */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: var(--accent);
+      color: white;
+      padding: 8px 16px;
+      z-index: 1000;
+      text-decoration: none;
+      font-size: 0.85rem;
+    }
+    .skip-link:focus { top: 0; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    
+    nav {
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      overflow: visible;
+    }
+    
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0.875rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .logo {
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    
+    .nav-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.8rem;
+      transition: color 0.2s;
+    }
+    
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a.active { color: var(--accent); font-weight: 500; }
+
+    /* Mobile Navigation */
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-direction: column;
+      gap: 4px;
+      padding: 8px;
+    }
+
+    .mobile-menu-btn::before,
+    .mobile-menu-btn::after,
+    .mobile-menu-btn span {
+      content: '';
+      display: block;
+      width: 16px;
+      height: 2px;
+      background: var(--text);
+      border-radius: 1px;
+    }
+
+    .mobile-menu-btn:hover {
+      background: var(--bg-muted);
+    }
+
+    .nav-links .nav-primary {
+      display: contents;
+    }
+
+    .nav-links .nav-secondary {
+      display: contents;
+    }
+
+    .nav-links {
+      align-items: center;
+    }
+
+    @media (max-width: 600px) {
+      .nav-container {
+        padding: 0.875rem 1rem;
+      }
+      
+      .nav-links {
+        gap: 0.5rem;
+      }
+      
+      .nav-links a {
+        font-size: 0.65rem;
+        white-space: nowrap;
+      }
+      
+      .nav-links .nav-primary a span {
+        font-size: 1em !important;
+      }
+      
+      .logo {
+        font-size: 0.9rem;
+        flex-shrink: 0;
+      }
+      
+      .mobile-menu-btn {
+        display: flex;
+      }
+      
+      .nav-links .nav-secondary {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 1rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 0.5rem;
+        flex-direction: column;
+        gap: 0;
+        min-width: 140px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      }
+      
+      .nav-links .nav-secondary.open {
+        display: flex;
+      }
+      
+      .nav-links .nav-secondary a {
+        padding: 0.6rem 1rem;
+        border-radius: 6px;
+      }
+      
+      .nav-links .nav-secondary a:hover {
+        background: var(--bg-muted);
+      }
+      
+      nav {
+        position: relative;
+      }
+    }
+    
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 3rem 3rem;
+    }
+    
+    .hero {
+      text-align: center;
+      margin: 0 auto 3rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+      max-width: 800px;
+    }
+    
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.02em;
+    }
+    
+    .hero p {
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .last-updated {
+      color: var(--text-dim);
+      font-size: 0.75rem;
+      margin-top: 0.75rem;
+    }
+    
+    /* TL;DR Box */
+    .tldr {
+      background: var(--accent-light);
+      border: 2px solid var(--accent);
+      border-radius: 16px;
+      padding: 2rem;
+      margin: 0 auto 3rem;
+      max-width: 800px;
+    }
+    
+    .tldr h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .tldr-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+    
+    .tldr-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+    
+    .tldr-icon {
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+    
+    .tldr-item p {
+      font-size: 0.9rem;
+      color: var(--text);
+      margin: 0;
+    }
+    
+    /* Section styles */
+    .section {
+      margin: 0 auto 2.5rem;
+      max-width: 800px;
+    }
+    
+    h2 {
+      font-size: 0.95rem;
+      font-weight: 500;
+      margin-bottom: 0.75rem;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+    
+    p {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      margin-bottom: 0.75rem;
+      line-height: 1.6;
+    }
+    
+    /* Comparison boxes */
+    .comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    
+    @media (max-width: 600px) {
+      .comparison { grid-template-columns: 1fr; }
+    }
+    
+    .box {
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+    
+    .box-red {
+      background: var(--red-light);
+      border: 1px solid #fecaca;
+    }
+    
+    .box-green {
+      background: var(--green-light);
+      border: 1px solid #bbf7d0;
+    }
+    
+    .box h3 {
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .box-red h3 { color: var(--red); }
+    .box-green h3 { color: var(--green); }
+    
+    .box ul {
+      list-style: none;
+      margin: 0;
+    }
+    
+    .box li {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      padding: 0.35rem 0;
+      padding-left: 1.25rem;
+      position: relative;
+    }
+    
+    .box-red li::before {
+      content: "✗";
+      position: absolute;
+      left: 0;
+      color: var(--red);
+      font-weight: 600;
+    }
+    
+    .box-green li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: var(--green);
+      font-weight: 600;
+    }
+    
+    /* Info cards */
+    .info-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1rem 0;
+    }
+    
+    .info-card h4 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+    
+    .info-card p {
+      margin: 0;
+      font-size: 0.85rem;
+    }
+    
+    /* Data flow diagram */
+    .data-flow {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      margin: 1.5rem 0;
+    }
+    
+    .flow-steps {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    
+    .flow-step {
+      text-align: center;
+      flex: 1;
+      min-width: 100px;
+    }
+    
+    .flow-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .flow-step h4 {
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    
+    .flow-step p {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      margin: 0;
+    }
+    
+    .flow-arrow {
+      color: var(--accent);
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    
+    /* Table */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: 0.9rem;
+    }
+    
+    .data-table th {
+      text-align: left;
+      font-weight: 600;
+      padding: 0.75rem;
+      background: var(--bg-muted);
+      border-bottom: 2px solid var(--border);
+    }
+    
+    .data-table td {
+      padding: 0.75rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-dim);
+    }
+    
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    
+    .badge-green {
+      background: var(--green-light);
+      color: var(--green);
+    }
+    
+    .badge-yellow {
+      background: #fef9c3;
+      color: #a16207;
+    }
+    
+    /* Rights section */
+    ul.rights-list {
+      list-style: none;
+      margin: 1rem 0;
+    }
+    
+    ul.rights-list li {
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      padding: 0.75rem 0;
+      padding-left: 2rem;
+      position: relative;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    ul.rights-list li:last-child {
+      border-bottom: none;
+    }
+    
+    ul.rights-list li::before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    
+    /* Contact box */
+    .contact-box {
+      background: var(--bg-muted);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 2rem auto 0;
+      text-align: center;
+      max-width: 800px;
+    }
+    
+    .contact-box h3 {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .contact-box p {
+      margin: 0;
+    }
+    
+    .contact-box a {
+      color: var(--accent);
+      font-weight: 500;
+    }
+    
+    /* Open source badge */
+    .open-source {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    
+    .open-source-icon {
+      font-size: 2rem;
+    }
+    
+    .open-source-text h4 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    
+    .open-source-text p {
+      font-size: 0.85rem;
+      margin: 0;
+    }
+    
+    .open-source-text a {
+      color: var(--accent);
+    }
+    
+    a { color: var(--accent); }
+    
+    .footer-wrapper {
+      border-top: 1px solid var(--border);
+      margin-top: auto;
+    }
+
+    footer {
+      padding: 2rem 3rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+    
+    .footer-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.75rem;
+    }
+    
+    .footer-links a:hover { color: var(--accent); }
+    
+    .footer-copy {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+    }
+    
+    @media (max-width: 600px) {
+      footer {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+        padding: 1.5rem 1rem;
+      }
+      
+      .footer-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="/otrust-polish.css?v=20260527-1">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <nav role="navigation" aria-label="Main navigation">
+    <div class="nav-container">
+      <a href="/" class="logo">OTRUST</a>
+      <div class="nav-links">
+        <span class="nav-primary">
+          <a href="/">Timestamp</a>
+          <a href="/sign">Signed</a>
+          <a href="/proof">Proof</a>
+        </span>
+        <span class="nav-secondary" id="nav-secondary">
+          <a href="/sign-in">Sign in</a>
+          <a href="/docs">Docs</a>
+          <a href="/about">About</a>
+        </span>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode"></button>
+        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu" title="Menu"><span></span></button>
+      </div>
+    </div>
+  </nav>
+  
+  <main id="main-content" role="main">
+    <div class="hero">
+      <h1>Privacy Policy</h1>
+      <p>We built OTRUST so you don't have to trust us. Zero-knowledge architecture means your data stays yours.</p>
+      <p class="last-updated">Last updated: December 31, 2025</p>
+    </div>
+    
+    <!-- TL;DR Summary -->
+    <div class="tldr">
+      <h2>TL;DR – The Important Bits</h2>
+      <div class="tldr-grid">
+        <div class="tldr-item">
+          <span class="tldr-icon"></span>
+          <p><strong>Timestamp: We never see your content.</strong> Only a cryptographic hash (fingerprint) is transmitted.</p>
+        </div>
+        <div class="tldr-item">
+          <span class="tldr-icon"></span>
+          <p><strong>Signed: Your choice.</strong> Zero-knowledge or temporary upload (encrypted, auto-deleted 1-12h).</p>
+        </div>
+        <div class="tldr-item">
+          <span class="tldr-icon"></span>
+          <p><strong>Proof: Local processing.</strong> Your ID and photos never leave your browser. Only cryptographic proof is stored.</p>
+        </div>
+        <div class="tldr-item">
+          <span class="tldr-icon"></span>
+          <p><strong>No accounts or tracking.</strong> No cookies, no analytics profiles, no data selling.</p>
+        </div>
+        <div class="tldr-item">
+          <span class="tldr-icon"></span>
+          <p><strong>Fully open source.</strong> Audit every line of code yourself.</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- What We Collect vs Don't -->
+    <div class="section">
+      <h2>Data Collection – Timestamp Service</h2>
+      <div class="comparison">
+        <div class="box box-red">
+          <h3>We Never Collect</h3>
+          <ul>
+            <li>Your original files or documents</li>
+            <li>Text content, images, or media</li>
+            <li>Personal information or names</li>
+            <li>Email addresses (unless you contact us)</li>
+            <li>Tracking cookies or fingerprints</li>
+            <li>Browsing history or behavior</li>
+            <li>Device identifiers</li>
+          </ul>
+        </div>
+        <div class="box box-green">
+          <h3>✓ We Do Store</h3>
+          <ul>
+            <li>SHA-256 hash of your content</li>
+            <li>Timestamp of submission</li>
+            <li>OpenTimestamps proof data</li>
+            <li>Optional filename (if provided)</li>
+            <li>Source identifier (web, cli, etc.)</li>
+            <li>IP for rate limiting (not stored)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Signed Service -->
+    <div class="section">
+      <h2>Data Collection – Signed Service</h2>
+      <p>OTRUST Signed offers two privacy modes:</p>
+      <div class="comparison">
+        <div class="box box-green">
+          <h3>✓ Zero-Knowledge Mode</h3>
+          <ul>
+            <li>You share document directly with signers</li>
+            <li>Only document hash stored on our servers</li>
+            <li>Same privacy as Timestamp service</li>
+            <li>Signer email for invitation delivery only</li>
+          </ul>
+        </div>
+        <div class="box box-green">
+          <h3>✓ Temporary Upload Mode</h3>
+          <ul>
+            <li>Document encrypted at rest (AES-256)</li>
+            <li>Auto-deleted after 1, 6, or 12 hours</li>
+            <li>Access via secure token only</li>
+            <li>Cryptographic proof of deletion provided</li>
+          </ul>
+        </div>
+      </div>
+      <div class="info-card">
+        <h4>Signature Data</h4>
+        <p>For both modes, we store: document hash, signer identifiers (name/email as provided), cryptographic signatures, and timestamps. Signature records are permanent to enable future verification.</p>
+      </div>
+    </div>
+    
+    <!-- Proof Service -->
+    <div class="section">
+      <h2>Data Collection – Proof Service</h2>
+      <p>OTRUST Proof creates zero-knowledge identity proofs using ZK-SNARKs:</p>
+      <div class="comparison">
+        <div class="box box-red">
+          <h3>We Never Receive</h3>
+          <ul>
+            <li>Your ID document images</li>
+            <li>Your selfie or photos</li>
+            <li>Personal data (name, DOB, address)</li>
+            <li>Your actual ID number</li>
+            <li>Biometric data</li>
+            <li>Face recognition templates</li>
+          </ul>
+        </div>
+        <div class="box box-green">
+          <h3>✓ We Do Store</h3>
+          <ul>
+            <li>ZK-SNARK proof (cryptographic commitment)</li>
+            <li>Public signals from the proof</li>
+            <li>One-way hash of ID number (for Sybil resistance)</li>
+            <li>Proof type and creation timestamp</li>
+            <li>Verification key ID</li>
+          </ul>
+        </div>
+      </div>
+      <div class="info-card">
+        <h4>How Zero-Knowledge Works</h4>
+        <p>All sensitive processing happens in your browser using JavaScript. Your ID is scanned by Tesseract.js (local OCR), face matching uses face-api.js (local models), and the ZK-SNARK proof is generated by snarkjs. Only the final cryptographic proof – which reveals nothing about your actual data – is sent to our servers.</p>
+      </div>
+      <div class="info-card">
+        <h4>Sybil Resistance</h4>
+        <p>To ensure one proof per person, we hash your ID number (e.g., Swedish personnummer) with a secret salt. This produces a unique identifier that cannot be reversed to reveal your actual ID. If you try to create a second proof, the system will detect the duplicate hash without ever knowing your real ID number.</p>
+      </div>
+    </div>
+    
+    <!-- How It Works -->
+    <div class="section">
+      <h2>How Data Flows</h2>
+      <p>Understanding where your data goes:</p>
+      
+      <div class="data-flow">
+        <div class="flow-steps">
+          <div class="flow-step">
+            <div class="flow-icon"></div>
+            <h4>Your File</h4>
+            <p>Stays on your device</p>
+          </div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step">
+            <div class="flow-icon"></div>
+            <h4>Browser Hash</h4>
+            <p>SHA-256 computed locally</p>
+          </div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step">
+            <div class="flow-icon"></div>
+            <h4>OTRUST API</h4>
+            <p>Only hash transmitted</p>
+          </div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-step">
+            <div class="flow-icon">₿</div>
+            <h4>Bitcoin</h4>
+            <p>Anchored permanently</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="info-card">
+        <h4>What is a Hash?</h4>
+        <p>A SHA-256 hash is a one-way mathematical fingerprint. It's a 64-character string that uniquely identifies your content, but it's mathematically impossible to reverse. You cannot reconstruct a document from its hash – not even with unlimited computing power.</p>
+      </div>
+    </div>
+    
+    <!-- Detailed Data Table -->
+    <div class="section">
+      <h2>Data Details</h2>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Data Type</th>
+            <th>Purpose</th>
+            <th>Retention</th>
+            <th>Required</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>SHA-256 Hash</td>
+            <td>Core timestamping function</td>
+            <td>Permanent</td>
+            <td><span class="badge badge-green">Yes</span></td>
+          </tr>
+          <tr>
+            <td>Submission Time</td>
+            <td>Proof ordering</td>
+            <td>Permanent</td>
+            <td><span class="badge badge-green">Yes</span></td>
+          </tr>
+          <tr>
+            <td>OTS Proof</td>
+            <td>Bitcoin verification</td>
+            <td>Permanent</td>
+            <td><span class="badge badge-green">Yes</span></td>
+          </tr>
+          <tr>
+            <td>Filename</td>
+            <td>User convenience</td>
+            <td>Permanent (if provided)</td>
+            <td><span class="badge badge-yellow">Optional</span></td>
+          </tr>
+          <tr>
+            <td>IP Address</td>
+            <td>Rate limiting only</td>
+            <td>~1 hour</td>
+            <td><span class="badge badge-green">Automatic</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <p><strong>Why permanent?</strong> Timestamps must be verifiable years or decades later. Deleting records would make verification impossible.</p>
+    </div>
+    
+    <!-- Platform-Specific -->
+    <div class="section">
+      <h2>Platform-Specific Details</h2>
+      
+      <div class="info-card">
+        <h4>Web Tool & Browser Extension</h4>
+        <p>Hashing happens entirely in your browser using JavaScript. Your file is never uploaded – it's read locally, hashed locally, and only the hash is sent to our API. You can verify this in your browser's network tab.</p>
+      </div>
+      
+      <div class="info-card">
+        <h4>ChatGPT Integration</h4>
+        <p>When using the OTRUST GPT, ChatGPT's Code Interpreter computes the hash. Only the hash is sent to OTRUST. Note: OpenAI has access to your full conversation under their privacy policy – we do not.</p>
+      </div>
+      
+      <div class="info-card">
+        <h4>CLI Tool</h4>
+        <p>The command-line tool runs entirely on your machine. Hashing is done locally using Node.js crypto. Only the hash is transmitted to the API.</p>
+      </div>
+    </div>
+    
+    <!-- Third Parties -->
+    <div class="section">
+      <h2>Third-Party Services</h2>
+      
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Service</th>
+            <th>Purpose</th>
+            <th>Data Shared</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>OpenTimestamps Calendars</td>
+            <td>Bitcoin anchoring</td>
+            <td>Hash only (public infrastructure)</td>
+          </tr>
+          <tr>
+            <td>Bitcoin Network</td>
+            <td>Immutable proof storage</td>
+            <td>Merkle root (aggregated hashes)</td>
+          </tr>
+          <tr>
+            <td>MongoDB Atlas</td>
+            <td>Database hosting</td>
+            <td>Hashes, metadata (encrypted at rest)</td>
+          </tr>
+          <tr>
+            <td>Railway</td>
+            <td>Server hosting</td>
+            <td>Standard server logs</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Your Rights -->
+    <div class="section">
+      <h2>Your Rights</h2>
+      <p>Since we don't collect personal data, traditional GDPR rights work differently:</p>
+      
+      <ul class="rights-list">
+        <li><strong>Right to Access:</strong> Timestamp records are public. Anyone can look up a hash.</li>
+        <li><strong>Right to Deletion:</strong> Timestamps are permanent by design – deletion would defeat the purpose.</li>
+        <li><strong>Right to Verification:</strong> You can verify any timestamp independently using OpenTimestamps clients. No trust in OTRUST required.</li>
+        <li><strong>Right to Portability:</strong> Download your .ots proof files anytime. They work with any OTS client.</li>
+        <li><strong>Right to Object:</strong> Contact us with concerns about specific records.</li>
+      </ul>
+    </div>
+    
+    <!-- Open Source -->
+    <div class="section">
+      <h2>Transparency</h2>
+      
+      <div class="open-source">
+        <div class="open-source-icon"></div>
+        <div class="open-source-text">
+          <h4>Open Source Code</h4>
+          <p>The self-hostable server, web UI, SDKs, CLI tooling, browser extension source, circuits, and cryptographic helpers are available for review: <a href="https://github.com/otrust-eu/opensource" target="_blank">github.com/otrust-eu/opensource</a></p>
+        </div>
+      </div>
+      
+      <p>We believe privacy claims should be verifiable. Review the public client-side code and the documented API behavior.</p>
+    </div>
+    
+    <!-- Changes -->
+    <div class="section">
+      <h2>Policy Changes</h2>
+      <p>We may update this policy occasionally. Significant changes will be announced on our website and GitHub. The "last updated" date at the top will always reflect the current version.</p>
+    </div>
+    
+    <!-- Contact -->
+    <div class="contact-box">
+      <h3>Questions?</h3>
+      <p>Email: <a href="mailto:privacy&#64;otrust.eu">privacy&#64;otrust.eu</a></p>
+    </div>
+  </main>
+  
+  <div class="footer-wrapper">
+  <footer role="contentinfo">
+    <div class="footer-links">
+      <a href="/">Timestamp</a>
+      <a href="/sign">Signed</a>
+      <a href="/proof">Proof</a>
+      <a href="/sign-in">Sign in</a>
+      <a href="/docs">Docs</a>
+      <a href="/about">About</a>
+      <a href="/privacy-policy">Privacy</a>
+      <a href="/terms">Terms</a>
+      <a href="https://github.com/otrust-eu/opensource">GitHub</a>
+    </div>
+    <div class="footer-copy">OTRUST - MIT License</div>
+  </footer>
+  </div>
+
+  <script nonce="">
+    // Dark mode initialization and toggle
+    function initTheme() {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+      
+      if (theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+        
+      }
+    }
+    
+    document.getElementById('theme-toggle')?.addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (isDark) {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'light');
+        
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+        
+      }
+    });
+    
+    initTheme();
+
+    // Mobile menu toggle
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const navSecondary = document.getElementById('nav-secondary');
+
+    mobileMenuBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      navSecondary.classList.toggle('open');
+      
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.nav-links')) {
+        navSecondary?.classList.remove('open');
+      }
+    });
+  </script>
+  <script src="/otrust-polish.js" defer></script>
+</body>
+</html>

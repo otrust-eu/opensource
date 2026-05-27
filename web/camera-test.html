@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Camera Test – OTRUST by Kris Ledel</title>
+  <meta name="description" content="Test your camera for OTRUST identity verification. Part of the privacy-first blockchain timestamping service by Kris Ledel.">
+  <meta name="author" content="Kris Ledel">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    video { background: #000; display: block; margin-bottom: 10px; }
+    button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+    #status { margin-top: 10px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>Camera Test</h1>
+  <video id="video" width="320" height="240" autoplay playsinline></video>
+  <button id="btn">Start Camera</button>
+  <p id="status">Click button to start</p>
+  
+  <script src="/js/camera-test.js"></script>
+</body>
+</html>

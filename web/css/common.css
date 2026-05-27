@@ -1,0 +1,919 @@
+/**
+ * OTRUST Common Styles
+ * 
+ * Shared CSS for all pages to ensure consistent design.
+ * Import this file in every HTML page.
+ */
+
+/* ========================================
+   CSS Variables (Design Tokens)
+   ======================================== */
+
+:root {
+  /* Background colors */
+  --bg: #fafaf9;
+  --bg-card: #ffffff;
+  --bg-muted: #f5f5f4;
+  
+  /* Border */
+  --border: #e5e5e5;
+  
+  /* Text colors */
+  --text: #1a1a1a;
+  --text-dim: #737373;
+  --text-muted: #999999;
+  
+  /* Primary accent (green) */
+  --accent: #2d5a3d;
+  --accent-hover: #1e4029;
+  --accent-light: #e8f0eb;
+  
+  /* Semantic colors */
+  --success: #22c55e;
+  --success-light: #f0fdf4;
+  --success-border: #bbf7d0;
+  
+  --warning: #f59e0b;
+  --warning-light: #fef3c7;
+  --warning-border: #fcd34d;
+  
+  --error: #dc2626;
+  --error-light: #fef2f2;
+  --error-border: #fecaca;
+  
+  /* Bitcoin orange */
+  --orange: #b45309;
+  
+  /* Utility colors */
+  --blue: #1d4ed8;
+  --blue-light: #dbeafe;
+}
+
+[data-theme="dark"] {
+  /* Background colors */
+  --bg: #0f0f0e;
+  --bg-card: #1a1a19;
+  --bg-muted: #262625;
+  
+  /* Border */
+  --border: #4a4a49;
+  
+  /* Text colors */
+  --text: #ffffff;
+  --text-dim: #d4d4d4;
+  --text-muted: #a3a3a3;
+  
+  /* Primary accent (green - brighter for dark mode) */
+  --accent: #5cb85c;
+  --accent-hover: #6fcf6f;
+  --accent-light: #1e3a24;
+  
+  /* Semantic colors */
+  --success: #5cb85c;
+  --success-light: #1a2e1a;
+  --success-border: #2d5a2d;
+  
+  --warning: #ff9800;
+  --warning-light: #2e2a1a;
+  --warning-border: #5a4a2d;
+  
+  --error: #ff6b6b;
+  --error-light: #2e1a1a;
+  --error-border: #5a2d2d;
+  
+  /* Bitcoin orange */
+  --orange: #ff9800;
+  
+  /* Utility colors */
+  --blue: #4db8ff;
+  --blue-light: #1e3a5a;
+}
+
+/* ========================================
+   Base Reset & Defaults
+   ======================================== */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ========================================
+   Accessibility
+   ======================================== */
+
+/* Skip link for keyboard navigation */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--accent);
+  color: white;
+  padding: 8px 16px;
+  z-index: 1000;
+  text-decoration: none;
+  font-size: 0.85rem;
+  border-radius: 0 0 4px 0;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* Focus visible for all interactive elements */
+:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+/* ========================================
+   Navigation
+   ======================================== */
+
+nav {
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.875rem 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--text);
+  text-decoration: none;
+  letter-spacing: -0.02em;
+}
+
+.nav-links {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.nav-links a {
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 0.8rem;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover {
+  color: var(--text);
+}
+
+.nav-links a.active {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.nav-links .nav-primary,
+.nav-links .nav-secondary {
+  display: contents;
+}
+
+/* Theme toggle button */
+.theme-toggle {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text);
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.theme-toggle:hover {
+  background: var(--bg-muted);
+  border-color: var(--accent);
+}
+
+/* Mobile menu button */
+.mobile-menu-btn {
+  display: none;
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text);
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  transition: background-color 0.2s;
+}
+
+.mobile-menu-btn:hover {
+  background: var(--bg-muted);
+}
+
+/* Mobile navigation */
+@media (max-width: 600px) {
+  .nav-container {
+    padding: 0.875rem 1rem;
+  }
+  
+  .mobile-menu-btn {
+    display: flex;
+  }
+  
+  .nav-links .nav-secondary {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 1rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.5rem;
+    flex-direction: column;
+    gap: 0;
+    min-width: 140px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  
+  .nav-links .nav-secondary.open {
+    display: flex;
+  }
+  
+  .nav-links .nav-secondary a {
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+  }
+  
+  .nav-links .nav-secondary a:hover {
+    background: var(--bg-muted);
+  }
+  
+  nav {
+    position: relative;
+  }
+}
+
+/* ========================================
+   Footer
+   ======================================== */
+
+footer {
+  border-top: 1px solid var(--border);
+  padding: 1.5rem 3rem;
+  text-align: center;
+  background: var(--bg);
+}
+
+.footer-links {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.footer-links a {
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 0.75rem;
+  transition: color 0.2s;
+}
+
+.footer-links a:hover {
+  color: var(--text);
+}
+
+.footer-copy {
+  color: var(--text-dim);
+  font-size: 0.7rem;
+}
+
+@media (max-width: 600px) {
+  footer {
+    padding: 1.5rem 1rem;
+  }
+  
+  .footer-links {
+    gap: 1rem;
+  }
+}
+
+/* ========================================
+   Buttons
+   ======================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.5rem;
+  border-radius: 10px;
+  font-weight: 500;
+  font-size: 0.8rem;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  transition: transform 0.15s, box-shadow 0.15s, background-color 0.15s;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+  color: white;
+  box-shadow: 
+    0 2px 4px rgba(45, 90, 61, 0.2),
+    0 6px 16px rgba(45, 90, 61, 0.15);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 4px 8px rgba(45, 90, 61, 0.25),
+    0 12px 24px rgba(45, 90, 61, 0.2);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-primary:disabled {
+  background: linear-gradient(135deg, #a3a3a3 0%, #8a8a8a 100%);
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.btn-secondary {
+  background: var(--bg-card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-muted);
+  transform: translateY(-1px);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, var(--error) 0%, #b91c1c 100%);
+  color: white;
+}
+
+.btn-danger:hover {
+  transform: translateY(-2px);
+}
+
+.btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+}
+
+.btn-lg {
+  padding: 1rem 2rem;
+  font-size: 0.9rem;
+}
+
+/* ========================================
+   Form Elements
+   ======================================== */
+
+.form-group {
+  margin-bottom: 0.875rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-bottom: 0.35rem;
+  color: var(--text);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="url"],
+textarea,
+select {
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  background: var(--bg);
+  color: var(--text);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 
+    0 0 0 3px var(--accent-light),
+    0 2px 8px rgba(45, 90, 61, 0.1);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-dim);
+  opacity: 0.5;
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* ========================================
+   Cards
+   ======================================== */
+
+.card {
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.card-lg {
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 
+    0 0 0 1px rgba(0,0,0,0.03),
+    0 2px 4px rgba(0,0,0,0.02),
+    0 12px 40px rgba(0,0,0,0.06);
+}
+
+/* ========================================
+   Alert Boxes
+   ======================================== */
+
+.alert {
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  font-size: 0.85rem;
+}
+
+.alert-success {
+  background: var(--success-light);
+  border: 1px solid var(--success-border);
+  color: #166534;
+}
+
+[data-theme="dark"] .alert-success {
+  color: var(--success);
+}
+
+.alert-warning {
+  background: var(--warning-light);
+  border: 1px solid var(--warning-border);
+  color: #92400e;
+}
+
+[data-theme="dark"] .alert-warning {
+  color: var(--warning);
+}
+
+.alert-error {
+  background: var(--error-light);
+  border: 1px solid var(--error-border);
+  color: #991b1b;
+}
+
+[data-theme="dark"] .alert-error {
+  color: var(--error);
+}
+
+.alert-info {
+  background: var(--bg-muted);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+/* ========================================
+   Hash Display Box
+   ======================================== */
+
+.hash-box {
+  background: var(--success-light);
+  padding: 1rem;
+  border-radius: 8px;
+  border: 2px solid var(--success);
+}
+
+.hash-box-label {
+  font-weight: 600;
+  color: #166534;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+[data-theme="dark"] .hash-box-label {
+  color: var(--success);
+}
+
+.hash-box-value {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.7rem;
+  word-break: break-all;
+  background: var(--bg-card);
+  padding: 0.75rem;
+  border-radius: 4px;
+  border: 1px solid var(--success-border);
+}
+
+/* ========================================
+   Countdown Timer
+   ======================================== */
+
+.countdown {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--warning-light);
+  border: 1px solid var(--warning-border);
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.countdown-icon {
+  font-size: 1.1rem;
+}
+
+.countdown-label {
+  color: var(--text-dim);
+}
+
+.countdown-time {
+  font-weight: 600;
+  font-family: 'Courier New', Courier, monospace;
+  color: var(--warning);
+}
+
+.countdown.urgent {
+  background: var(--error-light);
+  border-color: var(--error-border);
+}
+
+.countdown.urgent .countdown-time {
+  color: var(--error);
+}
+
+.countdown.expired {
+  background: var(--bg-muted);
+  border-color: var(--border);
+}
+
+.countdown.expired .countdown-time {
+  color: var(--text-dim);
+}
+
+/* ========================================
+   Tabs
+   ======================================== */
+
+.tabs {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.75rem 0.75rem 0;
+  background: var(--bg-muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.tab {
+  padding: 0.55rem 0.875rem;
+  background: transparent;
+  border: none;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: color 0.2s, background-color 0.2s;
+  border-radius: 10px 10px 0 0;
+  white-space: nowrap;
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tab.active {
+  color: var(--text);
+  background: var(--bg-card);
+  font-weight: 600;
+  box-shadow: 
+    0 -1px 0 var(--border),
+    -1px 0 0 var(--border),
+    1px 0 0 var(--border);
+}
+
+.tab-content {
+  display: none;
+  padding: 1.75rem;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* ========================================
+   Stats Display
+   ======================================== */
+
+.stats {
+  display: flex;
+  gap: 2rem;
+  padding: 1rem 0;
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.stat-label {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ========================================
+   Badge
+   ======================================== */
+
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.badge-success {
+  background: var(--success-light);
+  color: var(--success);
+  border: 1px solid var(--success-border);
+}
+
+.badge-warning {
+  background: var(--warning-light);
+  color: var(--warning);
+  border: 1px solid var(--warning-border);
+}
+
+.badge-error {
+  background: var(--error-light);
+  color: var(--error);
+  border: 1px solid var(--error-border);
+}
+
+.badge-info {
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+/* ========================================
+   Typography
+   ======================================== */
+
+h1 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+
+h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.3;
+  margin-bottom: 0.75rem;
+}
+
+h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+}
+
+.text-dim {
+  color: var(--text-dim);
+}
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+.text-accent {
+  color: var(--accent);
+}
+
+.text-success {
+  color: var(--success);
+}
+
+.text-warning {
+  color: var(--warning);
+}
+
+.text-error {
+  color: var(--error);
+}
+
+.text-sm {
+  font-size: 0.85rem;
+}
+
+.text-xs {
+  font-size: 0.75rem;
+}
+
+.font-mono {
+  font-family: 'Courier New', Courier, monospace;
+}
+
+/* ========================================
+   Utility Classes
+   ======================================== */
+
+.hidden {
+  display: none !important;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.gap-1 {
+  gap: 0.25rem;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.gap-3 {
+  gap: 0.75rem;
+}
+
+.gap-4 {
+  gap: 1rem;
+}
+
+.mt-1 {
+  margin-top: 0.25rem;
+}
+
+.mt-2 {
+  margin-top: 0.5rem;
+}
+
+.mt-3 {
+  margin-top: 0.75rem;
+}
+
+.mt-4 {
+  margin-top: 1rem;
+}
+
+.mb-1 {
+  margin-bottom: 0.25rem;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+.mb-3 {
+  margin-bottom: 0.75rem;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.w-full {
+  width: 100%;
+}
+
+/* ========================================
+   Loading Spinner
+   ======================================== */
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ========================================
+   Responsive Container
+   ======================================== */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 3rem;
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 1.5rem 1rem;
+  }
+}

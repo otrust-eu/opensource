@@ -1,0 +1,3184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OTRUST by Kris Ledel | Trust Infrastructure for Proofs, Signing & Global eID</title>
+  <meta name="description" content="OTRUST by Kris Ledel is cryptographic trust infrastructure for timestamping, document signing, identity proofs, and partner-branded global digital identity login flows.">
+  
+  <!-- SEO Meta Tags -->
+  <meta name="author" content="Kristian Ledel">
+  <meta name="creator" content="Kris Ledel">
+  <link rel="author" href="https://www.otrust.eu/about">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <link rel="canonical" href="https://www.otrust.eu/">
+  <meta name="theme-color" content="#2d5a3d">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.otrust.eu/">
+  <meta property="og:title" content="OTRUST by Kris Ledel - Cryptographic Trust Infrastructure">
+  <meta property="og:description" content="Timestamp files, sign documents, create identity proofs, and run global eID-ready partner login flows with independently verifiable records.">
+  <meta property="og:image" content="https://www.otrust.eu/og-image.svg">
+  <meta property="og:site_name" content="OTRUST">
+  <meta property="article:author" content="Kristian Ledel">
+  <meta property="og:locale" content="en_US">
+  
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://www.otrust.eu/">
+  <meta name="twitter:title" content="OTRUST by Kris Ledel - Trust Infrastructure">
+  <meta name="twitter:description" content="Timestamping, signing, identity proofs, and global eID-ready partner login flows.">
+  <meta name="twitter:image" content="https://www.otrust.eu/og-image.svg">
+  <meta name="twitter:creator" content="@kledel">
+  
+  <!-- Additional SEO -->
+  <meta name="geo.region" content="SE">
+  <meta name="geo.placename" content="Sweden">
+  <link rel="alternate" hreflang="en" href="https://www.otrust.eu/">
+  <link rel="alternate" hreflang="x-default" href="https://www.otrust.eu/">
+  
+  <!-- Structured Data: WebApplication -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "OTRUST",
+    "alternateName": "OTRUST Trust Infrastructure",
+    "url": "https://www.otrust.eu",
+    "description": "Cryptographic trust infrastructure by Kristian (Kris) Ledel for timestamping, document signing, privacy-preserving identity proofs, and global eID-ready partner-branded login flows.",
+    "applicationCategory": "SecurityApplication",
+    "applicationSubCategory": "Document Verification",
+    "operatingSystem": "Any",
+    "browserRequirements": "Requires JavaScript",
+    "softwareVersion": "1.0",
+    "author": {
+      "@type": "Person",
+      "name": "Kristian Ledel",
+      "alternateName": "Kris Ledel",
+      "url": "https://www.otrust.eu/about",
+      "sameAs": [
+        "https://github.com/krisledel",
+        "https://linkedin.com/in/kristianledel"
+      ],
+      "jobTitle": "Founder & Developer",
+      "knowsAbout": ["blockchain", "cryptography", "zero-knowledge proofs", "digital signatures", "OpenTimestamps", "Bitcoin", "global eID", "electronic identity", "digital identity", "partner authentication"]
+    },
+    "creator": {
+      "@type": "Person",
+      "name": "Kristian Ledel",
+      "alternateName": "Kris Ledel",
+      "url": "https://www.otrust.eu/about"
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "featureList": [
+      "Bitcoin blockchain anchoring",
+      "OpenTimestamps standard",
+      "Privacy-preserving proof packages",
+      "Cryptographic signatures",
+      "Bulk timestamping",
+      "Partner-branded hosted identity login",
+      "Global eID-ready partner auth architecture",
+      "Email timestamping",
+      "Email notifications",
+      "Downloadable .ots proofs"
+    ],
+    "audience": {
+      "@type": "Audience",
+      "audienceType": ["Product Teams", "B2B Platforms", "Researchers", "Legal Professionals", "Compliance Teams", "Developers"]
+    }
+  }
+  </script>
+  
+  <!-- Structured Data: Organization -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "OTRUST",
+    "url": "https://www.otrust.eu",
+    "logo": "https://www.otrust.eu/favicon.svg",
+    "founder": {
+      "@type": "Person",
+      "name": "Kristian Ledel",
+      "alternateName": "Kris Ledel",
+      "url": "https://www.otrust.eu/about",
+      "sameAs": [
+        "https://github.com/krisledel",
+        "https://linkedin.com/in/kristianledel"
+      ]
+    },
+    "foundingDate": "2024",
+    "sameAs": [
+      "https://github.com/otrust-eu",
+      "https://github.com/krisledel"
+    ]
+  }
+  </script>
+  
+  <!-- Structured Data: FAQ for rich snippets -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How can I prove when my research data existed?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "OTRUST creates a cryptographic timestamp of your research data anchored to the Bitcoin blockchain. This provides immutable, third-party verifiable proof of when your data existed, useful for establishing priority in scientific discoveries."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is blockchain timestamping legally valid for patents?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, blockchain timestamps using OpenTimestamps provide cryptographic proof of prior art that can be independently verified. Many patent attorneys use blockchain timestamps as evidence of invention dates and prior art."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does OTRUST protect my privacy?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "OTRUST uses a blind-notary architecture. Your files are hashed locally and only the SHA-256 hash, signature, public key, timestamp, and proof metadata are stored. The app does not intentionally persist IP addresses; notification emails are stored separately and removed by TTL."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does OTRUST work with global eID flows?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "OTRUST is designed as global eID-ready trust infrastructure for partner-branded login flows around regulated identity methods. OTRUST remains independent and handles proof creation, verification callbacks, branding, and auditability."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Who created OTRUST?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "OTRUST was created by Kristian (Kris) Ledel, a Swedish developer and entrepreneur specializing in blockchain technology and cryptographic security. Kris Ledel built OTRUST as a free, open-source tool for researchers, inventors, and legal professionals who need verifiable proof of when their work existed."
+        }
+      }
+    ]
+  }
+  </script>
+  
+  <!-- Structured Data: Creator Profile -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Kristian Ledel",
+    "alternateName": ["Kris Ledel", "krisledel"],
+    "url": "https://www.otrust.eu/about",
+    "jobTitle": "Founder & Developer",
+    "description": "Kristian Ledel is a Swedish software developer and entrepreneur who created OTRUST, a cryptographic trust infrastructure platform for timestamping, signing, identity proofs, and global eID-ready partner authentication.",
+    "knowsAbout": ["blockchain technology", "cryptography", "zero-knowledge proofs", "Bitcoin", "OpenTimestamps", "digital signatures", "web security", "global eID", "electronic identity", "digital identity"],
+    "nationality": {"@type": "Country", "name": "Sweden"},
+    "sameAs": [
+      "https://github.com/krisledel",
+      "https://linkedin.com/in/kristianledel",
+      "https://github.com/otrust-eu"
+    ],
+    "worksFor": {
+      "@type": "Organization",
+      "name": "OTRUST",
+      "url": "https://www.otrust.eu"
+    },
+    "brand": {
+      "@type": "Brand",
+      "name": "OTRUST",
+      "url": "https://www.otrust.eu"
+    }
+  }
+  </script>
+
+  <!-- Structured Data: BreadcrumbList -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {"@type": "ListItem", "position": 1, "name": "OTRUST by Kristian Ledel", "item": "https://www.otrust.eu/"},
+      {"@type": "ListItem", "position": 2, "name": "About Kris Ledel", "item": "https://www.otrust.eu/about"},
+      {"@type": "ListItem", "position": 3, "name": "Documentation", "item": "https://www.otrust.eu/docs"},
+      {"@type": "ListItem", "position": 4, "name": "API Reference", "item": "https://www.otrust.eu/api-docs"}
+    ]
+  }
+  </script>
+
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <!-- Privacy-respecting analytics (no cookies, no personal data) -->
+  <script defer data-domain="otrust.eu" src="https://plausible.io/js/script.js"></script>
+  <style>
+    html {
+    }
+    
+    :root {
+      --bg: #f7f7f3;
+      --bg-card: #ffffff;
+      --bg-muted: #eff1ed;
+      --border: #dadbd2;
+      --text: #171814;
+      --text-dim: #62665c;
+      --accent: #24543a;
+      --accent-hover: #173928;
+      --accent-light: #dfece4;
+      --orange: #b87914;
+      --success: #24543a;
+      --blue: #315f7d;
+      --gold: #a9843d;
+      --shadow: 0 18px 55px rgba(25, 30, 22, 0.1);
+    }
+
+    [data-theme="dark"] {
+      --bg: #10120f;
+      --bg-card: #181b17;
+      --bg-muted: #20251f;
+      --border: #394036;
+      --text: #f5f7f1;
+      --text-dim: #b9c0b2;
+      --accent: #7bc88c;
+      --accent-hover: #93d79f;
+      --accent-light: #203827;
+      --orange: #e2a247;
+      --success: #7bc88c;
+      --blue: #88b6d5;
+      --gold: #d8bb73;
+      --shadow: 0 20px 70px rgba(0, 0, 0, 0.32);
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    /* Accessibility: Skip link */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: var(--accent);
+      color: white;
+      padding: 8px 16px;
+      z-index: 1000;
+      text-decoration: none;
+      font-size: 0.85rem;
+    }
+    .skip-link:focus { top: 0; }
+    
+    /* Accessibility: Focus visible */
+    :focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 2px var(--accent);
+    }
+    button:focus-visible, a:focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 2px var(--accent);
+    }
+    
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0) 360px),
+        linear-gradient(135deg, #f8f7f1 0%, #f3f6f0 52%, #eef4f6 100%);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    [data-theme="dark"] body {
+      background:
+        linear-gradient(180deg, rgba(16,18,15,0.92) 0%, rgba(16,18,15,0) 360px),
+        linear-gradient(135deg, #10120f 0%, #151a15 52%, #121a1d 100%);
+    }
+    
+    /* Dark mode toggle */
+    .theme-toggle {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      font-family: monospace;
+      transition: background-color 0.2s, color 0.2s;
+    }
+    
+    .theme-toggle::after {
+      content: 'I';
+    }
+    
+    [data-theme="dark"] .theme-toggle::after {
+      content: 'O';
+    }
+    
+    .theme-toggle:hover {
+      background: var(--bg-muted);
+      border-color: var(--accent);
+    }
+    
+    /* Navigation */
+    nav {
+      background: rgba(247, 247, 243, 0.86);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      overflow: visible;
+    }
+
+    [data-theme="dark"] nav {
+      background: rgba(16, 18, 15, 0.86);
+    }
+    
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0.875rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .logo {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: 0.04em;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    
+    .nav-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.8rem;
+      transition: color 0.2s;
+    }
+    
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a.active { color: var(--accent); font-weight: 500; }
+    
+    /* Mobile Navigation */
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-direction: column;
+      gap: 4px;
+      padding: 8px;
+    }
+    
+    .mobile-menu-btn::before,
+    .mobile-menu-btn::after,
+    .mobile-menu-btn span {
+      content: '';
+      display: block;
+      width: 16px;
+      height: 2px;
+      background: var(--text);
+      border-radius: 1px;
+    }
+    
+    .mobile-menu-btn:hover {
+      background: var(--bg-muted);
+    }
+    
+    .nav-links .nav-primary {
+      display: contents;
+    }
+    
+    .nav-links .nav-secondary {
+      display: contents;
+    }
+    
+    /* Docs Submenu Bar */
+    .docs-submenu-bar {
+      display: none;
+      background: var(--bg-muted);
+      border-bottom: 1px solid var(--border);
+      animation: submenu-slide 0.2s ease-out;
+    }
+    
+    .docs-submenu-bar.open {
+      display: block;
+    }
+    
+    @keyframes submenu-slide {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .docs-submenu-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0.5rem 3rem;
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+    
+    .docs-submenu-bar a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.8rem;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      transition: all 0.15s;
+    }
+    
+    .docs-submenu-bar a:hover {
+      color: var(--text);
+      background: var(--bg-card);
+    }
+    
+    .docs-submenu-bar a.active {
+      color: var(--accent);
+      font-weight: 500;
+    }
+    
+    .nav-links a.docs-trigger {
+      cursor: pointer;
+    }
+    
+    .nav-links a.docs-trigger.open {
+      color: var(--accent);
+    }
+    
+    @media (max-width: 600px) {
+      .docs-submenu-container {
+        padding: 0.5rem 1rem;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .nav-container {
+        padding: 0.875rem 1rem;
+      }
+      
+      .mobile-menu-btn {
+        display: flex;
+      }
+      
+      .nav-links .nav-secondary {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 1rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 0.5rem;
+        flex-direction: column;
+        gap: 0;
+        min-width: 140px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      }
+      
+      .nav-links .nav-secondary.open {
+        display: flex;
+      }
+      
+      .nav-links .nav-secondary a {
+        padding: 0.6rem 1rem;
+        border-radius: 6px;
+      }
+      
+      .nav-links .nav-secondary a:hover {
+        background: var(--bg-muted);
+      }
+      
+      nav {
+        position: relative;
+      }
+    }
+
+    /* Hero */
+    .main-layout {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 3.5rem 3rem 3.75rem;
+      display: grid;
+      grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
+      gap: 3.5rem;
+      align-items: start;
+    }
+    
+    @media (max-width: 900px) {
+      .main-layout {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        padding: 1.5rem;
+      }
+    }
+    
+    .hero {
+      padding: 0;
+      max-width: none;
+      margin: 0;
+    }
+    
+    .hero-badge {
+      display: inline-block;
+      background: color-mix(in srgb, var(--accent-light) 80%, white);
+      color: var(--accent);
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 0.22rem 0.55rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .hero h1 {
+      font-size: 3.05rem;
+      font-weight: 700;
+      line-height: 1.02;
+      margin-bottom: 1.1rem;
+      color: var(--text);
+      letter-spacing: 0;
+    }
+    
+    .hero p {
+      font-size: 1rem;
+      color: var(--text-dim);
+      line-height: 1.65;
+      margin-bottom: 1.3rem;
+      max-width: 36rem;
+    }
+
+    .hero-trust {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .trust-pill {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.58);
+      color: var(--text);
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.35rem 0.65rem;
+    }
+
+    [data-theme="dark"] .trust-pill {
+      background: rgba(255,255,255,0.04);
+    }
+
+    .proof-preview {
+      margin: 0 0 1.6rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--bg-card) 88%, var(--accent-light));
+      box-shadow: 0 12px 34px rgba(25, 30, 22, 0.08);
+      overflow: hidden;
+    }
+
+    .proof-preview-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      padding: 0.8rem 0.9rem;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-dim);
+    }
+
+    .proof-preview-status {
+      color: var(--success);
+      font-weight: 700;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    .proof-preview-body {
+      padding: 0.9rem;
+    }
+
+    .hash-line {
+      height: 0.55rem;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent), var(--blue), var(--gold));
+      opacity: 0.82;
+      margin-bottom: 0.85rem;
+    }
+
+    .proof-row {
+      display: grid;
+      grid-template-columns: 5rem 1fr;
+      gap: 0.75rem;
+      align-items: center;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      padding: 0.32rem 0;
+    }
+
+    .proof-row span:last-child {
+      height: 0.45rem;
+      border-radius: 999px;
+      background: var(--bg-muted);
+    }
+
+    .proof-row:nth-child(3) span:last-child {
+      width: 72%;
+    }
+
+    .proof-row:nth-child(4) span:last-child {
+      width: 48%;
+    }
+    
+    /* Left column sections */
+    .left-col .stats {
+      padding: 0;
+      margin: 0 0 1.5rem;
+      max-width: none;
+      gap: 2rem;
+    }
+    
+    .left-col .stat-value {
+      font-size: 1.25rem;
+    }
+    
+    .left-col .stat-label {
+      font-size: 0.65rem;
+    }
+    
+    .info-section {
+      margin-bottom: 0;
+      border-top: 1px solid var(--border);
+      padding-top: 1.35rem;
+    }
+    
+    .info-section h2 {
+      font-size: 0.7rem;
+      font-weight: 500;
+      margin-bottom: 0.75rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+    
+    .step-item {
+      display: flex;
+      gap: 0.5rem;
+      align-items: flex-start;
+    }
+    
+    .step-num {
+      width: 1rem;
+      height: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--accent);
+      color: var(--bg);
+      font-size: 0.55rem;
+      font-weight: 600;
+      border-radius: 4px;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+    
+    .step-item strong {
+      font-size: 0.75rem;
+      font-weight: 500;
+      display: block;
+      margin-bottom: 0;
+    }
+    
+    .step-item p {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      margin: 0;
+      line-height: 1.35;
+    }
+    
+    /* Main Claim Card */
+    .claim-section {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .claim-card {
+      background: var(--bg-card);
+      border: 1px solid color-mix(in srgb, var(--border) 86%, white);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      contain: layout;
+    }
+    
+    .tabs {
+      display: flex;
+      gap: 0.25rem;
+      padding: 0.75rem;
+      background: color-mix(in srgb, var(--bg-muted) 72%, var(--bg-card));
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .tab {
+      padding: 0.55rem 0.875rem;
+      background: transparent;
+      border: none;
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: color 0.2s, background-color 0.2s;
+      border-radius: 6px;
+      white-space: nowrap;
+      position: relative;
+    }
+    
+    .tab:hover { 
+      color: var(--text); 
+    }
+    
+    .tab.active { 
+      color: var(--text); 
+      background: var(--bg-card);
+      font-weight: 600;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    
+    .history-count {
+      font-size: 0.65rem;
+      background: var(--accent);
+      color: white;
+      padding: 0.1rem 0.4rem;
+      border-radius: 10px;
+      margin-left: 0.25rem;
+    }
+    
+    .tab-content {
+      display: none;
+      padding: 1.9rem;
+      flex: 1;
+    }
+    
+    .tab-content.active { 
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* Form Elements */
+    .form-group {
+      margin-bottom: 0.875rem;
+    }
+    
+    .form-group label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 500;
+      margin-bottom: 0.35rem;
+      color: var(--text);
+    }
+    
+    input[type="text"], input[type="email"], textarea {
+      width: 100%;
+      padding: 0.7rem 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-family: inherit;
+      background: var(--bg);
+      color: var(--text);
+    }
+    
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 
+        0 0 0 3px var(--accent-light),
+        0 2px 8px rgba(45, 90, 61, 0.1);
+    }
+    
+    input::placeholder, textarea::placeholder {
+      color: var(--text-dim);
+      opacity: 0.5;
+    }
+    
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+    
+    .dropzone {
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      padding: 2.7rem 2rem;
+      text-align: center;
+      cursor: pointer;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.64), rgba(255,255,255,0.18)),
+        var(--bg);
+      position: relative;
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .dropzone::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 6px;
+      background: linear-gradient(135deg, color-mix(in srgb, var(--accent-light) 80%, white) 0%, transparent 58%);
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+    
+    .dropzone:hover::before, .dropzone.dragover::before {
+      opacity: 1;
+    }
+    
+    .dropzone:hover, .dropzone.dragover {
+      border-color: var(--accent);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(45, 90, 61, 0.12);
+    }
+    
+    .dropzone-icon {
+      margin-bottom: 0.75rem;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .dropzone-icon svg {
+      width: 40px;
+      height: 40px;
+      stroke-width: 1.25;
+    }
+    
+    .dropzone-text {
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      line-height: 1.5;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .dropzone-text strong {
+      color: var(--accent);
+      font-weight: 500;
+    }
+    
+    .dropzone-text small {
+      display: block;
+      margin-top: 0.4rem;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      opacity: 0.7;
+    }
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.8rem 1.5rem;
+      border-radius: 10px;
+      font-weight: 500;
+      font-size: 0.8rem;
+      cursor: pointer;
+      border: none;
+      width: 100%;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+      color: white;
+      border-radius: 8px;
+      box-shadow: 
+        0 2px 4px rgba(45, 90, 61, 0.2),
+        0 6px 16px rgba(45, 90, 61, 0.15);
+    }
+    
+    .btn-primary:hover { 
+      transform: translateY(-2px);
+      box-shadow: 
+        0 4px 8px rgba(45, 90, 61, 0.25),
+        0 12px 24px rgba(45, 90, 61, 0.2);
+    }
+    
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+    
+    .btn-primary:disabled { 
+      background: linear-gradient(135deg, #a3a3a3 0%, #8a8a8a 100%);
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+    
+    .btn-secondary {
+      background: var(--bg-card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    
+    .btn-secondary:hover { 
+      background: var(--bg-muted);
+      transform: translateY(-1px);
+    }
+    
+    /* File List */
+    .file-list {
+      margin: 1.25rem 0;
+    }
+    
+    .file-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.875rem 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 0.5rem;
+      font-size: 0.85rem;
+    }
+    
+    .file-item .name {
+      font-weight: 500;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 70%;
+    }
+    
+    .file-item .hash {
+      font-family: monospace;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+    
+    .file-item.already-timestamped {
+      background: var(--accent-light);
+      border-color: var(--accent);
+    }
+    
+    .file-item .existing-warning {
+      font-size: 0.7rem;
+      color: var(--accent);
+      margin-top: 0.25rem;
+    }
+    
+    .file-item .existing-warning.sign-warning {
+      color: #dc3545;
+    }
+    
+    .file-item .existing-warning a {
+      color: var(--accent);
+      text-decoration: underline;
+      margin-left: 0.5rem;
+    }
+    
+    .file-item .remove {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-size: 1.25rem;
+      padding: 0 0.5rem;
+    }
+    
+    .file-item .remove:hover { color: var(--orange); }
+    
+    /* Progress */
+    .progress-section {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+    
+    .progress-step {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 0;
+      font-size: 0.9rem;
+      color: var(--text-dim);
+    }
+    
+    .progress-step.active { color: var(--accent); font-weight: 500; }
+    .progress-step.done { color: var(--success); }
+    
+    .progress-step .icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      background: var(--bg-muted);
+      border: 2px solid var(--border);
+    }
+    
+    .progress-step.active .icon { border-color: var(--accent); background: var(--accent-light); }
+    .progress-step.done .icon { border-color: var(--success); background: #dcfce7; }
+    
+    /* Result */
+    .result {
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-top: 1rem;
+    }
+
+    [data-theme="dark"] .result {
+      background: #1e3a24;
+      border: 1px solid #2d5a3d;
+    }
+    
+    .result h4 {
+      color: var(--success);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .result.result-warning {
+      background: #fef3c7;
+      border: 1px solid #fcd34d;
+      border-left: 4px solid #f59e0b;
+    }
+
+    [data-theme="dark"] .result.result-warning {
+      background: #3a2f1f;
+      border: 1px solid #664d26;
+      border-left: 4px solid #ff9800;
+    }
+    
+    .result.result-warning h4 {
+      color: #b45309;
+    }
+    
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      padding: 0.25rem 0;
+    }
+    
+    .result-row .label { color: var(--text-dim); }
+    .result-row .value { font-family: monospace; font-weight: 500; color: var(--text); }
+    
+    .receipt-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+    
+    .receipt-actions .btn {
+      flex: 1;
+      min-width: 140px;
+      font-size: 0.85rem;
+      padding: 0.6rem 1rem;
+    }
+    
+    /* Receipt list */
+    .receipts-header {
+      padding: 0.5rem 0;
+      margin-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.9rem;
+      color: var(--text-dim);
+    }
+    
+    .receipt-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem;
+      background: var(--bg-muted);
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+      cursor: pointer;
+    }
+    
+    .receipt-item:hover {
+      background: var(--accent-light);
+    }
+    
+    .receipt-info {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .receipt-id {
+      font-family: monospace;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+    
+    .receipt-filename {
+      font-family: system-ui, sans-serif;
+      font-weight: 600;
+      color: var(--accent);
+      word-break: break-word;
+    }
+    
+    .receipt-id-small {
+      font-family: monospace;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      margin-left: 0.5rem;
+    }
+    
+    .receipt-hash {
+      font-family: monospace;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      margin-top: 0.15rem;
+    }
+    
+    .receipt-meta {
+      text-align: right;
+      flex-shrink: 0;
+    }
+    
+    .receipt-date {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+    
+    .receipt-status {
+      font-size: 0.75rem;
+      font-weight: 500;
+      margin-top: 0.15rem;
+    }
+    
+    .receipt-status.confirmed { color: var(--success); }
+    .receipt-status.pending { color: #d97706; }
+    
+    /* Text input for verify/receipt */
+    .input-group {
+      margin: 1rem 0;
+    }
+    
+    .input-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      color: var(--text-dim);
+    }
+    
+    .text-input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-family: monospace;
+      background: var(--bg);
+      transition: border-color 0.2s;
+    }
+    
+    .text-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    
+    .or-divider {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 1rem 0;
+      color: var(--text-dim);
+      font-size: 0.85rem;
+    }
+    
+    .or-divider::before, .or-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* Stats Section */
+    .stats {
+      display: flex;
+      gap: 3rem;
+      padding: 2rem;
+      margin: 2rem auto;
+      max-width: 800px;
+    }
+    
+    .stat {
+      text-align: left;
+    }
+    
+    .stat-value {
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+    
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    
+    /* Journey Section */
+    .section {
+      padding: 3rem 3rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .section-title {
+      margin-bottom: 2rem;
+    }
+    
+    .section-title h2 {
+      font-size: 0.95rem;
+      font-weight: 500;
+      letter-spacing: 0;
+    }
+    
+    .section-title p {
+      color: var(--text-dim);
+      font-size: 0.8rem;
+      margin-top: 0.2rem;
+    }
+    
+    .journey-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+    }
+    
+    @media (max-width: 700px) {
+      .journey-grid { grid-template-columns: repeat(2, 1fr); gap: 2rem; }
+    }
+    
+    .journey-card {
+      padding: 0 1rem 0 0;
+      text-align: left;
+    }
+    
+    .journey-card .step {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.25rem;
+      height: 1.25rem;
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: var(--bg);
+      background: var(--accent);
+      border-radius: 50%;
+      margin-bottom: 0.75rem;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .journey-card h3 {
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+    
+    .journey-card p {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      line-height: 1.5;
+    }
+    
+    /* Features */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2.5rem;
+    }
+    
+    @media (max-width: 600px) {
+      .features-grid { grid-template-columns: 1fr; gap: 2rem; }
+    }
+    
+    .feature-card {
+      padding: 0;
+    }
+    
+    .feature-card h3 {
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 0.4rem;
+    }
+    
+    .feature-card p {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      line-height: 1.5;
+    }
+
+    /* Footer */
+    .footer-wrapper {
+      border-top: 1px solid var(--border);
+      margin-top: auto;
+    }
+    
+    footer {
+      padding: 2rem 3rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+    
+    .footer-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.75rem;
+    }
+    
+    .footer-links a:hover { color: var(--accent); }
+    
+    .footer-copy {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+    }
+    
+    @media (max-width: 600px) {
+      footer {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+        padding: 1.5rem 1rem;
+      }
+      
+      .footer-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+      }
+    }
+
+    /* Features Section */
+    .features-section {
+      background:
+        linear-gradient(180deg, color-mix(in srgb, var(--bg-muted) 70%, white), var(--bg));
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 0;
+    }
+
+    .features-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+    
+    @media (min-width: 601px) {
+      .features-section {
+        padding: 3rem 0;
+      }
+      .features-container {
+        padding: 0 3rem;
+      }
+    }
+    
+    .features-title {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .features-title h2 {
+      font-size: 1.55rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      letter-spacing: 0;
+    }
+    
+    .features-title p {
+      color: var(--text-dim);
+      font-size: 0.85rem;
+    }
+    
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.25rem;
+      justify-items: center;
+    }
+    
+    .features-grid .feature-card {
+      width: 100%;
+      max-width: 280px;
+    }
+    
+    @media (min-width: 1001px) {
+      .features-grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1.25rem;
+      }
+      .features-grid .feature-card {
+        flex: 0 0 calc(25% - 1rem);
+        max-width: calc(25% - 1rem);
+      }
+    }
+    
+    @media (max-width: 1000px) {
+      .features-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .features-grid .feature-card {
+        max-width: none;
+      }
+    }
+    
+    @media (max-width: 650px) {
+      .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    .feature-card {
+      background: var(--bg-card);
+      border-radius: 8px;
+      padding: 1.5rem;
+      border: 1px solid var(--border);
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      min-height: 100%;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+    
+    .feature-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(45, 90, 61, 0.1);
+    }
+    
+    .feature-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--accent-light);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+    
+    .feature-icon svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--accent);
+    }
+    
+    .feature-card h3 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    
+    .feature-card p {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      line-height: 1.5;
+    }
+    
+    @media (max-width: 500px) {
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+      .features-container {
+        padding: 0 1.5rem;
+      }
+    }
+    
+    /* Spinner */
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 2.35rem; }
+      .stats { flex-wrap: wrap; gap: 1.5rem; }
+      .nav-links { gap: 1rem; }
+    }
+    
+    @media (max-width: 600px) {
+      .nav-container {
+        padding: 0.75rem 1rem;
+      }
+      
+      .nav-links {
+        gap: 0.5rem;
+      }
+      
+      .nav-links a {
+        font-size: 0.65rem;
+        white-space: nowrap;
+      }
+      
+      .nav-links .nav-primary a span {
+        font-size: 1em !important;
+      }
+      
+      .logo {
+        font-size: 0.9rem;
+        flex-shrink: 0;
+      }
+      
+      .main-layout {
+        padding: 1.25rem 1rem 2rem;
+        gap: 1.5rem;
+      }
+      
+      .hero h1 {
+        font-size: 2.05rem;
+      }
+      
+      .hero p {
+        font-size: 0.8rem;
+      }
+      
+      .claim-card {
+        border-radius: 8px;
+      }
+      
+      .tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding: 0.5rem;
+      }
+      
+      .tabs::-webkit-scrollbar {
+        display: none;
+      }
+      
+      .tab {
+        padding: 0.5rem 0.65rem;
+        font-size: 0.65rem;
+        flex-shrink: 0;
+      }
+      
+      .tab-content {
+        padding: 1rem;
+      }
+      
+      .dropzone {
+        padding: 1.5rem 1rem;
+      }
+      
+      .dropzone-text {
+        font-size: 0.8rem;
+      }
+      
+      .btn {
+        padding: 0.7rem 1rem;
+        font-size: 0.75rem;
+      }
+      
+      .stats {
+        gap: 1rem;
+        justify-content: center;
+      }
+      
+      .stat-value {
+        font-size: 1.1rem;
+      }
+      
+      .stat-label {
+        font-size: 0.6rem;
+      }
+      
+      .step-item strong {
+        font-size: 0.7rem;
+      }
+      
+      .step-item p {
+        font-size: 0.65rem;
+      }
+      
+      .info-section h2 {
+        font-size: 0.65rem;
+      }
+      
+      .file-item {
+        padding: 0.65rem 0.75rem;
+        font-size: 0.75rem;
+      }
+      
+      .file-item .hash {
+        font-size: 0.65rem;
+      }
+      
+      .result {
+        padding: 1rem;
+      }
+      
+      .result h4 {
+        font-size: 0.9rem;
+      }
+      
+      .result-row {
+        font-size: 0.75rem;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+      }
+      
+      .receipt-actions {
+        flex-direction: column;
+      }
+      
+      .receipt-actions .btn {
+        min-width: auto;
+      }
+    }
+    
+    @media (max-width: 400px) {
+      .hero h1 {
+        font-size: 1.75rem;
+      }
+      
+      .tab {
+        padding: 0.4rem 0.5rem;
+        font-size: 0.6rem;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="/otrust-polish.css?v=20260527-1">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <nav role="navigation" aria-label="Main navigation">
+    <div class="nav-container">
+      <a href="/" class="logo">OTRUST</a>
+      <div class="nav-links">
+        <span class="nav-primary">
+          <a href="/" class="active">Timestamp</a>
+          <a href="/sign">Signed</a>
+          <a href="/proof">Proof</a>
+        </span>
+        <span class="nav-secondary" id="nav-secondary">
+          <a href="/sign-in">Sign in</a>
+          <a href="/docs" class="docs-trigger" id="docs-trigger">Docs</a>
+          <a href="/about">About</a>
+        </span>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode"></button>
+        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu" title="Menu"><span></span></button>
+      </div>
+    </div>
+  </nav>
+  
+  <!-- Docs Submenu Bar -->
+  <div class="docs-submenu-bar" id="docs-submenu-bar">
+    <div class="docs-submenu-container">
+      <a href="/docs">Documentation</a>
+      <a href="/api-docs">API Reference</a>
+      <a href="/playground/">SDK Playground</a>
+      <a href="https://github.com/otrust-eu/opensource" target="_blank" rel="noopener noreferrer">GitHub</a>
+    </div>
+  </div>
+  
+  <main id="main-content" role="main">
+  <div class="main-layout">
+    <div class="left-col">
+      <section class="hero">
+        <span class="hero-badge">Trust infrastructure</span>
+        <h1>Cryptographic trust flows for real products.</h1>
+        <p>Timestamp files, sign documents, and run branded identity-proof login flows with minimal data exposure, independently verifiable proofs, and global digital identity architecture.</p>
+        <div class="hero-trust">
+          <span class="trust-pill">Partner-ready</span>
+          <span class="trust-pill">No raw content</span>
+          <span class="trust-pill">Open verification</span>
+        </div>
+      </section>
+      
+      <!-- Stats -->
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-value" id="stat-claims">–</div>
+          <div class="stat-label">Proof records</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="stat-confirmed">–</div>
+          <div class="stat-label">Anchored</div>
+        </div>
+      </div>
+      <script nonce="PLACEHOLDER">
+        fetch('/stats').then(r=>r.json()).then(d=>{
+          document.getElementById('stat-claims').textContent=(d.total_claims||0)+(d.total_signatures||0);
+          document.getElementById('stat-confirmed').textContent=(d.confirmed_claims||0)+(d.confirmed_signatures||0);
+        }).catch(()=>{});
+      </script>
+
+      <div class="proof-preview" aria-hidden="true">
+        <div class="proof-preview-head">
+          <span>Receipt</span>
+          <span class="proof-preview-status">Verifiable</span>
+        </div>
+        <div class="proof-preview-body">
+          <div class="hash-line"></div>
+          <div class="proof-row"><span>Hash</span><span></span></div>
+          <div class="proof-row"><span>Signature</span><span></span></div>
+          <div class="proof-row"><span>OTS proof</span><span></span></div>
+        </div>
+      </div>
+      
+      <!-- Flow -->
+      <section class="info-section" id="flow">
+        <h2>Verification flow</h2>
+        <div class="steps">
+          <div class="step-item">
+            <span class="step-num">1</span>
+            <div>
+              <strong>Hash</strong>
+              <p>SHA-256 in your browser. Content never uploaded.</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <span class="step-num">2</span>
+            <div>
+              <strong>Sign</strong>
+              <p>Ed25519 signature links the hash to your key.</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <span class="step-num">3</span>
+            <div>
+              <strong>Anchor</strong>
+              <p>OpenTimestamps embeds proof in blockchain.</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <span class="step-num">4</span>
+            <div>
+              <strong>Prove</strong>
+              <p>Download .ots file. Verify anywhere, forever.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+    
+    <!-- Main Claim Functionality -->
+    <section class="claim-section home-claim-section" id="timestamp-tool" aria-label="Timestamp tool">
+    <div class="claim-card timestamp-card">
+      <div class="tabs" role="tablist" aria-label="Timestamp actions">
+        <button class="tab active" type="button" role="tab" id="tab-button-file" data-tab="file" aria-selected="true" aria-controls="tab-file">Timestamp</button>
+        <button class="tab" type="button" role="tab" id="tab-button-text" data-tab="text" aria-selected="false" aria-controls="tab-text">Text</button>
+        <button class="tab" type="button" role="tab" id="tab-button-verify" data-tab="verify" aria-selected="false" aria-controls="tab-verify">Verify</button>
+        <button class="tab" type="button" role="tab" id="tab-button-compare" data-tab="compare" aria-selected="false" aria-controls="tab-compare">Compare</button>
+        <button class="tab" type="button" role="tab" id="tab-button-receipt" data-tab="receipt" aria-selected="false" aria-controls="tab-receipt">History<span class="history-count" id="history-count" style="display: none;">0</span></button>
+        <button class="tab" type="button" role="tab" id="tab-button-keys" data-tab="keys" aria-selected="false" aria-controls="tab-keys">Keys</button>
+      </div>
+      
+      <!-- File Tab -->
+      <div id="tab-file" class="tab-content active" role="tabpanel" aria-labelledby="tab-button-file" tabindex="0">
+        <div class="dropzone" id="dropzone" role="button" tabindex="0" aria-describedby="file-drop-help">
+          <div class="dropzone-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color: var(--accent);">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="12" y1="18" x2="12" y2="12"/>
+              <line x1="9" y1="15" x2="15" y2="15"/>
+            </svg>
+          </div>
+          <div class="dropzone-text">
+            Drop files here or <strong>browse</strong>
+            <small id="file-drop-help">Hashed locally - never uploaded</small>
+          </div>
+          <input type="file" id="file-input" multiple hidden>
+        </div>
+        
+        <div class="file-list" id="file-list"></div>
+        
+        <div class="form-group" style="margin-top: 0.875rem;">
+          <label for="notify-email">Email (optional)</label>
+          <input type="email" id="notify-email" placeholder="you@example.com">
+          <small class="field-hint">Notified when blockchain confirms</small>
+        </div>
+        
+        <button class="btn btn-primary" id="claim-btn" disabled>
+          Claim Selected Files
+        </button>
+        
+        <div class="progress-section" id="progress" style="display: none;" aria-live="polite">
+          <div class="progress-step" id="step-pow">
+            <span class="icon">1</span>
+            <span>Solving proof-of-work...</span>
+          </div>
+          <div class="progress-step" id="step-sign">
+            <span class="icon">2</span>
+            <span>Signing with your key...</span>
+          </div>
+          <div class="progress-step" id="step-submit">
+            <span class="icon">3</span>
+            <span>Submitting to blockchain...</span>
+          </div>
+        </div>
+        
+        <div id="result" aria-live="polite"></div>
+      </div>
+      
+      <!-- Text Tab -->
+      <div id="tab-text" class="tab-content" role="tabpanel" aria-labelledby="tab-button-text" tabindex="0" hidden>
+        <div class="form-group">
+          <label for="text-input">Content to timestamp</label>
+          <textarea id="text-input" placeholder="Paste text, code, or any content..." style="font-size: 0.8rem;"></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label for="text-notify-email">Email (optional)</label>
+          <input type="email" id="text-notify-email" placeholder="you@example.com">
+        </div>
+        
+        <button class="btn btn-primary" id="text-claim-btn">
+          Claim This Text
+        </button>
+        
+        <div id="text-result"></div>
+      </div>
+      
+      <!-- Verify Tab -->
+      <div id="tab-verify" class="tab-content" role="tabpanel" aria-labelledby="tab-button-verify" tabindex="0" hidden>
+        <p class="tab-intro">Check if content has been timestamped.</p>
+        
+        <div class="dropzone" id="verify-dropzone" role="button" tabindex="0" aria-label="Choose a file to verify">
+          <div class="dropzone-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color: var(--accent);">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.35-4.35"/>
+            </svg>
+          </div>
+          <div class="dropzone-text">
+            Drop file to verify
+          </div>
+          <input type="file" id="verify-file-input" hidden>
+        </div>
+        
+        <div class="or-divider">or</div>
+        
+        <div class="form-group">
+          <label class="sr-only" for="verify-hash-input">SHA-256 hash</label>
+          <input type="text" id="verify-hash-input" placeholder="SHA-256 hash" style="font-family: monospace; font-size: 0.75rem;">
+        </div>
+        
+        <button class="btn btn-primary" id="verify-btn">Verify</button>
+        
+        <div id="verify-result"></div>
+      </div>
+      
+      <!-- Compare Tab -->
+      <div id="tab-compare" class="tab-content" role="tabpanel" aria-labelledby="tab-button-compare" tabindex="0" hidden>
+        <p class="tab-intro">Find duplicates and check registration status.</p>
+        
+        <div class="dropzone" id="compare-dropzone" role="button" tabindex="0" aria-label="Choose files to compare">
+          <div class="dropzone-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color: var(--accent);">
+              <path d="M20 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v3"/>
+              <path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>
+              <path d="M12 12v9"/>
+              <path d="m8 8 4-4 4 4"/>
+            </svg>
+          </div>
+          <div class="dropzone-text">
+            Drop multiple files to compare
+          </div>
+          <input type="file" id="compare-file-input" multiple hidden>
+        </div>
+        
+        <div class="file-list" id="compare-file-list"></div>
+        
+        <button class="btn btn-primary" id="compare-btn" disabled>Compare Files</button>
+        
+        <div id="compare-result"></div>
+      </div>
+      
+      <!-- Receipt Tab -->
+      <div id="tab-receipt" class="tab-content" role="tabpanel" aria-labelledby="tab-button-receipt" tabindex="0" hidden>
+        <p class="tab-intro">Your timestamps for the current key.</p>
+        
+        <div id="receipts-loading" style="text-align: center; padding: 2rem; color: var(--text-dim);">
+          <span class="spinner"></span> Loading your receipts...
+        </div>
+        
+        <div id="receipts-list"></div>
+        
+        <div id="receipt-detail" style="display: none; margin-top: 1rem;"></div>
+      </div>
+      
+      <!-- Keys Tab -->
+      <div id="tab-keys" class="tab-content" role="tabpanel" aria-labelledby="tab-button-keys" tabindex="0" hidden>
+        <p class="tab-intro">Manage your Ed25519 signing keys. Stored locally in your browser.</p>
+        
+        <div class="form-group">
+          <label for="pubkey-display">Your Public Key</label>
+          <input type="text" id="pubkey-display" readonly placeholder="No key generated yet" style="font-family: monospace; font-size: 0.75rem;">
+        </div>
+        
+        <div class="key-actions">
+          <button class="btn btn-primary" id="generate-key-btn" style="flex: 1;">
+            Generate New Key
+          </button>
+          <button class="btn btn-secondary" id="export-key-btn" style="flex: 1;">
+            Export Keys
+          </button>
+        </div>
+        
+        <div class="form-group">
+          <label for="import-key-input">Import Keys (JSON)</label>
+          <input type="file" id="import-key-input" accept=".json">
+        </div>
+        
+        <div class="security-note">
+          <strong>Important:</strong> Your private key is stored in this browser only. Export and backup your keys.
+        </div>
+      </div>
+    </div>
+  </section>
+  </div>
+
+  <section class="platform-band" aria-labelledby="platform-heading">
+    <div class="platform-container">
+      <div class="platform-copy">
+        <span class="section-kicker">Platform</span>
+        <h2 id="platform-heading">Four product surfaces, one verification layer.</h2>
+        <p>OTRUST now covers the full trust journey: timestamp a record, collect signatures, create an identity proof, and use that proof in a global eID-ready partner-branded sign-in flow.</p>
+      </div>
+      <div class="platform-grid">
+        <a href="/" class="platform-card">
+          <span>01</span>
+          <strong>Timestamp</strong>
+          <p>Hash locally, anchor externally, verify later.</p>
+        </a>
+        <a href="/sign" class="platform-card">
+          <span>02</span>
+          <strong>Signed</strong>
+          <p>Collect intent and signatures with proof metadata.</p>
+        </a>
+        <a href="/proof" class="platform-card">
+          <span>03</span>
+          <strong>Proof</strong>
+          <p>Create reusable identity proof packages.</p>
+        </a>
+        <a href="/sign-in" class="platform-card">
+          <span>04</span>
+          <strong>Sign in</strong>
+          <p>Authenticate from a proof with partner branding for global identity flows.</p>
+        </a>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Features Section -->
+  <section class="features-section">
+    <div class="features-container">
+      <div class="features-title">
+        <h2>Integrations and developer surfaces</h2>
+        <p>Connect OTRUST where teams already work.</p>
+      </div>
+      
+      <div class="features-grid">
+        <a href="#timestamp-tool" class="feature-card" onclick="showTab('file'); return false;">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 6v6l4 2"/>
+            </svg>
+          </div>
+          <h3>Web Tool</h3>
+          <p>Timestamp files directly in your browser. Hash computed locally, never uploaded.</p>
+        </a>
+        
+        <a href="/docs.html#cli" class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <path d="M7 8l4 4-4 4"/>
+              <path d="M13 16h4"/>
+            </svg>
+          </div>
+          <h3>CLI Tool</h3>
+          <p>Command-line interface for automation and scripting. Batch timestamp hundreds of files.</p>
+        </a>
+        
+        <a href="#timestamp-tool" class="feature-card" onclick="showTab('verify'); return false;">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 12l2 2 4-4"/>
+              <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+            </svg>
+          </div>
+          <h3>Verification</h3>
+          <p>Verify any timestamp against blockchain. Independently auditable proofs.</p>
+        </a>
+        
+        <a href="/docs#selfhost" class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="3" width="20" height="14" rx="2"/>
+              <path d="M8 21h8"/>
+              <path d="M12 17v4"/>
+            </svg>
+          </div>
+          <h3>Self-Hosting</h3>
+          <p>Run the open source OTRUST server, web UI, SDKs, CLI, and circuits from GitHub.</p>
+        </a>
+        
+        <a href="https://chromewebstore.google.com/detail/otrust-blockchain-timesta/gadpcgaelaihbnnijgkcfmabdmkgpdol" target="_blank" rel="noopener noreferrer" class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+              <path d="M2 17l10 5 10-5"/>
+              <path d="M2 12l10 5 10-5"/>
+            </svg>
+          </div>
+          <h3>Browser Extension</h3>
+          <p>Timestamp any webpage with one click. Install from Chrome Web Store.</p>
+        </a>
+        
+        <a href="https://chatgpt.com/g/g-694d4a7fa8f48191aeb1db85f87fae5a-otrust-timestamper" target="_blank" rel="noopener noreferrer" class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              <path d="M8 9h8"/>
+              <path d="M8 13h6"/>
+            </svg>
+          </div>
+          <h3>ChatGPT Integration</h3>
+          <p>Timestamp conversations directly in ChatGPT. Just ask the GPT to timestamp your chat.</p>
+        </a>
+        
+        <a href="/docs.html#email" class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16v16H4z"/>
+              <path d="M4 6l8 6 8-6"/>
+            </svg>
+          </div>
+          <h3>Email Timestamper</h3>
+          <p>Send an email to timestamp&#64;otrust.eu. Get a receipt and proof links back.</p>
+        </a>
+        
+        <a href="https://t.me/OTRUSTbot" target="_blank" rel="noopener noreferrer" class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 2L11 13"/>
+              <path d="M22 2L15 22L11 13L2 9L22 2Z"/>
+            </svg>
+          </div>
+          <h3>Telegram Bot</h3>
+          <p>Timestamp messages and files directly in Telegram. Works in groups too.</p>
+        </a>
+        
+        <a href="/docs.html#whatsapp" class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+            </svg>
+          </div>
+          <h3>WhatsApp Bot</h3>
+          <p>Enterprise WhatsApp Business API integration. Contact us for setup.</p>
+        </a>
+
+        <a href="/sign-in" class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2l7 4v6c0 4.4-2.8 8.3-7 9.7C7.8 20.3 5 16.4 5 12V6l7-4z"/>
+              <path d="M9 12l2 2 4-4"/>
+            </svg>
+          </div>
+          <h3>Hosted Sign In</h3>
+          <p>Use OTRUST identity proofs for passwordless auth with approved partner branding.</p>
+        </a>
+
+        <a href="/playground/" class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M16 18l6-6-6-6"/>
+              <path d="M8 6l-6 6 6 6"/>
+              <path d="M14 4l-4 16"/>
+            </svg>
+          </div>
+          <h3>SDK Playground</h3>
+          <p>Interactive playground to test the TypeScript/JavaScript SDK. Try all API functions live.</p>
+        </a>
+        
+        <a href="/api-docs.html" class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <line x1="10" y1="9" x2="8" y2="9"/>
+            </svg>
+          </div>
+          <h3>REST API Docs</h3>
+          <p>Full API documentation with examples. OpenAPI spec available for code generation.</p>
+        </a>
+      </div>
+    </div>
+  </section>
+  </main>
+  
+  <div class="footer-wrapper">
+  <footer role="contentinfo">
+    <div class="footer-links">
+      <a href="/">Timestamp</a>
+      <a href="/sign">Signed</a>
+      <a href="/proof">Proof</a>
+      <a href="/sign-in">Sign in</a>
+      <a href="/docs">Docs</a>
+      <a href="/about">About</a>
+      <a href="/privacy-policy">Privacy</a>
+      <a href="/terms">Terms</a>
+      <a href="https://github.com/otrust-eu/opensource" rel="noopener noreferrer">GitHub</a>
+    </div>
+    <div class="footer-copy">OTRUST - MIT License</div>
+  </footer>
+  </div>
+  
+  <script type="module" nonce="">
+    import { sha256 } from 'https://esm.sh/@noble/hashes@1.3.3/sha256';
+    import { bytesToHex } from 'https://esm.sh/@noble/hashes@1.3.3/utils';
+    import * as ed from 'https://esm.sh/@noble/ed25519@2.1.0';
+    
+    // Dark mode initialization and toggle
+    function initTheme() {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+      
+      if (theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+      }
+    }
+    
+    document.getElementById('theme-toggle')?.addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (isDark) {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'light');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+      }
+    });
+    
+    initTheme();
+    
+    // Mobile menu toggle
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const navSecondary = document.getElementById('nav-secondary');
+    
+    mobileMenuBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      navSecondary.classList.toggle('open');
+      mobileMenuBtn.textContent = navSecondary.classList.contains('open') ? '×' : '';
+    });
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.nav-links') && !e.target.closest('.docs-submenu-bar')) {
+        navSecondary?.classList.remove('open');
+        if (mobileMenuBtn) mobileMenuBtn.textContent = '';
+        // Close docs submenu when clicking outside
+        docsSubmenuBar?.classList.remove('open');
+        docsTrigger?.classList.remove('open');
+      }
+    });
+    
+    // Docs submenu bar toggle
+    const docsTrigger = document.getElementById('docs-trigger');
+    const docsSubmenuBar = document.getElementById('docs-submenu-bar');
+    
+    docsTrigger?.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const isOpen = docsSubmenuBar.classList.toggle('open');
+      docsTrigger.classList.toggle('open', isOpen);
+    });
+
+    // Utility functions
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    
+    // State
+    let files = [];
+    let keys = null;
+    
+    // DOM Elements
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('file-input');
+    const fileList = document.getElementById('file-list');
+    const claimBtn = document.getElementById('claim-btn');
+    const progressEl = document.getElementById('progress');
+    const resultEl = document.getElementById('result');
+    
+    // Load or generate keys
+    async function loadKeys() {
+      const stored = localStorage.getItem('otrust_keys');
+      if (stored) {
+        keys = JSON.parse(stored);
+      } else {
+        await generateKeys();
+      }
+      updateKeyDisplay();
+    }
+    
+    async function generateKeys() {
+      const privateKey = ed.utils.randomPrivateKey();
+      const publicKey = await ed.getPublicKeyAsync(privateKey);
+      keys = {
+        privateKey: bytesToHex(privateKey),
+        publicKey: bytesToHex(publicKey)
+      };
+      localStorage.setItem('otrust_keys', JSON.stringify(keys));
+      updateKeyDisplay();
+    }
+    
+    function updateKeyDisplay() {
+      const display = document.getElementById('pubkey-display');
+      if (keys) {
+        display.value = keys.publicKey;
+        // Update history count badge
+        updateHistoryCount();
+      }
+    }
+    
+    async function updateHistoryCount() {
+      if (!keys?.publicKey) return;
+      try {
+        const res = await fetch('/receipts/' + keys.publicKey);
+        const data = await res.json();
+        const countBadge = document.getElementById('history-count');
+        if (data.count > 0) {
+          countBadge.textContent = data.count;
+          countBadge.style.display = 'inline';
+        } else {
+          countBadge.style.display = 'none';
+        }
+      } catch (e) {
+        // Ignore errors for badge
+      }
+    }
+    
+    loadKeys();
+    
+    // Tab switching - exposed globally for onclick handlers
+    function switchTab(tabName) {
+      // Whitelist allowed tab names to prevent XSS
+      const allowedTabs = ['file', 'text', 'verify', 'compare', 'receipt', 'keys'];
+      if (!allowedTabs.includes(tabName)) return;
+      
+      const targetTab = document.querySelector(`.tab[data-tab="${tabName}"]`);
+      const targetContent = document.getElementById('tab-' + tabName);
+      
+      // Only update if target exists and isn't already active
+      if (!targetTab || !targetContent || targetTab.classList.contains('active')) return;
+      
+      // Fade out current, then switch tabs, then fade in new
+      requestAnimationFrame(() => {
+        // Remove active from all
+        document.querySelectorAll('.tab').forEach(t => {
+          t.classList.remove('active');
+          t.setAttribute('aria-selected', 'false');
+        });
+        document.querySelectorAll('.tab-content').forEach(c => {
+          c.classList.remove('active');
+          c.hidden = true;
+        });
+        
+        // Immediately add active to new tab/content
+        targetTab.classList.add('active');
+        targetTab.setAttribute('aria-selected', 'true');
+        targetContent.hidden = false;
+        targetContent.classList.add('active');
+      });
+    }
+    
+    // Expose showTab globally for onclick handlers
+    window.showTab = switchTab;
+    
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        switchTab(tab.dataset.tab);
+      });
+    });
+
+    function enableDropzoneKeyboard(zone, input) {
+      zone?.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          input?.click();
+        }
+      });
+    }
+    
+    // File handling
+    enableDropzoneKeyboard(dropzone, fileInput);
+    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('dragover'); });
+    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+    dropzone.addEventListener('drop', async e => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+      await addFiles(e.dataTransfer.files);
+    });
+    fileInput.addEventListener('change', async () => {
+      await addFiles(fileInput.files);
+      fileInput.value = '';
+    });
+    
+    async function addFiles(fileList) {
+      for (const file of fileList) {
+        const buffer = await file.arrayBuffer();
+        const hash = bytesToHex(sha256(new Uint8Array(buffer)));
+        
+        // Check if this hash already exists (timestamp or sign request)
+        let existingData = null;
+        try {
+          const lookupRes = await fetch('/lookup/' + hash);
+          const lookupData = await lookupRes.json();
+          if (lookupData.exists) {
+            existingData = lookupData;
+          }
+        } catch (e) {
+          console.error('Lookup failed:', e);
+        }
+        
+        files.push({ name: file.name, size: file.size, hash, existingData });
+      }
+      renderFiles();
+    }
+    
+    function renderFiles() {
+      fileList.innerHTML = files.map((f, i) => {
+        let warningHtml = '';
+        if (f.existingData) {
+          if (f.existingData.timestamp) {
+            const ts = f.existingData.timestamp;
+            warningHtml += `
+              <div class="existing-warning">
+                Timestamped on ${new Date(ts.created_at).toLocaleDateString()}
+                ${ts.blockchain_confirmed ? '✓ Confirmed' : 'Pending'}
+                <a href="/proof/${ts.receipt_id}" target="_blank" rel="noopener noreferrer">View</a>
+              </div>
+            `;
+          }
+          if (f.existingData.sign_request) {
+            const sr = f.existingData.sign_request;
+            warningHtml += `
+              <div class="existing-warning sign-warning">
+                Already in signing session "${escapeHtml(sr.title)}" (${sr.status})
+              </div>
+            `;
+          }
+        }
+        
+        return `
+          <div class="file-item${f.existingData?.exists ? ' already-timestamped' : ''}">
+            <div>
+              <div class="name">${escapeHtml(f.name)}</div>
+              <div class="hash">${f.hash.substring(0, 16)}...</div>
+              ${warningHtml}
+            </div>
+            <button class="remove" onclick="removeFile(${i})">×</button>
+          </div>
+        `;
+      }).join('');
+      claimBtn.disabled = files.length === 0;
+      claimBtn.textContent = files.length > 0 
+        ? `Claim ${files.length} File${files.length > 1 ? 's' : ''}`
+        : 'Claim Selected Files';
+    }
+    
+    window.removeFile = function(i) {
+      files.splice(i, 1);
+      renderFiles();
+    };
+    
+    // Claim process
+    claimBtn.addEventListener('click', async () => {
+      if (files.length === 0) return;
+      
+      claimBtn.disabled = true;
+      progressEl.style.display = 'block';
+      resultEl.innerHTML = '';
+      
+      try {
+        // Step 1: Get challenge
+        setStep('pow', 'active');
+        const challengeRes = await fetch('/challenge');
+        const { challenge, difficulty } = await challengeRes.json();
+        
+        // Solve PoW
+        const nonce = await solvePow(challenge, difficulty);
+        setStep('pow', 'done');
+        
+        // Step 2: Sign
+        setStep('sign', 'active');
+        const claims = [];
+        for (const file of files) {
+          const sig = await ed.signAsync(file.hash, keys.privateKey);
+          claims.push({
+            hash: file.hash,
+            signature: bytesToHex(sig),
+            pubkey: keys.publicKey,
+            filename: file.name || undefined
+          });
+        }
+        setStep('sign', 'done');
+        
+        // Step 3: Submit
+        setStep('submit', 'active');
+        const notifyEmail = document.getElementById('notify-email').value.trim();
+        
+        let res;
+        if (claims.length === 1) {
+          res = await fetch('/claim', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              ...claims[0],
+              pow: { challenge, nonce },
+              notify_email: notifyEmail || undefined
+            })
+          });
+        } else {
+          res = await fetch('/claim/bulk', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ claims, pow: { challenge, nonce } })
+          });
+        }
+        
+        const data = await res.json();
+        setStep('submit', 'done');
+        
+        // Show result
+        if (res.ok) {
+          // Handle "already registered" as a warning case
+          if (data.status === 'already_registered') {
+            resultEl.innerHTML = `
+              <div class="result result-warning">
+                <h4>⚠️ Already Timestamped</h4>
+                <p style="color: var(--text-dim); font-size: 0.8rem; margin-bottom: 1rem;">This content was already registered on <strong>${new Date(data.timestamp).toLocaleDateString()}</strong>. No new timestamp created.</p>
+                <div class="result-row"><span class="label">Receipt ID</span><span class="value">${data.receipt_id}</span></div>
+                <div class="result-row"><span class="label">Blockchain</span><span class="value">${data.blockchain_confirmed ? '✓ Confirmed' : 'Pending confirmation'}</span></div>
+              </div>`;
+            files = [];
+            renderFiles();
+            claimBtn.disabled = false;
+            setTimeout(() => { progressEl.style.display = 'none'; }, 2000);
+            return;
+          }
+          
+          if (claims.length === 1) {
+            const receiptData = {
+              receipt_id: data.receipt_id,
+              hash: files[0]?.hash || claims[0].hash,
+              timestamp: data.timestamp,
+              pubkey: keys.publicKey,
+              blockchain_status: data.blockchain_status
+            };
+            const claimFilename = files[0]?.name || '';
+            resultEl.innerHTML = `
+              <div class="result">
+                <h4>✓ Timestamp Created</h4>
+                <div class="result-row"><span class="label">Receipt ID</span><span class="value">${data.receipt_id}</span></div>
+                ${claimFilename ? `<div class="result-row"><span class="label">File</span><span class="value">${claimFilename}</span></div>` : ''}
+                <div class="result-row"><span class="label">Timestamp</span><span class="value">${data.timestamp}</span></div>
+                <div class="result-row"><span class="label">Blockchain</span><span class="value">${data.blockchain_status}</span></div>
+                <div class="receipt-actions">
+                  <button class="btn btn-secondary" onclick="downloadReceipt('${data.receipt_id}')">Download Receipt</button>
+                  ${data.blockchain_status === 'confirmed' ? `<button class="btn btn-secondary" onclick="downloadCertificate('${data.receipt_id}', '${claims[0].hash}')">Download Certificate</button>` : ''}
+                </div>
+              </div>`;
+          } else {
+            const receiptIds = data.results?.filter(r => r.receipt_id).map(r => r.receipt_id) || [];
+            resultEl.innerHTML = `
+              <div class="result">
+                <h4>✓ Batch Processed</h4>
+                <div class="result-row"><span class="label">Created</span><span class="value">${data.created}</span></div>
+                <div class="result-row"><span class="label">Duplicates</span><span class="value">${data.duplicates}</span></div>
+                <div class="result-row"><span class="label">Errors</span><span class="value">${data.errors}</span></div>
+                ${receiptIds.length > 0 ? `<div class="receipt-actions"><button class="btn btn-secondary" onclick="downloadBulkReceipts()">Download All Receipts</button></div>` : ''}
+              </div>`;
+            window.lastBulkResults = data.results;
+          }
+          files = [];
+          renderFiles();
+        } else {
+          const errorMsg = escapeHtml(data.message || data.error || 'Something went wrong');
+          resultEl.innerHTML = `
+            <div style="padding: 1rem; background: #fef2f2; border-radius: 8px; margin-top: 1rem; border-left: 4px solid #dc2626;">
+              <strong style="color: #dc2626;">⚠️ ${errorMsg}</strong>
+              ${data.error === 'rate_limit_exceeded' ? '<p style="color: #666; font-size: 0.8rem; margin-top: 0.5rem;">Please wait a moment and try again.</p>' : ''}
+            </div>`;
+        }
+        
+      } catch (e) {
+        resultEl.innerHTML = `<div style="color: #dc2626; padding: 1rem; background: #fef2f2; border-radius: 8px; margin-top: 1rem;">Error: ${escapeHtml(e.message)}</div>`;
+      }
+      
+      claimBtn.disabled = false;
+      setTimeout(() => { progressEl.style.display = 'none'; }, 2000);
+    });
+    
+    function setStep(step, state) {
+      const el = document.getElementById('step-' + step);
+      el.className = 'progress-step ' + state;
+      if (state === 'done') el.querySelector('.icon').textContent = '✓';
+    }
+    
+    async function solvePow(challenge, difficulty) {
+      let nonce = 0;
+      while (true) {
+        const nonceHex = nonce.toString(16).padStart(16, '0');
+        const hash = sha256(new TextEncoder().encode(challenge + nonceHex));
+        
+        let zeroBits = 0;
+        for (const byte of hash) {
+          if (byte === 0) zeroBits += 8;
+          else { zeroBits += Math.clz32(byte) - 24; break; }
+          if (zeroBits >= difficulty) break;
+        }
+        
+        if (zeroBits >= difficulty) return nonceHex;
+        nonce++;
+        if (nonce % 10000 === 0) await new Promise(r => setTimeout(r, 0));
+      }
+    }
+    
+    // Text claim
+    document.getElementById('text-claim-btn').addEventListener('click', async () => {
+      const text = document.getElementById('text-input').value.trim();
+      if (!text) return alert('Enter some text');
+      
+      const btn = document.getElementById('text-claim-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Processing...';
+      
+      try {
+        const hash = bytesToHex(sha256(new TextEncoder().encode(text)));
+        
+        const challengeRes = await fetch('/challenge');
+        const { challenge, difficulty } = await challengeRes.json();
+        const nonce = await solvePow(challenge, difficulty);
+        
+        const sig = await ed.signAsync(hash, keys.privateKey);
+        const notifyEmail = document.getElementById('text-notify-email').value.trim();
+        
+        const res = await fetch('/claim', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            hash,
+            signature: bytesToHex(sig),
+            pubkey: keys.publicKey,
+            pow: { challenge, nonce },
+            notify_email: notifyEmail || undefined
+          })
+        });
+        
+        const data = await res.json();
+        
+        if (res.ok) {
+          document.getElementById('text-result').innerHTML = `
+            <div class="result">
+              <h4>✓ Timestamp Created</h4>
+              <div class="result-row"><span class="label">Hash</span><span class="value">${hash.substring(0, 24)}...</span></div>
+              <div class="result-row"><span class="label">Receipt ID</span><span class="value">${escapeHtml(data.receipt_id)}</span></div>
+              <div class="result-row"><span class="label">Timestamp</span><span class="value">${escapeHtml(data.timestamp)}</span></div>
+            </div>`;
+        } else {
+          document.getElementById('text-result').innerHTML = `<div style="color: #dc2626; padding: 1rem; background: #fef2f2; border-radius: 8px; margin-top: 1rem;">Error: ${escapeHtml(data.error || data.message)}</div>`;
+        }
+      } catch (e) {
+        document.getElementById('text-result').innerHTML = `<div style="color: #dc2626; padding: 1rem; background: #fef2f2; border-radius: 8px; margin-top: 1rem;">Error: ${escapeHtml(e.message)}</div>`;
+      }
+      
+      btn.disabled = false;
+      btn.textContent = 'Claim This Text';
+    });
+    
+    // Key management
+    document.getElementById('generate-key-btn').addEventListener('click', async () => {
+      if (confirm('Generate new keypair? Your old keys will be lost if not exported!')) {
+        await generateKeys();
+        alert('New keypair generated!');
+      }
+    });
+    
+    document.getElementById('export-key-btn').addEventListener('click', () => {
+      if (!keys) return alert('No keys to export');
+      const blob = new Blob([JSON.stringify({ ...keys, exportedAt: new Date().toISOString() }, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'otrust-keys.json';
+      a.click();
+    });
+    
+    document.getElementById('import-key-input').addEventListener('change', async e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      try {
+        const text = await file.text();
+        const imported = JSON.parse(text);
+        if (!imported.privateKey || !imported.publicKey) throw new Error('Invalid key file');
+        keys = { privateKey: imported.privateKey, publicKey: imported.publicKey };
+        localStorage.setItem('otrust_keys', JSON.stringify(keys));
+        updateKeyDisplay();
+        alert('Keys imported successfully!');
+      } catch (err) {
+        alert('Failed to import: ' + err.message);
+      }
+    });
+    
+    // ========== VERIFY TAB ==========
+    const verifyDropzone = document.getElementById('verify-dropzone');
+    const verifyFileInput = document.getElementById('verify-file-input');
+    
+    enableDropzoneKeyboard(verifyDropzone, verifyFileInput);
+    verifyDropzone.addEventListener('click', () => verifyFileInput.click());
+    verifyDropzone.addEventListener('dragover', e => { e.preventDefault(); verifyDropzone.classList.add('dragover'); });
+    verifyDropzone.addEventListener('dragleave', () => verifyDropzone.classList.remove('dragover'));
+    verifyDropzone.addEventListener('drop', async e => {
+      e.preventDefault();
+      verifyDropzone.classList.remove('dragover');
+      if (e.dataTransfer.files[0]) {
+        const buffer = await e.dataTransfer.files[0].arrayBuffer();
+        const hash = bytesToHex(sha256(new Uint8Array(buffer)));
+        document.getElementById('verify-hash-input').value = hash;
+        doVerify(hash);
+      }
+    });
+    verifyFileInput.addEventListener('change', async () => {
+      if (verifyFileInput.files[0]) {
+        const buffer = await verifyFileInput.files[0].arrayBuffer();
+        const hash = bytesToHex(sha256(new Uint8Array(buffer)));
+        document.getElementById('verify-hash-input').value = hash;
+        doVerify(hash);
+      }
+    });
+    
+    document.getElementById('verify-btn').addEventListener('click', () => {
+      const hash = document.getElementById('verify-hash-input').value.trim();
+      if (!hash) return alert('Enter a hash or drop a file');
+      doVerify(hash);
+    });
+    
+    async function doVerify(hash) {
+      const resultEl = document.getElementById('verify-result');
+      resultEl.innerHTML = '<div style="text-align:center;padding:1rem;"><span class="spinner"></span> Checking...</div>';
+      
+      try {
+        const res = await fetch('/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ hash })
+        });
+        const data = await res.json();
+        
+        if (data.status === 'found') {
+          const claim = data.claims[0];
+          resultEl.innerHTML = '<div class="result">' +
+            '<h4>✓ Verified</h4>' +
+            '<div class="result-row"><span class="label">Hash</span><span class="value">' + hash.substring(0, 20) + '...</span></div>' +
+            '<div class="result-row"><span class="label">Timestamp</span><span class="value">' + claim.timestamp + '</span></div>' +
+            '<div class="result-row"><span class="label">Receipt ID</span><span class="value">' + claim.receipt_id + '</span></div>' +
+            '<div class="result-row"><span class="label">Blockchain</span><span class="value">' + (claim.blockchain_confirmed ? '✓ Confirmed' : 'Pending') + '</span></div>' +
+            (data.claims.length > 1 ? '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--text-dim);">+ ' + (data.claims.length - 1) + ' more claim(s)</div>' : '') +
+          '</div>';
+        } else {
+          resultEl.innerHTML = '<div style="background: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px; padding: 1rem; margin-top: 1rem;">' +
+            '<strong>Not Found</strong><br><span style="font-size:0.9rem;color:var(--text-dim);">This content has not been timestamped yet.</span></div>';
+        }
+      } catch (e) {
+        resultEl.innerHTML = '<div style="color:#dc2626;padding:1rem;background:#fef2f2;border-radius:8px;margin-top:1rem;">Error: ' + e.message + '</div>';
+      }
+    }
+    
+    // ========== COMPARE TAB ==========
+    let compareFiles = [];
+    const compareDropzone = document.getElementById('compare-dropzone');
+    const compareFileInput = document.getElementById('compare-file-input');
+    const compareFileList = document.getElementById('compare-file-list');
+    const compareBtn = document.getElementById('compare-btn');
+    
+    enableDropzoneKeyboard(compareDropzone, compareFileInput);
+    compareDropzone.addEventListener('click', () => compareFileInput.click());
+    compareDropzone.addEventListener('dragover', e => { e.preventDefault(); compareDropzone.classList.add('dragover'); });
+    compareDropzone.addEventListener('dragleave', () => compareDropzone.classList.remove('dragover'));
+    compareDropzone.addEventListener('drop', async e => {
+      e.preventDefault();
+      compareDropzone.classList.remove('dragover');
+      await addCompareFiles(e.dataTransfer.files);
+    });
+    compareFileInput.addEventListener('change', async () => {
+      await addCompareFiles(compareFileInput.files);
+      compareFileInput.value = '';
+    });
+    
+    async function addCompareFiles(fileList) {
+      for (const file of fileList) {
+        const buffer = await file.arrayBuffer();
+        const hash = bytesToHex(sha256(new Uint8Array(buffer)));
+        compareFiles.push({ name: file.name, hash });
+      }
+      renderCompareFiles();
+    }
+    
+    function renderCompareFiles() {
+      compareFileList.innerHTML = compareFiles.map((f, i) => 
+        '<div class="file-item"><div><div class="name">' + escapeHtml(f.name) + '</div><div class="hash">' + f.hash.substring(0, 16) + '...</div></div>' +
+        '<button class="remove" onclick="removeCompareFile(' + i + ')">×</button></div>'
+      ).join('');
+      compareBtn.disabled = compareFiles.length < 2;
+      compareBtn.textContent = compareFiles.length > 0 ? 'Compare ' + compareFiles.length + ' Files' : 'Compare Files';
+    }
+    
+    window.removeCompareFile = function(i) {
+      compareFiles.splice(i, 1);
+      renderCompareFiles();
+    };
+    
+    compareBtn.addEventListener('click', async () => {
+      if (compareFiles.length < 2) return;
+      
+      compareBtn.disabled = true;
+      const resultEl = document.getElementById('compare-result');
+      resultEl.innerHTML = '<div style="text-align:center;padding:1rem;"><span class="spinner"></span> Comparing...</div>';
+      
+      // Find duplicates locally
+      const hashMap = {};
+      compareFiles.forEach(f => {
+        if (!hashMap[f.hash]) hashMap[f.hash] = [];
+        hashMap[f.hash].push(f.name);
+      });
+      
+      const duplicates = Object.entries(hashMap).filter(([h, names]) => names.length > 1);
+      
+      // Check registration status
+      try {
+        const res = await fetch('/verify/bulk', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ hashes: Object.keys(hashMap) })
+        });
+        const data = await res.json();
+        
+        let html = '<div style="margin-top:1rem;">';
+        
+        if (duplicates.length > 0) {
+          html += '<div style="background:#fef3c7;border:1px solid #fcd34d;border-radius:8px;padding:1rem;margin-bottom:1rem;"><strong>⚠️ Duplicates Found</strong><ul style="margin:0.5rem 0 0 1rem;font-size:0.85rem;">';
+          duplicates.forEach(([hash, names]) => {
+            html += '<li>' + names.join(', ') + '</li>';
+          });
+          html += '</ul></div>';
+        }
+        
+        const registered = data.results.filter(r => r.status === 'found').length;
+        const unregistered = data.results.filter(r => r.status === 'not_found').length;
+        
+        html += '<div class="result"><h4>Results</h4>' +
+          '<div class="result-row"><span class="label">Total Files</span><span class="value">' + compareFiles.length + '</span></div>' +
+          '<div class="result-row"><span class="label">Unique Hashes</span><span class="value">' + Object.keys(hashMap).length + '</span></div>' +
+          '<div class="result-row"><span class="label">Registered</span><span class="value">' + registered + '</span></div>' +
+          '<div class="result-row"><span class="label">Not Registered</span><span class="value">' + unregistered + '</span></div>' +
+          '</div></div>';
+        
+        resultEl.innerHTML = html;
+      } catch (e) {
+        resultEl.innerHTML = '<div style="color:#dc2626;padding:1rem;background:#fef2f2;border-radius:8px;margin-top:1rem;">Error: ' + escapeHtml(e.message) + '</div>';
+      }
+      
+      compareBtn.disabled = false;
+    });
+    
+    // ========== RECEIPT TAB ==========
+    let currentHistoryPubkey = null; // Track if viewing another pubkey's history
+    
+    async function loadMyReceipts(pubkeyOverride = null) {
+      const loadingEl = document.getElementById('receipts-loading');
+      const listEl = document.getElementById('receipts-list');
+      const detailEl = document.getElementById('receipt-detail');
+      
+      const pubkeyToUse = pubkeyOverride || keys?.publicKey;
+      currentHistoryPubkey = pubkeyOverride;
+      
+      if (!pubkeyToUse) {
+        loadingEl.style.display = 'none';
+        listEl.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-dim);">No key found. Go to the Keys tab to generate or import a key.</div>';
+        return;
+      }
+      
+      try {
+        loadingEl.style.display = 'block';
+        const res = await fetch('/receipts/' + pubkeyToUse);
+        const data = await res.json();
+        loadingEl.style.display = 'none';
+        
+        // Show banner if viewing another key's history
+        const bannerHtml = pubkeyOverride ? 
+          '<div style="background:var(--accent-light);border:1px solid var(--accent);border-radius:8px;padding:0.75rem;margin-bottom:1rem;font-size:0.75rem;">' +
+          '<strong>Viewing history for key:</strong> ' + pubkeyOverride.slice(0,16) + '...' +
+          '<br><a href="#" onclick="loadMyReceipts();return false;" style="color:var(--accent);">← Back to my history</a></div>' : '';
+        
+        if (data.receipts.length === 0) {
+          listEl.innerHTML = bannerHtml + '<div style="text-align:center;padding:2rem;color:var(--text-dim);">No timestamps found for this key.</div>';
+          // Update badge
+          const countBadge = document.getElementById('history-count');
+          if (!pubkeyOverride) {
+            countBadge.style.display = 'none';
+          }
+          return;
+        }
+        
+        // Update badge
+        const countBadge = document.getElementById('history-count');
+        if (!pubkeyOverride) {
+          countBadge.textContent = data.count;
+          countBadge.style.display = 'inline';
+        }
+        
+        listEl.innerHTML = bannerHtml + '<div class="receipts-header"><strong>' + data.count + ' timestamp' + (data.count !== 1 ? 's' : '') + '</strong></div>' +
+          data.receipts.map(r => `
+            <div class="receipt-item" data-receipt="${r.receipt_id}">
+              <div class="receipt-info">
+                <div class="receipt-id">${r.filename ? '<span class="receipt-filename">' + escapeHtml(r.filename) + '</span> <span class="receipt-id-small">' + r.receipt_id + '</span>' : r.receipt_id}</div>
+                <div class="receipt-hash">${r.hash.substring(0, 24)}...</div>
+              </div>
+              <div class="receipt-meta">
+                <div class="receipt-date">${new Date(r.timestamp).toLocaleDateString()}</div>
+                <div class="receipt-status ${r.blockchain_confirmed ? 'confirmed' : 'pending'}">${r.blockchain_confirmed ? '✓ Confirmed' : 'Pending'}</div>
+              </div>
+            </div>
+          `).join('');
+        
+        // Add click handlers
+        listEl.querySelectorAll('.receipt-item').forEach(item => {
+          item.addEventListener('click', () => {
+            const receiptId = item.dataset.receipt;
+            showReceiptDetail(receiptId);
+          });
+        });
+        
+      } catch (e) {
+        loadingEl.style.display = 'none';
+        listEl.innerHTML = '<div style="color:#dc2626;padding:1rem;">Error loading receipts: ' + escapeHtml(e.message) + '</div>';;
+      }
+    }
+    
+    window.showReceiptDetail = async function(receiptId) {
+      const detailEl = document.getElementById('receipt-detail');
+      detailEl.style.display = 'block';
+      detailEl.innerHTML = '<div style="text-align:center;padding:1rem;"><span class="spinner"></span></div>';
+      detailEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      
+      try {
+        const res = await fetch('/proof/' + receiptId);
+        const data = await res.json();
+        
+        if (data.error) {
+          detailEl.innerHTML = '<div style="background:#fef3c7;border:1px solid #fcd34d;border-radius:8px;padding:1rem;"><strong>Could not load details</strong></div>';
+          return;
+        }
+        
+        let html = '<div class="result"><h4>' + receiptId + '</h4>' +
+          '<div class="result-row"><span class="label">Hash</span><span class="value" style="word-break:break-all;">' + (data.hash || 'N/A') + '</span></div>' +
+          '<div class="result-row"><span class="label">Created</span><span class="value">' + (data.created_at || 'N/A') + '</span></div>' +
+          '<div class="result-row"><span class="label">Blockchain</span><span class="value">' + (data.blockchain?.confirmed ? '✓ Block ' + data.blockchain.block_height : 'Pending') + '</span></div>' +
+          '<div class="receipt-actions">';
+        
+        if (data.download_url) {
+          html += '<a href="' + data.download_url + '" class="btn btn-secondary" download>Download .ots</a>';
+        }
+        html += '<button class="btn btn-secondary" data-action="json" data-id="' + receiptId + '">JSON</button>';
+        html += '<button class="btn btn-secondary" data-action="cert" data-id="' + receiptId + '" data-hash="' + (data.hash || '') + '">Cert</button>';
+        html += '<button class="btn btn-secondary" data-action="close">Close</button>';
+        html += '</div></div>';
+        detailEl.innerHTML = html;
+        
+        // Add event listeners to buttons
+        detailEl.querySelectorAll('button[data-action]').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            const action = btn.dataset.action;
+            if (action === 'json') {
+              await window.downloadReceipt(btn.dataset.id);
+            } else if (action === 'cert') {
+              await window.downloadCertificate(btn.dataset.id, btn.dataset.hash);
+            } else if (action === 'close') {
+              detailEl.style.display = 'none';
+            }
+          });
+        });
+      } catch (e) {
+        detailEl.innerHTML = '<div style="color:#dc2626;padding:1rem;background:#fef2f2;border-radius:8px;">Error: ' + escapeHtml(e.message) + '</div>';
+      }
+    };
+    
+    async function showReceiptDetail(receiptId) {
+      await window.showReceiptDetail(receiptId);
+    }
+    
+    // Make loadMyReceipts global for "back to my history" link
+    window.loadMyReceipts = loadMyReceipts;
+    
+    // Load receipts when tab is clicked
+    document.querySelector('[data-tab="receipt"]').addEventListener('click', () => loadMyReceipts());
+    
+    // ========== URL HASH HANDLING ==========
+    // Handle #history=<pubkey> and #verify=<hash>
+    function handleUrlHash() {
+      const hash = window.location.hash;
+      if (hash.startsWith('#history=')) {
+        const pubkey = hash.slice(9);
+        if (pubkey.length === 64 && /^[a-f0-9]+$/i.test(pubkey)) {
+          switchTab('receipt');
+          loadMyReceipts(pubkey);
+        }
+      } else if (hash.startsWith('#verify=')) {
+        const hashToVerify = hash.slice(8);
+        if (hashToVerify.length === 64 && /^[a-f0-9]+$/i.test(hashToVerify)) {
+          switchTab('verify');
+          document.getElementById('verify-hash-input').value = hashToVerify;
+        }
+      }
+    }
+    
+    // Run on page load
+    handleUrlHash();
+    
+    // ========== DOWNLOAD FUNCTIONS ==========
+    // These must be global for onclick handlers in dynamically generated HTML
+    window.downloadReceipt = async function(receiptId) {
+      try {
+        const res = await fetch('/proof/' + receiptId);
+        if (!res.ok) throw new Error('Receipt not found');
+        const data = await res.json();
+        
+        const receipt = {
+          receipt_id: receiptId,
+          filename: data.filename || null,
+          hash: data.hash,
+          created_at: data.created_at,
+          status: data.status,
+          blockchain: data.blockchain,
+          ots_proof: data.ots_proof,
+          verification_url: window.location.origin + '/proof/' + receiptId
+        };
+        
+        const blob = new Blob([JSON.stringify(receipt, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = receiptId + '-receipt.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (e) {
+        alert('Failed to download receipt: ' + e.message);
+      }
+    };
+    
+    window.downloadCertificate = async function(receiptId, hash) {
+      try {
+        const res = await fetch('/proof/' + receiptId);
+        const data = await res.json();
+        
+        const filenameHtml = data.filename 
+          ? `<div class="field">
+        <div class="field-label">Document</div>
+        <div class="field-value">${data.filename}</div>
+      </div>` 
+          : '';
+        
+        const certHtml = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>OTRUST Certificate - ${receiptId}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Georgia', serif; background: #f8f8f5; padding: 2rem; }
+    .certificate { max-width: 800px; margin: 0 auto; background: white; border: 3px double #0f766e; padding: 3rem; position: relative; }
+    .certificate::before { content: ''; position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px; border: 1px solid #e5e5e0; pointer-events: none; }
+    .header { text-align: center; margin-bottom: 2rem; }
+    .logo { font-size: 1.5rem; font-weight: bold; color: #0f766e; letter-spacing: 0.1em; margin-bottom: 0.5rem; }
+    .title { font-size: 2rem; color: #1a1a1a; margin: 1rem 0; }
+    .subtitle { color: #666; font-style: italic; }
+    .content { margin: 2rem 0; line-height: 1.8; }
+    .field { margin: 1rem 0; }
+    .field-label { font-size: 0.8rem; color: #888; text-transform: uppercase; letter-spacing: 0.05em; }
+    .field-value { font-family: monospace; font-size: 0.9rem; word-break: break-all; background: #f5f5f5; padding: 0.5rem; border-radius: 4px; margin-top: 0.25rem; }
+    .field-value.document { font-family: 'Georgia', serif; font-size: 1rem; background: #f0fdf4; border-left: 3px solid #0f766e; }
+    .blockchain { margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #e5e5e5; }
+    .verified { color: #0f766e; font-weight: bold; }
+    .pending { color: #d97706; }
+    .footer { margin-top: 3rem; text-align: center; font-size: 0.8rem; color: #888; }
+    .seal { width: 80px; height: 80px; border: 2px solid #0f766e; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 1rem auto; color: #0f766e; font-weight: bold; }
+    @media print { body { background: white; padding: 0; } .certificate { border: none; box-shadow: none; } }
+  </style>
+</head>
+<body>
+  <div class="certificate">
+    <div class="header">
+      <div class="logo">⬡ OTRUST</div>
+      <h1 class="title">Certificate of Timestamp</h1>
+      <p class="subtitle">Proof of Existence & Authorship</p>
+    </div>
+    
+    <div class="content">
+      <p>This document certifies that the digital content identified by the hash below existed at the specified time and was registered on the OTRUST blind notary service with blockchain anchoring.</p>
+      
+      ${filenameHtml}
+      
+      <div class="field">
+        <div class="field-label">Receipt ID</div>
+        <div class="field-value">${receiptId}</div>
+      </div>
+      
+      <div class="field">
+        <div class="field-label">SHA-256 Hash</div>
+        <div class="field-value">${data.hash || hash}</div>
+      </div>
+      
+      <div class="field">
+        <div class="field-label">Timestamp (UTC)</div>
+        <div class="field-value">${data.created_at || new Date().toISOString()}</div>
+      </div>
+      
+      <div class="blockchain">
+        <div class="field">
+          <div class="field-label">Blockchain Status</div>
+          <div class="field-value ${data.blockchain?.confirmed ? 'verified' : 'pending'}">
+            ${data.blockchain?.confirmed 
+              ? '✓ Confirmed in Block #' + data.blockchain.block_height
+              : 'Pending blockchain confirmation'}
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="seal">✓</div>
+    
+    <div class="footer">
+      <p>Verify this certificate at: <strong>${window.location.origin}</strong></p>
+      <p style="margin-top: 0.5rem;">OTRUST uses OpenTimestamps for decentralized blockchain-backed timestamps</p>
+      <p style="margin-top: 1rem; font-size: 0.7rem;">Generated: ${new Date().toISOString()}</p>
+    </div>
+  </div>
+</body>
+</html>`;
+        
+        const blob = new Blob([certHtml], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = receiptId + '-certificate.html';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (e) {
+        alert('Failed to generate certificate: ' + e.message);
+      }
+    };
+    
+    window.downloadBulkReceipts = function() {
+      if (!window.lastBulkResults) return;
+      
+      const receipts = window.lastBulkResults.filter(r => r.receipt_id).map(r => ({
+        receipt_id: r.receipt_id,
+        hash: r.hash,
+        timestamp: r.timestamp,
+        status: r.status
+      }));
+      
+      const blob = new Blob([JSON.stringify(receipts, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'otrust-bulk-receipts.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    };
+  </script>
+  <script src="/otrust-polish.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Report Abuse – OTRUST by Kris Ledel</title>
+  <meta name="description" content="Report suspicious or abusive use of OTRUST signing services. Service by Kris Ledel.">
+  <meta name="author" content="Kris Ledel">
+  <meta name="robots" content="noindex">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <style>
+    :root {
+      --bg: #fafaf9;
+      --bg-card: #ffffff;
+      --bg-muted: #f5f5f4;
+      --border: #e5e5e5;
+      --text: #1a1a1a;
+      --text-dim: #737373;
+      --accent: #2d5a3d;
+      --accent-hover: #1e4029;
+      --error: #dc2626;
+      --warning: #f59e0b;
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    
+    nav {
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+    }
+    
+    .nav-container {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .logo {
+      font-weight: 700;
+      font-size: 1.25rem;
+      text-decoration: none;
+      color: var(--text);
+    }
+    
+    .logo-highlight {
+      color: var(--accent);
+    }
+    
+    main {
+      max-width: 600px;
+      margin: 3rem auto;
+      padding: 0 1.5rem;
+    }
+    
+    h1 {
+      font-size: 1.75rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .warning-icon {
+      font-size: 2rem;
+    }
+    
+    .intro {
+      color: var(--text-dim);
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+    }
+    
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+    
+    input, textarea, select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-family: inherit;
+    }
+    
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(45, 90, 61, 0.1);
+    }
+    
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+    
+    .btn {
+      background: var(--accent);
+      color: white;
+      padding: 0.875rem 2rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      width: 100%;
+    }
+    
+    .btn:hover {
+      background: var(--accent-hover);
+    }
+    
+    .btn:disabled {
+      background: var(--text-dim);
+      cursor: not-allowed;
+    }
+    
+    .info-box {
+      background: #fef3c7;
+      border: 1px solid var(--warning);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 2rem;
+      font-size: 0.9rem;
+      color: #92400e;
+    }
+    
+    .success-box {
+      background: #d1fae5;
+      border: 1px solid #10b981;
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-align: center;
+      color: #065f46;
+    }
+    
+    .ref-display {
+      background: var(--bg-muted);
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      margin-bottom: 1rem;
+    }
+    
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-dim);
+      font-size: 0.85rem;
+    }
+    
+    footer a {
+      color: var(--text-dim);
+      text-decoration: none;
+    }
+    
+    footer a:hover {
+      color: var(--accent);
+    }
+  </style>
+  <link rel="stylesheet" href="/otrust-polish.css?v=20260527-1">
+</head>
+<body>
+  <nav>
+    <div class="nav-container">
+      <a href="/" class="logo"><span class="logo-highlight">O</span>TRUST</a>
+      <a href="/sign" style="color: var(--text-dim); text-decoration: none;">Back to Sign</a>
+    </div>
+  </nav>
+  
+  <main>
+    <h1><span class="warning-icon">⚠️</span> Report Abuse</h1>
+    <p class="intro">
+      If you received a suspicious signing request or believe OTRUST is being used for fraud, 
+      phishing, or other malicious purposes, please report it here.
+    </p>
+    
+    <div class="info-box">
+      <strong>What we can do:</strong> We can investigate and block abusive senders from using our email signing service. 
+      We take all reports seriously and typically respond within 24 hours.
+    </div>
+    
+    <div class="card" id="report-form">
+      <div class="ref-display" id="ref-display" style="display: none;">
+        Reference: <span id="ref-id"></span>
+      </div>
+      
+      <form id="abuse-form">
+        <div class="form-group">
+          <label for="email">Your Email (for follow-up)</label>
+          <input type="email" id="email" name="email" required placeholder="your@email.com">
+        </div>
+        
+        <div class="form-group">
+          <label for="type">Type of Abuse</label>
+          <select id="type" name="type" required>
+            <option value="">Select...</option>
+            <option value="phishing">Phishing / Scam attempt</option>
+            <option value="spam">Unsolicited / Spam</option>
+            <option value="impersonation">Impersonation / Fake identity</option>
+            <option value="harassment">Harassment</option>
+            <option value="fraud">Fraudulent document</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea id="description" name="description" required 
+            placeholder="Please describe what happened. Include the sender's email address if you have it, and any other relevant details."></textarea>
+        </div>
+        
+        <button type="submit" class="btn" id="submit-btn">Submit Report</button>
+      </form>
+    </div>
+    
+    <div class="success-box" id="success-box" style="display: none;">
+      <h2 style="margin-bottom: 0.5rem;">✓ Report Submitted</h2>
+      <p>Thank you for helping keep OTRUST safe. We'll investigate and take appropriate action.</p>
+      <p style="margin-top: 1rem; font-size: 0.9rem; color: #065f46;">A confirmation email has been sent to your address.</p>
+    </div>
+  </main>
+  
+  <footer>
+    <a href="/">OTRUST</a> · <a href="/privacy-policy">Privacy</a> · <a href="/terms">Terms</a>
+  </footer>
+  
+  <script nonce="">
+    // Get reference from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const ref = urlParams.get('ref');
+    
+    if (ref) {
+      document.getElementById('ref-display').style.display = 'block';
+      document.getElementById('ref-id').textContent = ref;
+    }
+    
+    document.getElementById('abuse-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.textContent = 'Submitting...';
+      
+      const formData = {
+        email: document.getElementById('email').value,
+        type: document.getElementById('type').value,
+        description: document.getElementById('description').value,
+        reference: ref || null,
+        timestamp: new Date().toISOString()
+      };
+      
+      try {
+        const res = await fetch('/api/report-abuse', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+        
+        if (res.ok) {
+          document.getElementById('report-form').style.display = 'none';
+          document.getElementById('success-box').style.display = 'block';
+        } else {
+          throw new Error('Failed to submit');
+        }
+      } catch (err) {
+        alert('Failed to submit report. Please try again or email abuse\x40otrust.eu directly.');
+        btn.disabled = false;
+        btn.textContent = 'Submit Report';
+      }
+    });
+  </script>
+</body>
+</html>

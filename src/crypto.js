@@ -1,5 +1,5 @@
 /**
- * OTRUST open source cryptographic helpers.
+ * otrust-core/src/crypto.js
  *
  * Cryptographic operations using @noble libraries
  * Supports:

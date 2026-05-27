@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OTRUST Setup – Self-Hosted Blockchain Timestamp | By Kris Ledel</title>
+  <meta name="description" content="Set up your own OTRUST instance. Self-hosted blockchain timestamping. Open source by Kris Ledel.">
+  <meta name="keywords" content="OTRUST setup, self-hosted, blockchain timestamp, installation, open source, Kris Ledel">
+  <meta name="author" content="Kris Ledel">
+  <meta name="robots" content="noindex">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --border: #334155;
+      --text: #f1f5f9;
+      --text-dim: #94a3b8;
+      --primary: #22c55e;
+      --primary-hover: #16a34a;
+      --accent: #3b82f6;
+      --warning: #f59e0b;
+      --error: #ef4444;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+    
+    .logo {
+      margin-bottom: 40px;
+      text-align: center;
+    }
+    
+    .logo h1 {
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -2px;
+    }
+    
+    .logo h1 span {
+      color: var(--primary);
+    }
+    
+    .logo p {
+      color: var(--text-dim);
+      margin-top: 8px;
+    }
+    
+    .wizard {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 600px;
+      overflow: hidden;
+    }
+    
+    .progress {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .progress-step {
+      flex: 1;
+      padding: 16px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-dim);
+      position: relative;
+    }
+    
+    .progress-step.active {
+      color: var(--primary);
+      font-weight: 600;
+    }
+    
+    .progress-step.completed {
+      color: var(--text);
+    }
+    
+    .progress-step.completed::after {
+      content: '✓';
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      color: var(--primary);
+      font-size: 12px;
+    }
+    
+    .step-content {
+      padding: 32px;
+      display: none;
+    }
+    
+    .step-content.active {
+      display: block;
+    }
+    
+    .step-content h2 {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+    
+    .step-content p.subtitle {
+      color: var(--text-dim);
+      margin-bottom: 24px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 15px;
+      transition: border-color 0.2s;
+    }
+    
+    .form-group input:focus, .form-group select:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    
+    .form-group .hint {
+      font-size: 13px;
+      color: var(--text-dim);
+      margin-top: 6px;
+    }
+    
+    .toggle-group {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      background: var(--bg);
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+    
+    .toggle-group .info h4 {
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+    
+    .toggle-group .info p {
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+    
+    .toggle {
+      position: relative;
+      width: 50px;
+      height: 28px;
+    }
+    
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--border);
+      border-radius: 28px;
+      transition: 0.3s;
+    }
+    
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      height: 20px;
+      width: 20px;
+      left: 4px;
+      bottom: 4px;
+      background: white;
+      border-radius: 50%;
+      transition: 0.3s;
+    }
+    
+    .toggle input:checked + .toggle-slider {
+      background: var(--primary);
+    }
+    
+    .toggle input:checked + .toggle-slider::before {
+      transform: translateX(22px);
+    }
+    
+    .option-cards {
+      display: grid;
+      gap: 12px;
+    }
+    
+    .option-card {
+      padding: 16px;
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .option-card:hover {
+      border-color: var(--text-dim);
+    }
+    
+    .option-card.selected {
+      border-color: var(--primary);
+      background: rgba(34, 197, 94, 0.1);
+    }
+    
+    .option-card h4 {
+      margin-bottom: 4px;
+    }
+    
+    .option-card p {
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+    
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      padding: 24px 32px;
+      border-top: 1px solid var(--border);
+    }
+    
+    .btn {
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+    
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-dim);
+    }
+    
+    .btn-secondary:hover {
+      color: var(--text);
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+    
+    .btn-primary:disabled {
+      background: var(--border);
+      cursor: not-allowed;
+    }
+    
+    .summary-card {
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    
+    .summary-card h4 {
+      color: var(--text-dim);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+    
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .summary-item:last-child {
+      border-bottom: none;
+    }
+    
+    .summary-item .label {
+      color: var(--text-dim);
+    }
+    
+    .summary-item .value {
+      font-weight: 500;
+    }
+    
+    .summary-item .value.enabled {
+      color: var(--primary);
+    }
+    
+    .summary-item .value.disabled {
+      color: var(--text-dim);
+    }
+    
+    .success-screen {
+      text-align: center;
+      padding: 60px 32px;
+    }
+    
+    .success-screen .icon {
+      font-size: 64px;
+      margin-bottom: 24px;
+    }
+    
+    .success-screen h2 {
+      color: var(--primary);
+      margin-bottom: 16px;
+    }
+    
+    .success-screen p {
+      color: var(--text-dim);
+      margin-bottom: 32px;
+    }
+    
+    .code-block {
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 16px;
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 14px;
+      margin: 16px 0;
+      text-align: left;
+    }
+    
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .error-message {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid var(--error);
+      color: var(--error);
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="logo">
+    <h1>O<span>TRUST</span></h1>
+    <p>Zero-Knowledge Timestamping & Document Signing</p>
+  </div>
+  
+  <div class="wizard">
+    <div class="progress">
+      <div class="progress-step active" data-step="1">1. Basics</div>
+      <div class="progress-step" data-step="2">2. Features</div>
+      <div class="progress-step" data-step="3">3. Database</div>
+      <div class="progress-step" data-step="4">4. Email</div>
+      <div class="progress-step" data-step="5">5. Complete</div>
+    </div>
+    
+    <!-- Step 1: Basics -->
+    <div class="step-content active" data-step="1">
+      <h2>Basic Configuration</h2>
+      <p class="subtitle">Set up the core settings for your OTRUST instance.</p>
+      
+      <div class="form-group">
+        <label>Instance Name</label>
+        <input type="text" id="instanceName" value="OTRUST" placeholder="Your company or project name">
+      </div>
+      
+      <div class="form-group">
+        <label>Base URL</label>
+        <input type="url" id="baseUrl" placeholder="https://otrust.yourdomain.com">
+        <p class="hint">The public URL where your instance will be accessible</p>
+      </div>
+      
+      <div class="form-group">
+        <label>Environment</label>
+        <select id="environment">
+          <option value="development">Development</option>
+          <option value="production">Production</option>
+        </select>
+      </div>
+    </div>
+    
+    <!-- Step 2: Features -->
+    <div class="step-content" data-step="2">
+      <h2>Features</h2>
+      <p class="subtitle">Choose which modules to enable.</p>
+      
+      <div class="toggle-group">
+        <div class="info">
+          <h4>Timestamping</h4>
+          <p>Core feature - prove when content existed</p>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="featureTimestamp" checked disabled>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      
+      <div class="toggle-group">
+        <div class="info">
+          <h4>Document Signing</h4>
+          <p>Multi-party document signing with zero-knowledge</p>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="featureSign" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      
+      <div class="toggle-group">
+        <div class="info">
+          <h4>₿ Bitcoin Anchoring</h4>
+          <p>Anchor timestamps to Bitcoin blockchain</p>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="featureBlockchain" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      
+      <div class="toggle-group">
+        <div class="info">
+          <h4>Email Notifications</h4>
+          <p>Send confirmations and signing invites</p>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="featureEmail" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+    
+    <!-- Step 3: Database -->
+    <div class="step-content" data-step="3">
+      <h2>Database</h2>
+      <p class="subtitle">Configure MongoDB connection.</p>
+      
+      <div class="option-cards" id="dbOptions">
+        <div class="option-card selected" data-value="local">
+          <h4>Local MongoDB</h4>
+          <p>Running on the same machine (localhost:27017)</p>
+        </div>
+        <div class="option-card" data-value="atlas">
+          <h4>MongoDB Atlas</h4>
+          <p>Cloud-hosted database service</p>
+        </div>
+        <div class="option-card" data-value="custom">
+          <h4>Custom URI</h4>
+          <p>Enter your own connection string</p>
+        </div>
+      </div>
+      
+      <div id="dbCustomFields" style="margin-top: 20px; display: none;">
+        <div class="form-group">
+          <label>MongoDB URI</label>
+          <input type="text" id="mongoUri" placeholder="mongodb://user:pass@host:27017">
+        </div>
+      </div>
+      
+      <div class="form-group" style="margin-top: 20px;">
+        <label>Database Name</label>
+        <input type="text" id="dbName" value="otrust">
+      </div>
+    </div>
+    
+    <!-- Step 4: Email -->
+    <div class="step-content" data-step="4">
+      <h2>Email Configuration</h2>
+      <p class="subtitle" id="emailSubtitle">Set up email for notifications.</p>
+      
+      <div id="emailConfig">
+        <div class="option-cards" id="emailOptions">
+          <div class="option-card selected" data-value="resend">
+            <h4>Resend</h4>
+            <p>Simple API, great deliverability (recommended)</p>
+          </div>
+          <div class="option-card" data-value="smtp">
+            <h4>SMTP</h4>
+            <p>Gmail, Outlook, or custom SMTP server</p>
+          </div>
+          <div class="option-card" data-value="mock">
+            <h4>Mock / Disabled</h4>
+            <p>Log emails to console (for development)</p>
+          </div>
+        </div>
+        
+        <div id="resendFields" style="margin-top: 20px;">
+          <div class="form-group">
+            <label>Resend API Key</label>
+            <input type="password" id="resendApiKey" placeholder="re_xxxxxxxxxxxx">
+            <p class="hint">Get your key at <a href="https://resend.com/api-keys" target="_blank" style="color: var(--accent);">resend.com/api-keys</a></p>
+          </div>
+        </div>
+        
+        <div id="smtpFields" style="margin-top: 20px; display: none;">
+          <div class="form-group">
+            <label>SMTP Host</label>
+            <input type="text" id="smtpHost" placeholder="smtp.gmail.com">
+          </div>
+          <div class="form-group">
+            <label>SMTP Port</label>
+            <input type="number" id="smtpPort" value="587">
+          </div>
+          <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="smtpUser" placeholder="your@email.com">
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="smtpPass" placeholder="App password">
+          </div>
+        </div>
+        
+        <div class="form-group" style="margin-top: 20px;">
+          <label>From Address</label>
+          <input type="text" id="emailFrom" value="OTRUST <noreply@yourdomain.com>">
+        </div>
+      </div>
+      
+      <div id="emailDisabled" style="display: none;">
+        <p style="color: var(--text-dim); text-align: center; padding: 40px;">
+          Email notifications are disabled.<br>
+          You can enable them in the Features step.
+        </p>
+      </div>
+    </div>
+    
+    <!-- Step 5: Complete -->
+    <div class="step-content" data-step="5">
+      <div id="summaryView">
+        <h2>Review & Complete</h2>
+        <p class="subtitle">Review your configuration before saving.</p>
+        
+        <div class="summary-card">
+          <h4>Configuration</h4>
+          <div id="summaryContent"></div>
+        </div>
+        
+        <div id="saveError" class="error-message" style="display: none;"></div>
+      </div>
+      
+      <div id="successView" class="success-screen" style="display: none;">
+        <div class="icon">✓</div>
+        <h2>Setup Complete!</h2>
+        <p>Your OTRUST instance is ready to use.</p>
+        
+        <div class="code-block">
+          <div style="color: var(--text-dim);"># Restart the server to apply changes</div>
+          <div style="color: var(--primary);">npm start</div>
+        </div>
+        
+        <button class="btn btn-primary" onclick="window.location.href='/'">
+          Go to Dashboard →
+        </button>
+      </div>
+    </div>
+    
+    <div class="actions" id="wizardActions">
+      <button class="btn btn-secondary" id="btnPrev" onclick="prevStep()" style="visibility: hidden;">← Back</button>
+      <button class="btn btn-primary" id="btnNext" onclick="nextStep()">Continue →</button>
+    </div>
+  </div>
+  
+  <script nonce="">
+    let currentStep = 1;
+    const totalSteps = 5;
+    
+    // Option card selection
+    document.querySelectorAll('.option-cards').forEach(container => {
+      container.querySelectorAll('.option-card').forEach(card => {
+        card.addEventListener('click', () => {
+          container.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+          card.classList.add('selected');
+          
+          // Handle DB options
+          if (container.id === 'dbOptions') {
+            const value = card.dataset.value;
+            const customFields = document.getElementById('dbCustomFields');
+            customFields.style.display = value === 'local' ? 'none' : 'block';
+            if (value === 'local') {
+              document.getElementById('mongoUri').value = 'mongodb://localhost:27017';
+            } else if (value === 'atlas') {
+              document.getElementById('mongoUri').placeholder = 'mongodb+srv://USERNAME:PASSWORD@your-cluster.mongodb.net';
+            }
+          }
+          
+          // Handle Email options
+          if (container.id === 'emailOptions') {
+            const value = card.dataset.value;
+            document.getElementById('resendFields').style.display = value === 'resend' ? 'block' : 'none';
+            document.getElementById('smtpFields').style.display = value === 'smtp' ? 'block' : 'none';
+          }
+        });
+      });
+    });
+    
+    // Check email feature toggle
+    document.getElementById('featureEmail').addEventListener('change', (e) => {
+      // Will be handled when moving to email step
+    });
+    
+    function updateProgress() {
+      document.querySelectorAll('.progress-step').forEach((step, i) => {
+        step.classList.remove('active', 'completed');
+        if (i + 1 < currentStep) step.classList.add('completed');
+        if (i + 1 === currentStep) step.classList.add('active');
+      });
+      
+      document.querySelectorAll('.step-content').forEach((content, i) => {
+        content.classList.toggle('active', i + 1 === currentStep);
+      });
+      
+      // Update buttons
+      document.getElementById('btnPrev').style.visibility = currentStep > 1 ? 'visible' : 'hidden';
+      
+      if (currentStep === totalSteps) {
+        document.getElementById('btnNext').textContent = 'Save Configuration';
+        updateSummary();
+      } else {
+        document.getElementById('btnNext').textContent = 'Continue →';
+      }
+    }
+    
+    function nextStep() {
+      if (currentStep === 4) {
+        // Check if email is enabled
+        const emailEnabled = document.getElementById('featureEmail').checked;
+        if (!emailEnabled) {
+          // Skip email config, go to summary
+        }
+      }
+      
+      if (currentStep === totalSteps) {
+        saveConfiguration();
+        return;
+      }
+      
+      currentStep = Math.min(currentStep + 1, totalSteps);
+      
+      // Handle email step
+      if (currentStep === 4) {
+        const emailEnabled = document.getElementById('featureEmail').checked;
+        document.getElementById('emailConfig').style.display = emailEnabled ? 'block' : 'none';
+        document.getElementById('emailDisabled').style.display = emailEnabled ? 'none' : 'block';
+      }
+      
+      updateProgress();
+    }
+    
+    function prevStep() {
+      currentStep = Math.max(currentStep - 1, 1);
+      updateProgress();
+    }
+    
+    function getConfig() {
+      const dbOption = document.querySelector('#dbOptions .option-card.selected').dataset.value;
+      const emailOption = document.querySelector('#emailOptions .option-card.selected').dataset.value;
+      
+      return {
+        instance_name: document.getElementById('instanceName').value,
+        base_url: document.getElementById('baseUrl').value || window.location.origin,
+        node_env: document.getElementById('environment').value,
+        features: {
+          timestamp: true,
+          sign: document.getElementById('featureSign').checked,
+          blockchain: document.getElementById('featureBlockchain').checked,
+          email: document.getElementById('featureEmail').checked,
+          web_ui: true,
+          setup_wizard: false,
+        },
+        database: {
+          uri: dbOption === 'local' ? 'mongodb://localhost:27017' : document.getElementById('mongoUri').value,
+          name: document.getElementById('dbName').value,
+        },
+        email: {
+          mode: emailOption,
+          from: document.getElementById('emailFrom').value,
+          resend_api_key: emailOption === 'resend' ? document.getElementById('resendApiKey').value : undefined,
+          smtp: emailOption === 'smtp' ? {
+            host: document.getElementById('smtpHost').value,
+            port: parseInt(document.getElementById('smtpPort').value),
+            user: document.getElementById('smtpUser').value,
+            pass: document.getElementById('smtpPass').value,
+          } : undefined,
+        },
+      };
+    }
+    
+    function updateSummary() {
+      const config = getConfig();
+      const features = config.features;
+      
+      let html = `
+        <div class="summary-item">
+          <span class="label">Instance</span>
+          <span class="value">${config.instance_name || 'OTRUST'}</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Base URL</span>
+          <span class="value">${config.base_url || window.location.origin}</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Environment</span>
+          <span class="value">${config.node_env}</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Timestamping</span>
+          <span class="value enabled">✓ Enabled</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Document Signing</span>
+          <span class="value ${features.sign ? 'enabled' : 'disabled'}">${features.sign ? '✓ Enabled' : '✗ Disabled'}</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Bitcoin Anchoring</span>
+          <span class="value ${features.blockchain ? 'enabled' : 'disabled'}">${features.blockchain ? '✓ Enabled' : '✗ Disabled'}</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Email</span>
+          <span class="value ${features.email ? 'enabled' : 'disabled'}">${features.email ? '✓ ' + config.email.mode : '✗ Disabled'}</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Database</span>
+          <span class="value">${config.database.name}</span>
+        </div>
+      `;
+      
+      document.getElementById('summaryContent').innerHTML = html;
+    }
+    
+    async function saveConfiguration() {
+      const config = getConfig();
+      const btn = document.getElementById('btnNext');
+      const errorDiv = document.getElementById('saveError');
+      
+      btn.disabled = true;
+      btn.innerHTML = '<span class="loading"><span class="spinner"></span> Saving...</span>';
+      errorDiv.style.display = 'none';
+      
+      try {
+        const response = await fetch('/setup/save', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Origin': window.location.origin,
+          },
+          body: JSON.stringify(config),
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+          document.getElementById('summaryView').style.display = 'none';
+          document.getElementById('successView').style.display = 'block';
+          document.getElementById('wizardActions').style.display = 'none';
+        } else {
+          throw new Error(result.message || 'Failed to save configuration');
+        }
+      } catch (error) {
+        errorDiv.textContent = error.message;
+        errorDiv.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Retry';
+      }
+    }
+    
+    // Auto-fill base URL
+    document.getElementById('baseUrl').placeholder = window.location.origin;
+  </script>
+</body>
+</html>

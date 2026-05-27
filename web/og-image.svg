@@ -1,0 +1,28 @@
+<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fafaf9"/>
+      <stop offset="100%" style="stop-color:#f5f5f4"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  
+  <!-- Accent bar -->
+  <rect x="0" y="0" width="8" height="630" fill="#2d5a3d"/>
+  
+  <!-- Logo -->
+  <text x="80" y="280" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="700" fill="#1a1a1a">⬡ OTRUST</text>
+  
+  <!-- Tagline -->
+  <text x="80" y="360" font-family="system-ui, -apple-system, sans-serif" font-size="36" fill="#737373">Prove when something existed</text>
+  
+  <!-- Features -->
+  <text x="80" y="450" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="#2d5a3d">✓ Blockchain Anchored</text>
+  <text x="400" y="450" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="#2d5a3d">✓ Zero Knowledge</text>
+  <text x="700" y="450" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="#2d5a3d">✓ Free &amp; Open Source</text>
+  
+  <!-- URL -->
+  <text x="80" y="550" font-family="system-ui, -apple-system, sans-serif" font-size="28" fill="#737373">www.otrust.eu</text>
+</svg>

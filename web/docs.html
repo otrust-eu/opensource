@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentation – OTRUST by Kristian Ledel (Kris Ledel)</title>
+  <meta name="description" content="Complete guide to blockchain timestamping, multi-party document signing, and zero-knowledge identity proofs. Created by Kristian (Kris) Ledel.">
+  <meta name="keywords" content="blockchain timestamp, document signing, zero-knowledge proofs, commitment proofs, OTRUST docs, SDK, Kris Ledel, Kristian Ledel, privacy, blockchain developer">
+  <meta name="author" content="Kristian Ledel">
+  <meta name="creator" content="Kris Ledel">
+  <link rel="author" href="https://www.otrust.eu/about">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <meta name="theme-color" content="#2d5a3d">
+  <link rel="canonical" href="https://www.otrust.eu/docs.html">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://www.otrust.eu/docs.html">
+  <meta property="og:title" content="OTRUST Documentation – Blockchain Timestamping & ZK Proofs">
+  <meta property="og:description" content="Complete guide to blockchain timestamping, document signing, and zero-knowledge proofs.">
+  <meta property="og:image" content="https://www.otrust.eu/og-image.svg">
+  <meta property="og:site_name" content="OTRUST by Kristian Ledel">
+  <meta property="article:author" content="Kristian Ledel">
+  
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="OTRUST Documentation">
+  <meta name="twitter:description" content="Complete guide to blockchain timestamping, document signing, and zero-knowledge proofs.">
+  <meta name="twitter:image" content="https://www.otrust.eu/og-image.svg">
+  <meta name="twitter:creator" content="@kledel">
+  
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "name": "OTRUST Documentation",
+    "url": "https://www.otrust.eu/docs.html",
+    "description": "Complete guide to blockchain timestamping, multi-party document signing, and zero-knowledge identity proofs.",
+    "author": {
+      "@type": "Person",
+      "name": "Kristian Ledel",
+      "alternateName": "Kris Ledel",
+      "url": "https://www.otrust.eu/about",
+      "sameAs": ["https://github.com/krisledel", "https://linkedin.com/in/kristianledel"]
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "OTRUST",
+      "founder": {"@type": "Person", "name": "Kristian Ledel"}
+    }
+  }
+  </script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <script defer data-domain="otrust.eu" src="https://plausible.io/js/script.js"></script>
+  <style>
+    :root {
+      --bg: #fafaf9;
+      --bg-card: #ffffff;
+      --bg-muted: #f5f5f4;
+      --border: #e5e5e5;
+      --text: #1a1a1a;
+      --text-dim: #737373;
+      --accent: #2d5a3d;
+      --accent-light: #e8f0eb;
+    }
+    [data-theme="dark"] {
+      --bg: #0f0f0e;
+      --bg-card: #1a1a19;
+      --bg-muted: #262625;
+      --border: #3a3a39;
+      --text: #ffffff;
+      --text-dim: #a3a3a3;
+      --accent: #5cb85c;
+      --accent-light: #1e3a24;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: var(--accent);
+      color: white;
+      padding: 8px 16px;
+      z-index: 1000;
+    }
+    .skip-link:focus { top: 0; }
+    
+    /* Navigation */
+    nav {
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0.875rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    .nav-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.8rem;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a.active { color: var(--accent); font-weight: 500; }
+    .nav-links .nav-primary, .nav-links .nav-secondary { display: contents; }
+    .docs-trigger { cursor: pointer; }
+    .docs-trigger.open { color: var(--accent); }
+    .theme-toggle {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.7rem;
+      font-family: monospace;
+    }
+    .theme-toggle::after { content: 'I'; }
+    [data-theme="dark"] .theme-toggle::after { content: 'O'; }
+    .theme-toggle:hover { background: var(--bg-muted); }
+    
+    /* Docs Submenu */
+    .docs-submenu-bar {
+      display: none;
+      background: var(--bg-muted);
+      border-bottom: 1px solid var(--border);
+    }
+    .docs-submenu-bar.open { display: block; }
+    .docs-submenu-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0.5rem 2rem;
+      display: flex;
+      gap: 2rem;
+    }
+    .docs-submenu-bar a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.8rem;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+    }
+    .docs-submenu-bar a:hover { color: var(--text); background: var(--bg-card); }
+    .docs-submenu-bar a.active { color: var(--accent); font-weight: 500; }
+    
+    /* Main Layout */
+    .main-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 3rem;
+    }
+    
+    /* Sidebar */
+    .sidebar {
+      position: sticky;
+      top: 100px;
+      height: fit-content;
+    }
+    .sidebar-title {
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-dim);
+      margin-bottom: 0.75rem;
+    }
+    .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .sidebar-nav a {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.8rem;
+      border-radius: 6px;
+      transition: all 0.15s;
+    }
+    .sidebar-nav a:hover { background: var(--bg-muted); color: var(--text); }
+    .sidebar-nav a.active { background: var(--accent-light); color: var(--accent); font-weight: 500; }
+    .sidebar-divider { height: 1px; background: var(--border); margin: 0.75rem 0; }
+    
+    /* Content */
+    .content {
+      min-width: 0;
+    }
+    .content-header {
+      margin-bottom: 2rem;
+    }
+    .content-header h1 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .content-header p {
+      color: var(--text-dim);
+      font-size: 0.95rem;
+    }
+    
+    /* Sections */
+    .doc-section {
+      display: none;
+    }
+    .doc-section.active {
+      display: block;
+    }
+    
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .card h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+    .card h3 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin: 1.25rem 0 0.5rem;
+      color: var(--text);
+    }
+    .card p {
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      margin-bottom: 0.75rem;
+    }
+    .card ul, .card ol {
+      margin: 0.5rem 0 1rem 1.25rem;
+      color: var(--text-dim);
+      font-size: 0.85rem;
+    }
+    .card li { margin-bottom: 0.35rem; }
+    
+    /* Steps */
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin: 1rem 0;
+    }
+    .step {
+      display: flex;
+      gap: 0.75rem;
+    }
+    .step-num {
+      width: 1.5rem;
+      height: 1.5rem;
+      background: var(--accent);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    .step-content strong {
+      display: block;
+      font-size: 0.85rem;
+      margin-bottom: 0.25rem;
+    }
+    .step-content p {
+      margin: 0;
+      font-size: 0.8rem;
+    }
+    
+    /* Code */
+    code {
+      background: var(--bg-muted);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.8em;
+      font-family: 'SF Mono', Monaco, monospace;
+    }
+    pre {
+      background: #1a1a1a;
+      color: #e5e5e5;
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 0.75rem 0;
+      font-size: 0.75rem;
+      line-height: 1.6;
+    }
+    pre code {
+      background: none;
+      padding: 0;
+      color: inherit;
+    }
+    .comment { color: #6a9955; }
+    .string { color: #ce9178; }
+    
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+      margin: 0.75rem 0;
+    }
+    th, td {
+      text-align: left;
+      padding: 0.6rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      font-weight: 500;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      background: var(--bg-muted);
+    }
+    
+    /* Alerts */
+    .alert {
+      padding: 1rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      margin: 1rem 0;
+    }
+    .alert-info {
+      background: var(--accent-light);
+      border: 1px solid var(--accent);
+    }
+    .alert-warning {
+      background: #fef3c7;
+      border: 1px solid #d97706;
+    }
+    [data-theme="dark"] .alert-warning {
+      background: #422006;
+    }
+    
+    /* Buttons */
+    .btn {
+      display: inline-block;
+      padding: 0.6rem 1.2rem;
+      background: var(--accent);
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: opacity 0.15s;
+    }
+    .btn:hover { opacity: 0.9; }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+    }
+    
+    /* Grid */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+    .feature-card {
+      background: var(--bg-muted);
+      padding: 1rem;
+      border-radius: 8px;
+    }
+    .feature-card h4 {
+      font-size: 0.85rem;
+      margin-bottom: 0.35rem;
+    }
+    .feature-card p {
+      font-size: 0.8rem;
+      margin: 0;
+    }
+    
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border);
+      margin-top: 3rem;
+      padding: 2rem;
+      text-align: center;
+    }
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .footer-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.8rem;
+    }
+    .footer-links a:hover { color: var(--accent); }
+    .footer-copy {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+    
+    /* Mobile */
+    @media (max-width: 768px) {
+      .main-container {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+      }
+      .sidebar {
+        position: static;
+        display: flex;
+        overflow-x: auto;
+        gap: 0.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 1.5rem;
+      }
+      .sidebar-title { display: none; }
+      .sidebar-nav { flex-direction: row; gap: 0.5rem; }
+      .sidebar-nav a { white-space: nowrap; }
+      .sidebar-divider { display: none; }
+      .grid-2 { grid-template-columns: 1fr; }
+      .nav-container { padding: 0.75rem 1rem; }
+      .docs-submenu-container { padding: 0.5rem 1rem; gap: 1rem; flex-wrap: wrap; }
+    }
+  </style>
+  <link rel="stylesheet" href="/otrust-polish.css?v=20260527-1">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  
+  <nav>
+    <div class="nav-container">
+      <a href="/" class="logo">OTRUST</a>
+      <div class="nav-links">
+        <span class="nav-primary">
+          <a href="/">Timestamp</a>
+          <a href="/sign">Signed</a>
+          <a href="/proof">Proof</a>
+        </span>
+        <span class="nav-secondary" id="nav-secondary">
+          <a href="/sign-in">Sign in</a>
+          <a href="/docs" class="docs-trigger open" id="docs-trigger">Docs</a>
+          <a href="/about">About</a>
+        </span>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme"></button>
+      </div>
+    </div>
+  </nav>
+  
+  <div class="docs-submenu-bar open" id="docs-submenu-bar">
+    <div class="docs-submenu-container">
+      <a href="/docs" class="active">Documentation</a>
+      <a href="/api-docs">API Reference</a>
+      <a href="/playground/">SDK Playground</a>
+      <a href="https://github.com/otrust-eu/opensource" target="_blank">GitHub</a>
+    </div>
+  </div>
+  
+  <main id="main-content">
+    <div class="main-container">
+      <aside class="sidebar">
+        <div class="sidebar-title">Getting Started</div>
+        <nav class="sidebar-nav">
+          <a href="#overview" class="active" data-section="overview">Overview</a>
+          <a href="#web" data-section="web">Web Tools</a>
+          <a href="#sdk" data-section="sdk">SDK</a>
+        </nav>
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-title">Features</div>
+        <nav class="sidebar-nav">
+          <a href="#timestamp" data-section="timestamp">Timestamp</a>
+          <a href="#signed" data-section="signed">Signed</a>
+          <a href="#proof" data-section="proof">Proof</a>
+          <a href="#proofauth" data-section="proofauth">Proof as Auth</a>
+        </nav>
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-title">Integrations</div>
+        <nav class="sidebar-nav">
+          <a href="#extension" data-section="extension">Extension</a>
+          <a href="#chatgpt" data-section="chatgpt">ChatGPT</a>
+          <a href="#email" data-section="email">Email</a>
+          <a href="#bots" data-section="bots">Bots</a>
+        </nav>
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-title">Advanced</div>
+        <nav class="sidebar-nav">
+          <a href="#cli" data-section="cli">CLI</a>
+          <a href="#selfhost" data-section="selfhost">Self-Hosting</a>
+        </nav>
+      </aside>
+      
+      <div class="content">
+        <!-- Overview -->
+        <section id="overview" class="doc-section active">
+          <div class="content-header">
+            <h1>Documentation</h1>
+            <p>Learn how to use OTRUST for timestamping, document signing, identity proofs, and partner-branded login flows.</p>
+          </div>
+          
+          <div class="grid-2">
+            <div class="feature-card">
+              <h4>Timestamp</h4>
+              <p>Prove when data existed using blockchain anchoring via OpenTimestamps.</p>
+            </div>
+            <div class="feature-card">
+              <h4>Signed</h4>
+              <p>Multi-party document signing with Ed25519 cryptographic signatures.</p>
+            </div>
+            <div class="feature-card">
+              <h4>Proof</h4>
+              <p>Privacy-preserving identity proofs using commitments and selective disclosure.</p>
+            </div>
+            <div class="feature-card">
+              <h4>Sign in</h4>
+              <p>Hosted auth challenges that let partner apps verify proof ownership without raw identity data.</p>
+            </div>
+            <div class="feature-card">
+              <h4>Privacy-First</h4>
+              <p>Timestamp hashing happens in your browser. Signing supports local-hash mode or encrypted temporary upload.</p>
+            </div>
+          </div>
+          
+          <div class="card" style="margin-top: 1.5rem;">
+            <h2>Quick Start</h2>
+            <p>Choose how you want to use OTRUST:</p>
+            
+            <div class="grid-2" style="margin-top: 1rem;">
+              <a href="#web" class="feature-card" style="text-decoration: none; color: inherit;" onclick="showSection('web')">
+                <h4>Web Tools</h4>
+                <p>Timestamp, Signed, and Proof in your browser.</p>
+              </a>
+              <a href="#sdk" class="feature-card" style="text-decoration: none; color: inherit;" onclick="showSection('sdk')">
+                <h4>SDK</h4>
+                <p>JavaScript/TypeScript integration.</p>
+              </a>
+              <a href="#cli" class="feature-card" style="text-decoration: none; color: inherit;" onclick="showSection('cli')">
+                <h4>CLI</h4>
+                <p>Command-line for automation.</p>
+              </a>
+              <a href="/api-docs.html" class="feature-card" style="text-decoration: none; color: inherit;">
+                <h4>REST API</h4>
+                <p>Direct HTTP integration.</p>
+              </a>
+              <a href="#proofauth" class="feature-card" style="text-decoration: none; color: inherit;" onclick="showSection('proofauth')">
+                <h4>Partner Auth</h4>
+                <p>Challenge-based sign-in with branded hosted screens.</p>
+              </a>
+            </div>
+          </div>
+        </section>
+        
+        <!-- Web Tool -->
+        <section id="web" class="doc-section">
+          <div class="content-header">
+            <h1>Web Tools</h1>
+            <p>Three browser-first tools. No installation required; the server stores only the cryptographic metadata needed for verification.</p>
+          </div>
+          
+          <!-- Timestamp Tool -->
+          <div class="card">
+            <h2>Timestamp Tool</h2>
+            <p>Prove when any file existed using Bitcoin blockchain anchoring.</p>
+            
+            <div class="steps">
+              <div class="step">
+                <span class="step-num">1</span>
+                <div class="step-content">
+                  <strong>Drop your file</strong>
+                  <p>Drag any file into the upload area. The file is hashed locally – nothing is uploaded.</p>
+                </div>
+              </div>
+              <div class="step">
+                <span class="step-num">2</span>
+                <div class="step-content">
+                  <strong>Click "Timestamp"</strong>
+                  <p>Only the SHA-256 hash is sent to the server.</p>
+                </div>
+              </div>
+              <div class="step">
+                <span class="step-num">3</span>
+                <div class="step-content">
+                  <strong>Save your receipt</strong>
+                  <p>Download the receipt JSON with your claim ID.</p>
+                </div>
+              </div>
+              <div class="step">
+                <span class="step-num">4</span>
+                <div class="step-content">
+                  <strong>Wait for blockchain confirmation</strong>
+                  <p>OpenTimestamps anchors to Bitcoin every ~1 hour. Download your .ots proof when ready.</p>
+                </div>
+              </div>
+            </div>
+            
+            <h3>Verify a Timestamp</h3>
+            <p>Go to the Verify tab, upload your original file and the .ots proof file. Or use any OpenTimestamps client:</p>
+            <pre><code>pip install opentimestamps-client
+ots verify document.pdf.ots</code></pre>
+            
+            <a href="/" class="btn" style="margin-top: 1rem;">Open Timestamp Tool →</a>
+          </div>
+          
+          <!-- Signed Tool -->
+          <div class="card">
+            <h2>Signed Tool</h2>
+            <p>Multi-party document signing with Ed25519 cryptographic signatures.</p>
+            
+            <div class="steps">
+              <div class="step">
+                <span class="step-num">1</span>
+                <div class="step-content">
+                  <strong>Upload your document</strong>
+                  <p>Choose local-hash mode to keep the document on your device, or temporary encrypted upload when signers need a download link.</p>
+                </div>
+              </div>
+              <div class="step">
+                <span class="step-num">2</span>
+                <div class="step-content">
+                  <strong>Add signing parties</strong>
+                  <p>Enter email addresses. Choose parallel or sequential signing order.</p>
+                </div>
+              </div>
+              <div class="step">
+                <span class="step-num">3</span>
+                <div class="step-content">
+                  <strong>Send invitations</strong>
+                  <p>Each party receives an email with a unique signing link.</p>
+                </div>
+              </div>
+              <div class="step">
+                <span class="step-num">4</span>
+                <div class="step-content">
+                  <strong>Parties sign</strong>
+                  <p>Each signer generates an Ed25519 keypair and signs the document hash.</p>
+                </div>
+              </div>
+              <div class="step">
+                <span class="step-num">5</span>
+                <div class="step-content">
+                  <strong>Blockchain anchored</strong>
+                  <p>Complete signature package is timestamped on Bitcoin when all parties sign.</p>
+                </div>
+              </div>
+            </div>
+            
+            <h3>Verify Signatures</h3>
+            <p>Go to the Status tab and enter your signature ID (sig_xxx). View who has signed and cryptographic proof of each signature.</p>
+            
+            <a href="/sign" class="btn" style="margin-top: 1rem;">Open Signed Tool →</a>
+          </div>
+          
+          <!-- Proof Tool -->
+          <div class="card">
+            <h2>Proof Tool</h2>
+            <p>Create privacy-preserving identity proof packages. Prove facts using commitments without exposing the underlying data.</p>
+            
+            <div class="steps">
+              <div class="step">
+                <span class="step-num">1</span>
+                <div class="step-content">
+                  <strong>Choose proof type</strong>
+                  <p>Unique Identity (Sybil-resistant proof you're human) or Age 18+ verification.</p>
+                </div>
+              </div>
+              <div class="step">
+                <span class="step-num">2</span>
+                <div class="step-content">
+                  <strong>Scan your ID</strong>
+                  <p>Passport, driver's license, or national ID. OCR runs entirely in your browser.</p>
+                </div>
+              </div>
+              <div class="step">
+                <span class="step-num">3</span>
+                <div class="step-content">
+                  <strong>Take a selfie</strong>
+                  <p>Liveness detection with face matching. All processing is client-side.</p>
+                </div>
+              </div>
+              <div class="step">
+                <span class="step-num">4</span>
+                <div class="step-content">
+                  <strong>Generate proof package</strong>
+                  <p>The proof package stores commitments and public verification metadata, not raw identity data.</p>
+                </div>
+              </div>
+              <div class="step">
+                <span class="step-num">5</span>
+                <div class="step-content">
+                  <strong>Get your proof</strong>
+                  <p>Receive shareable URL and QR code. Add to Apple Wallet where supported.</p>
+                </div>
+              </div>
+            </div>
+            
+            <h3>Verify a Proof</h3>
+            <p>Anyone can verify a proof URL. Only the proof is verified – no personal data is revealed.</p>
+            
+            <a href="/proof" class="btn" style="margin-top: 1rem;">Open Proof Tool →</a>
+          </div>
+          
+          <!-- Privacy Note -->
+          <div class="card">
+            <h2>Privacy by Design</h2>
+            <p>All three tools share the same privacy principles:</p>
+            <ul>
+              <li><strong>Client-side hashing</strong> – Timestamp files are hashed in your browser</li>
+              <li><strong>Local-first signing</strong> – Documents can stay client-side, with encrypted temporary upload available when needed</li>
+              <li><strong>Minimal data</strong> – The service stores hashes, signatures, public keys, timestamps, and proof metadata</li>
+              <li><strong>Verifiable</strong> – All proofs can be independently verified without trusting OTRUST</li>
+            </ul>
+          </div>
+        </section>
+        
+        <!-- SDK -->
+        <section id="sdk" class="doc-section">
+          <div class="content-header">
+            <h1>SDK</h1>
+            <p>Integrate OTRUST into your applications with official SDKs.</p>
+          </div>
+          
+          <div class="card">
+            <h2>JavaScript / TypeScript</h2>
+            <pre><code>npm install @otrust/sdk</code></pre>
+            
+            <h3>Quick Example</h3>
+            <pre><code><span class="comment">// Timestamp a file</span>
+import { timestamp, hashFile } from '@otrust/sdk'
+
+const hash = await hashFile(file)
+const result = await timestamp.create(hash)
+console.log(result.id) <span class="comment">// ot_xxx...</span>
+
+<span class="comment">// Verify a timestamp</span>
+const verification = await timestamp.verify(hash)
+console.log(verification.status) <span class="comment">// 'confirmed'</span></code></pre>
+          </div>
+          
+          <div class="card">
+            <h2>Python</h2>
+            <pre><code>pip install otrust</code></pre>
+            
+            <h3>Quick Example</h3>
+            <pre><code><span class="comment"># Timestamp a file</span>
+from otrust import timestamp, hash_file
+
+hash = hash_file("document.pdf")
+result = timestamp.create(hash)
+print(result.id)  <span class="comment"># ot_xxx...</span>
+
+<span class="comment"># Verify</span>
+verification = timestamp.verify(hash)
+print(verification.status)  <span class="comment"># 'confirmed'</span></code></pre>
+          </div>
+          
+          <div class="card">
+            <h2>Available Modules</h2>
+            <table>
+              <tr><th>Module</th><th>Description</th></tr>
+              <tr><td><code>timestamp</code></td><td>Create and verify blockchain timestamps</td></tr>
+              <tr><td><code>sign</code></td><td>Multi-party document signing</td></tr>
+              <tr><td><code>proof</code></td><td>Zero-knowledge identity proofs</td></tr>
+              <tr><td><code>auth</code></td><td>Login with OTRUST authentication</td></tr>
+              <tr><td><code>sha256</code>, <code>hashFile</code></td><td>Hashing utilities</td></tr>
+              <tr><td><code>generateEd25519Keypair</code></td><td>Cryptographic key generation</td></tr>
+            </table>
+            
+            <a href="/playground/" class="btn" style="margin-top: 1rem;">Try in Playground →</a>
+          </div>
+          
+          <div class="card">
+            <h2>React Components</h2>
+            <pre><code>npm install @otrust/react</code></pre>
+            <pre><code>import { TimestampWidget, LoginButton, ProofBadge } from '@otrust/react'
+
+<span class="comment">// Ready-to-use timestamp widget</span>
+&lt;TimestampWidget onSuccess={(id) =&gt; console.log(id)} /&gt;
+
+<span class="comment">// Login with OTRUST button</span>
+&lt;LoginButton onAuth={(user) =&gt; setUser(user)} /&gt;
+
+<span class="comment">// Display proof verification badge</span>
+&lt;ProofBadge proofId="prf_xxx" /&gt;</code></pre>
+          </div>
+          
+          <div class="card">
+            <h2>Configuration</h2>
+            <p>Configure the SDK for custom deployments:</p>
+            <pre><code>import { configure } from '@otrust/sdk'
+
+configure({
+  baseUrl: 'https://your-otrust-instance.com',
+  timeout: 30000,
+  retries: 3
+})</code></pre>
+          </div>
+        </section>
+        
+        <!-- Timestamp -->
+        <section id="timestamp" class="doc-section">
+          <div class="content-header">
+            <h1>Timestamp</h1>
+            <p>Prove when data existed using Bitcoin blockchain anchoring.</p>
+          </div>
+          
+          <div class="card">
+            <h2>Timestamp flow</h2>
+            <ol>
+              <li>Your file is hashed locally (SHA-256)</li>
+              <li>Only the hash is sent to OTRUST</li>
+              <li>OTRUST aggregates hashes and creates a Merkle tree</li>
+              <li>The Merkle root is anchored to Bitcoin via OpenTimestamps</li>
+              <li>You receive a .ots proof file for independent verification</li>
+            </ol>
+            
+            <div class="alert alert-info">
+              <strong>Privacy:</strong> Your files never leave your device. Only the cryptographic hash is transmitted.
+            </div>
+          </div>
+          
+          <div class="card">
+            <h2>Use Cases</h2>
+            <ul>
+              <li><strong>Research data</strong> – Prove when experiments were conducted</li>
+              <li><strong>Creative works</strong> – Establish priority for ideas and designs</li>
+              <li><strong>Legal documents</strong> – Prove document existence at a specific time</li>
+              <li><strong>Code commits</strong> – Timestamp important software releases</li>
+              <li><strong>Audit trails</strong> – Create immutable logs of business events</li>
+            </ul>
+          </div>
+        </section>
+        
+        <!-- Signed -->
+        <section id="signed" class="doc-section">
+          <div class="content-header">
+            <h1>Signed</h1>
+            <p>Multi-party document signing with cryptographic proof.</p>
+          </div>
+          
+          <div class="card">
+            <h2>Signing flow</h2>
+            <div class="steps">
+              <div class="step">
+                <span class="step-num">1</span>
+                <div class="step-content">
+                  <strong>Upload your document</strong>
+                  <p>Drop a PDF or any file. It's hashed locally – never uploaded.</p>
+                </div>
+              </div>
+              <div class="step">
+                <span class="step-num">2</span>
+                <div class="step-content">
+                  <strong>Add signing parties</strong>
+                  <p>Enter email addresses. Choose parallel or sequential signing.</p>
+                </div>
+              </div>
+              <div class="step">
+                <span class="step-num">3</span>
+                <div class="step-content">
+                  <strong>Parties sign with Ed25519</strong>
+                  <p>Each signer generates a keypair and signs the document hash.</p>
+                </div>
+              </div>
+              <div class="step">
+                <span class="step-num">4</span>
+                <div class="step-content">
+                  <strong>Blockchain anchored</strong>
+                  <p>Complete signature package is timestamped on Bitcoin.</p>
+                </div>
+              </div>
+            </div>
+            <a href="/sign" class="btn" style="margin-top: 1rem;">Start Signing →</a>
+          </div>
+          
+          <div class="card">
+            <h2>Signing Modes</h2>
+            <table>
+              <tr><th>Mode</th><th>Description</th><th>Use Case</th></tr>
+              <tr><td><strong>Parallel</strong></td><td>All parties sign simultaneously</td><td>Simple agreements</td></tr>
+              <tr><td><strong>Sequential</strong></td><td>Must sign in order</td><td>Approval chains</td></tr>
+            </table>
+            
+            <h3>Party Roles</h3>
+            <table>
+              <tr><th>Role</th><th>Action</th></tr>
+              <tr><td><strong>Signer</strong></td><td>Must cryptographically sign</td></tr>
+              <tr><td><strong>Approver</strong></td><td>Must approve (doesn't sign)</td></tr>
+              <tr><td><strong>Viewer</strong></td><td>Receives copy only</td></tr>
+            </table>
+          </div>
+          
+          <div class="card">
+            <h2>Sign via Email</h2>
+            <p>Create signing requests without leaving your inbox:</p>
+            <ul>
+              <li><strong>TO:</strong> People who should sign</li>
+              <li><strong>CC:</strong> sign&#64;otrust.eu</li>
+              <li><strong>Attachment:</strong> Document to sign</li>
+            </ul>
+            <p>Each party receives an email with Sign/Decline buttons.</p>
+          </div>
+        </section>
+        
+        <!-- Proof -->
+        <section id="proof" class="doc-section">
+          <div class="content-header">
+            <h1>Proof</h1>
+            <p>Privacy-preserving identity proofs using commitments and selective disclosure.</p>
+          </div>
+          
+          <div class="card">
+            <h2>Proof flow</h2>
+            <div class="steps">
+              <div class="step">
+                <span class="step-num">1</span>
+                <div class="step-content">
+                  <strong>Upload your ID</strong>
+                  <p>Passport, driver's license, or national ID. Scanned locally.</p>
+                </div>
+              </div>
+              <div class="step">
+                <span class="step-num">2</span>
+                <div class="step-content">
+                  <strong>Take a selfie</strong>
+                  <p>Liveness detection ensures you're the person on the ID.</p>
+                </div>
+              </div>
+              <div class="step">
+                <span class="step-num">3</span>
+                <div class="step-content">
+                  <strong>Generate proof package</strong>
+                  <p>A commitment proof records the claim without revealing the underlying data.</p>
+                </div>
+              </div>
+              <div class="step">
+                <span class="step-num">4</span>
+                <div class="step-content">
+                  <strong>Get your proof</strong>
+                  <p>Receive a URL. Add to Apple Wallet where supported.</p>
+                </div>
+              </div>
+            </div>
+            <a href="/proof" class="btn" style="margin-top: 1rem;">Create Proof →</a>
+          </div>
+          
+          <div class="card">
+            <h2>Proof Types</h2>
+            <table>
+              <tr><th>Type</th><th>What It Proves</th><th>Use Case</th></tr>
+              <tr><td><strong>Unique Identity</strong></td><td>You're a unique human</td><td>Sybil resistance, voting, airdrops</td></tr>
+              <tr><td><strong>Age (18+)</strong></td><td>You're at least 18</td><td>Age verification, alcohol, gambling</td></tr>
+              <tr><td><strong>Income</strong></td><td>Income above threshold</td><td>Credit applications, rentals</td></tr>
+              <tr><td><strong>Membership</strong></td><td>Member of a group</td><td>Access control, communities</td></tr>
+            </table>
+            
+            <div class="alert alert-info">
+              <strong>Privacy:</strong> All processing (OCR, face matching, proof generation) happens in your browser. Your ID and photos never leave your device.
+            </div>
+          </div>
+          
+          <div class="card">
+            <h2>Technical Details</h2>
+            <h3>Commitment Proof Packages</h3>
+            <p>The current public beta uses SHA-256 field commitments and proof packages instead of server-side Circom/SNARK dependencies. Proof packages are designed to reveal the claim and verification metadata without exposing the raw input.</p>
+            <ul>
+              <li><strong>Age</strong> - proves an age threshold without storing the birthdate</li>
+              <li><strong>Income</strong> - proves a threshold without storing the exact income</li>
+              <li><strong>Membership</strong> - proves membership metadata without exposing the raw member identifier</li>
+            </ul>
+            
+            <h3>Verification</h3>
+            <p>Stored proof packages can be checked through the public proof endpoints. Advanced browser-generated proofs can still be submitted, but the backend no longer depends on a vulnerable server-side SNARK toolchain.</p>
+          </div>
+        </section>
+        
+        <!-- Proof as Auth -->
+        <section id="proofauth" class="doc-section">
+          <div class="content-header">
+            <h1>Proof as Auth</h1>
+            <p>Use zero-knowledge proofs for passwordless authentication.</p>
+          </div>
+          
+          <div class="card">
+            <h2>Authentication flow</h2>
+            <p>"Login with OTRUST" lets users authenticate using their identity proof without revealing personal data.</p>
+            
+            <div class="steps">
+              <div class="step">
+                <span class="step-num">1</span>
+                <div class="step-content">
+                  <strong>User clicks "Login with OTRUST"</strong>
+                  <p>Your app creates an authentication challenge.</p>
+                </div>
+              </div>
+              <div class="step">
+                <span class="step-num">2</span>
+                <div class="step-content">
+                  <strong>User scans QR or opens link</strong>
+                  <p>Redirects to OTRUST to present their proof.</p>
+                </div>
+              </div>
+              <div class="step">
+                <span class="step-num">3</span>
+                <div class="step-content">
+                  <strong>ZK proof is verified</strong>
+                  <p>OTRUST verifies the proof without seeing the underlying data.</p>
+                </div>
+              </div>
+              <div class="step">
+                <span class="step-num">4</span>
+                <div class="step-content">
+                  <strong>Callback with verified claims</strong>
+                  <p>Your app receives verified attributes (e.g., "is adult", "is unique").</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card">
+            <h2>SDK Integration</h2>
+            <pre><code><span class="comment">// Create auth challenge</span>
+import { auth } from '@otrust/sdk'
+
+const challenge = await auth.createChallenge({
+  claims: ['unique', 'adult'],
+  callback: 'https://yourapp.com/auth/callback'
+})
+
+<span class="comment">// Redirect user or show QR</span>
+window.location.href = challenge.authUrl</code></pre>
+            
+            <h3>Verify Callback</h3>
+            <pre><code><span class="comment">// In your callback handler</span>
+const result = await auth.verifyCallback(token)
+
+if (result.verified) {
+  console.log(result.claims) <span class="comment">// { unique: true, adult: true }</span>
+  console.log(result.proofId) <span class="comment">// prf_xxx for audit</span>
+}</code></pre>
+          </div>
+
+          <div class="card">
+            <h2>Partner Branding</h2>
+            <p>Partners can attach an approved hosted-login theme to a <code>client_id</code>. The theme affects logo, colors, headline, spacing, radius, and footer copy on <code>/auth/login?challenge=...</code>.</p>
+            <pre><code><span class="comment">// Admin/dashboard save</span>
+PUT /admin/auth-branding/acme_prod
+X-Admin-Key: &lt;admin-key&gt;
+
+{
+  "logoUrl": "https://example.com/assets/logo.svg",
+  "backgroundColor": "#F8FAFC",
+  "primaryColor": "#12324A",
+  "textColor": "#0F1B2D",
+  "fontFamily": "Inter",
+  "borderRadius": 8,
+  "spacingScale": "default",
+  "headline": "Sign in to Acme",
+  "subhead": "Secure verification with OTRUST Proof",
+  "footerText": "Acme uses OTRUST as identity provider",
+  "autoRedirectSeconds": 3
+}</code></pre>
+            <div class="alert alert-info">
+              <strong>Security:</strong> OTRUST disclosure, the OTRUST footer mark, and the DPO contact stay visible. The same theme follows <code>/proof?auth_challenge=...</code> when a user needs to create a proof first. Theme values are sanitized and all theme changes are written to the audit log.
+            </div>
+          </div>
+          
+          <div class="card">
+            <h2>React Component</h2>
+            <pre><code>import { LoginButton } from '@otrust/react'
+
+&lt;LoginButton
+  claims={['unique', 'adult']}
+  onSuccess={(user) =&gt; {
+    console.log(user.verified) <span class="comment">// true</span>
+    console.log(user.claims)   <span class="comment">// { unique: true, adult: true }</span>
+  }}
+/&gt;</code></pre>
+          </div>
+          
+          <div class="card">
+            <h2>Available Claims</h2>
+            <table>
+              <tr><th>Claim</th><th>Description</th><th>Use Case</th></tr>
+              <tr><td><code>unique</code></td><td>User is a unique human</td><td>One account per person</td></tr>
+              <tr><td><code>adult</code></td><td>User is 18+</td><td>Age-gated content</td></tr>
+            </table>
+            
+            <div class="alert alert-info">
+              <strong>Privacy:</strong> Claims are verified without revealing the user's actual identity, birthdate, or any personal information.
+            </div>
+          </div>
+        </section>
+        
+        <!-- Extension -->
+        <section id="extension" class="doc-section">
+          <div class="content-header">
+            <h1>Browser Extension</h1>
+            <p>Timestamp any webpage with one click.</p>
+          </div>
+          
+          <div class="card">
+            <h2>Installation</h2>
+            <p style="margin-bottom: 1rem;">Available for Chrome and Chromium-based browsers (Edge, Brave).</p>
+            <a href="https://chromewebstore.google.com/detail/otrust-blockchain-timesta/gadpcgaelaihbnnijgkcfmabdmkgpdol" class="btn" target="_blank">Add to Chrome →</a>
+            
+            <h3>Manual Installation</h3>
+            <ol>
+              <li><a href="/extension.zip" style="color: var(--accent);">Download extension.zip</a></li>
+              <li>Extract to a folder</li>
+              <li>Go to <code>chrome://extensions</code></li>
+              <li>Enable "Developer mode"</li>
+              <li>Click "Load unpacked" and select the folder</li>
+            </ol>
+          </div>
+          
+          <div class="card">
+            <h2>Usage</h2>
+            <p>Click the OTRUST icon to:</p>
+            <ul>
+              <li><strong>Timestamp This Page</strong> – Creates timestamp of page content</li>
+              <li><strong>Verify</strong> – Check if page has been timestamped</li>
+              <li><strong>History</strong> – View your timestamps</li>
+            </ul>
+          </div>
+        </section>
+        
+        <!-- ChatGPT -->
+        <section id="chatgpt" class="doc-section">
+          <div class="content-header">
+            <h1>ChatGPT Integration</h1>
+            <p>Timestamp conversations directly in ChatGPT.</p>
+          </div>
+          
+          <div class="card">
+            <h2>Getting Started</h2>
+            <ol>
+              <li><a href="https://chatgpt.com/g/g-694d4a7fa8f48191aeb1db85f87fae5a-otrust-timestamper" target="_blank" style="color: var(--accent);">Open OTRUST Timestamper GPT</a></li>
+              <li>Have a conversation</li>
+              <li>Say "timestamp this conversation"</li>
+              <li>Confirm the API call</li>
+            </ol>
+            
+            <h3>Use Cases</h3>
+            <ul>
+              <li><strong>AI-generated content</strong> – Prove when AI created text</li>
+              <li><strong>Brainstorming</strong> – Timestamp ideas and discussions</li>
+              <li><strong>Agreements</strong> – Record informal agreements</li>
+            </ul>
+            
+            <div class="alert alert-warning">
+              <strong>Note:</strong> OpenAI sees your conversation. For sensitive documents, use the <a href="#web" onclick="showSection('web')" style="color: var(--accent);">Web Tool</a>.
+            </div>
+          </div>
+        </section>
+        
+        <!-- Email -->
+        <section id="email" class="doc-section">
+          <div class="content-header">
+            <h1>Email Timestamper</h1>
+            <p>Timestamp emails by sending to timestamp&#64;otrust.eu</p>
+          </div>
+          
+          <div class="card">
+            <h2>Email flow</h2>
+            <ol>
+              <li>Compose an email with content to timestamp</li>
+              <li>Add attachments if needed</li>
+              <li>Send to <strong>timestamp&#64;otrust.eu</strong></li>
+              <li>Receive reply with claim ID and proof links</li>
+            </ol>
+            
+            <h3>What Gets Timestamped</h3>
+            <p>Subject, sender, date, body text, and attachment hashes are included in the hash.</p>
+          </div>
+        </section>
+        
+        <!-- Bots -->
+        <section id="bots" class="doc-section">
+          <div class="content-header">
+            <h1>Chat Bots</h1>
+            <p>Timestamp messages in Telegram and WhatsApp.</p>
+          </div>
+          
+          <div class="card">
+            <h2>Telegram Bot</h2>
+            <p>Start chatting with <a href="https://t.me/OTRUSTbot" target="_blank" style="color: var(--accent);">@OTRUSTbot</a></p>
+            
+            <h3>Commands</h3>
+            <ul>
+              <li><code>/start</code> – Introduction and help</li>
+              <li><code>/timestamp [text]</code> – Timestamp text or reply to a message</li>
+              <li><code>/help</code> – Show available commands</li>
+            </ul>
+            <p>Works in private chats and groups.</p>
+          </div>
+          
+          <div class="card">
+            <h2>WhatsApp Business</h2>
+            <p>Enterprise feature requiring Meta Business verification.</p>
+            <p>Contact <a href="mailto:hello&#64;otrust.eu" style="color: var(--accent);">hello&#64;otrust.eu</a> for setup.</p>
+          </div>
+        </section>
+        
+        <!-- CLI -->
+        <section id="cli" class="doc-section">
+          <div class="content-header">
+            <h1>CLI Tool</h1>
+            <p>Command-line interface for automation and scripting.</p>
+          </div>
+          
+          <div class="card">
+            <h2>Installation</h2>
+            <pre><code><span class="comment"># Clone and install</span>
+git clone https://github.com/otrust-eu/opensource.git
+cd opensource
+npm install
+npm link  <span class="comment"># Makes 'otrust' command available</span></code></pre>
+          </div>
+          
+          <div class="card">
+            <h2>Timestamp Commands</h2>
+            <pre><code><span class="comment"># Timestamp a file</span>
+otrust claim document.pdf
+
+<span class="comment"># Timestamp with email receipt</span>
+otrust claim document.pdf --email you@example.com
+
+<span class="comment"># Timestamp multiple files</span>
+otrust claim *.pdf
+
+<span class="comment"># Check status</span>
+otrust status ot_abc123xyz
+
+<span class="comment"># Download proof when ready</span>
+otrust proof ot_abc123xyz -o document.pdf.ots
+
+<span class="comment"># Verify a proof</span>
+otrust verify document.pdf document.pdf.ots</code></pre>
+          </div>
+          
+          <div class="card">
+            <h2>Signature Commands</h2>
+            <pre><code><span class="comment"># Create signature request</span>
+otrust sign create document.pdf --parties alice@x.com,bob@y.com
+
+<span class="comment"># Check signature status</span>
+otrust sign status sig_xxx
+
+<span class="comment"># Sign as a party</span>
+otrust sign approve sig_xxx --token xxx</code></pre>
+          </div>
+          
+          <div class="card">
+            <h2>Environment Variables</h2>
+            <table>
+              <tr><th>Variable</th><th>Description</th></tr>
+              <tr><td><code>OTRUST_API</code></td><td>API endpoint (default: https://otrust.eu)</td></tr>
+              <tr><td><code>OTRUST_KEY</code></td><td>Path to Ed25519 private key file</td></tr>
+              <tr><td><code>OTRUST_EMAIL</code></td><td>Default email for receipts</td></tr>
+            </table>
+          </div>
+          
+          <div class="card">
+            <h2>Scripting Examples</h2>
+            <pre><code><span class="comment"># Bash: Timestamp all PDFs in a folder</span>
+for f in *.pdf; do
+  otrust claim "$f" --email backup@company.com
+done
+
+<span class="comment"># CI/CD: Timestamp release artifacts</span>
+otrust claim dist/*.zip --json > timestamps.json</code></pre>
+          </div>
+        </section>
+        
+        <!-- Self-Hosting -->
+        <section id="selfhost" class="doc-section">
+          <div class="content-header">
+            <h1>Self-Hosting</h1>
+            <p>Run the open source OTRUST server, web UI, SDKs, CLI, and circuits from GitHub.</p>
+          </div>
+          
+          <div class="card">
+            <h2>Included</h2>
+            <ul>
+              <li>Express server for timestamping, signing, proof, auth, and verification APIs</li>
+              <li>Static web UI and OpenAPI documentation</li>
+              <li>TypeScript SDK</li>
+              <li>Python SDK</li>
+              <li>React components and hooks</li>
+              <li>CLI for hashing, timestamping, and verification</li>
+              <li>Circom circuits and browser extension source</li>
+            </ul>
+          </div>
+          
+          <div class="card">
+            <h2>Clone Repository</h2>
+            <pre><code><span class="comment"># Clone repository</span>
+git clone https://github.com/otrust-eu/opensource.git
+cd opensource
+
+<span class="comment"># Install workspace dependencies</span>
+npm install</code></pre>
+            <p>The repository is self-hostable. Private OTRUST production infrastructure, partner themes, and service secrets are not included.</p>
+          </div>
+          
+          <div class="card">
+            <h2>Run Locally</h2>
+            <pre><code><span class="comment"># Configure local environment</span>
+cp .env.example .env
+
+<span class="comment"># Start MongoDB + OTRUST</span>
+docker compose up --build
+
+<span class="comment"># Or run Node directly after MongoDB is available</span>
+npm run dev</code></pre>
+          </div>
+          
+          <div class="card">
+            <h2>Verify Locally</h2>
+            <pre><code><span class="comment"># Core crypto tests</span>
+npm run test:core
+
+<span class="comment"># Build SDK packages</span>
+npm run build
+
+<span class="comment"># Use the CLI directly</span>
+node cli/otrust.js keygen
+node cli/otrust.js verify 0000000000000000000000000000000000000000000000000000000000000000</code></pre>
+          </div>
+          
+          <div class="card">
+            <h2>Hosted API</h2>
+            <table>
+              <tr><th>Package</th><th>Use</th><th>Default API</th></tr>
+              <tr><td><code>sdk-js</code></td><td>Browser and server JavaScript integrations</td><td>https://otrust.eu</td></tr>
+              <tr><td><code>sdk-python</code></td><td>Python automation and backend integrations</td><td>https://otrust.eu</td></tr>
+              <tr><td><code>cli</code></td><td>Local hashing, signing, timestamping, and verification</td><td>https://www.otrust.eu</td></tr>
+            </table>
+          </div>
+          
+          <div class="card">
+            <h2>Repository</h2>
+            <p>The clean open source repository is maintained separately from private production infrastructure.</p>
+            <a href="https://github.com/otrust-eu/opensource" class="btn" target="_blank">Open GitHub</a>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+  
+  <footer>
+    <div class="footer-links">
+      <a href="/">Timestamp</a>
+      <a href="/sign">Signed</a>
+      <a href="/proof">Proof</a>
+      <a href="/sign-in">Sign in</a>
+      <a href="/docs">Docs</a>
+      <a href="/about">About</a>
+      <a href="/privacy-policy">Privacy</a>
+      <a href="/terms">Terms</a>
+      <a href="https://github.com/otrust-eu/opensource">GitHub</a>
+    </div>
+    <div class="footer-copy">OTRUST - MIT License</div>
+  </footer>
+  
+  <script nonce="">
+    // Theme
+    function initTheme() {
+      const saved = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (saved === 'dark' || (!saved && prefersDark)) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    }
+    initTheme();
+    
+    document.getElementById('theme-toggle')?.addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (isDark) {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'light');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+      }
+    });
+    
+    // Section navigation
+    function showSection(id) {
+      document.querySelectorAll('.doc-section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+      
+      const section = document.getElementById(id);
+      const link = document.querySelector(`[data-section="${id}"]`);
+      
+      if (section) section.classList.add('active');
+      if (link) link.classList.add('active');
+      
+      window.history.replaceState(null, '', '#' + id);
+    }
+    
+    // Handle sidebar clicks
+    document.querySelectorAll('.sidebar-nav a').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const section = link.getAttribute('data-section');
+        if (section) showSection(section);
+      });
+    });
+    
+    // Handle hash on load
+    if (window.location.hash) {
+      const id = window.location.hash.slice(1);
+      showSection(id);
+    }
+    
+    // Docs submenu toggle
+    const docsTrigger = document.getElementById('docs-trigger');
+    const docsSubmenuBar = document.getElementById('docs-submenu-bar');
+    
+    docsTrigger?.addEventListener('click', (e) => {
+      e.preventDefault();
+      docsSubmenuBar.classList.toggle('open');
+      docsTrigger.classList.toggle('open');
+    });
+  </script>
+  <script src="/otrust-polish.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OTRUST API Reference | Timestamping, Signing, Proof & Auth</title>
+  <meta name="description" content="REST API for OTRUST timestamping, signature verification, identity proofs, and hosted partner auth challenges.">
+  <meta name="keywords" content="timestamp API, identity proof API, hosted auth API, blockchain API, OpenTimestamps API, proof of existence API, REST API, OTRUST">
+  <meta name="author" content="Kristian Ledel">
+  <meta name="creator" content="Kris Ledel">
+  <link rel="author" href="https://www.otrust.eu/about">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <link rel="canonical" href="https://www.otrust.eu/api-docs.html">
+  <meta name="theme-color" content="#2d5a3d">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://www.otrust.eu/api-docs.html">
+  <meta property="og:title" content="OTRUST API Reference">
+  <meta property="og:description" content="REST API for timestamping, signing, identity proofs, and hosted partner auth challenges.">
+  <meta property="og:image" content="https://www.otrust.eu/og-image.svg">
+  <meta property="og:site_name" content="OTRUST">
+  <meta property="article:author" content="Kristian Ledel">
+  
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="OTRUST API Reference">
+  <meta name="twitter:description" content="APIs for timestamping, signing, identity proofs, and partner auth.">
+  <meta name="twitter:image" content="https://www.otrust.eu/og-image.svg">
+  <meta name="twitter:creator" content="@kledel">
+  
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "name": "OTRUST API Reference",
+    "url": "https://www.otrust.eu/api-docs.html",
+    "description": "REST API for timestamping, signature verification, identity proofs, and hosted partner authentication challenges.",
+    "author": {
+      "@type": "Person",
+      "name": "Kristian Ledel",
+      "alternateName": "Kris Ledel",
+      "url": "https://www.otrust.eu/about",
+      "sameAs": ["https://github.com/krisledel", "https://linkedin.com/in/kristianledel"]
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "OTRUST",
+      "founder": {"@type": "Person", "name": "Kristian Ledel"}
+    }
+  }
+  </script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <!-- Privacy-respecting analytics (no cookies, no personal data) -->
+  <script defer data-domain="otrust.eu" src="https://plausible.io/js/script.js"></script>
+  <style>
+    :root {
+      --bg: #fafaf9;
+      --bg-card: #ffffff;
+      --bg-muted: #f5f5f4;
+      --border: #e5e5e5;
+      --text: #1a1a1a;
+      --text-dim: #737373;
+      --accent: #2d5a3d;
+      --accent-hover: #1e4029;
+      --accent-light: #e8f0eb;
+      --blue: #1d4ed8;
+      --blue-light: #dbeafe;
+      --orange: #b45309;
+      --warning: #d97706;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0f0f0e;
+      --bg-card: #1a1a19;
+      --bg-muted: #262625;
+      --border: #4a4a49;
+      --text: #ffffff;
+      --text-dim: #d4d4d4;
+      --accent: #5cb85c;
+      --accent-hover: #6fcf6f;
+      --accent-light: #1e3a24;
+      --blue: #4db8ff;
+      --blue-light: #1e3a8a;
+      --orange: #ff9800;
+      --warning: #fbbf24;
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    /* Accessibility */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: var(--accent);
+      color: white;
+      padding: 8px 16px;
+      z-index: 1000;
+      text-decoration: none;
+      font-size: 0.85rem;
+    }
+    .skip-link:focus { top: 0; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .theme-toggle {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      font-family: monospace;
+      transition: all 0.2s;
+    }
+
+    .theme-toggle::after {
+      content: 'I';
+    }
+
+    [data-theme="dark"] .theme-toggle::after {
+      content: 'O';
+    }
+
+    .theme-toggle:hover {
+      background: var(--bg-muted);
+      border-color: var(--accent);
+    }
+    
+    /* Navigation */
+    nav {
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      overflow: visible;
+    }
+    
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0.875rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .logo {
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: 0;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    
+    .nav-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.8rem;
+      transition: color 0.2s;
+    }
+    
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a.active { color: var(--accent); font-weight: 500; }
+
+    /* Mobile Navigation */
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-direction: column;
+      gap: 4px;
+      padding: 8px;
+    }
+
+    .mobile-menu-btn::before,
+    .mobile-menu-btn::after,
+    .mobile-menu-btn span {
+      content: '';
+      display: block;
+      width: 16px;
+      height: 2px;
+      background: var(--text);
+      border-radius: 1px;
+    }
+
+    .mobile-menu-btn:hover {
+      background: var(--bg-muted);
+    }
+
+    .nav-links .nav-primary {
+      display: contents;
+    }
+
+    .nav-links .nav-secondary {
+      display: contents;
+    }
+
+    /* Docs Submenu Bar */
+    .docs-submenu-bar {
+      display: none;
+      background: var(--bg-muted);
+      border-bottom: 1px solid var(--border);
+      animation: submenu-slide 0.2s ease-out;
+    }
+    
+    .docs-submenu-bar.open {
+      display: block;
+    }
+    
+    @keyframes submenu-slide {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .docs-submenu-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0.5rem 3rem;
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+    
+    .docs-submenu-bar a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.8rem;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      transition: all 0.15s;
+    }
+    
+    .docs-submenu-bar a:hover {
+      color: var(--text);
+      background: var(--bg-card);
+    }
+    
+    .docs-submenu-bar a.active {
+      color: var(--accent);
+      font-weight: 500;
+    }
+    
+    .nav-links a.docs-trigger {
+      cursor: pointer;
+    }
+    
+    .nav-links a.docs-trigger.open {
+      color: var(--accent);
+    }
+
+    @media (max-width: 600px) {
+      .docs-submenu-container {
+        padding: 0.5rem 1rem;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .nav-container {
+        padding: 0.875rem 1rem;
+      }
+      
+      .mobile-menu-btn {
+        display: flex;
+      }
+      
+      .nav-links .nav-secondary {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 1rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 0.5rem;
+        flex-direction: column;
+        gap: 0;
+        min-width: 140px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      }
+      
+      .nav-links .nav-secondary.open {
+        display: flex;
+      }
+      
+      .nav-links .nav-secondary a {
+        padding: 0.6rem 1rem;
+        border-radius: 6px;
+      }
+      
+      .nav-links .nav-secondary a:hover {
+        background: var(--bg-muted);
+      }
+      
+      nav {
+        position: relative;
+      }
+    }
+    
+    /* Main Layout */
+    .main-layout {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 3rem 3rem;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 4rem;
+    }
+    
+    @media (max-width: 900px) {
+      .main-layout {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        padding: 1.5rem;
+      }
+    }
+    
+    /* Left column */
+    .left-col .hero-badge {
+      display: inline-block;
+      background: var(--accent-light);
+      color: var(--accent);
+      font-size: 0.6rem;
+      font-weight: 500;
+      padding: 0.15rem 0.5rem;
+      border-radius: 2px;
+      margin-bottom: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .left-col h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+    
+    .left-col > p {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+    }
+    
+    .base-url {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-family: monospace;
+      font-size: 0.8rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    /* Endpoint list */
+    .endpoint-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    
+    .endpoint-link {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 0.5rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 0.75rem;
+      transition: background 0.2s;
+    }
+    
+    .endpoint-link:hover {
+      background: var(--bg-muted);
+    }
+    
+    .method-badge {
+      font-size: 0.6rem;
+      font-weight: 600;
+      padding: 0.2rem 0.4rem;
+      border-radius: 3px;
+      text-transform: uppercase;
+    }
+    
+    .method-badge.get { background: var(--blue-light); color: var(--blue); }
+    .method-badge.post { background: var(--accent-light); color: var(--accent); }
+    
+    .endpoint-link span:last-child {
+      font-family: monospace;
+      color: var(--text);
+    }
+    
+    /* Right column - content card */
+    .content-card {
+      background: var(--bg-card);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 
+        0 0 0 1px rgba(0,0,0,0.03),
+        0 2px 4px rgba(0,0,0,0.02),
+        0 12px 40px rgba(0,0,0,0.06);
+      padding: 1.75rem;
+    }
+    
+    .content-card h2 {
+      font-size: 0.95rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      letter-spacing: 0;
+    }
+    
+    .content-card > p {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+    
+    .content-card h3 {
+      font-size: 0.75rem;
+      font-weight: 500;
+      margin: 1.25rem 0 0.5rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    
+    /* Endpoint blocks */
+    .endpoint {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin: 1.5rem 0;
+      overflow: hidden;
+    }
+    
+    .endpoint-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.875rem 1rem;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .endpoint-header .method {
+      font-size: 0.65rem;
+      font-weight: 600;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    
+    .endpoint-header .method.get { background: var(--blue-light); color: var(--blue); }
+    .endpoint-header .method.post { background: var(--accent-light); color: var(--accent); }
+    
+    .endpoint-header .path {
+      font-family: monospace;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+    
+    .endpoint-body {
+      padding: 1rem;
+    }
+    
+    .endpoint-body > p:first-child {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin-bottom: 0.75rem;
+    }
+    
+    /* Code blocks */
+    code {
+      background: var(--bg-muted);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.8em;
+      font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+    }
+    
+    pre {
+      background: #1a1a1a;
+      color: #e5e5e5;
+      padding: 1rem 1.25rem;
+      border-radius: 10px;
+      overflow-x: auto;
+      margin: 0.5rem 0 0.75rem;
+      font-size: 0.72rem;
+      line-height: 1.6;
+      font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+    }
+    
+    pre code {
+      background: none;
+      padding: 0;
+      color: inherit;
+    }
+    
+    .comment { color: #6a9955; }
+    .string { color: #ce9178; }
+    .keyword { color: #569cd6; }
+    .number { color: #b5cea8; }
+    .property { color: #9cdcfe; }
+    
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.75rem;
+      margin: 0.5rem 0;
+    }
+    
+    th, td {
+      text-align: left;
+      padding: 0.5rem 0.6rem;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    th {
+      font-weight: 500;
+      color: var(--text);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      background: var(--bg);
+    }
+    
+    td {
+      color: var(--text-dim);
+    }
+    
+    /* Section divider */
+    .section-divider {
+      border-top: 1px solid var(--border);
+      margin: 1.5rem 0;
+      padding-top: 1.5rem;
+    }
+    
+    /* Footer */
+    .footer-wrapper {
+      border-top: 1px solid var(--border);
+      margin-top: auto;
+    }
+    
+    footer {
+      padding: 2rem 3rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+    
+    .footer-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.75rem;
+    }
+    
+    .footer-links a:hover { color: var(--accent); }
+    
+    .footer-copy {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+    }
+    
+    @media (max-width: 600px) {
+      footer {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+        padding: 1.5rem 1rem;
+      }
+      .nav-container { 
+        padding: 0.75rem 1rem; 
+      }
+      .nav-links {
+        gap: 0.75rem;
+      }
+      .nav-links a {
+        font-size: 0.7rem;
+      }
+      .main-layout {
+        padding: 1rem;
+      }
+      .left-col h1 {
+        font-size: 1.1rem;
+      }
+      .base-url {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.75rem;
+      }
+      .endpoint-list {
+        gap: 0.4rem;
+      }
+      .endpoint-link {
+        font-size: 0.7rem;
+        padding: 0.4rem 0.5rem;
+      }
+      .content-card {
+        padding: 1rem;
+      }
+      pre {
+        font-size: 0.6rem;
+        padding: 0.75rem;
+      }
+      h2 {
+        font-size: 1rem;
+      }
+      h3 {
+        font-size: 0.8rem;
+      }
+      .endpoint-header {
+        padding: 0.65rem 0.75rem;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      .endpoint-header .path {
+        font-size: 0.75rem;
+      }
+      .endpoint-body {
+        padding: 0.75rem;
+      }
+      table {
+        font-size: 0.65rem;
+      }
+      th, td {
+        padding: 0.35rem;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="/otrust-polish.css?v=20260527-1">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <nav role="navigation" aria-label="Main navigation">
+    <div class="nav-container">
+      <a href="/" class="logo">OTRUST</a>
+      <div class="nav-links">
+        <span class="nav-primary">
+          <a href="/">Timestamp</a>
+          <a href="/sign">Signed</a>
+          <a href="/proof">Proof</a>
+        </span>
+        <span class="nav-secondary" id="nav-secondary">
+          <a href="/sign-in">Sign in</a>
+          <a href="/docs" class="docs-trigger open" id="docs-trigger">Docs</a>
+          <a href="/about">About</a>
+        </span>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode"></button>
+        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu" title="Menu"><span></span></button>
+      </div>
+    </div>
+  </nav>
+  
+  <!-- Docs Submenu Bar -->
+  <div class="docs-submenu-bar open" id="docs-submenu-bar">
+    <div class="docs-submenu-container">
+      <a href="/docs">Documentation</a>
+      <a href="/api-docs" class="active">API Reference</a>
+      <a href="/playground/">SDK Playground</a>
+      <a href="https://github.com/otrust-eu/opensource" target="_blank">GitHub</a>
+    </div>
+  </div>
+  
+  <main id="main-content" role="main">
+  <div class="main-layout">
+    <div class="left-col">
+      <span class="hero-badge">API</span>
+      <h1>API Reference</h1>
+      <p>Integrate timestamping, signing, identity proofs, and hosted partner auth. Public timestamp endpoints remain account-free; partner auth uses short-lived challenges.</p>
+      
+      <div class="base-url">https://www.otrust.eu</div>
+      
+      <div style="margin-bottom: 1.5rem;">
+        <a href="/swagger.html" style="display: inline-block; padding: 0.6rem 1rem; background: var(--accent); color: white; border-radius: 8px; text-decoration: none; font-weight: 500; font-size: 0.85rem;">
+          Interactive Swagger UI
+        </a>
+      </div>
+      
+      <div class="endpoint-list">
+        <a href="#get-challenge" class="endpoint-link">
+          <span class="method-badge get">GET</span>
+          <span>/challenge</span>
+        </a>
+        <a href="#post-claim" class="endpoint-link">
+          <span class="method-badge post">POST</span>
+          <span>/claim</span>
+        </a>
+        <a href="#post-claim-bulk" class="endpoint-link">
+          <span class="method-badge post">POST</span>
+          <span>/claim/bulk</span>
+        </a>
+        <a href="#post-verify" class="endpoint-link">
+          <span class="method-badge post">POST</span>
+          <span>/verify</span>
+        </a>
+        <a href="#get-lookup" class="endpoint-link">
+          <span class="method-badge get">GET</span>
+          <span>/lookup/:hash</span>
+        </a>
+        <a href="#get-ots" class="endpoint-link">
+          <span class="method-badge get">GET</span>
+          <span>/proof/:receiptId</span>
+        </a>
+        <a href="#post-signature-verify" class="endpoint-link">
+          <span class="method-badge post">POST</span>
+          <span>/verify/signature</span>
+        </a>
+        <a href="#post-blockchain-verify" class="endpoint-link">
+          <span class="method-badge post">POST</span>
+          <span>/verify/blockchain</span>
+        </a>
+        <a href="#partner-auth" class="endpoint-link">
+          <span class="method-badge post">POST</span>
+          <span>/api/v1/auth/challenge</span>
+        </a>
+        <a href="#file-types" class="endpoint-link">
+          <span class="method-badge" style="background: #6b7280;">INFO</span>
+          <span>File Types</span>
+        </a>
+      </div>
+    </div>
+    
+    <div class="content-card">
+      <h2>Access Model</h2>
+      <p>Public timestamp endpoints do not require accounts or API keys. Claim creation requires an Ed25519 signature plus a challenge proof-of-work, and rate limits apply. Partner auth endpoints are challenge-based and intended for server-side integrations.</p>
+
+      <div class="endpoint" id="partner-auth">
+        <div class="endpoint-header">
+          <span class="method post">POST</span>
+          <span class="path">/api/v1/auth/challenge</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Create a short-lived hosted-login challenge for a partner application. The response includes the OTRUST login URL; if a <code>clientId</code> has approved branding, the hosted login and proof creation screens use that theme.</p>
+          <h3>Request Body</h3>
+          <pre><code>{
+  <span class="property">"clientId"</span>: <span class="string">"acme_prod"</span>,
+  <span class="property">"redirectUri"</span>: <span class="string">"https://app.example/auth/callback"</span>,
+  <span class="property">"scope"</span>: [<span class="string">"identity"</span>],
+  <span class="property">"state"</span>: <span class="string">"opaque-csrf-state"</span>
+}</code></pre>
+          <h3>Related endpoints</h3>
+          <p><code>GET /api/v1/auth/challenge/:id</code>, <code>POST /api/v1/auth/prove</code>, <code>POST /api/v1/auth/verify</code>, and <code>GET /api/v1/auth/userinfo</code>.</p>
+        </div>
+      </div>
+      
+      <div class="endpoint" id="get-challenge">
+        <div class="endpoint-header">
+          <span class="method get">GET</span>
+          <span class="path">/challenge</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Get a challenge nonce and difficulty for claim proof-of-work. Challenges are single-use and expire server-side.</p>
+          <h3>Response</h3>
+          <pre><code>{
+  <span class="property">"challenge"</span>: <span class="string">"a1b2c3d4e5f6..."</span>,
+  <span class="property">"difficulty"</span>: <span class="number">16</span>,
+  <span class="property">"expires"</span>: <span class="string">"2026-05-19T12:15:00.000Z"</span>
+}</code></pre>
+        </div>
+      </div>
+      
+      <div class="endpoint" id="post-claim">
+        <div class="endpoint-header">
+          <span class="method post">POST</span>
+          <span class="path">/claim</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Submit a signed hash for timestamping.</p>
+          <h3>Request Body</h3>
+          <pre><code>{
+  <span class="property">"hash"</span>: <span class="string">"sha256-hex-of-content"</span>,
+  <span class="property">"signature"</span>: <span class="string">"ed25519-signature-hex"</span>,
+  <span class="property">"pubkey"</span>: <span class="string">"ed25519-public-key-hex"</span>,
+  <span class="property">"pow"</span>: {
+    <span class="property">"challenge"</span>: <span class="string">"challenge-from-/challenge"</span>,
+    <span class="property">"nonce"</span>: <span class="string">"nonce-that-meets-difficulty"</span>
+  },
+  <span class="property">"filename"</span>: <span class="string">"optional-display-name.pdf"</span>
+}</code></pre>
+          <h3>Response</h3>
+          <pre><code>{
+  <span class="property">"status"</span>: <span class="string">"ok"</span>,
+  <span class="property">"timestamp"</span>: <span class="string">"2026-05-19T12:00:00.000Z"</span>,
+  <span class="property">"receipt_id"</span>: <span class="string">"ot_abc123xyz"</span>,
+  <span class="property">"blockchain_status"</span>: <span class="string">"submitted"</span>,
+  <span class="property">"ots_proof"</span>: <span class="keyword">true</span>
+}</code></pre>
+        </div>
+      </div>
+
+      <div class="endpoint" id="post-claim-bulk">
+        <div class="endpoint-header">
+          <span class="method post">POST</span>
+          <span class="path">/claim/bulk</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Submit up to 100 signed hashes with one proof-of-work challenge.</p>
+          <h3>Request Body</h3>
+          <pre><code>{
+  <span class="property">"pow"</span>: { <span class="property">"challenge"</span>: <span class="string">"..."</span>, <span class="property">"nonce"</span>: <span class="string">"..."</span> },
+  <span class="property">"claims"</span>: [
+    {
+      <span class="property">"hash"</span>: <span class="string">"sha256-hex"</span>,
+      <span class="property">"signature"</span>: <span class="string">"ed25519-signature-hex"</span>,
+      <span class="property">"pubkey"</span>: <span class="string">"ed25519-public-key-hex"</span>
+    }
+  ]
+}</code></pre>
+        </div>
+      </div>
+      
+      <div class="endpoint" id="post-verify">
+        <div class="endpoint-header">
+          <span class="method post">POST</span>
+          <span class="path">/verify</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Check whether a SHA-256 hash has timestamp claims in OTRUST.</p>
+          <h3>Request Body</h3>
+          <pre><code>{
+  <span class="property">"hash"</span>: <span class="string">"sha256-hex-of-content"</span>
+}</code></pre>
+          <h3>Response</h3>
+          <pre><code>{
+  <span class="property">"status"</span>: <span class="string">"found"</span>,
+  <span class="property">"hash"</span>: <span class="string">"sha256-hex"</span>,
+  <span class="property">"claims"</span>: [
+    {
+      <span class="property">"receipt_id"</span>: <span class="string">"ot_abc123xyz"</span>,
+      <span class="property">"pubkey"</span>: <span class="string">"ed25519-public-key-hex"</span>,
+      <span class="property">"timestamp"</span>: <span class="string">"2026-05-19T12:00:00.000Z"</span>,
+      <span class="property">"blockchain_confirmed"</span>: <span class="keyword">false</span>,
+      <span class="property">"proof_url"</span>: <span class="string">"/proof/ot_abc123xyz"</span>
+    }
+  ]
+}</code></pre>
+        </div>
+      </div>
+
+      <div class="endpoint" id="get-lookup">
+        <div class="endpoint-header">
+          <span class="method get">GET</span>
+          <span class="path">/lookup/:hash</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Browser-friendly lookup for a SHA-256 hash. Prefer <code>POST /verify</code> when you want to keep hashes out of URLs and logs.</p>
+          <h3>Response</h3>
+          <pre><code>{
+  <span class="property">"status"</span>: <span class="string">"found"</span>,
+  <span class="property">"claims"</span>: []
+}</code></pre>
+        </div>
+      </div>
+      
+      <div class="endpoint" id="get-ots">
+        <div class="endpoint-header">
+          <span class="method get">GET</span>
+          <span class="path">/proof/:receiptId</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Return a human-readable proof page by default. Add <code>?format=json</code> for metadata or <code>?format=ots</code> to download the raw OpenTimestamps file.</p>
+          <h3>Response</h3>
+          <pre><code>{
+  <span class="property">"status"</span>: <span class="string">"pending"</span>,
+  <span class="property">"receipt_id"</span>: <span class="string">"ot_abc123xyz"</span>,
+  <span class="property">"hash"</span>: <span class="string">"sha256-hex"</span>,
+  <span class="property">"download_url"</span>: <span class="string">"/proof/ot_abc123xyz?format=ots"</span>
+}</code></pre>
+        </div>
+      </div>
+
+      <div class="endpoint" id="post-signature-verify">
+        <div class="endpoint-header">
+          <span class="method post">POST</span>
+          <span class="path">/verify/signature</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Verify that an Ed25519 signature matches a hash and public key.</p>
+          <h3>Request Body</h3>
+          <pre><code>{
+  <span class="property">"hash"</span>: <span class="string">"sha256-hex-of-content"</span>,
+  <span class="property">"signature"</span>: <span class="string">"ed25519-signature-hex"</span>,
+  <span class="property">"pubkey"</span>: <span class="string">"ed25519-public-key-hex"</span>
+}</code></pre>
+        </div>
+      </div>
+
+      <div class="endpoint" id="post-blockchain-verify">
+        <div class="endpoint-header">
+          <span class="method post">POST</span>
+          <span class="path">/verify/blockchain</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Verify a SHA-256 hash against a base64 OpenTimestamps proof payload.</p>
+          <h3>Request Body</h3>
+          <pre><code>{
+  <span class="property">"hash"</span>: <span class="string">"sha256-hex-of-content"</span>,
+  <span class="property">"ots_proof"</span>: <span class="string">"base64-encoded-ots-file"</span>
+}</code></pre>
+        </div>
+      </div>
+      
+      <div class="section-divider">
+        <h2>Example Workflow</h2>
+      </div>
+      <p>Complete example using curl:</p>
+      <pre><code><span class="comment"># 1. Hash your file locally</span>
+HASH=$(sha256sum document.pdf | cut -d' ' -f1)
+
+<span class="comment"># 2. Sign the hash with your Ed25519 key</span>
+
+<span class="comment"># 3. Submit the claim</span>
+curl -X POST https://www.otrust.eu/claim \
+  -H "Content-Type: application/json" \
+  -d '{"hash":"'$HASH'","signature":"...","pubkey":"...","pow":{"challenge":"...","nonce":"..."}}'
+
+<span class="comment"># 4. Check status</span>
+curl https://www.otrust.eu/proof/ot_abc123xyz?format=json
+
+<span class="comment"># 5. Download proof</span>
+curl https://www.otrust.eu/proof/ot_abc123xyz?format=ots \
+  -o document.pdf.ots</code></pre>
+      
+      <div class="section-divider" id="file-types">
+        <h2>File Upload Policy</h2>
+      </div>
+      <p>When using <code>/sign/upload</code>, certain file types are blocked for security reasons.</p>
+      
+      <h3>Blocked Extensions</h3>
+      <p style="margin-bottom: 0.75rem;">Server-executable files that could pose security risks:</p>
+      <table>
+        <tr><th>Category</th><th>Extensions</th></tr>
+        <tr><td>Windows Executables</td><td><code>.exe .dll .bat .cmd .com .msi .scr</code></td></tr>
+        <tr><td>Shell Scripts</td><td><code>.sh .bash .zsh .csh</code></td></tr>
+        <tr><td>PHP</td><td><code>.php .php3 .php4 .php5 .phtml .phar</code></td></tr>
+        <tr><td>ASP.NET</td><td><code>.asp .aspx .ashx .asmx .ascx</code></td></tr>
+        <tr><td>Java Server</td><td><code>.jsp .jspx .jsf .jspa .jar .war .ear</code></td></tr>
+        <tr><td>CGI/Config</td><td><code>.cgi .htaccess .htpasswd</code></td></tr>
+        <tr><td>Legacy</td><td><code>.swf .fla</code></td></tr>
+      </table>
+      
+      <h3 style="margin-top: 1.5rem;">Allowed File Types</h3>
+      <p style="margin-bottom: 0.75rem;">All other file types are allowed, including:</p>
+      <table>
+        <tr><th>Category</th><th>Extensions</th></tr>
+        <tr><td>Documents</td><td><code>.pdf .doc .docx .odt .txt .rtf .md</code></td></tr>
+        <tr><td>Images</td><td><code>.png .jpg .jpeg .gif .webp .svg .bmp .tiff</code></td></tr>
+        <tr><td>Source Code</td><td><code>.js .ts .py .rb .go .rs .c .cpp .java .cs</code></td></tr>
+        <tr><td>Data Files</td><td><code>.json .xml .yaml .yml .csv .toml</code></td></tr>
+        <tr><td>Archives</td><td><code>.zip .tar .gz .7z .rar</code></td></tr>
+      </table>
+      
+      <div style="margin-top: 1rem; padding: 1rem; background: var(--accent-light); border-radius: 8px; font-size: 0.85rem;">
+        <strong>Note:</strong> Uploaded files are stored temporarily (1-12 hours) for the signing flow, then automatically purged. Files are never executed by the server - they are always served as downloads. The extension blocking is a defense-in-depth measure.
+      </div>
+    </div>
+  </div>
+  </main>
+  
+  <div class="footer-wrapper">
+  <footer role="contentinfo">
+    <div class="footer-links">
+      <a href="/">Timestamp</a>
+      <a href="/sign">Signed</a>
+      <a href="/proof">Proof</a>
+      <a href="/sign-in">Sign in</a>
+      <a href="/docs">Docs</a>
+      <a href="/about">About</a>
+      <a href="/privacy-policy">Privacy</a>
+      <a href="/terms">Terms</a>
+      <a href="https://github.com/otrust-eu/opensource">GitHub</a>
+    </div>
+    <div class="footer-copy">OTRUST - MIT License</div>
+  </footer>
+  </div>
+
+  <script nonce="">
+    // Dark mode initialization and toggle
+    function initTheme() {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+      
+      if (theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+        
+      }
+    }
+    
+    document.getElementById('theme-toggle')?.addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (isDark) {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'light');
+        
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+        
+      }
+    });
+    
+    initTheme();
+
+    // Mobile menu toggle
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const navSecondary = document.getElementById('nav-secondary');
+
+    mobileMenuBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      navSecondary.classList.toggle('open');
+      
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.nav-links') && !e.target.closest('.docs-submenu-bar')) {
+        navSecondary?.classList.remove('open');
+        docsSubmenuBar?.classList.remove('open');
+        docsTrigger?.classList.remove('open');
+      }
+    });
+
+    // Docs submenu bar toggle
+    const docsTrigger = document.getElementById('docs-trigger');
+    const docsSubmenuBar = document.getElementById('docs-submenu-bar');
+    
+    docsTrigger?.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const isOpen = docsSubmenuBar.classList.toggle('open');
+      docsTrigger.classList.toggle('open', isOpen);
+    });
+  </script>
+  <script src="/otrust-polish.js" defer></script>
+</body>
+</html>

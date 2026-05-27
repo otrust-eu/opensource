@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Signing Status – OTRUST Signed by Kris Ledel</title>
+  <meta name="description" content="Track the status of your document signing request. Blockchain-backed signatures by Kris Ledel.">
+  <meta name="author" content="Kris Ledel">
+  <meta name="robots" content="noindex">
+  
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <style>
+    :root {
+      --bg: #fafaf9;
+      --bg-card: #ffffff;
+      --bg-muted: #f5f5f4;
+      --border: #e5e5e5;
+      --text: #1a1a1a;
+      --text-dim: #737373;
+      --accent: #2d5a3d;
+      --accent-hover: #1e4029;
+      --accent-light: #e8f0eb;
+      --orange: #b45309;
+      --success: #2d5a3d;
+      --error: #dc2626;
+      --warning: #d97706;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0f0f0e;
+      --bg-card: #1a1a19;
+      --bg-muted: #262625;
+      --border: #4a4a49;
+      --text: #ffffff;
+      --text-dim: #d4d4d4;
+      --accent: #5cb85c;
+      --accent-hover: #6fcf6f;
+      --accent-light: #1e3a24;
+      --orange: #ff9800;
+      --success: #5cb85c;
+      --error: #f87171;
+      --warning: #fbbf24;
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    
+    .theme-toggle {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      font-family: monospace;
+      transition: all 0.2s;
+    }
+
+    .theme-toggle::after {
+      content: 'I';
+    }
+
+    [data-theme="dark"] .theme-toggle::after {
+      content: 'O';
+    }
+    
+    .theme-toggle:hover {
+      background: var(--bg-muted);
+      border-color: var(--accent);
+    }
+    
+    /* Accessibility: Skip link */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: var(--accent);
+      color: white;
+      padding: 8px 16px;
+      z-index: 1000;
+      text-decoration: none;
+      font-size: 0.85rem;
+    }
+    .skip-link:focus { top: 0; }
+    
+    nav {
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      overflow: visible;
+    }
+    
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0.875rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .logo {
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    
+    .nav-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.8rem;
+      transition: color 0.2s;
+    }
+    
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a.active { color: var(--accent); font-weight: 500; }
+
+    /* Mobile Navigation */
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-direction: column;
+      gap: 4px;
+      padding: 8px;
+    }
+
+    .mobile-menu-btn::before,
+    .mobile-menu-btn::after,
+    .mobile-menu-btn span {
+      content: '';
+      display: block;
+      width: 16px;
+      height: 2px;
+      background: var(--text);
+      border-radius: 1px;
+    }
+
+    .mobile-menu-btn:hover {
+      background: var(--bg-muted);
+    }
+
+    .nav-links .nav-primary {
+      display: contents;
+    }
+
+    .nav-links .nav-secondary {
+      display: contents;
+    }
+
+    @media (max-width: 600px) {
+      .nav-container {
+        padding: 0.875rem 1rem;
+      }
+      
+      .mobile-menu-btn {
+        display: flex;
+      }
+      
+      .nav-links .nav-secondary {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 1rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 0.5rem;
+        flex-direction: column;
+        gap: 0;
+        min-width: 140px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      }
+      
+      .nav-links .nav-secondary.open {
+        display: flex;
+      }
+      
+      .nav-links .nav-secondary a {
+        padding: 0.6rem 1rem;
+        border-radius: 6px;
+      }
+      
+      .nav-links .nav-secondary a:hover {
+        background: var(--bg-muted);
+      }
+      
+      nav {
+        position: relative;
+      }
+    }
+    
+    .main-layout {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem 3rem 3rem;
+    }
+    
+    @media (max-width: 900px) {
+      .main-layout { padding: 1.5rem; }
+      .nav-container { padding: 0.875rem 1.5rem; }
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-dim);
+    }
+    
+    .error-state {
+      text-align: center;
+      padding: 3rem;
+    }
+    
+    .error-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .error-state h2 { margin-bottom: 0.5rem; }
+    .error-state p { color: var(--text-dim); }
+    
+    .status-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.5rem;
+    }
+    
+    .status-header h1 {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    
+    .status-badge.pending {
+      background: #fef3c7;
+      color: var(--warning);
+    }
+    
+    .status-badge.completed {
+      background: var(--accent-light);
+      color: var(--success);
+    }
+    
+    .status-badge.cancelled {
+      background: #fef2f2;
+      color: var(--error);
+    }
+    
+    .status-badge.expired {
+      background: var(--bg-muted);
+      color: var(--text-dim);
+    }
+    
+    [data-theme="dark"] .status-badge.pending {
+      background: #78350f;
+    }
+    
+    [data-theme="dark"] .status-badge.cancelled {
+      background: #450a0a;
+    }
+    
+    .info-card {
+      background: var(--bg-card);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+    
+    .info-card-header {
+      background: var(--bg-muted);
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--text-dim);
+    }
+    
+    .info-card-body {
+      padding: 1rem;
+    }
+    
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+    
+    .info-row:last-child { border-bottom: none; }
+    
+    .info-label { color: var(--text-dim); }
+    
+    .info-value {
+      font-weight: 500;
+      text-align: right;
+      word-break: break-all;
+    }
+    
+    .info-value.mono {
+      font-family: monospace;
+      font-size: 0.75rem;
+    }
+    
+    .parties-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    
+    .party-card {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem;
+      background: var(--bg-muted);
+      border-radius: 10px;
+    }
+    
+    .party-avatar {
+      width: 36px;
+      height: 36px;
+      background: var(--accent-light);
+      color: var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    
+    .party-info { flex: 1; }
+    
+    .party-email {
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+    
+    .party-role {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      text-transform: capitalize;
+    }
+    
+    .party-status {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+    }
+    
+    .party-status.pending {
+      background: #fef3c7;
+      color: var(--warning);
+    }
+    
+    .party-status.signed, .party-status.approved, .party-status.viewed {
+      background: var(--accent-light);
+      color: var(--success);
+    }
+    
+    .party-status.declined {
+      background: #fef2f2;
+      color: var(--error);
+    }
+    
+    [data-theme="dark"] .party-status.pending { background: #78350f; }
+    [data-theme="dark"] .party-status.declined { background: #450a0a; }
+    
+    .actions-section {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.7rem 1.25rem;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      text-decoration: none;
+    }
+    
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+    
+    .btn-primary:hover { background: var(--accent-hover); }
+    
+    .btn-secondary {
+      background: var(--bg-muted);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    
+    .btn-danger {
+      background: #fef2f2;
+      color: var(--error);
+      border: 1px solid #fecaca;
+    }
+    
+    [data-theme="dark"] .btn-danger {
+      background: #450a0a;
+      border-color: #7f1d1d;
+    }
+    
+    .btn-danger:hover {
+      background: var(--error);
+      color: white;
+    }
+    
+    .package-section {
+      margin-top: 2rem;
+    }
+    
+    .package-section.pending-blockchain .package-card {
+      background: #fef3c7;
+      border-color: #f59e0b;
+    }
+    
+    .package-section.pending-blockchain .package-card h3,
+    .package-section.pending-blockchain .package-card p {
+      color: #78350f;
+    }
+    
+    [data-theme="dark"] .package-section.pending-blockchain .package-card {
+      background: #78350f;
+      border-color: #f59e0b;
+    }
+    
+    [data-theme="dark"] .package-section.pending-blockchain .package-card h3,
+    [data-theme="dark"] .package-section.pending-blockchain .package-card p {
+      color: #fef3c7;
+    }
+    
+    .package-card {
+      background: var(--accent-light);
+      border: 1px solid var(--accent);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+    
+    .package-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .package-card h3 { font-size: 1rem; margin-bottom: 0.35rem; }
+    .package-card p { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 1rem; }
+    
+    /* Countdown timer */
+    .countdown-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.3rem 0.6rem;
+      background: var(--warning-light, #fef3c7);
+      border: 1px solid var(--warning-border, #fcd34d);
+      border-radius: 6px;
+      font-size: 0.8rem;
+    }
+    
+    [data-theme="dark"] .countdown-inline {
+      background: #2e2a1a;
+      border-color: #5a4a2d;
+    }
+    
+    .countdown-icon {
+      font-size: 0.9rem;
+    }
+    
+    .countdown-time {
+      font-weight: 600;
+      font-family: 'Courier New', Courier, monospace;
+      color: var(--warning, #d97706);
+    }
+    
+    .countdown-inline.urgent {
+      background: var(--error-light, #fef2f2);
+      border-color: var(--error-border, #fecaca);
+    }
+    
+    [data-theme="dark"] .countdown-inline.urgent {
+      background: #2e1a1a;
+      border-color: #5a2d2d;
+    }
+    
+    .countdown-inline.urgent .countdown-time {
+      color: var(--error, #dc2626);
+    }
+    
+    .countdown-inline.expired {
+      background: var(--bg-muted);
+      border-color: var(--border);
+    }
+    
+    .countdown-inline.expired .countdown-time {
+      color: var(--text-dim);
+    }
+    
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 3rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .footer-wrapper {
+      border-top: 1px solid var(--border);
+      margin-top: 2rem;
+    }
+    
+    .footer-wrapper footer {
+      border-top: none;
+    }
+    
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    
+    .footer-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.75rem;
+    }
+    
+    .footer-links a:hover { color: var(--accent); }
+    
+    .footer-copy {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+    }
+    
+    @media (max-width: 600px) {
+      footer {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+        padding: 1.5rem 1rem;
+      }
+      .footer-links { justify-content: center; }
+    }
+    
+    .refresh-note {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      text-align: center;
+      margin-top: 1rem;
+    }
+    
+    .back-link {
+      display: inline-block;
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.85rem;
+      margin-bottom: 1.5rem;
+      transition: color 0.2s;
+    }
+    
+    .back-link:hover {
+      color: var(--accent);
+    }
+  </style>
+  <link rel="stylesheet" href="/otrust-polish.css?v=20260527-1">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <nav role="navigation" aria-label="Main navigation">
+    <div class="nav-container">
+      <a href="/" class="logo">OTRUST</a>
+      <div class="nav-links">
+        <span class="nav-primary">
+          <a href="/">Timestamp</a>
+          <a href="/sign">Signed</a>
+          <a href="/proof">Proof</a>
+        </span>
+        <span class="nav-secondary" id="nav-secondary">
+          <a href="/sign-in">Sign in</a>
+          <a href="/docs">Docs</a>
+          <a href="/about">About</a>
+        </span>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode"></button>
+        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu" title="Menu"><span></span></button>
+      </div>
+    </div>
+  </nav>
+  
+  <main id="main-content" class="main-layout" role="main">
+    <div id="loading" class="loading">
+      Loading signing request...
+    </div>
+    
+    <div id="error" class="error-state" style="display: none;">
+      <div class="error-icon">✗</div>
+      <h2>Request Not Found</h2>
+      <p>This signing request doesn't exist or has been deleted.</p>
+    </div>
+    
+    <div id="content" style="display: none;">
+      <a href="/sign" class="back-link">← Back to Signed</a>
+      
+      <div class="status-header">
+        <div>
+          <h1 id="doc-title">Document Title</h1>
+          <p id="doc-filename" style="font-size: 0.8rem; color: var(--text-dim);"></p>
+        </div>
+        <span class="status-badge pending" id="status-badge">
+          <span id="status-icon"></span>
+          <span id="status-text">Pending</span>
+        </span>
+      </div>
+      
+      <div class="info-card">
+        <div class="info-card-header">Document Info</div>
+        <div class="info-card-body">
+          <div class="info-row">
+            <span class="info-label">Document Hash</span>
+            <span class="info-value mono" id="doc-hash"></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Created</span>
+            <span class="info-value" id="created-at"></span>
+          </div>
+          <div class="info-row" id="deadline-row" style="display: none;">
+            <span class="info-label">Deadline</span>
+            <span class="info-value" id="deadline"></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Signing Order</span>
+            <span class="info-value" id="signing-order"></span>
+          </div>
+          <div class="info-row" id="doc-url-row" style="display: none;">
+            <span class="info-label">Document URL</span>
+            <span class="info-value"><a href="" id="doc-url" target="_blank">View Document</a></span>
+          </div>
+          <div class="info-row" id="file-expiry-row" style="display: none;">
+            <span class="info-label">File Auto-Delete</span>
+            <span class="info-value">
+              <div id="file-countdown" class="countdown-inline">
+                <span class="countdown-icon"></span>
+                <span class="countdown-time" id="countdown-time">--:--</span>
+              </div>
+            </span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="info-card">
+        <div class="info-card-header">Signing Parties</div>
+        <div class="info-card-body">
+          <div class="parties-list" id="parties-list">
+            <!-- Filled dynamically -->
+          </div>
+        </div>
+      </div>
+      
+      <div class="actions-section" id="actions-section">
+        <button class="btn btn-secondary" id="remind-btn">Send Reminders</button>
+        <button class="btn btn-danger" id="cancel-btn">Cancel Request</button>
+      </div>
+      
+      <div class="package-section" id="package-section" style="display: none;">
+        <div class="package-card">
+          <div class="package-icon"></div>
+          <h3>Signature Package Ready</h3>
+          <p>All parties have completed. Download the blockchain-anchored proof.</p>
+          <p id="blockchain-info" style="font-size: 0.8rem; color: var(--accent); margin-bottom: 1rem;"></p>
+          <button class="btn btn-primary" id="download-package-btn">Download Signature Package</button>
+        </div>
+      </div>
+      
+      <div class="package-section pending-blockchain" id="pending-blockchain" style="display: none;">
+        <div class="package-card">
+          <div class="package-icon"></div>
+          <h3>Awaiting Blockchain Confirmation</h3>
+          <p>All parties have signed. The signature package is being anchored to the Bitcoin blockchain. This typically takes a few hours.</p>
+          <p style="font-size: 0.8rem; color: var(--text-dim);">You'll receive an email when the proof is ready.</p>
+        </div>
+      </div>
+      
+      <p class="refresh-note">Page auto-refreshes every 30 seconds</p>
+    </div>
+  </main>
+  
+  <div class="footer-wrapper">
+  <footer role="contentinfo">
+    <div class="footer-links">
+      <a href="/">Timestamp</a>
+      <a href="/sign">Signed</a>
+      <a href="/proof">Proof</a>
+      <a href="/sign-in">Sign in</a>
+      <a href="/docs">Docs</a>
+      <a href="/about">About</a>
+      <a href="/privacy-policy">Privacy</a>
+      <a href="/terms">Terms</a>
+      <a href="https://github.com/otrust-eu/opensource">GitHub</a>
+    </div>
+    <div class="footer-copy">OTRUST - MIT License</div>
+  </footer>
+  </div>
+  
+  <script nonce="{{CSP_NONCE}}">
+    // Theme toggle
+    const themeToggle = document.querySelector('.theme-toggle');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const savedTheme = localStorage.getItem('theme');
+    
+    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      themeToggle.textContent = '';
+    }
+    
+    themeToggle.addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+      localStorage.setItem('theme', isDark ? 'light' : 'dark');
+      themeToggle.textContent = isDark ? '' : '';
+    });
+
+    // Mobile menu toggle
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const navSecondary = document.getElementById('nav-secondary');
+
+    mobileMenuBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      navSecondary.classList.toggle('open');
+      
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.nav-links')) {
+        navSecondary?.classList.remove('open');
+      }
+    });
+    
+    // Get sign ID from URL path (/sign/sr_xxx) or query param (?id=sr_xxx)
+    const urlParams = new URLSearchParams(window.location.search);
+    let signId = urlParams.get('id');
+    
+    // Also check URL path for /sign/sr_xxx format (includes - and _ in ID)
+    if (!signId) {
+      const pathMatch = window.location.pathname.match(/\/sign\/(sr_[a-zA-Z0-9_-]+)/);
+      if (pathMatch) {
+        signId = pathMatch[1];
+      }
+    }
+    
+    // Also try /sign-view/sr_xxx format
+    if (!signId) {
+      const viewPathMatch = window.location.pathname.match(/\/sign-view\/(sr_[a-zA-Z0-9_-]+)/);
+      if (viewPathMatch) {
+        signId = viewPathMatch[1];
+      }
+    }
+    
+    let csrfToken = null;
+    let cancelToken = null;
+    // Accept both 'token' and 'view_token' query params
+    let viewToken = urlParams.get('token') || urlParams.get('view_token');
+    
+    async function getCsrfToken() {
+      try {
+        const res = await fetch('/csrf-token');
+        const data = await res.json();
+        csrfToken = data.token;
+      } catch (e) {
+        console.error('Failed to get CSRF token:', e);
+      }
+    }
+    
+    async function loadSignRequest() {
+      if (!signId) {
+        showError();
+        return;
+      }
+      
+      // Try to get cancel_token from localStorage (creator saved it when creating)
+      cancelToken = localStorage.getItem('cancel_token_' + signId);
+      
+      try {
+        // Include view_token for authenticated access
+        let url = '/sign/' + signId;
+        if (viewToken) {
+          url += '?view_token=' + encodeURIComponent(viewToken);
+        }
+        
+        const res = await fetch(url);
+        
+        if (!res.ok) {
+          showError();
+          return;
+        }
+        
+        const data = await res.json();
+        renderSignRequest(data);
+        
+      } catch (e) {
+        console.error('Failed to load sign request:', e);
+        showError();
+      }
+    }
+    
+    function showError() {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('error').style.display = 'block';
+      document.getElementById('content').style.display = 'none';
+    }
+    
+    function renderSignRequest(data) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('error').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+      
+      // Check if authenticated (has cancel/remind capability)
+      const isAuthenticated = data.is_authenticated || !!cancelToken;
+      
+      // Title and filename
+      document.getElementById('doc-title').textContent = data.title;
+      if (data.filename) {
+        document.getElementById('doc-filename').textContent = data.filename;
+      }
+      
+      // Status badge
+      const statusBadge = document.getElementById('status-badge');
+      const statusIcon = document.getElementById('status-icon');
+      const statusText = document.getElementById('status-text');
+      
+      statusBadge.className = 'status-badge ' + data.status;
+      
+      switch (data.status) {
+        case 'pending':
+          statusIcon.textContent = '';
+          statusText.textContent = 'Pending';
+          break;
+        case 'completed':
+          statusIcon.textContent = '✓';
+          statusText.textContent = 'Completed';
+          break;
+        case 'cancelled':
+          statusIcon.textContent = '✗';
+          statusText.textContent = 'Cancelled';
+          break;
+        case 'expired':
+          statusIcon.textContent = '';
+          statusText.textContent = 'Expired';
+          break;
+      }
+      
+      // Document info
+      document.getElementById('doc-hash').textContent = data.document_hash.substring(0, 16) + '...' + data.document_hash.substring(48);
+      document.getElementById('created-at').textContent = new Date(data.created_at).toLocaleString();
+      document.getElementById('signing-order').textContent = data.signing_order === 'parallel' ? 'Parallel (all at once)' : 'Sequential (in order)';
+      
+      if (data.deadline) {
+        document.getElementById('deadline-row').style.display = 'flex';
+        document.getElementById('deadline').textContent = new Date(data.deadline).toLocaleDateString();
+      }
+      
+      if (data.document_url) {
+        document.getElementById('doc-url-row').style.display = 'flex';
+        // Add auth tokens for secure file download
+        let docUrl = data.document_url;
+        if (docUrl.includes('/sign/file/sf_')) {
+          const separator = docUrl.includes('?') ? '&' : '?';
+          docUrl = `${docUrl}${separator}sign_id=${signId}${viewToken ? '&view_token=' + encodeURIComponent(viewToken) : ''}`;
+        }
+        document.getElementById('doc-url').href = docUrl;
+      }
+      
+      // File expiry countdown
+      if (data.file_expires_at) {
+        document.getElementById('file-expiry-row').style.display = 'flex';
+        initFileCountdown(new Date(data.file_expires_at), data.file_ttl_hours);
+      }
+      
+      // Parties
+      const partiesList = document.getElementById('parties-list');
+      partiesList.innerHTML = '';
+      
+      data.parties.forEach((party, i) => {
+        // Use email_hint from server (masked email like "j***@***.com")
+        const emailDisplay = party.email_hint || 'Hidden';
+        const initials = emailDisplay.substring(0, 2).toUpperCase();
+        
+        // Determine status from action field
+        let status = 'pending';
+        let showStatus = true;
+        
+        if (party.acted_at) {
+          status = party.action || 'completed';
+        } else if (party.role === 'viewer') {
+          // Viewers don't need to act - don't show "Pending"
+          showStatus = false;
+        }
+        
+        const statusClass = status;
+        const statusLabel = status.charAt(0).toUpperCase() + status.slice(1);
+        
+        const card = document.createElement('div');
+        card.className = 'party-card';
+        card.innerHTML = `
+          <div class="party-avatar">${initials}</div>
+          <div class="party-info">
+            <div class="party-email">${escapeHtml(emailDisplay)}</div>
+            <div class="party-role">${party.role}${data.signing_order === 'sequential' ? ' (#' + (i + 1) + ')' : ''}</div>
+          </div>
+          ${showStatus ? `<span class="party-status ${statusClass}">${statusLabel}</span>` : ''}
+        `;
+        partiesList.appendChild(card);
+      });
+      
+      // Actions
+      if (data.status === 'pending') {
+        document.getElementById('actions-section').style.display = 'flex';
+      } else {
+        document.getElementById('actions-section').style.display = 'none';
+      }
+      
+      // Package - only show download after blockchain confirmation
+      if (data.status === 'completed') {
+        if (data.has_proof) {
+          document.getElementById('package-section').style.display = 'block';
+          document.getElementById('pending-blockchain').style.display = 'none';
+          
+          // Show blockchain info
+          if (data.blockchain_block) {
+            document.getElementById('blockchain-info').textContent = 
+              `✓ Confirmed in Bitcoin block #${data.blockchain_block}`;
+          }
+        } else {
+          // Still waiting for blockchain
+          document.getElementById('package-section').style.display = 'none';
+          document.getElementById('pending-blockchain').style.display = 'block';
+        }
+      }
+    }
+    
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+    
+    // Send reminders
+    document.getElementById('remind-btn').addEventListener('click', async () => {
+      // Can use either cancel_token or view_token
+      const authToken = cancelToken || viewToken;
+      if (!authToken) {
+        alert('You need the creator link to send reminders.');
+        return;
+      }
+      
+      try {
+        const res = await fetch('/sign/' + signId + '/remind', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': csrfToken
+          },
+          body: JSON.stringify({ 
+            cancel_token: cancelToken || undefined,
+            view_token: viewToken || undefined
+          })
+        });
+        
+        const data = await res.json();
+        
+        if (res.ok) {
+          alert('Reminders sent to ' + data.reminders_sent + ' pending parties');
+        } else {
+          alert(data.message || 'Failed to send reminders');
+        }
+      } catch (e) {
+        alert('Failed to send reminders');
+      }
+    });
+    
+    // Cancel request
+    document.getElementById('cancel-btn').addEventListener('click', async () => {
+      if (!cancelToken) {
+        alert('You need the creator link to cancel. Check the URL you received when creating this request.');
+        return;
+      }
+      
+      if (!confirm('Are you sure you want to cancel this signing request? This cannot be undone.')) {
+        return;
+      }
+      
+      const reason = prompt('Optional: Reason for cancellation');
+      
+      try {
+        const res = await fetch('/sign/' + signId + '/cancel', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': csrfToken
+          },
+          body: JSON.stringify({ 
+            cancel_token: cancelToken,
+            reason: reason || null
+          })
+        });
+        
+        const data = await res.json();
+        
+        if (res.ok) {
+          alert('Signing request cancelled');
+          loadSignRequest();
+        } else {
+          alert(data.message || 'Failed to cancel request');
+        }
+      } catch (e) {
+        alert('Failed to cancel request');
+      }
+    });
+    
+    // Download package
+    document.getElementById('download-package-btn').addEventListener('click', async () => {
+      try {
+        const res = await fetch('/sign/' + signId + '/package');
+        const data = await res.json();
+        
+        if (!res.ok) {
+          alert(data.message || 'Package not available');
+          return;
+        }
+        
+        // Download as JSON
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'signature-package-' + signId + '.json';
+        a.click();
+        URL.revokeObjectURL(url);
+        
+      } catch (e) {
+        alert('Failed to download package');
+      }
+    });
+    
+    // File countdown timer
+    let countdownInterval = null;
+    
+    function initFileCountdown(expiresAt, ttlHours) {
+      const countdownEl = document.getElementById('file-countdown');
+      const timeEl = document.getElementById('countdown-time');
+      
+      // Clear any existing interval
+      if (countdownInterval) {
+        clearInterval(countdownInterval);
+      }
+      
+      function updateCountdown() {
+        const now = Date.now();
+        const target = expiresAt.getTime();
+        const diff = target - now;
+        
+        if (diff <= 0) {
+          countdownEl.classList.add('expired');
+          countdownEl.classList.remove('urgent');
+          timeEl.textContent = 'File deleted';
+          return false;
+        }
+        
+        // Calculate time parts
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        
+        // Format time string
+        let timeStr = '';
+        if (hours > 0) {
+          timeStr = `${hours}h ${minutes}m ${seconds}s`;
+        } else if (minutes > 0) {
+          timeStr = `${minutes}m ${seconds}s`;
+        } else {
+          timeStr = `${seconds}s`;
+        }
+        
+        timeEl.textContent = timeStr;
+        
+        // Add urgent class if under 10 minutes
+        if (diff <= 10 * 60 * 1000) {
+          countdownEl.classList.add('urgent');
+        } else {
+          countdownEl.classList.remove('urgent');
+        }
+        
+        return true;
+      }
+      
+      // Initial update
+      if (updateCountdown()) {
+        // Continue updating every second
+        countdownInterval = setInterval(() => {
+          if (!updateCountdown()) {
+            clearInterval(countdownInterval);
+          }
+        }, 1000);
+      }
+    }
+    
+    // Init
+    getCsrfToken();
+    loadSignRequest();
+    
+    // Auto refresh
+    setInterval(loadSignRequest, 30000);
+  </script>
+  <script src="/otrust-polish.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OTRUST API - Swagger UI | Interactive API Documentation by Kristian Ledel</title>
+  <meta name="description" content="Interactive API documentation for OTRUST blockchain timestamping service. Test endpoints directly in your browser. Created by Kristian (Kris) Ledel.">
+  <meta name="keywords" content="OTRUST API, Swagger, OpenAPI, blockchain API, timestamp API, Kris Ledel, Kristian Ledel">
+  <meta name="author" content="Kristian Ledel">
+  <meta name="creator" content="Kris Ledel">
+  <link rel="author" href="https://www.otrust.eu/about">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://www.otrust.eu/swagger.html">
+  <meta name="theme-color" content="#2d5a3d">
+  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.18.2/swagger-ui.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <script defer data-domain="otrust.eu" src="https://plausible.io/js/script.js"></script>
+  <style>
+    :root {
+      --accent: #2d5a3d;
+    }
+    [data-theme="dark"] {
+      --accent: #5cb85c;
+    }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .navbar {
+      background: var(--bg, #fafaf9);
+      border-bottom: 1px solid var(--border, #e5e5e5);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .navbar a {
+      color: var(--text, #1a1a1a);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .navbar-back {
+      color: var(--accent);
+      cursor: pointer;
+    }
+    .navbar-back:hover {
+      text-decoration: underline;
+    }
+    #swagger-ui {
+      max-width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <a href="/api-docs.html" class="navbar-back">← Back to API Docs</a>
+    <span>OTRUST Swagger UI</span>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode"></button>
+  </div>
+  <div id="swagger-ui"></div>
+  
+  <script src="https://unpkg.com/swagger-ui-dist@5.18.2/swagger-ui-bundle.js"></script>
+  <script src="https://unpkg.com/swagger-ui-dist@5.18.2/swagger-ui-standalone-preset.js"></script>
+  <script src="/js/swagger-init.js"></script>
+</body>
+</html>

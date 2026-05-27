@@ -1,0 +1,2446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OTRUST Signed – Zero-Knowledge Document Signing | Blockchain E-Signature by Kristian Ledel</title>
+  <meta name="description" content="Get documents signed with blockchain-backed proof. Use local-hash mode or temporary encrypted upload. Prove WHO signed WHAT and WHEN. Created by Kristian (Kris) Ledel.">
+
+  <meta name="keywords" content="document signing, e-signature, blockchain signature, zero-knowledge signing, proof of signature, digital signature, OTRUST, Kris Ledel, Kristian Ledel, electronic signature, legal signature, privacy-first signing">
+  <meta name="author" content="Kristian Ledel">
+  <meta name="creator" content="Kris Ledel">
+  <link rel="author" href="https://www.otrust.eu/about">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <link rel="canonical" href="https://www.otrust.eu/sign">
+  <meta name="theme-color" content="#2d5a3d">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.otrust.eu/sign">
+  <meta property="og:title" content="OTRUST Signed – Zero-Knowledge Document Signing by Kristian Ledel">
+  <meta property="og:description" content="Get documents signed with blockchain-backed proof using local hashes or temporary encrypted upload.">
+  <meta property="og:image" content="https://www.otrust.eu/og-image.svg">
+  <meta property="og:site_name" content="OTRUST by Kristian Ledel">
+  <meta property="article:author" content="Kristian Ledel">
+  
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="OTRUST Signed – Blockchain E-Signature">
+  <meta name="twitter:description" content="Zero-knowledge document signing. Prove WHO signed WHAT and WHEN.">
+  <meta name="twitter:image" content="https://www.otrust.eu/og-image.svg">
+  <meta name="twitter:creator" content="@kledel">
+  
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "OTRUST Signed",
+    "url": "https://www.otrust.eu/sign",
+    "description": "Privacy-first document signing with blockchain proof, local-hash mode, and optional temporary encrypted upload.",
+    "applicationCategory": "SecurityApplication",
+    "author": {
+      "@type": "Person",
+      "name": "Kristian Ledel",
+      "alternateName": "Kris Ledel",
+      "url": "https://www.otrust.eu/about",
+      "sameAs": ["https://github.com/krisledel", "https://linkedin.com/in/kristianledel"]
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
+  
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <script defer data-domain="otrust.eu" src="https://plausible.io/js/script.js"></script>
+  <style>
+    :root {
+      --bg: #fafaf9;
+      --bg-card: #ffffff;
+      --bg-muted: #f5f5f4;
+      --border: #e5e5e5;
+      --text: #1a1a1a;
+      --text-dim: #737373;
+      --accent: #2d5a3d;
+      --accent-hover: #1e4029;
+      --accent-light: #e8f0eb;
+      --orange: #b45309;
+      --success: #2d5a3d;
+      --error: #dc2626;
+      --warning: #d97706;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0f0f0e;
+      --bg-card: #1a1a19;
+      --bg-muted: #262625;
+      --border: #4a4a49;
+      --text: #ffffff;
+      --text-dim: #d4d4d4;
+      --accent: #5cb85c;
+      --accent-hover: #6fcf6f;
+      --accent-light: #1e3a24;
+      --orange: #ff9800;
+      --success: #5cb85c;
+      --error: #f87171;
+      --warning: #fbbf24;
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: var(--accent);
+      color: white;
+      padding: 8px 16px;
+      z-index: 1000;
+      text-decoration: none;
+      font-size: 0.85rem;
+    }
+    .skip-link:focus { top: 0; }
+    
+    :focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 2px var(--accent);
+    }
+    
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    
+    .theme-toggle {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      font-family: monospace;
+      transition: all 0.2s;
+    }
+
+    .theme-toggle::after {
+      content: 'I';
+    }
+
+    [data-theme="dark"] .theme-toggle::after {
+      content: 'O';
+    }
+    
+    .theme-toggle:hover {
+      background: var(--bg-muted);
+      border-color: var(--accent);
+    }
+    
+    nav {
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      overflow: visible;
+    }
+    
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0.875rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .logo {
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: 0;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    
+    .nav-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.8rem;
+      transition: color 0.2s;
+    }
+    
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a.active { color: var(--accent); font-weight: 500; }
+
+    /* Mobile Navigation */
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-direction: column;
+      gap: 4px;
+      padding: 8px;
+    }
+
+    .mobile-menu-btn::before,
+    .mobile-menu-btn::after,
+    .mobile-menu-btn span {
+      content: '';
+      display: block;
+      width: 16px;
+      height: 2px;
+      background: var(--text);
+      border-radius: 1px;
+    }
+
+    .mobile-menu-btn:hover {
+      background: var(--bg-muted);
+    }
+
+    .nav-links .nav-primary {
+      display: contents;
+    }
+
+    .nav-links .nav-secondary {
+      display: contents;
+    }
+
+    @media (max-width: 600px) {
+      .nav-container {
+        padding: 0.875rem 1rem;
+      }
+      
+      .nav-links {
+        gap: 0.5rem;
+      }
+      
+      .nav-links a {
+        font-size: 0.65rem;
+        white-space: nowrap;
+      }
+      
+      .nav-links .nav-primary a span {
+        font-size: 1em !important;
+      }
+      
+      .logo {
+        font-size: 0.9rem;
+        flex-shrink: 0;
+      }
+      
+      .mobile-menu-btn {
+        display: flex;
+      }
+      
+      .nav-links .nav-secondary {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 1rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 0.5rem;
+        flex-direction: column;
+        gap: 0;
+        min-width: 140px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      }
+      
+      .nav-links .nav-secondary.open {
+        display: flex;
+      }
+      
+      .nav-links .nav-secondary a {
+        padding: 0.6rem 1rem;
+        border-radius: 6px;
+      }
+      
+      .nav-links .nav-secondary a:hover {
+        background: var(--bg-muted);
+      }
+      
+      nav {
+        position: relative;
+      }
+    }
+    
+    .main-layout {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 3rem 3rem;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+    
+    @media (max-width: 900px) {
+      .main-layout {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        padding: 1.5rem;
+      }
+      .nav-container {
+        padding: 0.875rem 1.5rem;
+      }
+    }
+    
+    .left-col {
+      position: sticky;
+      top: 5rem;
+    }
+    
+    @media (max-width: 900px) {
+      .left-col {
+        position: static;
+      }
+    }
+    
+    .hero {
+      margin-bottom: 1.5rem;
+    }
+    
+    .hero-badge {
+      display: inline-block;
+      background: var(--accent-light);
+      color: var(--accent);
+      font-size: 0.6rem;
+      font-weight: 500;
+      padding: 0.15rem 0.5rem;
+      border-radius: 2px;
+      margin-bottom: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .hero h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+    }
+    
+    .hero p {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      line-height: 1.5;
+    }
+    
+    /* Stats */
+    .stats {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .stat-value {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    
+    .stat-label {
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    
+    /* Flow */
+    .info-section h2 {
+      font-size: 0.7rem;
+      font-weight: 500;
+      margin-bottom: 0.75rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+    
+    .step-item {
+      display: flex;
+      gap: 0.5rem;
+      align-items: flex-start;
+    }
+    
+    .step-num {
+      width: 1rem;
+      height: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--accent);
+      color: var(--bg);
+      font-size: 0.55rem;
+      font-weight: 600;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+    
+    .step-item strong {
+      font-size: 0.75rem;
+      font-weight: 500;
+      display: block;
+    }
+    
+    .step-item p {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      margin: 0;
+      line-height: 1.35;
+    }
+    
+    .right-col {
+      min-width: 0;
+    }
+    
+    .sign-card {
+      background: var(--bg-card);
+      border-radius: 16px;
+      box-shadow: 
+        0 0 0 1px rgba(0,0,0,0.03),
+        0 2px 4px rgba(0,0,0,0.02),
+        0 12px 40px rgba(0,0,0,0.06);
+      overflow: hidden;
+    }
+    
+    .sign-tabs {
+      display: flex;
+      background: var(--bg-muted);
+      border-bottom: 1px solid var(--border);
+      padding: 0 0.5rem;
+    }
+    
+    .sign-tab {
+      padding: 0.75rem 1.25rem;
+      background: transparent;
+      border: none;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: color 0.2s, background-color 0.2s;
+      border-radius: 10px 10px 0 0;
+      white-space: nowrap;
+      position: relative;
+    }
+    
+    .sign-tab:hover { 
+      color: var(--text); 
+    }
+    
+    .sign-tab.active { 
+      color: var(--text); 
+      background: var(--bg-card);
+      font-weight: 600;
+      box-shadow: 
+        0 -1px 0 var(--border),
+        -1px 0 0 var(--border),
+        1px 0 0 var(--border);
+    }
+    
+    .sign-tab-content {
+      display: none;
+      padding: 1.5rem;
+    }
+    
+    .sign-tab-content.active {
+      display: block;
+    }
+    
+    .sign-card-body {
+      padding: 1.5rem;
+    }
+    
+    .step-indicator {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .step-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+    }
+    
+    .step-dot.active {
+      background: var(--accent);
+    }
+    
+    .step-dot.completed {
+      background: var(--success);
+    }
+    
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    
+    .form-group label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 500;
+      margin-bottom: 0.35rem;
+    }
+    
+    .form-group .hint {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      margin-top: 0.25rem;
+    }
+    
+    .advanced-options {
+      margin-bottom: 1rem;
+      font-size: 0.8rem;
+    }
+    
+    .advanced-options summary {
+      cursor: pointer;
+      color: var(--text-dim);
+      padding: 0.5rem 0;
+    }
+    
+    .advanced-options summary:hover {
+      color: var(--accent);
+    }
+    
+    input[type="text"], 
+    input[type="email"], 
+    input[type="date"],
+    input[type="url"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 0.7rem 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-family: inherit;
+      background: var(--bg);
+      color: var(--text);
+    }
+    
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+    
+    /* Delivery choice cards */
+    .choice-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+    
+    @media (max-width: 600px) {
+      .choice-cards {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .choice-card {
+      position: relative;
+      cursor: pointer;
+    }
+    
+    .choice-card input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .choice-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 1rem;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      background: var(--bg);
+      transition: all 0.2s;
+    }
+    
+    .choice-card input:checked + .choice-content {
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+    
+    .choice-card:hover .choice-content {
+      border-color: var(--accent);
+    }
+    
+    .choice-icon {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .choice-content strong {
+      font-size: 0.8rem;
+      margin-bottom: 0.25rem;
+    }
+    
+    .choice-desc {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      line-height: 1.3;
+    }
+    
+    /* TTL selection */
+    .ttl-options {
+      margin-top: 0.75rem;
+      padding: 0.75rem;
+      background: var(--bg-muted);
+      border-radius: 8px;
+    }
+    
+    .ttl-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    
+    .ttl-buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .ttl-btn {
+      flex: 1;
+      cursor: pointer;
+    }
+    
+    .ttl-btn input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .ttl-btn span {
+      display: block;
+      text-align: center;
+      padding: 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.75rem;
+      background: var(--bg);
+      transition: all 0.15s;
+    }
+    
+    .ttl-btn input:checked + span {
+      border-color: var(--accent);
+      background: var(--accent-light);
+      color: var(--accent);
+      font-weight: 500;
+    }
+    
+    .ttl-btn:hover span {
+      border-color: var(--accent);
+    }
+    
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: var(--bg);
+    }
+    
+    .drop-zone:hover, .drop-zone.drag-over {
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+    
+    .drop-zone-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .drop-zone-text {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+    
+    .drop-zone-text strong {
+      color: var(--accent);
+    }
+    
+    .file-info {
+      display: none;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem;
+      background: var(--accent-light);
+      border-radius: 10px;
+      margin-top: 0.75rem;
+    }
+    
+    .file-info.show {
+      display: flex;
+    }
+    
+    .file-icon {
+      font-size: 1.5rem;
+    }
+    
+    .file-details {
+      flex: 1;
+    }
+    
+    .file-name {
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+    
+    .file-hash {
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      font-family: monospace;
+      word-break: break-all;
+    }
+    
+    .file-remove {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+    
+    .existing-hash-warning {
+      margin-top: 0.75rem;
+      padding: 0.75rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+    }
+    
+    .existing-hash-warning.timestamp-warning {
+      background: rgba(255, 193, 7, 0.15);
+      border: 1px solid rgba(255, 193, 7, 0.4);
+      color: #856404;
+    }
+    
+    .existing-hash-warning.sign-warning {
+      background: rgba(220, 53, 69, 0.15);
+      border: 1px solid rgba(220, 53, 69, 0.4);
+      color: #721c24;
+    }
+    
+    .existing-hash-warning .warning-title {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    
+    .existing-hash-warning .warning-details {
+      font-size: 0.75rem;
+      opacity: 0.9;
+    }
+    
+    .parties-section {
+      margin-top: 1.5rem;
+    }
+    
+    .parties-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+    
+    .parties-header h3 {
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    
+    .add-party-btn {
+      background: var(--accent-light);
+      border: none;
+      color: var(--accent);
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    
+    .add-party-btn:hover {
+      background: var(--accent);
+      color: white;
+    }
+    
+    .party-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    
+    .party-item {
+      display: grid;
+      grid-template-columns: 1fr 120px 40px 32px;
+      gap: 0.5rem;
+      align-items: center;
+      padding: 0.75rem;
+      background: var(--bg-muted);
+      border-radius: 10px;
+    }
+    
+    @media (max-width: 600px) {
+      .party-item {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+      }
+    }
+    
+    .party-item input, .party-item select {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+    }
+    
+    .proof-required-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    
+    .proof-required-label input {
+      display: none;
+    }
+    
+    .proof-badge {
+      font-size: 1.2rem;
+      opacity: 0.3;
+      transition: opacity 0.2s;
+    }
+    
+    .proof-required-label input:checked + .proof-badge {
+      opacity: 1;
+    }
+    
+    .proof-required-label:hover .proof-badge {
+      opacity: 0.7;
+    }
+    
+    .remove-party {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-size: 1.2rem;
+      justify-self: center;
+    }
+    
+    .remove-party:hover {
+      color: var(--error);
+    }
+    
+    .options-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    
+    @media (max-width: 600px) {
+      .options-row {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.8rem 1.5rem;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+    
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+    
+    .btn-primary:disabled {
+      background: var(--border);
+      cursor: not-allowed;
+    }
+    
+    .btn-secondary {
+      background: var(--bg-muted);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    
+    .btn-secondary:hover {
+      background: var(--border);
+    }
+    
+    .actions {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+    
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid transparent;
+      border-top-color: currentColor;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .alert {
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      margin-bottom: 1rem;
+    }
+    
+    .alert-error {
+      background: #fef2f2;
+      color: var(--error);
+      border: 1px solid #fecaca;
+    }
+    
+    [data-theme="dark"] .alert-error {
+      background: #450a0a;
+      border-color: #7f1d1d;
+    }
+    
+    .alert-warning {
+      background: #fffbeb;
+      color: #92400e;
+      border: 1px solid #fcd34d;
+    }
+    
+    [data-theme="dark"] .alert-warning {
+      background: #451a03;
+      border-color: #d97706;
+      color: #fcd34d;
+    }
+    
+    .alert-success {
+      background: var(--accent-light);
+      color: var(--success);
+      border: 1px solid var(--accent);
+    }
+    
+    .success-section {
+      display: none;
+      text-align: center;
+      padding: 2rem;
+    }
+    
+    .success-section.show {
+      display: block;
+    }
+    
+    .success-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    
+    .success-section h2 {
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .success-section p {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      margin-bottom: 1.5rem;
+    }
+    
+    .copy-box {
+      background: var(--bg-muted);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .copy-box input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-family: monospace;
+      font-size: 0.75rem;
+    }
+    
+    .copy-btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+    
+    .how-it-works {
+      background: var(--bg-muted);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 2rem;
+    }
+    
+    .how-it-works h3 {
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    
+    .how-it-works-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+    }
+    
+    .how-item {
+      display: flex;
+      gap: 0.75rem;
+    }
+    
+    .how-num {
+      width: 1.5rem;
+      height: 1.5rem;
+      background: var(--accent);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    
+    .how-text {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      line-height: 1.4;
+    }
+    
+    .how-text strong {
+      color: var(--text);
+      display: block;
+      margin-bottom: 0.15rem;
+    }
+    
+    /* My Signings History (tab content) */
+    .my-signings-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    
+    .my-signing-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      background: var(--bg);
+      border-radius: 0.5rem;
+      border: 1px solid var(--border);
+      gap: 1rem;
+    }
+    
+    .my-signing-info {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .my-signing-title {
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 0.25rem;
+    }
+    
+    .my-signing-meta {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+    
+    .my-signing-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-shrink: 0;
+    }
+    
+    .my-signing-actions .btn {
+      padding: 0.4rem 0.75rem;
+      font-size: 0.75rem;
+    }
+    
+    .my-signings-empty {
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      padding: 2rem 1rem;
+    }
+    
+    .history-count {
+      font-size: 0.7rem;
+      background: var(--accent);
+      color: white;
+      padding: 0.1rem 0.4rem;
+      border-radius: 10px;
+      margin-left: 0.3rem;
+    }
+    
+    /* Features Section */
+    .features-section {
+      background: var(--bg-muted);
+      border-top: 1px solid var(--border);
+      padding: 2rem 0;
+    }
+
+    .features-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+    
+    @media (min-width: 601px) {
+      .features-section {
+        padding: 3rem 0;
+      }
+      .features-container {
+        padding: 0 3rem;
+      }
+    }
+    
+    .features-title {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .features-title h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    
+    .features-title p {
+      color: var(--text-dim);
+      font-size: 0.85rem;
+    }
+    
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      justify-items: center;
+    }
+    
+    .features-grid .feature-card {
+      width: 100%;
+      max-width: 320px;
+    }
+    
+    @media (max-width: 800px) {
+      .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (max-width: 500px) {
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .feature-card {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 1.5rem;
+      border: 1px solid var(--border);
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      transition: all 0.2s ease;
+    }
+    
+    .feature-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(45, 90, 61, 0.1);
+    }
+    
+    .feature-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--accent-light);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+    
+    .feature-icon svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--accent);
+    }
+    
+    .feature-card h3 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    
+    .feature-card p {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      line-height: 1.5;
+    }
+
+    .footer-wrapper {
+      border-top: 1px solid var(--border);
+      margin-top: auto;
+    }
+    
+    footer {
+      padding: 2rem 3rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+    
+    .footer-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.75rem;
+    }
+    
+    .footer-links a:hover { color: var(--accent); }
+    
+    .footer-copy {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+    }
+    
+    @media (max-width: 600px) {
+      footer {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+        padding: 1.5rem 1rem;
+      }
+      .footer-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+      }
+    }
+    
+    /* Hide file input */
+    #file-input {
+      display: none;
+    }
+  </style>
+  <link rel="stylesheet" href="/otrust-polish.css?v=20260527-1">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  
+  <nav role="navigation" aria-label="Main navigation">
+    <div class="nav-container">
+      <a href="/" class="logo">OTRUST</a>
+      <div class="nav-links">
+        <span class="nav-primary">
+          <a href="/">Timestamp</a>
+          <a href="/sign" class="active">Signed</a>
+          <a href="/proof">Proof</a>
+        </span>
+        <span class="nav-secondary" id="nav-secondary">
+          <a href="/sign-in">Sign in</a>
+          <a href="/docs">Docs</a>
+          <a href="/about">About</a>
+        </span>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode"></button>
+        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu" title="Menu"><span></span></button>
+      </div>
+    </div>
+  </nav>
+  
+  <main id="main-content" class="main-layout">
+    <div class="left-col">
+      <section class="hero">
+        <span class="hero-badge">Zero-Knowledge Signing</span>
+        <h1>Prove who signed what and when</h1>
+        <p>Get documents signed with blockchain-backed proof. Your document can stay on your device; only the hash is used for verification.</p>
+      </section>
+      
+      <!-- Stats -->
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-value" id="stat-requests">0</div>
+          <div class="stat-label">Requests</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="stat-signatures">0</div>
+          <div class="stat-label">Completed</div>
+        </div>
+      </div>
+      
+      <!-- Flow -->
+      <section class="info-section">
+        <h2>Flow</h2>
+        <div class="steps">
+          <div class="step-item">
+            <span class="step-num">1</span>
+            <div>
+              <strong>Upload or Hash</strong>
+              <p>Temporary encrypted upload, or zero-knowledge with local hash only.</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <span class="step-num">2</span>
+            <div>
+              <strong>Invite Parties</strong>
+              <p>Each signer gets a unique link to verify and sign.</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <span class="step-num">3</span>
+            <div>
+              <strong>Cryptographic Signatures</strong>
+              <p>Ed25519 signatures prove who signed what.</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <span class="step-num">4</span>
+            <div>
+              <strong>Blockchain Anchor</strong>
+              <p>Final proof anchored to Bitcoin via OpenTimestamps.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+    
+    <div class="right-col">
+    <div class="sign-card">
+      <div class="sign-tabs">
+        <button class="sign-tab active" data-tab="create">New Request</button>
+        <button class="sign-tab" data-tab="history">History<span class="history-count" id="history-count" style="display: none;">0</span></button>
+        <button class="sign-tab" data-tab="keys">Keys</button>
+      </div>
+      
+      <!-- Create Tab -->
+      <div id="tab-create" class="sign-tab-content active">
+        <div id="form-section">
+          <div id="error-alert" class="alert alert-error" style="display: none;"></div>
+        
+        <!-- Step 1: Document -->
+        <div class="form-group">
+          <label>Document to Sign</label>
+          <div class="drop-zone" id="drop-zone">
+            <div class="drop-zone-icon"></div>
+            <div class="drop-zone-text">
+              <strong>Drop file here</strong> or click to browse
+            </div>
+          </div>
+          <input type="file" id="file-input">
+          <div class="file-info" id="file-info">
+            <span class="file-icon"></span>
+            <div class="file-details">
+              <div class="file-name" id="file-name"></div>
+              <div class="file-hash" id="file-hash"></div>
+            </div>
+            <button class="file-remove" id="file-remove" aria-label="Remove file">&times;</button>
+          </div>
+          <div class="existing-hash-warning" id="existing-hash-warning" style="display: none;"></div>
+        </div>
+        
+        <!-- Delivery Method Choice -->
+        <div class="form-group delivery-choice">
+          <label>How should signers get the document?</label>
+          <div class="choice-cards">
+            <label class="choice-card">
+              <input type="radio" name="delivery" value="upload" checked>
+              <div class="choice-content">
+                <span class="choice-icon"></span>
+                <strong>Temporary Upload</strong>
+                <span class="choice-desc">Encrypted, auto-deleted. Signers download directly.</span>
+              </div>
+            </label>
+            <label class="choice-card">
+              <input type="radio" name="delivery" value="self">
+              <div class="choice-content">
+                <span class="choice-icon"></span>
+                <strong>I'll Send It Myself</strong>
+                <span class="choice-desc">Zero-knowledge. Document never touches our servers.</span>
+              </div>
+            </label>
+          </div>
+          <div class="hint" id="delivery-hint">Document encrypted at rest. You'll receive email confirmation when it's purged with cryptographic proof of deletion.</div>
+          
+          <!-- TTL selection (only shown for upload mode) -->
+          <div id="ttl-selection" class="ttl-options">
+            <label class="ttl-label">Auto-delete after:</label>
+            <div class="ttl-buttons">
+              <label class="ttl-btn">
+                <input type="radio" name="ttl" value="1" checked>
+                <span>1 hour</span>
+              </label>
+              <label class="ttl-btn">
+                <input type="radio" name="ttl" value="6">
+                <span>6 hours</span>
+              </label>
+              <label class="ttl-btn">
+                <input type="radio" name="ttl" value="12">
+                <span>12 hours</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="title">Document Title</label>
+          <input type="text" id="title" placeholder="e.g., Employment Agreement - John Doe">
+        </div>
+        
+        <!-- Document URL is auto-generated from uploaded file, but can be overridden -->
+        <details class="advanced-options">
+          <summary>Advanced Options</summary>
+          <div class="form-group" style="margin-top: 1rem;">
+            <label for="document-url">Custom Document URL <span style="font-weight: 400; color: var(--text-dim);">(optional)</span></label>
+            <input type="url" id="document-url" placeholder="https://example.com/document.pdf or Dropbox link">
+            <div class="hint">Override the auto-generated download link with your own external document URL.</div>
+          </div>
+        </details>
+        
+        <!-- Parties Section -->
+        <div class="parties-section">
+          <div class="parties-header">
+            <h3>Signing Parties</h3>
+            <button class="add-party-btn" id="add-party">+ Add Party</button>
+          </div>
+          <p class="hint" style="margin-bottom: 0.5rem;">Click 🔐 to require OTRUST Proof verification (verified human identity)</p>
+          
+          <div class="party-list" id="party-list">
+            <div class="party-item">
+              <input type="email" placeholder="email@example.com" class="party-email">
+              <select class="party-role">
+                <option value="signer">Signer</option>
+                <option value="approver">Approver</option>
+                <option value="viewer">Viewer (CC)</option>
+              </select>
+              <label class="proof-required-label" title="Require this party to verify with OTRUST Proof">
+                <input type="checkbox" class="party-require-proof">
+                <span class="proof-badge">🔐</span>
+              </label>
+              <button class="remove-party" aria-label="Remove">&times;</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Options -->
+        <div class="options-row">
+          <div class="form-group">
+            <label for="signing-order">Signing Order</label>
+            <select id="signing-order">
+              <option value="parallel">Parallel (all at once)</option>
+              <option value="sequential">Sequential (in order)</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="deadline">Deadline (optional)</label>
+            <input type="date" id="deadline">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="creator-email">Your Email</label>
+          <input type="email" id="creator-email" placeholder="your@email.com">
+          <div class="hint">You'll receive status updates and the final signature package</div>
+        </div>
+        
+        <div class="form-group">
+          <label for="message">Message to Signers (optional)</label>
+          <textarea id="message" rows="3" placeholder="Please review and sign this document..."></textarea>
+        </div>
+        
+        <div class="actions">
+          <button class="btn btn-primary" id="create-btn" disabled>
+            <span class="btn-text">Create Signing Request</span>
+            <span class="spinner" style="display: none;"></span>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Success Section -->
+      <div class="success-section" id="success-section">
+        <div class="success-icon">?</div>
+        <h2>Signing Request Created!</h2>
+        <p id="success-message">Invitations have been sent to all parties.</p>
+        
+        <!-- Self-send reminder (shown only for zero-knowledge mode) -->
+        <div id="self-send-reminder" class="alert alert-warning" style="display: none; text-align: left; margin-bottom: 1rem;">
+          <strong>Don't forget!</strong> You chose zero-knowledge mode. 
+          Send the document to your signers yourself (email, cloud link, etc).
+        </div>
+        
+        <div class="copy-box">
+          <input type="text" id="status-url" readonly>
+          <button class="copy-btn" id="copy-btn">Copy</button>
+        </div>
+        
+        <p class="hint">Bookmark this link to track signing progress</p>
+        
+        <div class="actions" style="justify-content: center; border: none; padding-top: 0;">
+          <a href="" id="view-status-btn" class="btn btn-primary">View Status</a>
+          <button class="btn btn-secondary" id="create-another-btn">Create Another</button>
+        </div>
+      </div>
+      </div>
+      </div>
+      
+      <!-- History Tab -->
+      <div id="tab-history" class="sign-tab-content">
+        <div class="my-signings-list" id="my-signings-list">
+          <!-- Items populated by JavaScript -->
+        </div>
+        <div class="my-signings-empty" id="my-signings-empty">
+          <p>No signing requests yet.</p>
+          <p style="margin-top: 0.5rem; font-size: 0.75rem;">When you create signing requests, they'll appear here for easy access.</p>
+        </div>
+      </div>
+      
+      <!-- Keys Tab -->
+      <div id="tab-keys" class="sign-tab-content">
+        <p style="color: var(--text-dim); font-size: 0.75rem; margin-bottom: 0.875rem;">Manage your Ed25519 signing keys. Stored locally in your browser.</p>
+        
+        <div class="form-group">
+          <label>Your Public Key</label>
+          <input type="text" id="pubkey-display" readonly placeholder="No key generated yet" style="font-family: monospace; font-size: 0.75rem;">
+        </div>
+        
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 0.875rem;">
+          <button class="btn btn-primary" id="generate-key-btn" style="flex: 1;">
+            Generate New Key
+          </button>
+          <button class="btn btn-secondary" id="export-key-btn" style="flex: 1;">
+            Export Keys
+          </button>
+        </div>
+        
+        <div class="form-group">
+          <label>Import Keys (JSON)</label>
+          <input type="file" id="import-key-input" accept=".json">
+        </div>
+        
+        <div style="background: var(--accent-light); border-radius: 6px; padding: 0.75rem; font-size: 0.7rem; color: var(--accent);">
+          <strong>Key:</strong> Your private key is stored in this browser only. Export and backup your keys.
+        </div>
+      </div>
+    </div>
+    </div>
+  </main>
+  
+  <!-- Features Section -->
+  <section class="features-section">
+    <div class="features-container">
+      <div class="features-title">
+        <h2>Ways to Sign</h2>
+        <p>Create and sign documents without leaving your workflow</p>
+      </div>
+      
+      <div class="features-grid">
+        <a href="/sign" class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 6v6l4 2"/>
+            </svg>
+          </div>
+          <h3>Web Tool</h3>
+          <p>Create signing requests in your browser. Use local-hash mode for full client-side privacy, or encrypted temporary upload when signers need a download link.</p>
+        </a>
+        
+        <a href="/docs#signed" class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16v16H4z"/>
+              <path d="M4 6l8 6 8-6"/>
+            </svg>
+          </div>
+          <h3>Sign via Email</h3>
+          <p>Email signers with sign&#64;otrust.eu in CC. Signers click Sign or Decline directly in the email.</p>
+        </a>
+        
+        <a href="/docs#signed" class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 12l2 2 4-4"/>
+              <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+            </svg>
+          </div>
+          <h3>Verification</h3>
+          <p>Verify any signature package independently. Check document hash, Ed25519 signatures, and blockchain proof.</p>
+        </a>
+      </div>
+    </div>
+  </section>
+  
+  <div class="footer-wrapper">
+  <footer role="contentinfo">
+    <div class="footer-links">
+      <a href="/">Timestamp</a>
+      <a href="/sign">Signed</a>
+      <a href="/proof">Proof</a>
+      <a href="/sign-in">Sign in</a>
+      <a href="/docs">Docs</a>
+      <a href="/about">About</a>
+      <a href="/privacy-policy">Privacy</a>
+      <a href="/terms">Terms</a>
+      <a href="https://github.com/otrust-eu/opensource">GitHub</a>
+    </div>
+    <div class="footer-copy">OTRUST - MIT License</div>
+    <div class="footer-copy" style="font-size: 0.7rem; opacity: 0.6; margin-top: 0.5rem;">Cryptographic proof of signature intent. Legal standing varies by jurisdiction. <a href="/terms" style="color: inherit;">Terms</a></div>
+  </footer>
+  </div>
+  
+  <script nonce="{{CSP_NONCE}}">
+    // Theme toggle
+    const themeToggle = document.querySelector('.theme-toggle');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const savedTheme = localStorage.getItem('theme');
+    
+    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      themeToggle.textContent = '';
+    }
+    
+    themeToggle.addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+      localStorage.setItem('theme', isDark ? 'light' : 'dark');
+      themeToggle.textContent = isDark ? '' : '';
+    });
+
+    // Mobile menu toggle
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const navSecondary = document.getElementById('nav-secondary');
+
+    mobileMenuBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      navSecondary.classList.toggle('open');
+      
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.nav-links')) {
+        navSecondary?.classList.remove('open');
+      }
+    });
+    
+    // State
+    let documentHash = null;
+    let fileName = null;
+    let csrfToken = null;
+    
+    // Elements
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const fileInfo = document.getElementById('file-info');
+    const fileNameEl = document.getElementById('file-name');
+    const fileHashEl = document.getElementById('file-hash');
+    const fileRemove = document.getElementById('file-remove');
+    const partyList = document.getElementById('party-list');
+    const addPartyBtn = document.getElementById('add-party');
+    const createBtn = document.getElementById('create-btn');
+    const errorAlert = document.getElementById('error-alert');
+    const formSection = document.getElementById('form-section');
+    const successSection = document.getElementById('success-section');
+    
+    // Get CSRF token
+    async function getCsrfToken() {
+      try {
+        const res = await fetch('/csrf-token');
+        const data = await res.json();
+        csrfToken = data.token;
+      } catch (e) {
+        console.error('Failed to get CSRF token:', e);
+      }
+    }
+    getCsrfToken();
+    
+    // Load stats
+    async function loadStats() {
+      try {
+        const res = await fetch('/stats');
+        const data = await res.json();
+        document.getElementById('stat-requests').textContent = data.total_signatures || 0;
+        document.getElementById('stat-signatures').textContent = data.completed_signatures || 0;
+      } catch (e) {
+        console.log('Stats unavailable');
+      }
+    }
+    loadStats();
+    
+    // File handling
+    dropZone.addEventListener('click', () => fileInput.click());
+    
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('drag-over');
+    });
+    
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('drag-over');
+    });
+    
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('drag-over');
+      if (e.dataTransfer.files.length) {
+        handleFile(e.dataTransfer.files[0]);
+      }
+    });
+    
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length) {
+        handleFile(fileInput.files[0]);
+      }
+    });
+    
+    fileRemove.addEventListener('click', () => {
+      documentHash = null;
+      fileName = null;
+      uploadedFileId = null;
+      hasExistingSignRequest = false;
+      fileInfo.classList.remove('show');
+      dropZone.style.display = 'block';
+      // Clear existing hash warning
+      const warningEl = document.getElementById('existing-hash-warning');
+      warningEl.style.display = 'none';
+      warningEl.innerHTML = '';
+      updateCreateBtn();
+    });
+    
+    let uploadedFileId = null;
+    let hasExistingSignRequest = false;
+
+    // Check if document hash already exists
+    async function checkExistingHash(hash) {
+      hasExistingSignRequest = false;
+      const warningEl = document.getElementById('existing-hash-warning');
+      warningEl.style.display = 'none';
+      warningEl.innerHTML = '';
+      warningEl.className = 'existing-hash-warning';
+      
+      try {
+        const res = await fetch('/lookup/' + hash);
+        const data = await res.json();
+        
+        if (data.exists) {
+          let html = '';
+          
+          if (data.timestamp) {
+            warningEl.classList.add('timestamp-warning');
+            const date = new Date(data.timestamp.created_at).toLocaleString();
+            const status = data.timestamp.blockchain_confirmed ? 'Blockchain confirmed' : 'Pending confirmation';
+            html += `<div class="warning-title">This document was already timestamped</div>`;
+            html += `<div class="warning-details">Receipt: ${data.timestamp.receipt_id}<br>${date} - ${status}</div>`;
+          }
+          
+          if (data.sign_request) {
+            hasExistingSignRequest = true;
+            if (html) html += '<hr style="margin: 0.5rem 0; border: none; border-top: 1px solid rgba(0,0,0,0.1);">';
+            warningEl.classList.add('sign-warning');
+            const date = new Date(data.sign_request.created_at).toLocaleString();
+            const partiesText = data.sign_request.parties_count > 0 ? `${data.sign_request.parties_count} parties` : '';
+            html += `<div class="warning-title">This document already has a signing session</div>`;
+            html += `<div class="warning-details">${data.sign_request.title || 'Untitled'} - ${data.sign_request.status}${partiesText ? ' - ' + partiesText : ''}<br>${date}</div>`;
+            html += `<div class="warning-details" style="margin-top: 0.5rem; font-weight: 500;">Cannot create another session for this document.</div>`;
+          }
+          
+          if (html) {
+            warningEl.innerHTML = html;
+            warningEl.style.display = 'block';
+          }
+        }
+        updateCreateBtn();
+      } catch (e) {
+        console.error('Lookup failed:', e);
+      }
+    }
+    
+    // Delivery method handling
+    const deliveryRadios = document.querySelectorAll('input[name="delivery"]');
+    const deliveryHint = document.getElementById('delivery-hint');
+    const ttlSelection = document.getElementById('ttl-selection');
+    
+    function getTtlHours() {
+      return document.querySelector('input[name="ttl"]:checked')?.value || '1';
+    }
+    
+    function updateDeliveryUI() {
+      const isSelfSend = getDeliveryMethod() === 'self';
+      const ttlHours = getTtlHours();
+      
+      // Show/hide TTL selection
+      ttlSelection.style.display = isSelfSend ? 'none' : 'block';
+      
+      // Update hint text
+      if (isSelfSend) {
+        deliveryHint.textContent = 'Zero-knowledge: You share the document yourself (email, cloud link, etc). We only see the hash.';
+      } else {
+        const timeText = ttlHours === '1' ? '1 hour' : `${ttlHours} hours`;
+        deliveryHint.textContent = `Document encrypted. Auto-deleted after ${timeText}. You'll get email + purge proof when deleted.`;
+      }
+    }
+    
+    deliveryRadios.forEach(radio => {
+      radio.addEventListener('change', () => {
+        updateDeliveryUI();
+        // If file already selected, re-process it
+        if (fileName && fileInput.files.length) {
+          handleFile(fileInput.files[0]);
+        }
+      });
+    });
+    
+    // TTL change handler
+    document.querySelectorAll('input[name="ttl"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        updateDeliveryUI();
+        // If file already uploaded, re-upload with new TTL
+        if (uploadedFileId && fileInput.files.length) {
+          handleFile(fileInput.files[0]);
+        }
+      });
+    });
+    
+    function getDeliveryMethod() {
+      return document.querySelector('input[name="delivery"]:checked').value;
+    }
+    
+    async function handleFile(file) {
+      fileName = file.name;
+      fileNameEl.textContent = file.name;
+      fileInfo.classList.add('show');
+      dropZone.style.display = 'none';
+      
+      const deliveryMethod = getDeliveryMethod();
+      
+      if (deliveryMethod === 'self') {
+        // Zero-knowledge: hash locally only
+        fileHashEl.textContent = 'Computing hash locally...';
+        
+        try {
+          const arrayBuffer = await file.arrayBuffer();
+          const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+          const hashArray = Array.from(new Uint8Array(hashBuffer));
+          documentHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+          uploadedFileId = null; // No upload
+          
+          fileHashEl.textContent = 'SHA-256: ' + documentHash.substring(0, 16) + '...' + documentHash.substring(48);
+          fileHashEl.innerHTML += ' <span style="color: var(--success); font-size: 0.8em;">Local only</span>';
+          
+          // Check if this document has existing timestamps or sign requests
+          await checkExistingHash(documentHash);
+          
+          // Auto-fill title
+          const titleInput = document.getElementById('title');
+          if (!titleInput.value) {
+            titleInput.value = file.name.replace(/\.[^/.]+$/, '');
+          }
+          
+          updateCreateBtn();
+        } catch (e) {
+          console.error('Hash error:', e);
+          fileHashEl.textContent = 'Error: ' + e.message;
+          fileInfo.classList.remove('show');
+          dropZone.style.display = 'block';
+        }
+      } else {
+        // Temporary upload mode
+        const ttlHours = getTtlHours();
+        fileHashEl.textContent = 'Uploading & computing hash...';
+        
+        try {
+          // Get creator email if available (for purge notifications)
+          const creatorEmail = document.getElementById('creator-email').value.trim();
+          
+          const res = await fetch('/sign/upload', {
+            method: 'POST',
+            headers: {
+              'Content-Type': file.type || 'application/octet-stream',
+              'X-Filename': file.name,
+              'X-TTL-Hours': ttlHours,
+              'X-Creator-Email': creatorEmail || '',
+              'X-CSRF-Token': csrfToken
+            },
+            body: file
+          });
+          
+          if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.message || 'Upload failed');
+          }
+          
+          const data = await res.json();
+          documentHash = data.document_hash;
+          uploadedFileId = data.file_id;
+          
+          // Check if this document has existing timestamps or sign requests
+          await checkExistingHash(documentHash);
+          
+          const ttlText = ttlHours === '1' ? '1h' : `${ttlHours}h`;
+          // SECURITY: Use textContent to prevent XSS, then create child element safely
+          fileHashEl.textContent = 'SHA-256: ' + documentHash.substring(0, 16) + '...' + documentHash.substring(48) + ' ';
+          const statusSpan = document.createElement('span');
+          statusSpan.style.cssText = 'color: var(--success); font-size: 0.8em;';
+          statusSpan.textContent = `Uploaded (${ttlText})`;
+          fileHashEl.appendChild(statusSpan);
+          
+          // Auto-fill title
+          const titleInput = document.getElementById('title');
+          if (!titleInput.value) {
+            titleInput.value = file.name.replace(/\.[^/.]+$/, '');
+          }
+          
+          updateCreateBtn();
+        } catch (e) {
+          console.error('Upload error:', e);
+          // SECURITY: Use textContent to prevent XSS from error messages
+          fileHashEl.textContent = 'Error: ' + (e.message || 'Unknown error');
+          fileInfo.classList.remove('show');
+          dropZone.style.display = 'block';
+        }
+      }
+    }
+    
+    // Party management
+    addPartyBtn.addEventListener('click', addParty);
+    
+    function addParty() {
+      const item = document.createElement('div');
+      item.className = 'party-item';
+      item.innerHTML = `
+        <input type="email" placeholder="email@example.com" class="party-email">
+        <select class="party-role">
+          <option value="signer">Signer</option>
+          <option value="approver">Approver</option>
+          <option value="viewer">Viewer (CC)</option>
+        </select>
+        <label class="proof-required-label" title="Require this party to verify with OTRUST Proof">
+          <input type="checkbox" class="party-require-proof">
+          <span class="proof-badge">🔐</span>
+        </label>
+        <button class="remove-party" aria-label="Remove">&times;</button>
+      `;
+      
+      item.querySelector('.remove-party').addEventListener('click', () => {
+        if (partyList.children.length > 1) {
+          item.remove();
+        }
+      });
+      
+      item.querySelector('.party-email').addEventListener('input', updateCreateBtn);
+      
+      partyList.appendChild(item);
+    }
+    
+    // Initial party remove button
+    document.querySelector('.remove-party').addEventListener('click', function() {
+      if (partyList.children.length > 1) {
+        this.closest('.party-item').remove();
+      }
+    });
+    
+    // Update create button state
+    function updateCreateBtn() {
+      const creatorEmail = document.getElementById('creator-email').value;
+      const parties = getParties();
+      const hasValidParty = parties.some(p => p.email);
+      
+      createBtn.disabled = !documentHash || !creatorEmail || !hasValidParty || hasExistingSignRequest;
+    }
+    
+    document.getElementById('creator-email').addEventListener('input', updateCreateBtn);
+    document.querySelector('.party-email').addEventListener('input', updateCreateBtn);
+    
+    function getParties() {
+      const items = partyList.querySelectorAll('.party-item');
+      const parties = [];
+      items.forEach(item => {
+        const email = item.querySelector('.party-email').value.trim();
+        const role = item.querySelector('.party-role').value;
+        const requireProof = item.querySelector('.party-require-proof')?.checked || false;
+        if (email) {
+          parties.push({ email, role, requireOtrustProof: requireProof });
+        }
+      });
+      return parties;
+    }
+    
+    function showError(msg) {
+      errorAlert.textContent = msg;
+      errorAlert.style.display = 'block';
+    }
+    
+    function hideError() {
+      errorAlert.style.display = 'none';
+    }
+    
+    // Create signing request
+    createBtn.addEventListener('click', async () => {
+      hideError();
+      
+      const title = document.getElementById('title').value.trim() || 'Untitled Document';
+      const manualDocUrl = document.getElementById('document-url').value.trim();
+      const signingOrder = document.getElementById('signing-order').value;
+      const deadline = document.getElementById('deadline').value;
+      const creatorEmail = document.getElementById('creator-email').value.trim();
+      const message = document.getElementById('message').value.trim();
+      const parties = getParties();
+      
+      // Auto-generate document URL if file was uploaded
+      let documentUrl = manualDocUrl;
+      if (!documentUrl && uploadedFileId) {
+        documentUrl = window.location.origin + '/sign/file/' + uploadedFileId;
+      }
+      
+      if (!documentHash) {
+        showError('Please select a document');
+        return;
+      }
+      
+      if (!creatorEmail) {
+        showError('Please enter your email');
+        return;
+      }
+      
+      if (parties.length === 0) {
+        showError('Please add at least one signing party');
+        return;
+      }
+      
+      // Show loading
+      createBtn.disabled = true;
+      createBtn.querySelector('.btn-text').textContent = 'Creating...';
+      createBtn.querySelector('.spinner').style.display = 'inline-block';
+      
+      try {
+        const res = await fetch('/sign/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': csrfToken
+          },
+          body: JSON.stringify({
+            document_hash: documentHash,
+            title,
+            filename: fileName,
+            document_url: documentUrl || null,
+            parties,
+            signing_order: signingOrder,
+            deadline: deadline || null,
+            creator_email: creatorEmail,
+            message: message || null
+          })
+        });
+        
+        const data = await res.json();
+        
+        if (!res.ok) {
+          throw new Error(data.message || data.error || 'Failed to create signing request');
+        }
+        
+        // Show success with secure tokens
+        // Include view_token for status page access (secure)
+        const statusUrl = window.location.origin + '/sign/view?id=' + data.sign_id + 
+          (data.view_token ? '&view_token=' + encodeURIComponent(data.view_token) : '');
+        document.getElementById('status-url').value = statusUrl;
+        document.getElementById('view-status-btn').href = statusUrl;
+        
+        // Store cancel_token in localStorage for later use (cancel/remind)
+        if (data.cancel_token) {
+          localStorage.setItem('cancel_token_' + data.sign_id, data.cancel_token);
+        }
+        
+        // Add to My Signings history
+        const docTitle = document.getElementById('title').value;
+        addToMySignings(data.sign_id, data.view_token, docTitle, fileName);
+        
+        // Show self-send reminder if zero-knowledge mode
+        const selfSendReminder = document.getElementById('self-send-reminder');
+        const successMessage = document.getElementById('success-message');
+        if (getDeliveryMethod() === 'self') {
+          selfSendReminder.style.display = 'block';
+          successMessage.textContent = 'Invitations sent. Remember to share the document yourself!';
+        } else {
+          selfSendReminder.style.display = 'none';
+          successMessage.textContent = 'Invitations have been sent. Signers can download the document directly.';
+        }
+        
+        formSection.style.display = 'none';
+        successSection.classList.add('show');
+        
+      } catch (e) {
+        showError(e.message);
+        createBtn.disabled = false;
+        createBtn.querySelector('.btn-text').textContent = 'Create Signing Request';
+        createBtn.querySelector('.spinner').style.display = 'none';
+      }
+    });
+    
+    // Copy URL
+    document.getElementById('copy-btn').addEventListener('click', () => {
+      const input = document.getElementById('status-url');
+      input.select();
+      document.execCommand('copy');
+      document.getElementById('copy-btn').textContent = 'Copied!';
+      setTimeout(() => {
+        document.getElementById('copy-btn').textContent = 'Copy';
+      }, 2000);
+    });
+    
+    // Create another
+    document.getElementById('create-another-btn').addEventListener('click', () => {
+      // Reset form
+      documentHash = null;
+      fileName = null;
+      uploadedFileId = null;
+      fileInfo.classList.remove('show');
+      dropZone.style.display = 'block';
+      document.getElementById('title').value = '';
+      document.getElementById('document-url').value = '';
+      document.getElementById('deadline').value = '';
+      document.getElementById('message').value = '';
+      
+      // Reset delivery method to default (upload) and TTL to 1 hour
+      document.querySelector('input[name="delivery"][value="upload"]').checked = true;
+      document.querySelector('input[name="ttl"][value="1"]').checked = true;
+      ttlSelection.style.display = 'block';
+      updateDeliveryUI();
+      
+      // Reset parties to one
+      partyList.innerHTML = `
+        <div class="party-item">
+          <input type="email" placeholder="email@example.com" class="party-email">
+          <select class="party-role">
+            <option value="signer">Signer</option>
+            <option value="approver">Approver</option>
+            <option value="viewer">Viewer (CC)</option>
+          </select>
+          <button class="remove-party" aria-label="Remove">&times;</button>
+        </div>
+      `;
+      
+      document.querySelector('.remove-party').addEventListener('click', function() {
+        if (partyList.children.length > 1) {
+          this.closest('.party-item').remove();
+        }
+      });
+      document.querySelector('.party-email').addEventListener('input', updateCreateBtn);
+      
+      // Reset button
+      createBtn.disabled = true;
+      createBtn.querySelector('.btn-text').textContent = 'Create Signing Request';
+      createBtn.querySelector('.spinner').style.display = 'none';
+      
+      // Show form
+      formSection.style.display = 'block';
+      successSection.classList.remove('show');
+      
+      // Get new CSRF token
+      getCsrfToken();
+    });
+    
+    // ========== My Signings History ==========
+    const MY_SIGNINGS_KEY = 'otrust_my_signings';
+    
+    function getMySignings() {
+      try {
+        const data = localStorage.getItem(MY_SIGNINGS_KEY);
+        return data ? JSON.parse(data) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+    
+    function saveMySignings(signings) {
+      localStorage.setItem(MY_SIGNINGS_KEY, JSON.stringify(signings));
+    }
+    
+    function addToMySignings(signId, viewToken, title, fileName) {
+      const signings = getMySignings();
+      // Check if already exists
+      if (signings.some(s => s.sign_id === signId)) return;
+      
+      signings.unshift({
+        sign_id: signId,
+        view_token: viewToken,
+        title: title || fileName || 'Untitled',
+        file_name: fileName,
+        created_at: new Date().toISOString()
+      });
+      
+      // Keep max 50 entries
+      if (signings.length > 50) signings.pop();
+      
+      saveMySignings(signings);
+      renderMySignings();
+    }
+    
+    function removeFromMySignings(signId) {
+      const signings = getMySignings().filter(s => s.sign_id !== signId);
+      saveMySignings(signings);
+      renderMySignings();
+    }
+    
+    function renderMySignings() {
+      const signings = getMySignings();
+      const list = document.getElementById('my-signings-list');
+      const empty = document.getElementById('my-signings-empty');
+      const countBadge = document.getElementById('history-count');
+      
+      // Update count badge
+      if (signings.length > 0) {
+        countBadge.textContent = signings.length;
+        countBadge.style.display = 'inline';
+      } else {
+        countBadge.style.display = 'none';
+      }
+      
+      // Show empty state or list
+      if (signings.length === 0) {
+        list.style.display = 'none';
+        empty.style.display = 'block';
+        return;
+      }
+      
+      list.style.display = 'flex';
+      empty.style.display = 'none';
+      list.innerHTML = '';
+      
+      signings.forEach(signing => {
+        const url = '/sign/view?id=' + signing.sign_id + 
+          (signing.view_token ? '&view_token=' + encodeURIComponent(signing.view_token) : '');
+        
+        const date = new Date(signing.created_at);
+        const dateStr = date.toLocaleDateString(undefined, { 
+          year: 'numeric', month: 'short', day: 'numeric' 
+        });
+        
+        const item = document.createElement('div');
+        item.className = 'my-signing-item';
+        item.innerHTML = `
+          <div class="my-signing-info">
+            <div class="my-signing-title">${escapeHtml(signing.title)}</div>
+            <div class="my-signing-meta">${dateStr}${signing.file_name ? ' - ' + escapeHtml(signing.file_name) : ''}</div>
+          </div>
+          <div class="my-signing-actions">
+            <a href="${url}" class="btn btn-primary">View</a>
+            <button class="btn btn-secondary" onclick="removeFromMySignings('${signing.sign_id}')" title="Remove from list">&times;</button>
+          </div>
+        `;
+        list.appendChild(item);
+      });
+    }
+    
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    // Tab switching
+    document.querySelectorAll('.sign-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tabName = tab.dataset.tab;
+        
+        // Update tab buttons
+        document.querySelectorAll('.sign-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        // Update tab content
+        document.querySelectorAll('.sign-tab-content').forEach(c => c.classList.remove('active'));
+        document.getElementById('tab-' + tabName).classList.add('active');
+      });
+    });
+    
+    // Initialize My Signings on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      renderMySignings();
+    });
+    
+    // ============================================
+    // Key Management
+    // ============================================
+    let keys = null;
+    
+    async function loadKeys() {
+      const stored = localStorage.getItem('otrust_keys');
+      if (stored) {
+        keys = JSON.parse(stored);
+      } else {
+        await generateKeys();
+      }
+      updateKeyDisplay();
+    }
+    
+    async function generateKeys() {
+      const privateKey = ed.utils.randomPrivateKey();
+      const publicKey = await ed.getPublicKeyAsync(privateKey);
+      keys = {
+        privateKey: bytesToHex(privateKey),
+        publicKey: bytesToHex(publicKey)
+      };
+      localStorage.setItem('otrust_keys', JSON.stringify(keys));
+      updateKeyDisplay();
+    }
+    
+    function updateKeyDisplay() {
+      const display = document.getElementById('pubkey-display');
+      if (keys && display) {
+        display.value = keys.publicKey;
+      }
+    }
+    
+    // Generate new key button
+    document.getElementById('generate-key-btn')?.addEventListener('click', async () => {
+      if (confirm('This will replace your current key. Make sure you have exported it first!')) {
+        await generateKeys();
+        alert('New key generated!');
+      }
+    });
+    
+    // Export keys
+    document.getElementById('export-key-btn')?.addEventListener('click', () => {
+      if (!keys) return;
+      const data = JSON.stringify(keys, null, 2);
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'otrust-keys.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+    
+    // Import keys
+    document.getElementById('import-key-input')?.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      try {
+        const text = await file.text();
+        const imported = JSON.parse(text);
+        
+        if (!imported.privateKey || !imported.publicKey) {
+          throw new Error('Invalid key file');
+        }
+        
+        keys = imported;
+        localStorage.setItem('otrust_keys', JSON.stringify(keys));
+        updateKeyDisplay();
+        alert('Keys imported successfully!');
+      } catch (err) {
+        alert('Failed to import keys: ' + err.message);
+      }
+    });
+    
+    // Load keys on startup (called from module after crypto is loaded)
+    window.initKeyManagement = async function() {
+      await loadKeys();
+    };
+  </script>
+  
+  <!-- Key management crypto module -->
+  <script type="module" nonce="{{CSP_NONCE}}">
+    import * as ed from 'https://esm.sh/@noble/ed25519@2.1.0';
+    import { bytesToHex } from 'https://esm.sh/@noble/hashes@1.3.3/utils';
+    
+    // Expose to window for the inline script
+    window.ed = ed;
+    window.bytesToHex = bytesToHex;
+    
+    // Initialize key management after crypto is loaded
+    if (window.initKeyManagement) {
+      window.initKeyManagement();
+    }
+  </script>
+  <script src="/otrust-polish.js" defer></script>
+</body>
+</html>

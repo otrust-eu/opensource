@@ -1,0 +1,235 @@
+// OTRUST Chrome Extension - Popup
+
+const API = 'https://www.otrust.eu';
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const timestampBtn = document.getElementById('timestamp-btn');
+  const verifyBtn = document.getElementById('verify-btn');
+  const historyBtn = document.getElementById('history-btn');
+  const resultEl = document.getElementById('result');
+  const pubkeyDisplay = document.getElementById('pubkey-display');
+  const keyValueEl = pubkeyDisplay.querySelector('.key-value');
+
+  // Show abbreviated pubkey in footer
+  const keys = await getKeys();
+  keyValueEl.textContent = `${keys.publicKey.slice(0, 6)}...${keys.publicKey.slice(-4)}`;
+  pubkeyDisplay.addEventListener('click', async () => {
+    await navigator.clipboard.writeText(keys.publicKey);
+    keyValueEl.textContent = 'Copied!';
+    setTimeout(() => {
+      keyValueEl.textContent = `${keys.publicKey.slice(0, 6)}...${keys.publicKey.slice(-4)}`;
+    }, 1500);
+  });
+
+  // Progress UI helper
+  function showProgress(steps) {
+    return `<div class="progress-section">${steps.map(s => 
+      `<div class="progress-step ${s.status}">
+        <span class="icon">${s.status === 'done' ? '✓' : s.status === 'active' ? '<span class="spinner"></span>' : '○'}</span>
+        ${s.label}
+      </div>`
+    ).join('')}</div>`;
+  }
+
+  // History button - open otrust.eu with this extension's pubkey
+  historyBtn.addEventListener('click', async () => {
+    chrome.tabs.create({ url: `${API}/#history=${keys.publicKey}` });
+  });
+
+  timestampBtn.addEventListener('click', async () => {
+    timestampBtn.disabled = true;
+    
+    const steps = [
+      { label: 'Reading page', status: 'active' },
+      { label: 'Proof-of-work', status: '' },
+      { label: 'Signing', status: '' },
+      { label: 'Submitting', status: '' }
+    ];
+    resultEl.innerHTML = showProgress(steps);
+
+    try {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      
+      // Check for restricted URLs
+      if (!tab.url || tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://') || tab.url.startsWith('about:')) {
+        throw new Error('Cannot timestamp browser pages. Open a website first.');
+      }
+      
+      const response = await getPageContent(tab.id);
+      if (!response?.content) throw new Error('Could not read page');
+      const hash = await sha256(response.content);
+      
+      steps[0].status = 'done';
+      steps[1].status = 'active';
+      resultEl.innerHTML = showProgress(steps);
+      
+      // Get PoW challenge
+      const challengeRes = await fetch(`${API}/challenge`);
+      if (!challengeRes.ok) throw new Error('Server unavailable');
+      const challenge = await challengeRes.json();
+      if (!challenge.challenge || challenge.difficulty === undefined) {
+        throw new Error('Invalid challenge response');
+      }
+      
+      // Solve PoW
+      const nonce = await solvePoW(challenge.challenge, challenge.difficulty);
+      
+      steps[1].status = 'done';
+      steps[2].status = 'active';
+      resultEl.innerHTML = showProgress(steps);
+      
+      // Get/create keys & sign
+      const keys = await getKeys();
+      const sig = await sign(hash, keys);
+      
+      steps[2].status = 'done';
+      steps[3].status = 'active';
+      resultEl.innerHTML = showProgress(steps);
+      
+      // Submit
+      const res = await fetch(`${API}/claim`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          hash,
+          signature: sig,
+          pubkey: keys.publicKey,
+          pow: { challenge: challenge.challenge, nonce },
+          filename: response.title || 'Web page'
+        })
+      });
+      
+      const data = await res.json();
+      
+      if (data.error) throw new Error(data.error);
+      
+      const isExisting = data.status === 'already_registered';
+      resultEl.innerHTML = `
+        <div class="result ${isExisting ? 'warning' : 'success'}">
+          <h4>${isExisting ? '⚠️ Already Timestamped' : '✓ Timestamped!'}</h4>
+          <div class="result-row"><span class="label">Receipt</span><span class="value">${data.receipt_id}</span></div>
+          <div class="result-row"><span class="label">Hash</span><span class="value">${hash.slice(0,16)}...</span></div>
+        </div>`;
+    } catch (e) {
+      resultEl.innerHTML = `<div class="result error"><h4>❌ Error</h4><p style="font-size:0.8rem;margin-top:0.25rem;">${e.message}</p></div>`;
+    }
+    timestampBtn.disabled = false;
+  });
+
+  verifyBtn.addEventListener('click', async () => {
+    try {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      
+      if (!tab.url || tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://') || tab.url.startsWith('about:')) {
+        throw new Error('Cannot verify browser pages. Open a website first.');
+      }
+      
+      const response = await getPageContent(tab.id);
+      const hash = await sha256(response.content);
+      chrome.tabs.create({ url: `${API}/#verify=${hash}` });
+    } catch (e) {
+      resultEl.innerHTML = `<div class="result error"><h3>❌ Error</h3><p>${e.message}</p></div>`;
+    }
+  });
+});
+
+// Helper to get page content with injection fallback
+async function getPageContent(tabId) {
+  try {
+    // Try sending message to existing content script
+    const response = await chrome.tabs.sendMessage(tabId, { action: 'getPageContent' });
+    if (response?.content) return response;
+  } catch (e) {
+    // Content script not loaded, inject it
+  }
+  
+  // Inject content script and try again
+  await chrome.scripting.executeScript({
+    target: { tabId },
+    files: ['content.js']
+  });
+  
+  // Wait a moment for injection
+  await new Promise(r => setTimeout(r, 100));
+  
+  const response = await chrome.tabs.sendMessage(tabId, { action: 'getPageContent' });
+  if (!response?.content) throw new Error('Could not read page content. Try refreshing the page.');
+  return response;
+}
+
+async function sha256(text) {
+  const data = new TextEncoder().encode(text);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function getKeys() {
+  let { otrust_keys } = await chrome.storage.local.get('otrust_keys');
+  
+  // Check if keys exist and have correct format (privateKey should be 64 hex chars = 32 bytes)
+  if (otrust_keys && otrust_keys.privateKey && otrust_keys.privateKey.length === 64 && otrust_keys.pkcs8) {
+    return otrust_keys;
+  }
+  
+  // Generate new keys (or regenerate if old format)
+  console.log('[OTRUST] Generating new Ed25519 keypair...');
+  const keyPair = await crypto.subtle.generateKey({ name: 'Ed25519' }, true, ['sign']);
+  const pub = await crypto.subtle.exportKey('raw', keyPair.publicKey);
+  const pkcs8 = await crypto.subtle.exportKey('pkcs8', keyPair.privateKey);
+  
+  // Extract raw 32-byte seed from PKCS#8 (last 32 bytes of 48-byte PKCS#8)
+  const pkcs8Bytes = new Uint8Array(pkcs8);
+  const rawPriv = pkcs8Bytes.slice(-32);
+  
+  otrust_keys = {
+    publicKey: Array.from(new Uint8Array(pub)).map(b => b.toString(16).padStart(2, '0')).join(''),
+    privateKey: Array.from(rawPriv).map(b => b.toString(16).padStart(2, '0')).join(''),
+    // Store full PKCS#8 for Web Crypto signing
+    pkcs8: Array.from(pkcs8Bytes).map(b => b.toString(16).padStart(2, '0')).join('')
+  };
+  await chrome.storage.local.set({ otrust_keys });
+  console.log('[OTRUST] New keypair generated, pubkey:', otrust_keys.publicKey.slice(0, 16) + '...');
+  return otrust_keys;
+}
+
+async function sign(hash, keys) {
+  // Use PKCS#8 format for Web Crypto API
+  const pkcs8Hex = keys.pkcs8 || keys.privateKey;
+  const pkcs8Bytes = new Uint8Array(pkcs8Hex.match(/.{2}/g).map(b => parseInt(b, 16)));
+  
+  // If it's 32 bytes (raw), we need to construct PKCS#8
+  let keyData;
+  if (pkcs8Bytes.length === 32) {
+    // Build PKCS#8 wrapper for raw Ed25519 seed
+    // PKCS#8 header for Ed25519: 302e020100300506032b6570042204 + 32 bytes
+    const header = new Uint8Array([
+      0x30, 0x2e, 0x02, 0x01, 0x00, 0x30, 0x05, 0x06, 
+      0x03, 0x2b, 0x65, 0x70, 0x04, 0x22, 0x04, 0x20
+    ]);
+    keyData = new Uint8Array(48);
+    keyData.set(header, 0);
+    keyData.set(pkcs8Bytes, 16);
+  } else {
+    keyData = pkcs8Bytes;
+  }
+  
+  const key = await crypto.subtle.importKey('pkcs8', keyData, { name: 'Ed25519' }, false, ['sign']);
+  const hashBytes = new Uint8Array(hash.match(/.{2}/g).map(b => parseInt(b, 16)));
+  const sig = await crypto.subtle.sign({ name: 'Ed25519' }, key, hashBytes);
+  return Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function solvePoW(challenge, difficulty) {
+  if (!challenge || typeof difficulty !== 'number') {
+    throw new Error('Invalid PoW parameters');
+  }
+  const target = BigInt('0x' + 'f'.repeat(64)) >> BigInt(difficulty);
+  for (let nonce = 0; nonce < 100000000; nonce++) {
+    const nonceHex = nonce.toString(16).padStart(16, '0');
+    const attempt = challenge + nonceHex;
+    const hash = await sha256(attempt);
+    if (BigInt('0x' + hash) <= target) return nonceHex; // Return hex string, not number
+    if (nonce % 5000 === 0) await new Promise(r => setTimeout(r, 0));
+  }
+  throw new Error('PoW timeout');
+}
