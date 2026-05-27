@@ -18,8 +18,30 @@ const inMemoryCollections = {
   pow_challenges: [],
   email_notifications: [],
   auth_branding: [],
-  audit_log: []
+  audit_log: [],
+  usage_counters: []
 };
+
+function matchesQuery(doc, query = {}) {
+  return Object.keys(query).every(key => {
+    const expected = query[key];
+
+    if (typeof expected === 'object' && expected !== null) {
+      let handledOperator = false;
+      if ('$lte' in expected && !(doc[key] <= expected.$lte)) return false;
+      if ('$gte' in expected && !(doc[key] >= expected.$gte)) return false;
+      if ('$lt' in expected && !(doc[key] < expected.$lt)) return false;
+      if ('$gt' in expected && !(doc[key] > expected.$gt)) return false;
+      if ('$in' in expected && !expected.$in.includes(doc[key])) return false;
+      if ('$ne' in expected && doc[key] === expected.$ne) return false;
+      if ('$exists' in expected && ((doc[key] !== undefined) !== expected.$exists)) return false;
+      handledOperator = ['$lte', '$gte', '$lt', '$gt', '$in', '$ne', '$exists'].some(operator => operator in expected);
+      return handledOperator ? true : doc[key] === expected;
+    }
+
+    return doc[key] === expected;
+  });
+}
 
 /**
  * Create an in-memory mock collection
@@ -35,24 +57,10 @@ function createMockCollection(name) {
       return { insertedId: _id };
     },
     findOne: async (query) => {
-      return data.find(doc => {
-        return Object.keys(query).every(key => doc[key] === query[key]);
-      }) || null;
+      return data.find(doc => matchesQuery(doc, query)) || null;
     },
     find: (query = {}) => {
-      const filtered = data.filter(doc => {
-        return Object.keys(query).every(key => {
-          // Handle MongoDB operators
-          if (typeof query[key] === 'object' && query[key] !== null) {
-            if ('$lte' in query[key]) return doc[key] <= query[key].$lte;
-            if ('$gte' in query[key]) return doc[key] >= query[key].$gte;
-            if ('$lt' in query[key]) return doc[key] < query[key].$lt;
-            if ('$gt' in query[key]) return doc[key] > query[key].$gt;
-            if ('$in' in query[key]) return query[key].$in.includes(doc[key]);
-          }
-          return doc[key] === query[key];
-        });
-      });
+      const filtered = data.filter(doc => matchesQuery(doc, query));
       return {
         toArray: async () => filtered,
         sort: () => ({
@@ -65,20 +73,30 @@ function createMockCollection(name) {
         })
       };
     },
-    updateOne: async (query, update) => {
-      const idx = data.findIndex(doc => 
-        Object.keys(query).every(key => doc[key] === query[key])
-      );
-      if (idx >= 0 && update.$set) {
-        data[idx] = { ...data[idx], ...update.$set };
+    updateOne: async (query, update, options = {}) => {
+      let idx = data.findIndex(doc => matchesQuery(doc, query));
+
+      if (idx < 0 && options.upsert) {
+        const doc = { ...query, ...(update.$setOnInsert || {}) };
+        data.push(doc);
+        idx = data.length - 1;
+      }
+
+      if (idx >= 0) {
+        if (update.$set) {
+          data[idx] = { ...data[idx], ...update.$set };
+        }
+        if (update.$inc) {
+          Object.entries(update.$inc).forEach(([key, value]) => {
+            data[idx][key] = (Number(data[idx][key]) || 0) + value;
+          });
+        }
         return { modifiedCount: 1 };
       }
       return { modifiedCount: 0 };
     },
     deleteOne: async (query) => {
-      const idx = data.findIndex(doc => 
-        Object.keys(query).every(key => doc[key] === query[key])
-      );
+      const idx = data.findIndex(doc => matchesQuery(doc, query));
       if (idx >= 0) {
         data.splice(idx, 1);
         return { deletedCount: 1 };
@@ -95,7 +113,7 @@ function createMockCollection(name) {
       // Otherwise filter and remove matching
       const toRemove = [];
       data.forEach((doc, idx) => {
-        if (Object.keys(query).every(key => doc[key] === query[key])) {
+        if (matchesQuery(doc, query)) {
           toRemove.push(idx);
         }
       });
@@ -106,22 +124,16 @@ function createMockCollection(name) {
       return { deletedCount: toRemove.length };
     },
     findOneAndUpdate: async (query, update, options = {}) => {
-      const idx = data.findIndex(doc => {
-        return Object.keys(query).every(key => {
-          // Handle MongoDB operators
-          if (typeof query[key] === 'object' && query[key] !== null) {
-            if ('$gt' in query[key]) return doc[key] > query[key].$gt;
-            if ('$gte' in query[key]) return doc[key] >= query[key].$gte;
-            if ('$lt' in query[key]) return doc[key] < query[key].$lt;
-            if ('$lte' in query[key]) return doc[key] <= query[key].$lte;
-          }
-          return doc[key] === query[key];
-        });
-      });
+      const idx = data.findIndex(doc => matchesQuery(doc, query));
       if (idx >= 0) {
         const original = { ...data[idx] };
         if (update.$set) {
           data[idx] = { ...data[idx], ...update.$set };
+        }
+        if (update.$inc) {
+          Object.entries(update.$inc).forEach(([key, value]) => {
+            data[idx][key] = (Number(data[idx][key]) || 0) + value;
+          });
         }
         // Return the document directly (MongoDB driver v4+ behavior)
         return options.returnDocument === 'before' ? original : data[idx];
@@ -130,7 +142,7 @@ function createMockCollection(name) {
     },
     createIndex: async () => ({ ok: 1 }),
     dropIndex: async () => ({ ok: 1 }),
-    countDocuments: async () => data.length
+    countDocuments: async (query = {}) => data.filter(doc => matchesQuery(doc, query)).length
   };
 }
 

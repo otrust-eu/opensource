@@ -223,6 +223,48 @@ const logSecurityEvent = (event, req, details = {}) => {
   console.log(`[Security] ${JSON.stringify(logEntry)}`);
 };
 
+const USAGE_COUNTER_ID = 'global';
+
+function toUsageCount(value) {
+  const count = Number(value);
+  if (!Number.isFinite(count) || count < 0) return 0;
+  return Math.floor(count);
+}
+
+async function incrementUsageCounter(field, amount = 1) {
+  if (!/^[a-z0-9_]{1,80}$/.test(field)) return;
+
+  const safeAmount = toUsageCount(amount) || 1;
+  const now = new Date();
+
+  try {
+    const db = getDb();
+    await db.collection('usage_counters').updateOne(
+      { _id: USAGE_COUNTER_ID },
+      {
+        $inc: {
+          [field]: safeAmount,
+          verifications_processed: safeAmount
+        },
+        $set: { updated_at: now },
+        $setOnInsert: { created_at: now }
+      },
+      { upsert: true }
+    );
+  } catch (error) {
+    console.error('[Usage] Counter update failed:', error.message);
+  }
+}
+
+async function readUsageCounters(db) {
+  try {
+    return await db.collection('usage_counters').findOne({ _id: USAGE_COUNTER_ID }) || {};
+  } catch (error) {
+    console.error('[Usage] Counter read failed:', error.message);
+    return {};
+  }
+}
+
 // Rate limiters with secure key generation and logging
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -503,6 +545,7 @@ app.get('/lookup/:hash', async (req, res) => {
       };
     }
     
+    await incrementUsageCounter('lookup_checks');
     res.json(result);
   } catch (error) {
     console.error('Lookup error:', error.message);
@@ -914,6 +957,7 @@ app.post('/verify/bulk', verifyLimiter, bulkJson, async (req, res) => {
       }
     }
 
+    await incrementUsageCounter('bulk_hash_verifications', results.length);
     res.json({ status: 'ok', results });
 
   } catch (error) {
@@ -936,6 +980,8 @@ app.post('/verify', verifyLimiter, smallJson, async (req, res) => {
       .find({ hash: hash.toLowerCase() })
       .sort({ created_at: 1 })
       .toArray();
+
+    await incrementUsageCounter('hash_verifications');
 
     if (claimDocs.length === 0) {
       return res.json({ status: 'not_found' });
@@ -971,6 +1017,7 @@ app.post('/verify/signature', smallJson, async (req, res) => {
     }
 
     const valid = await verifySignature(hash, signature, pubkey);
+    await incrementUsageCounter('signature_verifications');
     res.json({ valid });
   } catch (error) {
     res.json({ valid: false });
@@ -2522,6 +2569,7 @@ app.post('/verify/blockchain', smallJson, async (req, res) => {
     }
     
     const result = await verifyTimestamp(hash, ots_proof);
+    await incrementUsageCounter('blockchain_verifications');
     res.json(result);
     
   } catch (error) {
@@ -3097,7 +3145,9 @@ app.get('/stats', async (req, res) => {
       signConfirmed,
       proofTotal,
       activeProofs,
-      verifiedProofViews
+      verifiedProofViews,
+      proofVerificationDocs,
+      usageCounters
     ] = await Promise.all([
       claims.countDocuments(),
       claims.countDocuments({ blockchain_confirmed: true }),
@@ -3107,12 +3157,22 @@ app.get('/stats', async (req, res) => {
       signRequests.countDocuments({ blockchain_confirmed: true }),
       proofs.countDocuments(),
       proofs.countDocuments({ status: { $ne: 'revoked' } }),
-      proofs.countDocuments({ verified_count: { $gt: 0 } })
+      proofs.countDocuments({ verified_count: { $gt: 0 } }),
+      proofs.find({ verified_count: { $gt: 0 } }).toArray(),
+      readUsageCounters(db)
     ]);
 
     const totalRecords = total + signTotal + proofTotal;
     const verifiedRecords = confirmed + signCompleted + activeProofs;
     const anchoredRecords = confirmed + signConfirmed;
+    const proofVerificationEvents = proofVerificationDocs.reduce(
+      (sum, proof) => sum + toUsageCount(proof.verified_count),
+      0
+    );
+    const verificationsProcessed =
+      totalRecords +
+      proofVerificationEvents +
+      toUsageCount(usageCounters.verifications_processed);
     
     // Get latest confirmed block (from both claims and sign_requests)
     const [latestClaim, latestSign] = await Promise.all([
@@ -3141,8 +3201,10 @@ app.get('/stats', async (req, res) => {
       total_proofs: proofTotal,
       active_proofs: activeProofs,
       verified_proof_views: verifiedProofViews,
+      proof_verification_events: proofVerificationEvents,
       total_records: totalRecords,
       verified_records: verifiedRecords,
+      verifications_processed: verificationsProcessed,
       anchored_records: anchoredRecords,
       latest_block: latestBlock
     });
@@ -3862,6 +3924,8 @@ app.post('/api/proof/verify', bulkJson, async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid Proof ID format' });
     }
     
+    const db = getDb();
+
     // Find the identity proof
     const identityProof = await db.collection('identity_proofs').findOne({ proofId });
     if (!identityProof) {
@@ -3905,6 +3969,8 @@ app.post('/api/proof/verify', bulkJson, async (req, res) => {
         { $set: { failedAttempts: 0, lockedUntil: null } }
       );
       
+      await incrementUsageCounter('proof_pin_verifications');
+
       // Return verification data (NOT the secret)
       res.json({
         success: true,
@@ -4142,7 +4208,6 @@ app.post('/api/proof/submit', bulkJson, async (req, res) => {
 app.get('/api/proof/:proofId', async (req, res) => {
   try {
     const { proofId } = req.params;
-    const { token } = req.query;
     
     const db = getDb();
     const proof = await db.collection('proofs').findOne({ id: proofId });
@@ -4199,6 +4264,8 @@ app.post('/api/proof/:proofId/verify', bulkJson, async (req, res) => {
         return res.json({ valid: false, error: 'This proof has expired' });
       }
       
+      await incrementUsageCounter('identity_proof_verifications');
+
       return res.json({ 
         valid: true, 
         proofType: 'identity',
@@ -5465,6 +5532,8 @@ app.post('/api/v1/auth/prove', bulkJson, async (req, res) => {
     
     // Clean up challenge
     authChallenges.delete(challengeId);
+
+    await incrementUsageCounter('auth_proof_verifications');
     
     res.json({
       success: true,
@@ -5541,6 +5610,8 @@ app.post('/api/v1/auth/verify', bulkJson, async (req, res) => {
     
     console.log(`[Auth] Token verified for proof: ${safeProofId || 'invalid'}`);
     
+    await incrementUsageCounter('auth_token_verifications');
+
     res.json({
       valid: true,
       proofId: safeProofId,
@@ -5609,6 +5680,8 @@ app.get('/api/v1/auth/userinfo', async (req, res) => {
       return res.status(404).json({ error: 'proof_not_found' });
     }
     
+    await incrementUsageCounter('auth_userinfo_verifications');
+
     res.json({
       proofId: safeProofId,
       verified: true,

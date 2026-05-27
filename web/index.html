@@ -1767,13 +1767,13 @@
         </div>
         <div class="stat">
           <div class="stat-value" id="stat-confirmed">–</div>
-          <div class="stat-label">Verified</div>
+          <div class="stat-label">Verifications processed</div>
         </div>
       </div>
       <script nonce="PLACEHOLDER">
         fetch('/stats').then(r=>r.json()).then(d=>{
           document.getElementById('stat-claims').textContent=d.total_records ?? ((d.total_claims||0)+(d.total_signatures||0)+(d.total_proofs||0));
-          document.getElementById('stat-confirmed').textContent=d.verified_records ?? ((d.confirmed_claims||0)+(d.completed_signatures||0)+(d.active_proofs||0));
+          document.getElementById('stat-confirmed').textContent=d.verifications_processed ?? d.verified_records ?? ((d.confirmed_claims||0)+(d.completed_signatures||0)+(d.active_proofs||0));
         }).catch(()=>{});
       </script>
 
