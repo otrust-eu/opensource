@@ -459,6 +459,31 @@
         }
       }
     },
+    "/stats/badges.json": {
+      "get": {
+        "summary": "Compact stats for embeds",
+        "description": "Lightweight public stats for trust badges and widgets.",
+        "tags": ["Statistics"],
+        "responses": {
+          "200": {
+            "description": "Badge stats",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "service": {"type": "string"},
+                    "anchored_records": {"type": "integer"},
+                    "latest_block": {"type": "integer"},
+                    "updated_at": {"type": "string", "format": "date-time"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/receipts/{pubkey}": {
       "get": {
         "summary": "Get receipts by public key (removed)",

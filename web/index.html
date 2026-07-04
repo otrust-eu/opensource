@@ -485,14 +485,15 @@
     <div class="claim-card timestamp-card">
       <div class="timestamp-dashboard-head">
         <div>
-          <span class="workspace-topline">Local-first record workspace</span>
-          <h2>Timestamp, verify and manage records.</h2>
-          <p>Hash locally, sign with your browser key, anchor externally, and keep every receipt independently verifiable.</p>
+          <span class="workspace-topline" data-i18n="workspace.topline">Local-first record workspace</span>
+          <h2 data-i18n="workspace.title">Timestamp, verify and manage records.</h2>
+          <p data-i18n="workspace.subtitle">Hash locally, sign with your browser key, anchor externally, and keep every receipt independently verifiable.</p>
         </div>
         <div class="timestamp-live-meta" aria-label="Timestamp guarantees">
           <span>SHA-256 local hash</span>
           <span>Ed25519 signature</span>
           <span>Bitcoin anchoring via OTS</span>
+          <button type="button" class="lang-toggle-btn" id="lang-toggle" title="Switch language">SV</button>
         </div>
       </div>
 
@@ -702,7 +703,8 @@
             <div class="timestamp-panel-heading">
               <span>05 / Receipt ledger</span>
               <h3>History</h3>
-              <p class="tab-intro">Receipts saved in this browser only — not shared via URL or server lookup.</p>
+              <p class="tab-intro" data-i18n="history.intro">Receipts saved in this browser only — not shared via URL or server lookup.</p>
+              <div id="bitcoin-toast" class="bitcoin-toast" role="status" aria-live="polite" hidden></div>
             </div>
 
             <div id="receipts-loading" style="text-align: center; padding: 2rem; color: var(--text-dim);">
@@ -718,7 +720,7 @@
             <div class="timestamp-panel-heading">
               <span>06 / Local identity</span>
               <h3>Browser keys</h3>
-              <p class="tab-intro">Manage the Ed25519 signing key stored locally in this browser.</p>
+              <p class="tab-intro" data-i18n="keys.intro">Manage the Ed25519 signing key stored locally in this browser.</p>
             </div>
 
             <div class="timestamp-keys-grid">
@@ -743,6 +745,18 @@
 
               <div class="security-note">
                 <strong>Important:</strong> Your private key is stored in this browser only. Export and backup your keys.
+              </div>
+
+              <div class="info-card" style="margin-top:1rem;">
+                <h4 data-i18n="backup.title">Encrypted backup</h4>
+                <p style="font-size:0.85rem;color:var(--text-dim);" data-i18n="backup.desc">Export keys and local history as a password-protected file. Import on another browser in this profile.</p>
+                <div class="key-actions" style="margin-top:0.75rem;">
+                  <button type="button" class="btn btn-secondary" id="export-backup-btn">Export backup</button>
+                  <label class="btn btn-secondary" style="cursor:pointer;">
+                    Import backup
+                    <input type="file" id="import-backup-input" accept=".json,application/json" hidden>
+                  </label>
+                </div>
               </div>
             </div>
           </div>
@@ -812,6 +826,29 @@
                 </div>
                 <h3>Browser Extension</h3>
                 <p>Timestamp any webpage with one click. Install from Chrome Web Store.</p>
+              </a>
+
+              <a href="/bookmarklet" class="feature-card">
+                <div class="feature-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                  </svg>
+                </div>
+                <h3>Bookmarklet</h3>
+                <p>Verify the current page without installing an extension. Drag to bookmarks bar.</p>
+              </a>
+
+              <a href="/embed" class="feature-card">
+                <div class="feature-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"/>
+                    <rect x="14" y="3" width="7" height="7"/>
+                    <rect x="3" y="14" width="7" height="7"/>
+                    <rect x="14" y="14" width="7" height="7"/>
+                  </svg>
+                </div>
+                <h3>Embed badge</h3>
+                <p>Show live OTRUST anchored-record stats on your website.</p>
               </a>
 
               <a href="https://chatgpt.com/g/g-694d4a7fa8f48191aeb1db85f87fae5a-otrust-timestamper" target="_blank" rel="noopener noreferrer" class="feature-card">
@@ -1424,8 +1461,23 @@
                 <div class="receipt-actions">
                   <button class="btn btn-secondary" onclick="downloadReceipt('${data.receipt_id}')">Download Receipt</button>
                   ${data.blockchain_status === 'confirmed' ? `<button class="btn btn-secondary" onclick="downloadCertificate('${data.receipt_id}', '${claims[0].hash}')">Download Certificate</button>` : ''}
+                  <button type="button" class="btn btn-secondary" id="share-proof-btn">Share proof</button>
                 </div>
               </div>`;
+            const shareOpts = {
+              receiptId: data.receipt_id,
+              hash: claims[0].hash,
+              filename: claimFilename,
+              blockchainStatus: data.blockchain_status,
+              verifyUrl: verifyUrl
+            };
+            document.getElementById('share-proof-btn')?.addEventListener('click', async () => {
+              try {
+                await window.otrustShareProof?.downloadShareCard(shareOpts);
+              } catch (e) {
+                alert('Share failed: ' + e.message);
+              }
+            });
           } else {
             (data.results || []).forEach((result, index) => {
               if (result.status !== 'created' && result.status !== 'duplicate') return;
@@ -1774,6 +1826,19 @@
     // ========== RECEIPT TAB (browser-local only) ==========
     let receiptPollTimer = null;
 
+    function showBitcoinToast(receiptId, blockHeight) {
+      const toast = document.getElementById('bitcoin-toast');
+      if (!toast) return;
+      const msg = window.otrustI18n?.t('toast.confirmed') || 'Bitcoin confirmed!';
+      toast.innerHTML = `<strong>${msg}</strong> ${receiptId}${blockHeight ? ` · block ${blockHeight}` : ''}`;
+      toast.hidden = false;
+      toast.classList.add('visible');
+      setTimeout(() => {
+        toast.classList.remove('visible');
+        toast.hidden = true;
+      }, 8000);
+    }
+
     async function refreshPendingReceiptStatuses(receipts) {
       const pending = receipts.filter((r) => !r.blockchain_confirmed);
       await Promise.all(pending.slice(0, 20).map(async (receipt) => {
@@ -1786,6 +1851,7 @@
               blockchain_confirmed: true,
               blockchain_block: data.blockchain.block_height || null
             });
+            showBitcoinToast(receipt.receipt_id, data.blockchain.block_height);
           }
         } catch {
           /* ignore */
@@ -2094,6 +2160,32 @@
       }
     };
     
+    document.getElementById('export-backup-btn')?.addEventListener('click', async () => {
+      const password = prompt('Choose a backup password (min 8 characters):');
+      if (!password) return;
+      try {
+        const backup = await window.otrustLocalBackup.exportEncryptedBackup(password);
+        window.otrustLocalBackup.downloadBackupFile(backup);
+      } catch (e) {
+        alert('Export failed: ' + e.message);
+      }
+    });
+
+    document.getElementById('import-backup-input')?.addEventListener('change', async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const password = prompt('Enter backup password:');
+      if (!password) return;
+      try {
+        const result = await window.otrustLocalBackup.importEncryptedBackup(file, password);
+        updateHistoryCount();
+        alert(`Imported ${result.receipts} receipts, ${result.signings} signings${result.hasKeys ? ', keys restored' : ''}.`);
+      } catch (err) {
+        alert('Import failed: ' + err.message);
+      }
+      e.target.value = '';
+    });
+
     window.downloadBulkReceipts = function() {
       if (!window.lastBulkResults) return;
       
@@ -2113,7 +2205,16 @@
       URL.revokeObjectURL(url);
     };
   </script>
+  <style>
+    .lang-toggle-btn { margin-left:0.5rem;padding:0.2rem 0.45rem;border:1px solid var(--border);border-radius:4px;background:var(--bg-card);font-size:0.65rem;cursor:pointer;color:var(--text-dim); }
+    .lang-toggle-btn:hover { border-color:var(--accent);color:var(--accent); }
+    .bitcoin-toast { margin:0 0 1rem;padding:0.75rem 1rem;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:8px;color:#2d5a3d;font-size:0.85rem;opacity:0;transition:opacity 0.3s; }
+    .bitcoin-toast.visible { opacity:1; }
+  </style>
   <script src="/js/receipt-history.js?v=20260704privacy"></script>
+  <script src="/js/local-backup.js?v=20260704pack"></script>
+  <script src="/js/share-proof.js?v=20260704pack"></script>
+  <script src="/js/i18n.js?v=20260704pack"></script>
   <script src="/js/usage-beacon.js?v=20260704activity"></script>
   <script src="/js/otrust-extras.js?v=20260704fix" defer></script>
   <script src="/otrust-polish.js?v=20260704fix" defer></script>

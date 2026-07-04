@@ -24,6 +24,7 @@ import os from 'os';
 const VERSION = '0.1.0';
 const DEFAULT_API = process.env.OTRUST_API || 'https://www.otrust.eu';
 const KEY_PATH = process.env.OTRUST_KEY || path.join(os.homedir(), '.otrust', 'key.json');
+const HISTORY_PATH = process.env.OTRUST_HISTORY || path.join(os.homedir(), '.otrust', 'history.json');
 
 // ============================================
 // ED25519 IMPLEMENTATION (minimal, no deps)
@@ -225,6 +226,27 @@ function saveKey(keypair) {
     fs.mkdirSync(dir, { recursive: true });
   }
   fs.writeFileSync(KEY_PATH, JSON.stringify(keypair, null, 2), { mode: 0o600 });
+}
+
+function loadHistory() {
+  if (!fs.existsSync(HISTORY_PATH)) return [];
+  try {
+    return JSON.parse(fs.readFileSync(HISTORY_PATH, 'utf8'));
+  } catch {
+    return [];
+  }
+}
+
+function saveHistory(entries) {
+  const dir = path.dirname(HISTORY_PATH);
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(HISTORY_PATH, JSON.stringify(entries.slice(0, 500), null, 2), { mode: 0o600 });
+}
+
+function addHistoryEntry(entry) {
+  const history = loadHistory().filter((h) => h.receipt_id !== entry.receipt_id);
+  history.unshift({ ...entry, timestamp: entry.timestamp || new Date().toISOString() });
+  saveHistory(history);
 }
 
 // ============================================
@@ -546,6 +568,12 @@ const commands = {
 
     if (claimRes.status === 201) {
       console.log('done\n');
+      addHistoryEntry({
+        receipt_id: claimRes.data.receipt_id,
+        hash,
+        filename: fs.existsSync(target) ? path.basename(target) : null,
+        blockchain_confirmed: claimRes.data.blockchain_status === 'confirmed'
+      });
       console.log('  ' + '─'.repeat(40));
       console.log(`  ✓ Timestamp created`);
       console.log(`  Receipt:   ${claimRes.data.receipt_id}`);
@@ -618,6 +646,54 @@ const commands = {
     console.log('');
   },
 
+  async history(args) {
+    const entries = loadHistory();
+    if (args.includes('--json')) {
+      console.log(JSON.stringify(entries, null, 2));
+      return;
+    }
+    if (entries.length === 0) {
+      console.log('\n  No local CLI history yet. Run: otrust claim <file>\n');
+      return;
+    }
+    console.log('\n  OTRUST Local History\n  ' + '─'.repeat(40));
+    for (const e of entries.slice(0, 20)) {
+      const name = e.filename || e.receipt_id;
+      const status = e.blockchain_confirmed ? 'confirmed' : 'pending';
+      console.log(`  ${name}`);
+      console.log(`    ${e.receipt_id} · ${status} · ${e.hash?.slice(0, 16)}...`);
+    }
+    console.log('  ' + '─'.repeat(40) + '\n');
+  },
+
+  async 'ipfs-export'(args) {
+    const receiptId = args[0];
+    if (!receiptId) {
+      console.error('Usage: otrust ipfs-export <receipt-id> [--out file.json]');
+      process.exit(1);
+    }
+    const out = args.includes('--out') ? args[args.indexOf('--out') + 1] : `${receiptId}-ipfs-bundle.json`;
+    process.stdout.write('  Fetching proof... ');
+    const proofRes = await apiRequest('GET', `/proof/${receiptId}`);
+    if (proofRes.status !== 200) {
+      console.log('failed');
+      console.error(`  Error: ${proofRes.data?.error || proofRes.status}`);
+      process.exit(1);
+    }
+    console.log('done');
+    const bundle = {
+      format: 'otrust-ipfs-bundle',
+      version: 1,
+      exported_at: new Date().toISOString(),
+      receipt_id: receiptId,
+      hash: proofRes.data.hash,
+      proof: proofRes.data,
+      pin_instructions: 'Upload this JSON or the ots_proof field to IPFS via Pinata, web3.storage, or your own node.'
+    };
+    fs.writeFileSync(out, JSON.stringify(bundle, null, 2));
+    console.log(`  Saved: ${path.resolve(out)}`);
+  },
+
   help() {
     console.log(`
   OTRUST CLI v${VERSION}
@@ -632,6 +708,8 @@ const commands = {
     verify <file|hash>               Verify timestamp
     bulk <files|folders>             Batch timestamp files
     verify-bulk <files|folders>      Batch verify files
+    history [--json]                 List local CLI receipt history
+    ipfs-export <receipt-id>         Export IPFS-ready proof bundle
 
   OPTIONS
     --save                Save key to ~/.otrust/key.json

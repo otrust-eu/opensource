@@ -189,13 +189,25 @@ document.addEventListener('DOMContentLoaded', async () => {
       const emailNote = notifyEmail && !isExisting
         ? `<p style="font-size:0.72rem;color:var(--text-dim);margin-top:0.5rem;">We'll email you when Bitcoin confirms.</p>`
         : '';
+      const verifyUrl = `${API}/proof/${data.receipt_id}`;
       resultEl.innerHTML = `
         <div class="result ${isExisting ? 'warning' : 'success'}">
           <h4>${isExisting ? '⚠️ Already Timestamped' : '✓ Timestamp created'}</h4>
           <div class="result-row"><span class="label">Receipt</span><span class="value">${data.receipt_id}</span></div>
           <div class="result-row"><span class="label">Hash</span><span class="value">${hash.slice(0,16)}...</span></div>
           ${emailNote}
+          <div class="btn-row" style="margin-top:0.65rem;">
+            <button type="button" class="btn btn-secondary" id="ext-open-proof">Open proof</button>
+            <button type="button" class="btn btn-secondary" id="ext-copy-share">Copy share</button>
+          </div>
         </div>`;
+      document.getElementById('ext-open-proof')?.addEventListener('click', () => {
+        chrome.tabs.create({ url: verifyUrl });
+      });
+      document.getElementById('ext-copy-share')?.addEventListener('click', async () => {
+        const text = ['OTRUST timestamp', `Receipt: ${data.receipt_id}`, `Hash: ${hash}`, `Verify: ${verifyUrl}`].join('\n');
+        await navigator.clipboard.writeText(text);
+      });
     } catch (e) {
       resultEl.innerHTML = `<div class="result error"><h4>❌ Error</h4><p style="font-size:0.8rem;margin-top:0.25rem;">${e.message}</p></div>`;
     }

@@ -37,6 +37,7 @@ const __dirname = path.dirname(__filename);
 import { verifySignature, verifyPow } from './crypto.js';
 import { generateChallenge, consumeChallenge } from './pow.js';
 import { startOtsProcessor, verifyTimestamp, getTimestampInfo, createTimestamp, setOnConfirmationCallback, setOnSignatureConfirmationCallback, processPendingTimestamps } from './opentimestamps.js';
+import { isValidWebhookUrl, storeWebhookNotification, dispatchConfirmationWebhook } from './webhooks.js';
 import { sendEmail } from './email.js';
 import {
   emailTemplate,
@@ -621,7 +622,7 @@ app.get('/challenge', challengeLimiter, async (req, res) => {
 // POST /claim
 app.post('/claim', claimLimiter, smallJson, async (req, res) => {
   try {
-    const { hash, signature, pubkey, pow, notify_email, filename } = req.body;
+    const { hash, signature, pubkey, pow, notify_email, notify_webhook, notify_webhook_secret, filename } = req.body;
 
     // Minimal logging - no sensitive data
     if (process.env.NODE_ENV !== 'production') {
@@ -731,6 +732,14 @@ app.post('/claim', claimLimiter, smallJson, async (req, res) => {
       }
     }
 
+    if (notify_webhook && isValidWebhookUrl(notify_webhook)) {
+      try {
+        await storeWebhookNotification(db, receiptId, notify_webhook, notify_webhook_secret, timestamp);
+      } catch (webhookErr) {
+        console.error(`[Webhook] Failed to store notification: ${webhookErr.message}`);
+      }
+    }
+
     await incrementActivityCounters({
       claims_submitted: 1,
       claims_created: 1
@@ -764,7 +773,7 @@ const gptLimiter = rateLimit({
 
 app.post('/claim/simple', gptLimiter, smallJson, async (req, res) => {
   try {
-    const { hash, source, notify_email } = req.body;
+    const { hash, source, notify_email, notify_webhook, notify_webhook_secret } = req.body;
 
     if (!isValidHash(hash)) {
       return res.status(400).json({ error: 'invalid_hash', message: 'Hash must be 64 hex characters (SHA-256)' });
@@ -838,6 +847,14 @@ app.post('/claim/simple', gptLimiter, smallJson, async (req, res) => {
       }
     }
 
+    if (notify_webhook && isValidWebhookUrl(notify_webhook)) {
+      try {
+        await storeWebhookNotification(db, receiptId, notify_webhook, notify_webhook_secret, timestamp);
+      } catch (webhookErr) {
+        console.error(`[Webhook] Failed to store notification: ${webhookErr.message}`);
+      }
+    }
+
     await incrementActivityCounters({
       claims_submitted: 1,
       claims_created: 1
@@ -863,7 +880,7 @@ app.post('/claim/simple', gptLimiter, smallJson, async (req, res) => {
 // POST /claim/bulk - Batch claims with single PoW
 app.post('/claim/bulk', claimLimiter, bulkJson, async (req, res) => {
   try {
-    const { claims, pow, notify_email } = req.body;
+    const { claims, pow, notify_email, notify_webhook, notify_webhook_secret } = req.body;
 
     if (!Array.isArray(claims) || claims.length === 0) {
       return res.status(400).json({ error: 'invalid_claims', message: 'Claims must be a non-empty array' });
@@ -983,6 +1000,14 @@ app.post('/claim/bulk', claimLimiter, bulkJson, async (req, res) => {
           });
         } catch (emailErr) {
           console.error(`[Email] Failed to store bulk notification for ${receiptId}: ${emailErr.message}`);
+        }
+      }
+
+      if (notify_webhook && isValidWebhookUrl(notify_webhook)) {
+        try {
+          await storeWebhookNotification(db, receiptId, notify_webhook, notify_webhook_secret, timestamp);
+        } catch (webhookErr) {
+          console.error(`[Webhook] Failed to store bulk notification for ${receiptId}: ${webhookErr.message}`);
         }
       }
 
@@ -3275,6 +3300,48 @@ app.post('/api/usage/event', usageEventLimiter, smallJson, async (req, res) => {
   }
 });
 
+// GET /stats/badges.json - Compact stats for embeds and widgets
+app.get('/stats/badges.json', async (req, res) => {
+  try {
+    const db = getDb();
+    const claims = db.collection('claims');
+    const signRequests = db.collection('sign_requests');
+    const proofs = db.collection('proofs');
+
+    const [confirmed, signConfirmed, proofTotal, latestClaim, latestSign] = await Promise.all([
+      claims.countDocuments({ blockchain_confirmed: true }),
+      signRequests.countDocuments({ blockchain_confirmed: true }),
+      proofs.countDocuments({ status: { $ne: 'revoked' } }),
+      claims.findOne(
+        { blockchain_confirmed: true, blockchain_block: { $exists: true } },
+        { sort: { blockchain_block: -1 } }
+      ),
+      signRequests.findOne(
+        { blockchain_confirmed: true, blockchain_block: { $exists: true } },
+        { sort: { blockchain_block: -1 } }
+      )
+    ]);
+
+    const latestBlock = Math.max(
+      latestClaim?.blockchain_block || 0,
+      latestSign?.blockchain_block || 0
+    ) || null;
+
+    res.set('Cache-Control', 'public, max-age=300');
+    res.json({
+      service: 'OTRUST',
+      anchored_records: confirmed + signConfirmed,
+      active_proofs: proofTotal,
+      latest_block: latestBlock,
+      updated_at: new Date().toISOString(),
+      transparency_url: `${process.env.BASE_URL || 'https://www.otrust.eu'}/transparency`
+    });
+  } catch (error) {
+    console.error('Stats badges error:', error.message);
+    res.status(500).json({ error: 'server_error' });
+  }
+});
+
 // GET /stats - Public statistics
 app.get('/stats', async (req, res) => {
   try {
@@ -3556,6 +3623,19 @@ function hasEmailInjection(email) {
     /subject:/i         // Subject header
   ];
   return injectionPatterns.some(pattern => pattern.test(email));
+}
+
+// Notify claim owner when Bitcoin anchor is confirmed (webhook + optional email)
+async function notifyClaimConfirmed(claim, blockHeight) {
+  const db = getDb();
+  if (db) {
+    try {
+      await dispatchConfirmationWebhook(db, claim, blockHeight);
+    } catch (webhookErr) {
+      console.error(`[Webhook] Confirmation dispatch failed: ${webhookErr.message}`);
+    }
+  }
+  await sendConfirmationEmail(claim, blockHeight);
 }
 
 // Send confirmation email when Bitcoin anchor is confirmed
@@ -5859,7 +5939,7 @@ export async function startServer(port = PORT) {
   console.log('[DB] MongoDB initialized');
 
   // Set up email notification callback for confirmed timestamps
-  setOnConfirmationCallback(sendConfirmationEmail);
+  setOnConfirmationCallback(notifyClaimConfirmed);
   
   // Set up email notification callback for confirmed signature packages
   setOnSignatureConfirmationCallback(sendSignatureConfirmationEmail);

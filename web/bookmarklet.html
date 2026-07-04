@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OTRUST Bookmarklet — Verify this page</title>
+  <link rel="stylesheet" href="/otrust-redesign.css?v=20260704ux">
+</head>
+<body data-otrust-page="docs">
+  <main style="max-width:640px;margin:2rem auto;padding:0 1rem;">
+    <h1>Verify this page</h1>
+    <p>Drag the button below to your bookmarks bar. On any public webpage, click it to hash the page content and open OTRUST verify with that hash.</p>
+    <p>
+      <a class="btn btn-primary" href="javascript:(function(){var s=document.documentElement.outerHTML;fetch('https://www.otrust.eu/api/usage/event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({event:'hash_computed',count:1})}).catch(function(){});crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)).then(function(b){var a=Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0')}).join('');window.open('https://www.otrust.eu/#verify='+a,'_blank');});})();">
+        OTRUST Verify Page
+      </a>
+    </p>
+    <p style="color:var(--text-dim);font-size:0.85rem;">Works on https:// pages with Web Crypto. Cannot read chrome:// or extension pages.</p>
+    <p><a href="/timestamp">← Back to timestamp tool</a></p>
+  </main>
+</body>
+</html>

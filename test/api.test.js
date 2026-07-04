@@ -367,6 +367,16 @@ describe('API Integration Tests', () => {
     });
   });
 
+  describe('GET /stats/badges.json', () => {
+    test('returns compact embed stats', async () => {
+      const res = await request('/stats/badges.json');
+      expect(res.status).toBe(200);
+      expect(res.body.service).toBe('OTRUST');
+      expect(typeof res.body.anchored_records).toBe('number');
+      expect(res.body.updated_at).toBeDefined();
+    });
+  });
+
   describe('POST /claim/simple', () => {
     test('creates claim without PoW for trusted sources', async () => {
       const testHash = hash('simple claim test ' + Date.now());
