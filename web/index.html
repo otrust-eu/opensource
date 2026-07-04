@@ -557,10 +557,13 @@
               </div>
 
               <div class="timestamp-side-stack">
-                <div class="form-group">
-                  <label for="notify-email">Email notification</label>
-                  <input type="email" id="notify-email" placeholder="you@example.com">
-                  <small class="field-hint">Optional alert when blockchain confirms.</small>
+                <div class="form-group notify-email-group">
+                  <label class="notify-email-opt">
+                    <input type="checkbox" id="notify-email-opt-in" checked>
+                    <span>Email me when Bitcoin confirms</span>
+                  </label>
+                  <input type="email" id="notify-email" placeholder="you@example.com" autocomplete="email">
+                  <small class="field-hint">Automatic alert in ~1–2 hours. Email is deleted after sending.</small>
                 </div>
 
                 <button class="btn btn-primary" id="claim-btn" disabled>
@@ -604,13 +607,16 @@
               </div>
 
               <div class="timestamp-side-stack">
-                <div class="form-group">
-                  <label for="text-notify-email">Email notification</label>
-                  <input type="email" id="text-notify-email" placeholder="you@example.com">
+                <div class="form-group notify-email-group">
+                  <label class="notify-email-opt">
+                    <input type="checkbox" id="text-notify-email-opt-in" checked>
+                    <span>Email me when Bitcoin confirms</span>
+                  </label>
+                  <input type="email" id="text-notify-email" placeholder="you@example.com" autocomplete="email">
                 </div>
 
                 <button class="btn btn-primary" id="text-claim-btn">
-                  Claim This Text
+                  Create timestamp
                 </button>
               </div>
             </div>
@@ -1045,6 +1051,41 @@
       if (!str) return '';
       return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
+
+    const NOTIFY_EMAIL_KEY = 'otrust_notify_email';
+
+    function getNotifyEmail(inputId, optInId) {
+      const optIn = document.getElementById(optInId);
+      if (optIn && !optIn.checked) return '';
+      const value = document.getElementById(inputId)?.value?.trim() || '';
+      if (value) localStorage.setItem(NOTIFY_EMAIL_KEY, value);
+      return value;
+    }
+
+    function initNotifyEmailFields() {
+      const saved = localStorage.getItem(NOTIFY_EMAIL_KEY) || '';
+      const pairs = [
+        ['notify-email', 'notify-email-opt-in'],
+        ['text-notify-email', 'text-notify-email-opt-in']
+      ];
+      pairs.forEach(([inputId, optInId]) => {
+        const input = document.getElementById(inputId);
+        const optIn = document.getElementById(optInId);
+        if (!input) return;
+        if (saved) input.value = saved;
+        const syncSaved = () => {
+          const value = input.value.trim();
+          if (value) localStorage.setItem(NOTIFY_EMAIL_KEY, value);
+        };
+        input.addEventListener('change', syncSaved);
+        input.addEventListener('blur', syncSaved);
+        optIn?.addEventListener('change', () => {
+          input.disabled = optIn && !optIn.checked;
+        });
+        if (optIn) input.disabled = !optIn.checked;
+      });
+    }
+    initNotifyEmailFields();
     
     // State
     let files = [];
@@ -1299,7 +1340,7 @@
         
         // Step 3: Submit
         setStep('submit', 'active');
-        const notifyEmail = document.getElementById('notify-email').value.trim();
+        const notifyEmail = getNotifyEmail('notify-email', 'notify-email-opt-in');
         
         let res;
         if (claims.length === 1) {
@@ -1316,7 +1357,11 @@
           res = await fetch('/claim/bulk', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ claims, pow: { challenge, nonce } })
+            body: JSON.stringify({
+              claims,
+              pow: { challenge, nonce },
+              notify_email: notifyEmail || undefined
+            })
           });
         }
         
@@ -1350,6 +1395,9 @@
               blockchain_status: data.blockchain_status
             };
             const claimFilename = files[0]?.name || '';
+            const emailNote = notifyEmail
+              ? `<p class="blockchain-pending-note">We'll email <strong>${escapeHtml(notifyEmail)}</strong> when Bitcoin confirms.</p>`
+              : '';
             const pendingNote = data.blockchain_status !== 'confirmed'
               ? '<p class="blockchain-pending-note">Bitcoin confirmation via OpenTimestamps typically takes 1–2 hours. Save your receipt ID to verify later.</p>'
               : '';
@@ -1363,7 +1411,7 @@
                 ${claimFilename ? `<div class="result-row"><span class="label">File</span><span class="value">${claimFilename}</span></div>` : ''}
                 <div class="result-row"><span class="label">Timestamp</span><span class="value">${data.timestamp}</span></div>
                 <div class="result-row"><span class="label">Blockchain</span><span class="value">${data.blockchain_status}</span></div>
-                ${pendingNote}
+                ${emailNote}${pendingNote}
                 <div class="receipt-actions">
                   <button class="btn btn-secondary" onclick="downloadReceipt('${data.receipt_id}')">Download Receipt</button>
                   ${data.blockchain_status === 'confirmed' ? `<button class="btn btn-secondary" onclick="downloadCertificate('${data.receipt_id}', '${claims[0].hash}')">Download Certificate</button>` : ''}
@@ -1371,9 +1419,13 @@
               </div>`;
           } else {
             const receiptIds = data.results?.filter(r => r.receipt_id).map(r => r.receipt_id) || [];
+            const bulkEmailNote = notifyEmail && data.created > 0
+              ? `<p class="blockchain-pending-note">We'll email <strong>${escapeHtml(notifyEmail)}</strong> as each receipt confirms on Bitcoin.</p>`
+              : '';
             resultEl.innerHTML = `
               <div class="result">
                 <h4>? Batch Processed</h4>
+                ${bulkEmailNote}
                 <div class="result-row"><span class="label">Created</span><span class="value">${data.created}</span></div>
                 <div class="result-row"><span class="label">Duplicates</span><span class="value">${data.duplicates}</span></div>
                 <div class="result-row"><span class="label">Errors</span><span class="value">${data.errors}</span></div>
@@ -1444,7 +1496,7 @@
         
         const ed = await loadEd25519();
         const sig = await ed.signAsync(hexToBytes(hash), hexToBytes(keys.privateKey));
-        const notifyEmail = document.getElementById('text-notify-email').value.trim();
+        const notifyEmail = getNotifyEmail('text-notify-email', 'text-notify-email-opt-in');
         
         const res = await fetch('/claim', {
           method: 'POST',

@@ -2,6 +2,8 @@
 
 const API = 'https://www.otrust.eu';
 
+const NOTIFY_EMAIL_KEY = 'otrust_notify_email';
+
 document.addEventListener('DOMContentLoaded', async () => {
   const timestampBtn = document.getElementById('timestamp-btn');
   const verifyBtn = document.getElementById('verify-btn');
@@ -9,6 +11,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   const resultEl = document.getElementById('result');
   const pubkeyDisplay = document.getElementById('pubkey-display');
   const keyValueEl = pubkeyDisplay.querySelector('.key-value');
+  const notifyEmailInput = document.getElementById('notify-email');
+  const notifyOptIn = document.getElementById('notify-email-opt-in');
+
+  const stored = await chrome.storage.local.get([NOTIFY_EMAIL_KEY]);
+  if (stored[NOTIFY_EMAIL_KEY] && notifyEmailInput) {
+    notifyEmailInput.value = stored[NOTIFY_EMAIL_KEY];
+  }
+  notifyOptIn?.addEventListener('change', () => {
+    if (notifyEmailInput) notifyEmailInput.disabled = !notifyOptIn.checked;
+  });
+  notifyEmailInput?.addEventListener('change', async () => {
+    const value = notifyEmailInput.value.trim();
+    if (value) await chrome.storage.local.set({ [NOTIFY_EMAIL_KEY]: value });
+  });
+  if (notifyEmailInput && notifyOptIn) notifyEmailInput.disabled = !notifyOptIn.checked;
 
   // Show abbreviated pubkey in footer
   const keys = await getKeys();
@@ -86,7 +103,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       steps[3].status = 'active';
       resultEl.innerHTML = showProgress(steps);
       
-      // Submit
+      const notifyEmail = notifyOptIn?.checked ? notifyEmailInput?.value?.trim() : '';
+      if (notifyEmail) await chrome.storage.local.set({ [NOTIFY_EMAIL_KEY]: notifyEmail });
+
       const res = await fetch(`${API}/claim`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -95,7 +114,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           signature: sig,
           pubkey: keys.publicKey,
           pow: { challenge: challenge.challenge, nonce },
-          filename: response.title || 'Web page'
+          filename: response.title || 'Web page',
+          notify_email: notifyEmail || undefined
         })
       });
       
@@ -104,11 +124,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (data.error) throw new Error(data.error);
       
       const isExisting = data.status === 'already_registered';
+      const emailNote = notifyEmail && !isExisting
+        ? `<p style="font-size:0.72rem;color:var(--text-dim);margin-top:0.5rem;">We'll email you when Bitcoin confirms.</p>`
+        : '';
       resultEl.innerHTML = `
         <div class="result ${isExisting ? 'warning' : 'success'}">
-          <h4>${isExisting ? '⚠️ Already Timestamped' : '✓ Timestamped!'}</h4>
+          <h4>${isExisting ? '⚠️ Already Timestamped' : '✓ Timestamp created'}</h4>
           <div class="result-row"><span class="label">Receipt</span><span class="value">${data.receipt_id}</span></div>
           <div class="result-row"><span class="label">Hash</span><span class="value">${hash.slice(0,16)}...</span></div>
+          ${emailNote}
         </div>`;
     } catch (e) {
       resultEl.innerHTML = `<div class="result error"><h4>❌ Error</h4><p style="font-size:0.8rem;margin-top:0.25rem;">${e.message}</p></div>`;

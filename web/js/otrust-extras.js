@@ -18,7 +18,7 @@
         <ol>
           <li>Drop a file or paste text</li>
           <li>Click <em>Create timestamp</em></li>
-          <li>Save your receipt ID — Bitcoin confirmation takes ~1–2 hours</li>
+          <li>Optionally add email — we notify you automatically when Bitcoin confirms</li>
         </ol>
       </div>
       <button type="button" class="otrust-onboard-dismiss">Got it</button>

@@ -776,7 +776,7 @@ app.post('/claim/simple', gptLimiter, smallJson, async (req, res) => {
 // POST /claim/bulk - Batch claims with single PoW
 app.post('/claim/bulk', claimLimiter, bulkJson, async (req, res) => {
   try {
-    const { claims, pow } = req.body;
+    const { claims, pow, notify_email } = req.body;
 
     if (!Array.isArray(claims) || claims.length === 0) {
       return res.status(400).json({ error: 'invalid_claims', message: 'Claims must be a non-empty array' });
@@ -832,6 +832,8 @@ app.post('/claim/bulk', claimLimiter, bulkJson, async (req, res) => {
     // Process valid claims
     const db = getDb();
     const claimsCollection = db.collection('claims');
+    const notifications = db.collection('email_notifications');
+    const validEmail = notify_email && isValidEmail(notify_email) ? notify_email : null;
     const results = [];
     const timestamp = new Date();
 
@@ -884,6 +886,18 @@ app.post('/claim/bulk', claimLimiter, bulkJson, async (req, res) => {
         ots_pending: otsProof ? true : false,
         ots_submitted_at: otsProof ? timestamp : null
       });
+
+      if (validEmail) {
+        try {
+          await notifications.insertOne({
+            claim_id: receiptId,
+            email: validEmail,
+            created_at: timestamp
+          });
+        } catch (emailErr) {
+          console.error(`[Email] Failed to store bulk notification for ${receiptId}: ${emailErr.message}`);
+        }
+      }
 
       results.push({
         index: i,
@@ -3432,7 +3446,8 @@ async function sendConfirmationEmail(claim, blockHeight) {
   
   const baseUrl = process.env.BASE_URL || 'https://www.otrust.eu';
   const proofUrl = `${baseUrl}/proof/${claim.id}?format=ots`;
-  const verifyUrl = `${baseUrl}/#verify=${claim.hash}`;
+  const verifyUrl = `${baseUrl}/proof/${claim.id}`;
+  const workspaceUrl = `${baseUrl}/timestamp#timestamp-tool`;
   
   try {
     // Build HTML content using template components
@@ -3445,11 +3460,11 @@ async function sendConfirmationEmail(claim, blockHeight) {
       ['Timestamp', claim.created_at]
     ]);
     contentHtml += emailActionArea(`
-      ${emailButton('Download .ots Proof', proofUrl)}
+      ${emailButton('View receipt', verifyUrl)}
       &nbsp;&nbsp;
-      ${emailButton('Verify', verifyUrl, 'secondary')}
+      ${emailButton('Download .ots proof', proofUrl, 'secondary')}
     `);
-    contentHtml += emailMuted('This is an automated notification from OTRUST. Your email has been deleted from our system.');
+    contentHtml += emailMuted(`Bitcoin confirmation is permanent. Open the <a href="${workspaceUrl}">timestamp workspace</a> to verify another file. Your email is deleted from our system after this message is sent.`);
     
     const html = emailTemplate({
       title: `✓ Bitcoin Confirmation - ${claim.id}`,

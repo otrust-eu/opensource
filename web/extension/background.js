@@ -3,7 +3,7 @@
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: 'otrust-timestamp',
-    title: ' Timestamp with OTRUST',
+    title: '⏱️ Timestamp with OTRUST',
     contexts: ['page']
   });
 });

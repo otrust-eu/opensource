@@ -4480,6 +4480,12 @@ body.otrust-page-note .dashboard-page-panel .note-side {
 .receipt-qr { margin: 0.75rem 0; text-align: left; }
 .receipt-qr img { border: 1px solid var(--otrust-line); border-radius: 6px; background: #fff; }
 .receipt-qr-caption { margin: 0.35rem 0 0; font-size: 0.72rem; color: var(--otrust-faint); }
+.notify-email-opt {
+  display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.45rem;
+  font-size: 0.78rem; color: var(--otrust-ink); cursor: pointer;
+}
+.notify-email-opt input { width: auto; margin: 0; }
+.notify-email-group input[type="email"]:disabled { opacity: 0.45; }
 
 .changelog-page, .health-page, .use-cases-page, .partner-preview-page {
   max-width: 920px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem;

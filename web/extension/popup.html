@@ -2,6 +2,9 @@
 <html>
 <head>
   <meta charset="UTF-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #fafaf9;
@@ -269,6 +272,11 @@
   </div>
   <div class="content">
     <div class="section-title">Create timestamp</div>
+    <label class="notify-email-opt" style="display:flex;align-items:center;gap:0.4rem;font-size:0.72rem;margin-bottom:0.5rem;">
+      <input type="checkbox" id="notify-email-opt-in" checked>
+      <span>Email me when Bitcoin confirms</span>
+    </label>
+    <input type="email" id="notify-email" placeholder="you@example.com" style="width:100%;margin-bottom:0.65rem;padding:0.55rem 0.65rem;border:1px solid var(--border);border-radius:4px;font-size:0.8rem;">
     <button class="btn btn-primary" id="timestamp-btn">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="12" cy="12" r="10"/>
@@ -284,7 +292,7 @@
   </div>
   <div class="footer">
     <span id="pubkey-display" class="pubkey-chip" title="Click to copy">
-      <span class="key-icon"></span>
+      <span class="key-icon">🔑</span>
       <span class="key-value"></span>
     </span>
     <a href="https://www.otrust.eu/timestamp" target="_blank">Open workspace</a>
