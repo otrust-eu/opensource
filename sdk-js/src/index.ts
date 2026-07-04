@@ -1,41 +1,41 @@
 /**
  * OTRUST SDK
- *
+ * 
  * Official SDK for OTRUST - Zero-knowledge timestamping, signing, identity proofs, and authentication.
- *
+ * 
  * @example
  * ```ts
  * import { timestamp, sign, proof, auth, configure } from '@otrust/sdk';
- *
+ * 
  * // Configure (optional - defaults to https://otrust.eu)
  * configure({ baseUrl: 'https://otrust.eu' });
- *
+ * 
  * // Timestamp a file
  * const result = await timestamp.create(file);
  * if (result.ok) {
  *   console.log('Receipt:', result.value.receiptId);
  * }
- *
+ * 
  * // Create a sign request
  * const signResult = await sign.create(file, {
  *   title: 'Contract',
  *   creatorEmail: 'alice@example.com',
  *   parties: [{ email: 'bob@example.com', role: 'signer' }],
  * });
- *
+ * 
  * // Create identity proof
  * const proofResult = await proof.identity({
  *   personnummer: '19900101-1234',
  *   birthDate: '1990-01-01',
  * });
- *
+ * 
  * // Login with OTRUST
  * const authResult = await auth.createChallenge({
  *   clientId: 'my-app',
  *   redirectUri: 'https://my-app.com/callback',
  * });
  * ```
- *
+ * 
  * @packageDocumentation
  */
 
@@ -45,9 +45,10 @@ import { sign } from './sign.js';
 import { proof } from './proof.js';
 import { auth } from './auth.js';
 import { face } from './face.js';
+import { admin } from './admin.js';
 
 // Re-export all services
-export { timestamp, sign, proof, auth, face };
+export { timestamp, sign, proof, auth, face, admin };
 
 // Re-export types
 export type {
@@ -105,6 +106,14 @@ export type {
   LivenessStatus,
   VerifySelfieOptions,
 } from './face.js';
+
+export type {
+  SystemStats,
+  AbuseReport,
+  AbuseReportStatus,
+  ListAbuseReportsOptions,
+  RateLimitInfo,
+} from './admin.js';
 
 // Re-export client utilities
 export {

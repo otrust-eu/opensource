@@ -1331,7 +1331,7 @@ async function generateIdentityProof() {
             <span class="value" style="font-family: monospace;">${data.proofId}</span>
           </div>
           <div class="result-actions">
-            <button class="btn btn-secondary" id="copy-identity-link">Copy Link</button>
+            <button class="btn btn-secondary" id="copy-identity-link">Copy verify link</button>
             <a href="${data.shareUrl}" target="_blank" class="btn btn-secondary">Open ID</a>
           </div>
           <div class="result-actions" style="margin-top: 0.5rem;">
@@ -1389,6 +1389,7 @@ async function generateIdentityProof() {
         const fullUrl = window.location.origin + data.shareUrl;
         navigator.clipboard.writeText(fullUrl);
         this.textContent = '✓ Copied!';
+        setTimeout(() => { this.textContent = 'Copy verify link'; }, 2000);
       });
       
       // Copy secret button
@@ -1628,7 +1629,7 @@ async function generateAgeProof() {
             <span class="value" style="font-size: 0.7rem;">${proofLocation}</span>
           </div>
           <div class="result-actions">
-            <button class="btn btn-secondary" id="copy-age-link">Copy Link</button>
+            <button class="btn btn-secondary" id="copy-age-link">Copy verify link</button>
             <a href="${data.shareUrl}" target="_blank" class="btn btn-secondary">Open ID</a>
           </div>
         </div>
@@ -1755,7 +1756,7 @@ async function generateIncomeProof() {
             <span class="value" style="font-size: 0.7rem;">${proofLocation}</span>
           </div>
           <div class="result-actions">
-            <button class="btn btn-secondary" id="copy-income-link">Copy Link</button>
+            <button class="btn btn-secondary" id="copy-income-link">Copy verify link</button>
             <a href="${data.shareUrl}" target="_blank" class="btn btn-secondary">Open ID</a>
           </div>
         </div>

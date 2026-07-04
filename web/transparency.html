@@ -164,7 +164,7 @@
   </style>
   <link rel="stylesheet" href="/otrust-redesign.css?v=20260530mono">
 </head>
-<body>
+<body data-otrust-page="transparency">
   <a href="#main-content" class="skip-link">Skip to content</a>
   <nav role="navigation" aria-label="Main navigation">
     <div class="nav-container">
@@ -271,23 +271,8 @@
     </footer>
   </div>
 
-  <script nonce="PLACEHOLDER">
-    const formatNumber = (value) => new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 }).format(Number(value || 0));
-
-    fetch('/stats')
-      .then((response) => response.json())
-      .then((stats) => {
-        document.getElementById('metric-total').textContent = formatNumber(stats.total_records);
-        document.getElementById('metric-verified').textContent = formatNumber(stats.verified_records);
-        document.getElementById('metric-anchored').textContent = formatNumber(stats.anchored_records);
-        document.getElementById('metric-block').textContent = stats.latest_block ? formatNumber(stats.latest_block) : 'Pending';
-        document.getElementById('latest-block-row').textContent = `bitcoin:block ${stats.latest_block || 'pending'}`;
-      })
-      .catch(() => {
-        document.querySelectorAll('.metric-card strong').forEach((el) => { el.textContent = 'Unavailable'; });
-      });
-  </script>
-  <script src="/otrust-polish.js?v=20260530mono" defer></script>
+  <script src="/js/otrust-extras.js?v=20260704ux" defer></script>
+  <script src="/otrust-polish.js?v=20260704ux" defer></script>
 </body>
 </html>
 

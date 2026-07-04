@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OTRUST Partner Auth Theme Preview</title>
+  <meta name="description" content="Preview partner branding for OTRUST hosted Auth — logo, accent color, and hosted flow chrome.">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/otrust-redesign.css?v=20260704ux">
+  <link rel="stylesheet" href="/partners-hemsted.css?v=20260704ux">
+</head>
+<body data-otrust-page="partner-preview">
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <main id="main-content" class="partner-preview-page" role="main">
+    <div id="partner-preview-root">
+    <header class="partner-preview-head">
+      <a href="/" class="dashboard-logo">OTRUST</a>
+      <h1>Partner theme preview</h1>
+      <p>Sketch how your brand appears in hosted Auth. Production themes are configured server-side — this is a local preview only.</p>
+    </header>
+
+    <div class="partner-preview-layout">
+      <form class="partner-preview-form" aria-label="Brand inputs" onsubmit="return false">
+        <label>Brand name <input id="preview-brand-name" type="text" value="Acme Corp" autocomplete="organization"></label>
+        <label>Accent color <input id="preview-brand-color" type="color" value="#1a1a1a"></label>
+        <label>Logo URL <input id="preview-brand-logo" type="url" placeholder="https://example.com/logo.svg" inputmode="url"></label>
+        <p class="partner-preview-hint">See a live example: <a href="/partners/hemsted">Hemsted partner flow</a></p>
+      </form>
+
+      <div class="partner-preview-screen" id="partner-preview-screen" aria-label="Auth screen preview">
+        <div class="preview-auth-card">
+          <img class="preview-brand-logo" alt="" hidden>
+          <p class="preview-powered">Secure verification via <strong>OTRUST</strong></p>
+          <h2 class="preview-brand-name">Your brand</h2>
+          <p class="preview-sub">Sign in with your OTRUST ID to continue to <span class="preview-brand-name-inline">Your brand</span>.</p>
+          <button type="button" class="preview-cta">Continue with OTRUST</button>
+          <p class="preview-footer-mark">OTRUST processes identity verification for this partner.</p>
+        </div>
+      </div>
+    </div>
+    </div>
+  </main>
+  <script src="/js/otrust-extras.js?v=20260704ux" defer></script>
+</body>
+</html>

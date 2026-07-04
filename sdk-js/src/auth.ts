@@ -1,6 +1,6 @@
 /**
  * OTRUST SDK - Auth Service
- *
+ * 
  * "Login with OTRUST" - Identity-based authentication.
  * Allow users to prove their identity using OTRUST Proof.
  */
@@ -89,7 +89,7 @@ export interface UserInfo {
 
 /**
  * Create an auth challenge for "Login with OTRUST".
- *
+ * 
  * @example
  * ```ts
  * // Server-side: Create challenge
@@ -99,7 +99,7 @@ export interface UserInfo {
  *   scope: ['identity'],
  *   state: generateRandomState(),
  * });
- *
+ * 
  * if (result.ok) {
  *   // Redirect user to loginUrl
  *   res.redirect(result.value.loginUrl);
@@ -119,7 +119,7 @@ export async function createChallenge(options: {
   if (!options.clientId) {
     return err(new OTrustError('validation_error', 'clientId is required'));
   }
-
+  
   if (!options.redirectUri) {
     return err(new OTrustError('validation_error', 'redirectUri is required'));
   }
@@ -153,7 +153,7 @@ export async function createChallenge(options: {
 /**
  * Generate a login URL for "Login with OTRUST" button.
  * This is a synchronous function that builds the URL client-side.
- *
+ * 
  * @example
  * ```ts
  * // Get login URL (synchronous)
@@ -161,7 +161,7 @@ export async function createChallenge(options: {
  *   clientId: 'my-app',
  *   redirectUri: 'https://my-app.com/callback',
  * });
- *
+ * 
  * // Use in HTML
  * // <a href={url}>Login with OTRUST</a>
  * ```
@@ -175,21 +175,21 @@ export function loginUrl(options: {
   if (!options.clientId) {
     return err(new OTrustError('validation_error', 'clientId is required'));
   }
-
+  
   if (!options.redirectUri) {
     return err(new OTrustError('validation_error', 'redirectUri is required'));
   }
 
   const client = getClient();
   const baseUrl = client.baseUrl || 'https://otrust.eu';
-
+  
   const params = new URLSearchParams({
     client_id: options.clientId,
     redirect_uri: options.redirectUri,
     scope: (options.scope ?? ['identity']).join(' '),
     response_type: 'code',
   });
-
+  
   if (options.state) {
     params.set('state', options.state);
   }
@@ -200,7 +200,7 @@ export function loginUrl(options: {
 /**
  * Prove identity ownership (used on login page).
  * Typically called by OTRUST's login page, not by your app.
- *
+ * 
  * @example
  * ```ts
  * const result = await auth.prove({
@@ -237,18 +237,18 @@ export async function prove(options: {
 /**
  * Verify an auth token.
  * Call this in your callback handler to validate the token.
- *
+ * 
  * @example
  * ```ts
  * // In your callback handler
  * const token = req.query.token;
  * const state = req.query.state;
- *
+ * 
  * // Verify state matches what you sent
  * if (state !== savedState) {
  *   throw new Error('Invalid state');
  * }
- *
+ * 
  * // Verify token
  * const result = await auth.verify(token);
  * if (result.ok && result.value.valid) {
@@ -287,7 +287,7 @@ export async function verify(token: string): Promise<Result<VerifiedIdentity>> {
 
 /**
  * Get user info with a valid token.
- *
+ * 
  * @example
  * ```ts
  * const result = await auth.userinfo(token);
@@ -316,7 +316,7 @@ export async function userinfo(token: string): Promise<Result<UserInfo>> {
 
 /**
  * Parse callback URL to extract token and state.
- *
+ * 
  * @example
  * ```ts
  * const { token, state } = auth.parseCallback(window.location.href);
@@ -336,7 +336,7 @@ export function parseCallback(url: string): { token?: string; state?: string } {
 
 /**
  * Generate a random state string for CSRF protection.
- *
+ * 
  * @example
  * ```ts
  * const state = auth.generateState();

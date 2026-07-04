@@ -53,7 +53,7 @@ describe('sign service', () => {
         role: 'signer',
         name: 'Test User',
       };
-
+      
       expect(party.role).toBe('signer');
     });
 
@@ -62,7 +62,7 @@ describe('sign service', () => {
         email: 'test@example.com',
         role: 'approver',
       };
-
+      
       expect(party.role).toBe('approver');
     });
   });

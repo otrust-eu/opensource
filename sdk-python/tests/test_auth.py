@@ -47,7 +47,7 @@ class TestAuthParseCallback:
         # First store the state
         state = "state_456"
         auth._state_store[state] = state
-
+        
         result = auth.parse_callback(
             "https://myapp.com/callback?code=auth_code_123&state=state_456"
         )
@@ -68,7 +68,7 @@ class TestAuthVerifyState:
         # Generate a state and store it
         state = secrets.token_hex(16)
         auth._state_store[state] = state
-
+        
         # Should verify successfully
         assert auth.verify_state(state) is True
 
@@ -80,7 +80,8 @@ class TestAuthClearState:
         """Test that clear_state removes stored state."""
         state = secrets.token_hex(16)
         auth._state_store[state] = state
-
+        
         auth.clear_state(state)
-
+        
         assert state not in auth._state_store
+

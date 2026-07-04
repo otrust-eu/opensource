@@ -1,6 +1,6 @@
 /**
  * useAuth Hook
- *
+ * 
  * Handle OTRUST authentication flow in React.
  */
 
@@ -52,16 +52,16 @@ const STATE_KEY = 'otrust_auth_state';
 
 /**
  * Hook for managing OTRUST authentication.
- *
+ * 
  * @example
  * ```tsx
  * function App() {
  *   const { isAuthenticated, user, login, logout } = useAuth();
- *
+ * 
  *   if (!isAuthenticated) {
  *     return <button onClick={() => login()}>Login</button>;
  *   }
- *
+ * 
  *   return (
  *     <div>
  *       <p>Logged in as {user?.proofId}</p>
@@ -97,14 +97,14 @@ export function useAuth(): UseAuthReturn {
     try {
       // Verify token
       const verifyResult = await auth.verify(authToken);
-
+      
       if (!verifyResult.ok || !verifyResult.value.valid) {
         throw new Error('Invalid token');
       }
 
       // Get user info
       const userResult = await auth.userinfo(authToken);
-
+      
       if (userResult.ok) {
         setUser({
           proofId: userResult.value.proofId,
@@ -139,7 +139,7 @@ export function useAuth(): UseAuthReturn {
 
     try {
       const authState = options?.state ?? auth.generateState();
-
+      
       const result = await auth.loginUrl({
         clientId: config.clientId,
         redirectUri: config.redirectUri,
@@ -176,7 +176,7 @@ export function useAuth(): UseAuthReturn {
 
     try {
       const parsed = auth.parseCallback(window.location.href);
-
+      
       if (!parsed.token) {
         throw new Error('No token in callback');
       }
@@ -207,7 +207,7 @@ export function useAuth(): UseAuthReturn {
     if (!token) return false;
 
     const result = await auth.verify(token);
-
+    
     if (result.ok && result.value.valid) {
       return true;
     }

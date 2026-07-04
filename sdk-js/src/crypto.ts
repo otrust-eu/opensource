@@ -1,6 +1,6 @@
 /**
  * OTRUST SDK - Crypto Utilities
- *
+ * 
  * Hash functions and cryptographic utilities using Web Crypto API.
  * Works in all environments: Node.js, Deno, Bun, browsers, and edge runtimes.
  */
@@ -8,7 +8,7 @@
 /** Hash a string or ArrayBuffer using SHA-256 */
 export async function sha256(data: string | ArrayBuffer | Uint8Array): Promise<string> {
   let buffer: ArrayBuffer;
-
+  
   if (typeof data === 'string') {
     buffer = new TextEncoder().encode(data).buffer as ArrayBuffer;
   } else if (data instanceof ArrayBuffer) {
@@ -34,18 +34,18 @@ export async function hashFileWithProgress(
 ): Promise<string> {
   const CHUNK_SIZE = 64 * 1024 * 1024; // 64MB chunks
   const totalSize = file.size;
-
+  
   if (totalSize <= CHUNK_SIZE) {
     onProgress?.(1);
     return hashFile(file);
   }
 
   // For large files, we need to hash in chunks
-  // This is a simplified version - for true streaming,
+  // This is a simplified version - for true streaming, 
   // we'd need a different approach
   let offset = 0;
   const chunks: ArrayBuffer[] = [];
-
+  
   while (offset < totalSize) {
     const chunk = file.slice(offset, Math.min(offset + CHUNK_SIZE, totalSize));
     chunks.push(await chunk.arrayBuffer());
@@ -106,7 +106,7 @@ export async function generateEd25519Keypair(): Promise<{
 }> {
   // Note: Ed25519 is available in Node.js but not in all browsers
   // For browsers without Ed25519 support, use a polyfill or secp256k1
-
+  
   const keyPair = await crypto.subtle.generateKey(
     {
       name: 'Ed25519',
@@ -130,7 +130,7 @@ export async function signEd25519(
   privateKeyHex: string
 ): Promise<string> {
   const privateKeyBuffer = hexToBuffer(privateKeyHex);
-
+  
   const privateKey = await crypto.subtle.importKey(
     'pkcs8',
     privateKeyBuffer.buffer as ArrayBuffer,
@@ -139,7 +139,7 @@ export async function signEd25519(
     ['sign']
   );
 
-  const dataBuffer = typeof data === 'string'
+  const dataBuffer = typeof data === 'string' 
     ? new TextEncoder().encode(data).buffer as ArrayBuffer
     : data;
 
@@ -161,7 +161,7 @@ export async function verifyEd25519(
   try {
     const publicKeyBuffer = hexToBuffer(publicKeyHex);
     const signatureBuffer = hexToBuffer(signature);
-
+    
     const publicKey = await crypto.subtle.importKey(
       'raw',
       publicKeyBuffer.buffer as ArrayBuffer,
@@ -170,7 +170,7 @@ export async function verifyEd25519(
       ['verify']
     );
 
-    const dataBuffer = typeof data === 'string'
+    const dataBuffer = typeof data === 'string' 
       ? new TextEncoder().encode(data).buffer as ArrayBuffer
       : data;
 

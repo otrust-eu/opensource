@@ -73,12 +73,11 @@
     "proof",
     "zero-knowledge"
   ],
-  "author": "Kris Ledel <kris@otrust.eu>",
+  "author": "OTRUST",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/otrust-eu/opensource.git",
-    "directory": "sdk-react"
+    "url": "https://github.com/otrust/sdk-react"
   },
   "homepage": "https://otrust.eu/docs/react"
 }

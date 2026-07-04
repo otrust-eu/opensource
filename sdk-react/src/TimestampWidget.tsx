@@ -1,16 +1,16 @@
 /**
  * Timestamp Widget Component
- *
+ * 
  * Drag-and-drop file upload for creating timestamps.
  */
 
-import {
-  useState,
-  useCallback,
-  useRef,
-  type CSSProperties,
+import { 
+  useState, 
+  useCallback, 
+  useRef, 
+  type CSSProperties, 
   type DragEvent,
-  type ChangeEvent
+  type ChangeEvent 
 } from 'react';
 import { timestamp, type TimestampClaim } from '@otrust/sdk';
 import { UploadIcon, CheckIcon, ErrorIcon } from './icons.js';
@@ -46,7 +46,7 @@ interface FileStatus {
 
 /**
  * Drag-and-drop timestamp widget.
- *
+ * 
  * @example
  * ```tsx
  * <TimestampWidget
@@ -85,13 +85,13 @@ export function TimestampWidget({
       }
 
       // Update to hashing status
-      setFiles(prev => prev.map(f =>
+      setFiles(prev => prev.map(f => 
         f.file === file ? { ...f, status: 'hashing' } : f
       ));
 
       // Create timestamp with progress
       status.status = 'uploading';
-      setFiles(prev => prev.map(f =>
+      setFiles(prev => prev.map(f => 
         f.file === file ? { ...f, status: 'uploading', progress: 50 } : f
       ));
 
@@ -129,7 +129,7 @@ export function TimestampWidget({
     // Process files sequentially
     for (const fileStatus of newFiles) {
       const result = await processFile(fileStatus.file);
-      setFiles(prev => prev.map(f =>
+      setFiles(prev => prev.map(f => 
         f.file === fileStatus.file ? result : f
       ));
     }
@@ -148,7 +148,7 @@ export function TimestampWidget({
   const handleDrop = useCallback((e: DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-
+    
     if (e.dataTransfer.files.length > 0) {
       handleFiles(e.dataTransfer.files);
     }

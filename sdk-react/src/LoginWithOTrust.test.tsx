@@ -49,7 +49,7 @@ describe('LoginWithOTrust', () => {
   describe('callbacks', () => {
     it('calls onError when clientId missing', async () => {
       const onError = vi.fn();
-
+      
       render(
         <OTrustProvider>
           <LoginWithOTrust onError={onError} />
@@ -57,12 +57,12 @@ describe('LoginWithOTrust', () => {
       );
 
       fireEvent.click(screen.getByRole('button'));
-
+      
       // Wait for async handler
       await vi.waitFor(() => {
         expect(onError).toHaveBeenCalled();
       });
-
+      
       expect(onError).toHaveBeenCalledWith(
         expect.objectContaining({
           message: expect.stringContaining('clientId')
@@ -72,7 +72,7 @@ describe('LoginWithOTrust', () => {
 
     it('calls onAuthStart when clicked', async () => {
       const onAuthStart = vi.fn();
-
+      
       render(
         <OTrustProvider config={{ clientId: 'test', redirectUri: 'https://test.com/cb' }}>
           <LoginWithOTrust onAuthStart={onAuthStart} />
@@ -80,7 +80,7 @@ describe('LoginWithOTrust', () => {
       );
 
       fireEvent.click(screen.getByRole('button'));
-
+      
       await vi.waitFor(() => {
         expect(onAuthStart).toHaveBeenCalled();
       });

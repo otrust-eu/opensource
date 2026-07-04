@@ -1,6 +1,6 @@
 /**
  * Signature Status Component
- *
+ * 
  * Display the status of a signing request with party progress.
  */
 
@@ -64,7 +64,7 @@ const STATUS_COLORS: Record<string, { bg: string; text: string; border: string }
 
 /**
  * Display signing request status.
- *
+ * 
  * @example
  * ```tsx
  * <SignatureStatus
@@ -94,7 +94,7 @@ export function SignatureStatus({
 
     async function fetchStatus() {
       const result = await sign.status(requestId);
-
+      
       if (!mounted) return;
 
       if (result.ok) {
@@ -111,7 +111,7 @@ export function SignatureStatus({
             actedAt: p.actedAt,
           })),
         };
-
+        
         setData(newData);
         setLoading(false);
         setError(null);

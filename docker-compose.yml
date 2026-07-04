@@ -1,21 +1,25 @@
+# OTRUST Local Development Environment
+# Usage: docker-compose up
+
+version: '3.8'
+
 services:
   app:
     build: .
     ports:
-      - "3000:3000"
+      - "8080:8080"
     environment:
-      NODE_ENV: development
-      PORT: 3000
-      BASE_URL: http://localhost:3000
-      MONGODB_URI: mongodb://mongodb:27017
-      MONGODB_DB: otrust
-      ENABLE_BLOCKCHAIN: "false"
-      EMAIL_MODE: mock
-      AUTH_SECRET: change-me-in-production
-      CORS_ORIGINS: http://localhost:3000
+      - NODE_ENV=development
+      - PORT=8080
+      - MONGODB_URL=mongodb://mongodb:27017
+      - MONGODB_DB=otrust
     depends_on:
       mongodb:
         condition: service_healthy
+    volumes:
+      # Mount source for hot reload (optional)
+      - ./src:/app/src:ro
+      - ./web:/app/web:ro
     restart: unless-stopped
 
   mongodb:
@@ -31,13 +35,14 @@ services:
       retries: 5
     restart: unless-stopped
 
+  # Optional: MongoDB web UI
   mongo-express:
     image: mongo-express:latest
     ports:
       - "8081:8081"
     environment:
-      ME_CONFIG_MONGODB_URL: mongodb://mongodb:27017
-      ME_CONFIG_BASICAUTH: "false"
+      - ME_CONFIG_MONGODB_URL=mongodb://mongodb:27017
+      - ME_CONFIG_BASICAUTH=false
     depends_on:
       mongodb:
         condition: service_healthy

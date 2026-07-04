@@ -1,6 +1,6 @@
 /**
  * useProof Hook
- *
+ * 
  * Manage proof verification and display in React.
  */
 
@@ -15,7 +15,7 @@ export interface UseProofReturn {
   /** Get proof details */
   getProof: (proofId: string) => Promise<ProofDetails | null>;
   /** Get wallet pass URL */
-  getWalletPass: (proofId: string, platform: 'apple') => Promise<string | null>;
+  getWalletPass: (proofId: string, platform: 'apple' | 'google') => Promise<string | null>;
   /** Loading state */
   isLoading: boolean;
   /** Error state */
@@ -47,19 +47,19 @@ interface ProofDetails {
 
 /**
  * Hook for managing proofs.
- *
+ * 
  * @example
  * ```tsx
  * function ProofVerifier() {
  *   const { verify, isLoading, lastVerification } = useProof();
- *
+ * 
  *   const handleVerify = async () => {
  *     const result = await verify('id_abc123');
  *     if (result?.valid) {
  *       console.log('Proof is valid!');
  *     }
  *   };
- *
+ * 
  *   return (
  *     <button onClick={handleVerify} disabled={isLoading}>
  *       Verify Proof
@@ -79,7 +79,7 @@ export function useProof(): UseProofReturn {
 
     try {
       const result = await proof.verify(proofId);
-
+      
       if (result.ok) {
         const verification: ProofVerification = {
           valid: result.value.valid,
@@ -107,7 +107,7 @@ export function useProof(): UseProofReturn {
 
     try {
       const result = await proof.get(proofId);
-
+      
       if (result.ok) {
         return {
           id: result.value.id,
@@ -130,15 +130,15 @@ export function useProof(): UseProofReturn {
   }, []);
 
   const getWalletPass = useCallback(async (
-    proofId: string,
-    platform: 'apple'
+    proofId: string, 
+    platform: 'apple' | 'google'
   ): Promise<string | null> => {
     setIsLoading(true);
     setError(null);
 
     try {
       const result = await proof.wallet(proofId, platform);
-
+      
       if (result.ok) {
         return result.value.saveUrl ?? null;
       } else {
@@ -163,7 +163,7 @@ export function useProof(): UseProofReturn {
 
     try {
       const result = await proof.verifyWithPin(proofId, pin);
-
+      
       if (result.ok) {
         const verification: ProofVerification = {
           valid: result.value.valid,

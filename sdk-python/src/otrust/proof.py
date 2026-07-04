@@ -14,7 +14,7 @@ from .result import Result, OTrustError, ok, err
 
 ProofType = Literal["identity", "age", "membership"]
 ProofStatus = Literal["active", "revoked", "expired"]
-WalletFormat = Literal["apple"]
+WalletFormat = Literal["apple", "google"]
 
 
 @dataclass
@@ -345,7 +345,7 @@ async def wallet(
 
     Args:
         proof_id: Proof ID
-        format: Wallet format ("apple")
+        format: Wallet format ("apple" or "google")
 
     Returns:
         Result with wallet pass URLs

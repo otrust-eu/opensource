@@ -68,6 +68,16 @@
         "types": "./dist/face.d.cts",
         "default": "./dist/face.cjs"
       }
+    },
+    "./admin": {
+      "import": {
+        "types": "./dist/admin.d.ts",
+        "default": "./dist/admin.js"
+      },
+      "require": {
+        "types": "./dist/admin.d.cts",
+        "default": "./dist/admin.cjs"
+      }
     }
   },
   "files": [
@@ -100,12 +110,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/otrust-eu/opensource.git",
-    "directory": "sdk-js"
+    "url": "https://github.com/otrust-eu/sdk-js.git"
   },
   "homepage": "https://otrust.eu",
   "bugs": {
-    "url": "https://github.com/otrust-eu/opensource/issues"
+    "url": "https://github.com/otrust-eu/sdk-js/issues"
   },
   "engines": {
     "node": ">=18.0.0"

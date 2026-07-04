@@ -1,6 +1,6 @@
 /**
  * OTRUST SDK - Proof Service
- *
+ * 
  * Zero-knowledge identity and attribute proofs.
  */
 
@@ -83,7 +83,7 @@ export interface ProofDetails {
 }
 
 /** Wallet format */
-export type WalletFormat = 'apple';
+export type WalletFormat = 'apple' | 'google';
 
 /** Options for identity verification with face recognition */
 export interface IdentityVerifyOptions {
@@ -118,24 +118,24 @@ export interface IdentityVerifyOptions {
 
 /**
  * Create a new identity proof WITH face verification.
- *
+ * 
  * This is the recommended way to create an identity proof.
  * It performs face recognition client-side before submitting to the server.
- *
+ * 
  * IMPORTANT: Store the returned `secret` securely!
  * It's the only way to prove you own this identity.
- *
+ * 
  * @example
  * ```ts
  * import { proof, face } from '@otrust/sdk';
- *
+ * 
  * // Initialize face recognition
  * await face.init();
- *
+ * 
  * // Start camera
  * const video = document.getElementById('webcam');
  * await face.startCamera(video);
- *
+ * 
  * // Create identity proof with face verification
  * const result = await proof.verifyIdentity({
  *   personnummer: '19900101-1234',
@@ -144,7 +144,7 @@ export interface IdentityVerifyOptions {
  *   videoElement: video,
  *   onProgress: (status) => console.log(status.message),
  * });
- *
+ * 
  * if (result.ok) {
  *   console.log('Proof created:', result.value.proofId);
  *   console.log('Face match:', result.value.verification.faceMatch);
@@ -153,7 +153,7 @@ export interface IdentityVerifyOptions {
  */
 export async function verifyIdentity(options: IdentityVerifyOptions): Promise<Result<IdentityProof>> {
   const { face } = await import('./face.js');
-
+  
   const {
     personnummer,
     birthDate,
@@ -185,7 +185,7 @@ export async function verifyIdentity(options: IdentityVerifyOptions): Promise<Re
 
     // Step 3: Verify selfie with liveness
     onProgress?.({ step: 'verifying_selfie', message: 'Position your face and blink twice...', faceDetected: false, blinksDetected: 0 });
-
+    
     const verifyResult = await face.verifySelfie(videoElement, idFaceResult.value, {
       requireLiveness: !skipLiveness,
       requiredBlinks: 2,
@@ -215,7 +215,7 @@ export async function verifyIdentity(options: IdentityVerifyOptions): Promise<Re
 
   // Step 4: Create proof on server
   onProgress?.({ step: 'creating_proof', message: 'Creating identity proof...' });
-
+  
   return identity({
     personnummer,
     birthDate,
@@ -228,10 +228,10 @@ export async function verifyIdentity(options: IdentityVerifyOptions): Promise<Re
 
 /**
  * Create a new identity proof (low-level, without face verification).
- *
+ * 
  * ⚠️ For production use, prefer `proof.verifyIdentity()` which includes
  * face recognition and liveness detection.
- *
+ * 
  * @example
  * ```ts
  * const result = await proof.identity({
@@ -290,7 +290,7 @@ export async function identity(options: {
 
 /**
  * Create an age proof (prove you're at least X years old).
- *
+ * 
  * @example
  * ```ts
  * const result = await proof.age({
@@ -330,7 +330,7 @@ export async function age(options: {
 
 /**
  * Create a membership proof.
- *
+ * 
  * @example
  * ```ts
  * const result = await proof.membership({
@@ -384,7 +384,7 @@ export interface IncomeProof {
 
 /**
  * Create an income proof (prove income is within a range).
- *
+ * 
  * @example
  * ```ts
  * const result = await proof.income({
@@ -392,7 +392,7 @@ export interface IncomeProof {
  *   minIncome: 40000,
  *   maxIncome: 60000, // Optional upper bound
  * });
- *
+ * 
  * if (result.ok) {
  *   // Share this URL to prove income is >= 40000
  *   console.log(result.value.shareUrl);
@@ -460,10 +460,10 @@ export interface BrowserProofOptions {
 
 /**
  * Submit a browser-generated ZK proof for storage.
- *
+ * 
  * Use this when you generate proofs client-side using snarkjs or similar.
  * The server will verify and store the proof for sharing.
- *
+ * 
  * @example
  * ```ts
  * // After generating a Groth16 proof client-side
@@ -477,7 +477,7 @@ export interface BrowserProofOptions {
  *   minAge: 21,
  *   generatedAt: new Date().toISOString(),
  * });
- *
+ * 
  * if (result.ok) {
  *   console.log('Proof stored:', result.value.proofId);
  *   console.log('Share URL:', result.value.shareUrl);
@@ -515,7 +515,7 @@ export async function submitBrowserProof(
 
 /**
  * Get proof details.
- *
+ * 
  * @example
  * ```ts
  * const result = await proof.get('id_abc123');
@@ -558,7 +558,7 @@ export async function get(proofId: string): Promise<Result<ProofDetails>> {
 
 /**
  * Verify a proof is valid.
- *
+ * 
  * @example
  * ```ts
  * const result = await proof.verify('id_abc123');
@@ -600,16 +600,16 @@ export interface ProofVerifyResult {
 
 /**
  * Verify a proof with PIN (for signing authentication).
- *
+ * 
  * This is used when a signer needs to prove they own an OTRUST identity
  * proof as part of the signing process. The sender can require this
  * for extra identity verification.
- *
+ * 
  * @example
  * ```ts
  * // Verify proof with PIN before signing
  * const result = await proof.verifyWithPin('id_abc123', '123456');
- *
+ * 
  * if (result.ok && result.value.valid) {
  *   // Pass the verification result to sign.complete()
  *   await sign.complete(signId, token, hash, {
@@ -619,7 +619,7 @@ export interface ProofVerifyResult {
  * ```
  */
 export async function verifyWithPin(
-  proofId: string,
+  proofId: string, 
   pin: string
 ): Promise<Result<ProofVerifyResult>> {
   // Validate PIN format
@@ -665,7 +665,7 @@ export async function verifyWithPin(
 
 /**
  * Get wallet pass data.
- *
+ * 
  * @example
  * ```ts
  * const result = await proof.wallet('id_abc123', 'apple');
@@ -704,7 +704,7 @@ export async function wallet(
 /**
  * Revoke an identity proof (for lost/compromised cases).
  * Returns a recovery token to create a new proof.
- *
+ * 
  * @example
  * ```ts
  * const result = await proof.revoke('id_abc123');
@@ -731,7 +731,7 @@ export async function revoke(proofId: string): Promise<Result<{
 
 /**
  * Send proof backup to email.
- *
+ * 
  * @example
  * ```ts
  * await proof.emailBackup({
@@ -749,7 +749,7 @@ export async function emailBackup(options: {
   commitment: string;
 }): Promise<Result<{ success: boolean }>> {
   const client = getClient();
-
+  
   return client.post<{ success: boolean }>('/api/proof/email-backup', {
     ...options,
     shareUrl: `${client.baseUrl}/proof/${options.proofId}`,

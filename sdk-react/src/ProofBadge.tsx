@@ -1,6 +1,6 @@
 /**
  * Proof Badge Component
- *
+ * 
  * Displays a verified proof badge with optional details.
  */
 
@@ -42,11 +42,11 @@ interface ProofData {
 
 /**
  * Display a verified proof badge.
- *
+ * 
  * @example
  * ```tsx
- * <ProofBadge
- *   proofId="id_abc123"
+ * <ProofBadge 
+ *   proofId="id_abc123" 
  *   type="identity"
  *   showStatus
  *   autoVerify
@@ -75,9 +75,9 @@ export function ProofBadge({
 
     async function verifyProof() {
       setStatus('loading');
-
+      
       const result = await proof.verify(proofId);
-
+      
       if (result.ok) {
         if (result.value.valid) {
           setStatus('verified');

@@ -6,7 +6,7 @@ describe('SignatureStatus', () => {
   describe('rendering', () => {
     it('renders with request ID', () => {
       render(<SignatureStatus requestId="sr_abc123" />);
-
+      
       // Shows loading state initially
       expect(screen.getByText(/Loading/i)).toBeInTheDocument();
     });
@@ -15,7 +15,7 @@ describe('SignatureStatus', () => {
       const { container } = render(
         <SignatureStatus requestId="sr_abc123" className="custom-status" />
       );
-
+      
       expect(container.firstChild).toHaveClass('custom-status');
     });
   });
@@ -23,12 +23,12 @@ describe('SignatureStatus', () => {
   describe('polling', () => {
     it('does not poll when pollInterval is not set', () => {
       vi.useFakeTimers();
-
+      
       render(<SignatureStatus requestId="sr_abc123" />);
-
+      
       // No interval should be set
       vi.advanceTimersByTime(60000);
-
+      
       vi.useRealTimers();
     });
   });

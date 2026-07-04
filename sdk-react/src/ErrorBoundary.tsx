@@ -1,6 +1,6 @@
 /**
  * Error Boundary Component for OTRUST React SDK
- *
+ * 
  * Catches JavaScript errors anywhere in the child component tree
  * and displays a fallback UI instead of crashing.
  */
@@ -23,7 +23,7 @@ interface ErrorBoundaryState {
 
 /**
  * Error boundary component that catches errors in child components.
- *
+ * 
  * @example
  * ```tsx
  * <OTrustErrorBoundary

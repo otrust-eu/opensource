@@ -1,6 +1,6 @@
 /**
  * OTRUST SDK - Timestamp Service
- *
+ * 
  * Bitcoin-anchored timestamps via OpenTimestamps.
  * Prove that data existed at a specific point in time.
  */
@@ -126,7 +126,7 @@ export interface CreateOptions {
 /**
  * Create a timestamp for a file or data.
  * This is the main entry point - handles hashing automatically.
- *
+ * 
  * @example
  * ```ts
  * // Timestamp a file
@@ -134,13 +134,13 @@ export interface CreateOptions {
  * if (result.ok) {
  *   console.log('Receipt:', result.value.receiptId);
  * }
- *
+ * 
  * // Timestamp a string
  * const result = await timestamp.create('Hello, World!');
- *
+ * 
  * // Timestamp with options
- * const result = await timestamp.create(file, {
- *   email: 'me@example.com'
+ * const result = await timestamp.create(file, { 
+ *   email: 'me@example.com' 
  * });
  * ```
  */
@@ -150,7 +150,7 @@ export async function create(
 ): Promise<Result<TimestampClaim>> {
   // Hash the data
   let hash: string;
-
+  
   if (data instanceof File || data instanceof Blob) {
     hash = await hashFile(data);
   } else if (typeof data === 'string') {
@@ -170,7 +170,7 @@ export async function create(
 
 /**
  * Create a timestamp using the simple API (rate-limited, no PoW).
- *
+ * 
  * @example
  * ```ts
  * const result = await timestamp.createSimple(hash);
@@ -219,7 +219,7 @@ export async function createSimple(
 
 /**
  * Verify if a hash has been timestamped.
- *
+ * 
  * @example
  * ```ts
  * // Verify a file
@@ -227,7 +227,7 @@ export async function createSimple(
  * if (result.ok && result.value.exists) {
  *   console.log('Timestamped at:', result.value.claim?.createdAt);
  * }
- *
+ * 
  * // Verify a hash directly
  * const result = await timestamp.verify(hash);
  * ```
@@ -237,7 +237,7 @@ export async function verify(
 ): Promise<Result<VerifyResult>> {
   // Hash the data
   let hash: string;
-
+  
   if (data instanceof File || data instanceof Blob) {
     hash = await hashFile(data);
   } else if (typeof data === 'string') {
@@ -287,7 +287,7 @@ export async function verify(
 
 /**
  * Verify multiple hashes at once (max 100).
- *
+ * 
  * @example
  * ```ts
  * const result = await timestamp.verifyBulk([hash1, hash2, hash3]);
@@ -331,7 +331,7 @@ export async function verifyBulk(hashes: string[]): Promise<Result<BulkVerifyRes
     results: result.value.results.map(r => {
       const exists = r.status === 'found' && (r.claims?.length ?? 0) > 0;
       const firstClaim = r.claims?.[0];
-
+      
       return {
         hash: r.hash,
         exists,
@@ -351,7 +351,7 @@ export async function verifyBulk(hashes: string[]): Promise<Result<BulkVerifyRes
 
 /**
  * Get proof details for a receipt ID.
- *
+ * 
  * @example
  * ```ts
  * const result = await timestamp.getProof('ot_abc123');
@@ -387,7 +387,7 @@ export async function getProof(receiptId: string): Promise<Result<TimestampClaim
 
 /**
  * Lookup if a hash exists (quick check).
- *
+ * 
  * @example
  * ```ts
  * const result = await timestamp.lookup(hash);
@@ -425,7 +425,7 @@ export async function lookup(hash: string): Promise<Result<{ exists: boolean; re
 
 /**
  * Hash a file with progress reporting.
- *
+ * 
  * @example
  * ```ts
  * const hash = await timestamp.hash(file, (progress) => {
@@ -454,7 +454,7 @@ export async function hash(
 
 /**
  * Get a proof-of-work challenge from the server.
- *
+ * 
  * @example
  * ```ts
  * const challenge = await timestamp.getChallenge();
@@ -488,7 +488,7 @@ export async function getChallenge(): Promise<Result<Challenge>> {
 /**
  * Solve a proof-of-work challenge.
  * This is CPU-intensive and runs synchronously.
- *
+ * 
  * @example
  * ```ts
  * const pow = await timestamp.solveChallenge(challenge);
@@ -497,7 +497,7 @@ export async function getChallenge(): Promise<Result<Challenge>> {
 export function solveChallenge(challenge: Challenge): ProofOfWork {
   const target = '0'.repeat(challenge.difficulty);
   let nonce = 0;
-
+  
   while (true) {
     // Simple hash check - in production this should use Web Crypto
     const testHash = simpleHash(challenge.challenge + nonce);
@@ -505,7 +505,7 @@ export function solveChallenge(challenge: Challenge): ProofOfWork {
       return { challenge: challenge.challenge, nonce };
     }
     nonce++;
-
+    
     // Safety limit
     if (nonce > 100_000_000) {
       throw new Error('PoW solving exceeded maximum iterations');
@@ -526,7 +526,7 @@ function simpleHash(str: string): string {
 
 /**
  * Create a timestamp with proof-of-work (higher rate limits).
- *
+ * 
  * @example
  * ```ts
  * const challenge = await timestamp.getChallenge();
@@ -576,7 +576,7 @@ export async function createWithPoW(
 /**
  * Create multiple timestamps in a single batch (max 100).
  * Requires proof-of-work for the entire batch.
- *
+ * 
  * @example
  * ```ts
  * const challenge = await timestamp.getChallenge();
@@ -624,7 +624,7 @@ export async function createBulk(
 
 /**
  * Get all receipts for a public key.
- *
+ * 
  * @example
  * ```ts
  * const result = await timestamp.getReceiptsByPubkey(pubkey);
@@ -666,7 +666,7 @@ export async function getReceiptsByPubkey(pubkey: string): Promise<Result<Receip
 
 /**
  * Verify a cryptographic signature.
- *
+ * 
  * @example
  * ```ts
  * const result = await timestamp.verifySignature(hash, signature, pubkey);
@@ -692,7 +692,7 @@ export async function verifySignature(
 
 /**
  * Verify an OpenTimestamps blockchain proof.
- *
+ * 
  * @example
  * ```ts
  * const result = await timestamp.verifyBlockchain(hash, otsProof);

@@ -1,6 +1,6 @@
 /**
  * useTimestamp Hook
- *
+ * 
  * Create and verify timestamps in React.
  */
 
@@ -41,19 +41,19 @@ interface LookupResult {
 
 /**
  * Hook for creating and verifying timestamps.
- *
+ * 
  * @example
  * ```tsx
  * function TimestampForm() {
  *   const { create, isLoading, progress, lastClaim, error } = useTimestamp();
- *
+ * 
  *   const handleFile = async (file: File) => {
  *     const claim = await create(file, { email: 'me@example.com' });
  *     if (claim) {
  *       console.log('Timestamped:', claim.receiptId);
  *     }
  *   };
- *
+ * 
  *   return (
  *     <input type="file" onChange={(e) => handleFile(e.target.files[0])} />
  *   );
@@ -67,7 +67,7 @@ export function useTimestamp(): UseTimestampReturn {
   const [lastClaim, setLastClaim] = useState<TimestampClaim | null>(null);
 
   const create = useCallback(async (
-    data: File | Blob | string,
+    data: File | Blob | string, 
     options?: CreateOptions
   ): Promise<TimestampClaim | null> => {
     setIsLoading(true);
@@ -80,12 +80,12 @@ export function useTimestamp(): UseTimestampReturn {
         // Use the SDK's hash with progress
         const hash = await timestamp.hash(data, (p) => setProgress(p * 0.5));
         setProgress(0.5);
-
+        
         const result = await timestamp.create(hash, {
           filename: options?.filename ?? (data instanceof File ? data.name : undefined),
           email: options?.email,
         });
-
+        
         setProgress(1);
 
         if (result.ok) {

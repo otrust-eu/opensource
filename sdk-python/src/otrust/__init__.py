@@ -5,12 +5,12 @@ Official Python SDK for OTRUST - Zero-knowledge timestamps, signing, proofs, and
 
 Example usage:
     >>> from otrust import timestamp, sign, proof, auth
-    >>>
+    >>> 
     >>> # Create timestamp
     >>> result = await timestamp.create("Hello, World!")
     >>> if result.ok:
     ...     print(f"Receipt: {result.value.receipt_id}")
-    >>>
+    >>> 
     >>> # Create identity proof
     >>> result = await proof.identity(
     ...     personnummer="19900101-1234",

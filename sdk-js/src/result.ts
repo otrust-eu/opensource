@@ -1,6 +1,6 @@
 /**
  * OTRUST SDK - Result Types
- *
+ * 
  * Modern error handling using Result types instead of try/catch.
  * Inspired by Rust's Result<T, E> pattern.
  */
@@ -136,7 +136,7 @@ export class OTrustError extends Error {
   /** Create from HTTP response */
   static fromResponse(status: number, body?: Record<string, unknown>): OTrustError {
     const message = (body?.message as string) || (body?.error as string) || 'Unknown error';
-
+    
     let code: OTrustErrorCode;
     switch (status) {
       case 400:

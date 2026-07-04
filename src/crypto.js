@@ -1,6 +1,6 @@
-/**
+﻿/**
  * otrust-core/src/crypto.js
- *
+ * 
  * Cryptographic operations using @noble libraries
  * Supports:
  * - Ed25519 (EdDSA) - default, fast
@@ -39,7 +39,7 @@ export async function verifySignature(messageHash, signature, pubkey) {
   try {
     const keyType = detectKeyType(pubkey);
     const messageBytes = hexToBytes(messageHash);
-
+    
     if (keyType === 'ed25519') {
       const signatureBytes = hexToBytes(signature);
       const pubkeyBytes = hexToBytes(pubkey);
@@ -91,7 +91,7 @@ export function generateKeypair(type = 'ed25519') {
       publicKey: bytesToHex(publicKey)
     };
   }
-
+  
   // Default: Ed25519
   const privateKey = ed25519.utils.randomPrivateKey();
   const publicKey = ed25519.getPublicKey(privateKey);
@@ -133,7 +133,7 @@ export function verifyPow(challenge, nonce, difficulty = 20) {
     if (!challenge || typeof nonce !== 'string' || !/^[0-9a-f]+$/i.test(nonce)) return false;
     const combined = challenge + nonce;
     const hashResult = sha256(new TextEncoder().encode(combined));
-
+    
     let zeroBits = 0;
     for (const byte of hashResult) {
       if (byte === 0) {

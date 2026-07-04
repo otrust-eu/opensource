@@ -60,3 +60,4 @@ class TestGetClient:
         client1 = get_client()
         client2 = get_client()
         assert client1 is client2
+

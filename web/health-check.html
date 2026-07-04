@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OTRUST Self-Host Health Check</title>
+  <meta name="description" content="Verify your self-hosted OTRUST instance: health, stats, timestamp challenge, docs, and workspaces.">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/otrust-redesign.css?v=20260704ux">
+</head>
+<body data-otrust-page="health">
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <main id="main-content" class="health-page" role="main">
+    <header class="health-head">
+      <a href="/" class="dashboard-logo">OTRUST</a>
+      <h1>Self-host health check</h1>
+      <p>Run this after <code>docker compose up</code> or your first deploy. All checks hit this instance only.</p>
+      <button type="button" class="btn btn-secondary" id="health-recheck">Re-run checks</button>
+    </header>
+    <ul class="health-checklist" id="health-checklist" aria-live="polite"></ul>
+    <section class="health-next">
+      <h2>Next steps</h2>
+      <ul class="bento-doclist">
+        <li><a href="/timestamp"><span><strong>Timestamp a file</strong><em>Try the workspace</em></span><span class="arr" aria-hidden="true">→</span></a></li>
+        <li><a href="/docs"><span><strong>Read the docs</strong><em>API and architecture</em></span><span class="arr" aria-hidden="true">→</span></a></li>
+        <li><a href="/transparency"><span><strong>Transparency log</strong><em>Live public metrics</em></span><span class="arr" aria-hidden="true">→</span></a></li>
+      </ul>
+    </section>
+  </main>
+  <script src="/js/otrust-extras.js?v=20260704ux" defer></script>
+</body>
+</html>

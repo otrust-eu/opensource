@@ -77,3 +77,4 @@ class TestTimestampModuleExists:
         """Test that timestamp module has is_valid_hash function."""
         assert hasattr(timestamp, 'is_valid_hash')
         assert callable(timestamp.is_valid_hash)
+

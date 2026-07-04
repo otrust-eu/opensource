@@ -1,4 +1,4 @@
-/**
+﻿/**
  * otrust-core/src/server.js
  *
  * Blind notary service - Zero-knowledge timestamping
@@ -1539,6 +1539,7 @@ function renderProofPage(claim, info, receiptId) {
       .nav-container { padding-left: 1rem; padding-right: 1rem; }
     }
   </style>
+  <link rel="stylesheet" href="/otrust-redesign.css?v=20260527-1">
 </head>
 <body>
   <nav>
@@ -1720,6 +1721,7 @@ function renderProofNotFound(receiptId) {
       font-weight: 500;
     }
   </style>
+  <link rel="stylesheet" href="/otrust-redesign.css?v=20260527-1">
 </head>
 <body>
   <nav>
@@ -1981,6 +1983,7 @@ app.get('/sign/file/:fileId', async (req, res) => {
     .btn { display: inline-block; background: #2d5a3d; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 500; }
     .btn:hover { background: #1e4029; }
   </style>
+  <link rel="stylesheet" href="/otrust-redesign.css?v=20260527-1">
 </head>
 <body>
   <div class="container">
@@ -2582,9 +2585,14 @@ const serveHtmlWithNonce = (filePath) => {
   return (req, res) => {
     try {
       let html = fs.readFileSync(filePath, 'utf8');
+      const dashboardCacheVersion = '20260601-02';
       // Replace nonce placeholders in inline <script> tags
       // SECURITY: [^"]* is bounded by " character and is safe from ReDoS
       html = html.replace(/nonce="[^"]*"/g, `nonce="${req.cspNonce}"`);
+      html = html
+        .replace(/\/otrust-polish\.css\?v=[^"'\s<>]+/g, `/otrust-polish.css?v=${dashboardCacheVersion}`)
+        .replace(/\/otrust-redesign\.css\?v=[^"'\s<>]+/g, `/otrust-redesign.css?v=${dashboardCacheVersion}`)
+        .replace(/\/otrust-polish\.js\?v=[^"'\s<>]+/g, `/otrust-polish.js?v=${dashboardCacheVersion}`);
       res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
       res.send(html);
@@ -2605,6 +2613,10 @@ app.get('/sign-in.html', serveHtmlWithNonce(path.join(__dirname, '../web/sign-in
 app.get('/sign-in', serveHtmlWithNonce(path.join(__dirname, '../web/sign-in.html')));
 app.get(['/signin', '/login'], (req, res) => res.redirect(301, '/sign-in'));
 app.get(['/partners/hemsted', '/partners/hemsted.html'], serveHtmlWithNonce(path.join(__dirname, '../web/partners-hemsted.html')));
+app.get(['/partners/preview', '/partners-preview.html'], serveHtmlWithNonce(path.join(__dirname, '../web/partners-preview.html')));
+app.get(['/changelog', '/changelog.html'], serveHtmlWithNonce(path.join(__dirname, '../web/changelog.html')));
+app.get(['/use-cases', '/use-cases.html'], serveHtmlWithNonce(path.join(__dirname, '../web/use-cases.html')));
+app.get(['/health-check', '/health-check.html'], serveHtmlWithNonce(path.join(__dirname, '../web/health-check.html')));
 app.get('/about.html', serveHtmlWithNonce(path.join(__dirname, '../web/about.html')));
 app.get('/about', serveHtmlWithNonce(path.join(__dirname, '../web/about.html')));
 app.get('/transparency.html', serveHtmlWithNonce(path.join(__dirname, '../web/transparency.html')));
@@ -2803,6 +2815,12 @@ app.use(express.static(path.join(__dirname, '../web'), {
   setHeaders: (res, path) => {
     // Prevent caching of HTML files (but these shouldn't be served by static now)
     if (path.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    } else if (
+      path.endsWith('otrust-redesign.css') ||
+      path.endsWith('otrust-polish.css') ||
+      path.endsWith('otrust-polish.js')
+    ) {
       res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     }
   }
@@ -4800,7 +4818,37 @@ const AUTH_SPACING_SCALES = new Set(['tight', 'default', 'loose']);
 const AUTH_IDENTITY_METHODS = new Set(['proof', 'all']);
 const RGB_COLOR_RE = /^rgba?\(\s*(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\s*,\s*(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\s*,\s*(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(?:\s*,\s*(0|1|0?\.\d+))?\s*\)$/i;
 
-const BUILTIN_AUTH_BRANDING = Object.freeze({});
+const HEMSTED_AUTH_THEME = Object.freeze({
+  enabled: true,
+  logoUrl: 'https://hemsted.se/assets/branding/logo.svg',
+  logoAlt: 'Hemsted',
+  backgroundColor: '#FAFAF7',
+  primaryColor: '#0F1B2D',
+  textColor: '#0F1B2D',
+  fontFamily: 'Inter',
+  fontUrl: null,
+  borderRadius: 8,
+  spacingScale: 'default',
+  headline: 'Logga in p\u00e5 Hemsted',
+  subhead: 'S\u00e4ker inloggning med OTRUST Proof',
+  footerText: '\u00a9 Hemsted AB \u00b7 Identity-fl\u00f6de s\u00e4krat av OTRUST',
+  infoBlurb: 'Verifieringen sker p\u00e5 otrust.eu. OTRUST hanterar identity-fl\u00f6det och skickar dig tillbaka till Hemsted efter verifiering.',
+  cookieBannerText: '',
+  allowedIdentityMethods: ['proof'],
+  autoRedirectSeconds: 3,
+  maxAssetBytes: 200000
+});
+
+const BUILTIN_AUTH_BRANDING = Object.freeze({
+  hemsted_prod: {
+    hemsted_dark: Object.freeze({ ...HEMSTED_AUTH_THEME, themeId: 'hemsted_dark' }),
+    hemsted_dark_staging: Object.freeze({
+      ...HEMSTED_AUTH_THEME,
+      themeId: 'hemsted_dark_staging',
+      infoBlurb: 'Staging theme. Verifieringen sker p\u00e5 otrust.eu och skickar dig tillbaka till Hemsted efter verifiering.'
+    })
+  }
+});
 
 function sanitizeClientId(value) {
   const str = ensureString(value, 80);
@@ -4946,6 +4994,13 @@ function builtInAuthBranding(clientId, themeId) {
 }
 
 function applyAuthBrandingPolicy(clientId, themeId, branding) {
+  if (clientId === 'hemsted_prod' && (themeId === 'hemsted_dark' || themeId === 'hemsted_dark_staging')) {
+    return {
+      ...branding,
+      subhead: HEMSTED_AUTH_THEME.subhead,
+      allowedIdentityMethods: ['proof']
+    };
+  }
   return branding;
 }
 
@@ -5045,7 +5100,7 @@ function requestedAuthThemeId(req) {
 }
 
 function defaultAuthThemeIdForClient(clientId) {
-  return AUTH_BRANDING_DEFAULTS.themeId;
+  return clientId === 'hemsted_prod' ? 'hemsted_dark' : AUTH_BRANDING_DEFAULTS.themeId;
 }
 
 function requestedChallengeThemeId(req, clientId) {

@@ -621,7 +621,7 @@ function ReactTimestampWidget() {
     <div className="function-card">
       <h3>{'<TimestampWidget />'}</h3>
       <p>Drag-and-drop file upload for creating timestamps</p>
-
+      
       <div className="component-demo">
         <div className="demo-box">
           <div className="demo-widget timestamp-widget-demo">
@@ -669,7 +669,7 @@ function ReactLoginButton() {
     <div className="function-card">
       <h3>{'<LoginWithOTrust />'}</h3>
       <p>"Login with OTRUST" authentication button</p>
-
+      
       <div className="component-demo">
         <div className="demo-box">
           <button className="demo-login-btn">
@@ -720,7 +720,7 @@ function ReactProofBadge() {
     <div className="function-card">
       <h3>{'<ProofBadge />'}</h3>
       <p>Display verification status badge</p>
-
+      
       <div className="component-demo">
         <div className="demo-box" style={{ gap: '1rem' }}>
           <div className="demo-badge verified">
@@ -776,7 +776,7 @@ function ReactSignatureStatus() {
     <div className="function-card">
       <h3>{'<SignatureStatus />'}</h3>
       <p>Real-time signature request status</p>
-
+      
       <div className="component-demo">
         <div className="demo-box">
           <div className="demo-sig-status">
@@ -835,7 +835,7 @@ function ReactHooks() {
     <div className="function-card">
       <h3>React Hooks</h3>
       <p>Custom hooks for common operations</p>
-
+      
       <div className="hooks-list">
         <div className="hook-item">
           <code>useAuth()</code>
@@ -868,7 +868,7 @@ function MyComponent() {
   const { user, login, logout } = useAuth()
   const { data, loading, verify } = useProof('prf_123')
   const { create, status } = useTimestamp()
-
+  
   return user ? <p>Hello {user.email}</p> : <button onClick={login}>Login</button>
 }`} />
       </div>
@@ -899,13 +899,13 @@ export default function App() {
           </div>
         </div>
       </nav>
-
+      
       <div className="docs-submenu-bar open">
         <div className="docs-submenu-container">
           <a href="https://otrust.eu/docs">Documentation</a>
           <a href="https://otrust.eu/api-docs">API Reference</a>
           <a href="https://otrust.eu/playground/" className="active">SDK Playground</a>
-          <a href="https://github.com/otrust-eu/opensource" target="_blank">GitHub</a>
+          <a href="https://github.com/otrust-eu/core" target="_blank">GitHub ↗</a>
         </div>
       </div>
       <main className="app-main">
@@ -970,3 +970,4 @@ export default function App() {
     </div>
   )
 }
+

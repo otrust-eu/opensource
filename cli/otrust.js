@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 /**
  * otrust CLI
- *
+ * 
  * Commands:
  *   keygen              Generate Ed25519 keypair
  *   claim <file>        Timestamp a file
  *   verify <file>       Verify a file's timestamp
  *   sign <file>         Sign a file (without claiming)
- *
+ * 
  * Usage:
  *   otrust keygen > ~/.otrust/key.json
  *   otrust claim ./document.pdf
@@ -36,7 +36,7 @@ function generateKeypair() {
     publicKeyEncoding: { type: 'spki', format: 'der' },
     privateKeyEncoding: { type: 'pkcs8', format: 'der' }
   });
-
+  
   // Ed25519 PKCS8 structure: 48 bytes total
   // - 16 bytes header
   // - 32 bytes seed (private key)
@@ -44,19 +44,19 @@ function generateKeypair() {
   if (privateKey.length !== 48) {
     throw new Error('Unexpected PKCS8 private key length: ' + privateKey.length);
   }
-
+  
   // Verify PKCS8 Ed25519 OID (1.3.101.112 = 2b 65 70)
   const oid = privateKey.slice(7, 10);
   if (oid[0] !== 0x2b || oid[1] !== 0x65 || oid[2] !== 0x70) {
     throw new Error('Invalid Ed25519 PKCS8 OID');
   }
-
+  
   // Extract 32-byte seed from offset 16
   const privkeyRaw = privateKey.slice(16, 48);
-
+  
   // Ed25519 SPKI: last 32 bytes are the public key
   const pubkeyRaw = publicKey.slice(-32);
-
+  
   return {
     privateKey: privkeyRaw.toString('hex'),
     publicKey: pubkeyRaw.toString('hex')
@@ -65,44 +65,44 @@ function generateKeypair() {
 
 function sign(messageHash, privateKeyHex) {
   const privateKeyRaw = Buffer.from(privateKeyHex, 'hex');
-
+  
   // Reconstruct PKCS8 DER format
   const pkcs8Header = Buffer.from([
     0x30, 0x2e, 0x02, 0x01, 0x00, 0x30, 0x05, 0x06,
     0x03, 0x2b, 0x65, 0x70, 0x04, 0x22, 0x04, 0x20
   ]);
   const privateKeyDer = Buffer.concat([pkcs8Header, privateKeyRaw]);
-
+  
   const key = crypto.createPrivateKey({
     key: privateKeyDer,
     format: 'der',
     type: 'pkcs8'
   });
-
+  
   const messageBuffer = Buffer.from(messageHash, 'hex');
   const signature = crypto.sign(null, messageBuffer, key);
-
+  
   return signature.toString('hex');
 }
 
 function getPublicKey(privateKeyHex) {
   const privateKeyRaw = Buffer.from(privateKeyHex, 'hex');
-
+  
   const pkcs8Header = Buffer.from([
     0x30, 0x2e, 0x02, 0x01, 0x00, 0x30, 0x05, 0x06,
     0x03, 0x2b, 0x65, 0x70, 0x04, 0x22, 0x04, 0x20
   ]);
   const privateKeyDer = Buffer.concat([pkcs8Header, privateKeyRaw]);
-
+  
   const privateKey = crypto.createPrivateKey({
     key: privateKeyDer,
     format: 'der',
     type: 'pkcs8'
   });
-
+  
   const publicKey = crypto.createPublicKey(privateKey);
   const publicKeyDer = publicKey.export({ type: 'spki', format: 'der' });
-
+  
   return publicKeyDer.slice(-32).toString('hex');
 }
 
@@ -130,15 +130,15 @@ function hashString(str) {
 
 function solvePow(challenge, difficulty) {
   let nonce = 0;
-
+  
   process.stdout.write('  Solving proof-of-work... ');
-
+  
   while (true) {
     const nonceHex = nonce.toString(16).padStart(16, '0');
     const hash = crypto.createHash('sha256')
       .update(challenge + nonceHex)
       .digest();
-
+    
     // Check leading zero bits
     let zeroBits = 0;
     for (const byte of hash) {
@@ -150,12 +150,12 @@ function solvePow(challenge, difficulty) {
       }
       if (zeroBits >= difficulty) break;
     }
-
+    
     if (zeroBits >= difficulty) {
       console.log('done');
       return nonceHex;
     }
-
+    
     nonce++;
     if (nonce % 100000 === 0) {
       process.stdout.write('.');
@@ -172,7 +172,7 @@ function apiRequest(method, path, data = null) {
     const url = new URL(path, DEFAULT_API);
     const isHttps = url.protocol === 'https:';
     const client = isHttps ? https : http;
-
+    
     const options = {
       hostname: url.hostname,
       port: url.port || (isHttps ? 443 : 3000),
@@ -201,7 +201,7 @@ function apiRequest(method, path, data = null) {
       req.destroy();
       reject(new Error('Request timeout'));
     });
-
+    
     if (data) req.write(JSON.stringify(data));
     req.end();
   });
@@ -235,10 +235,10 @@ const commands = {
   async keygen(args) {
     const keyType = args.includes('--secp256k1') ? 'secp256k1' : 'ed25519';
     console.log(`Generating ${keyType} keypair...\n`);
-
+    
     const keypair = generateKeypair();
     keypair.type = keyType;
-
+    
     if (args.includes('--save')) {
       saveKey(keypair);
       console.log(`Key type:    ${keyType}`);
@@ -593,12 +593,12 @@ const commands = {
     // Query API using POST (not GET) to prevent URL/log leakage
     process.stdout.write('  Querying... ');
     const res = await apiRequest('POST', '/verify', { hash });
-
+    
     if (res.data.status === 'found') {
       console.log('done\n');
       console.log('  ' + '─'.repeat(40));
       console.log(`  ✓ Verified`);
-
+      
       for (const claim of res.data.claims) {
         console.log(`  Pubkey:    ${claim.pubkey.substring(0, 16)}...`);
         console.log(`  Time:      ${claim.timestamp}`);

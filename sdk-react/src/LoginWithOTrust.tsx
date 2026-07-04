@@ -1,6 +1,6 @@
 /**
  * Login with OTRUST Button Component
- *
+ * 
  * A styled button that initiates the OTRUST authentication flow.
  */
 
@@ -48,7 +48,7 @@ export interface LoginWithOTrustProps {
 
 /**
  * "Login with OTRUST" button component.
- *
+ * 
  * @example
  * ```tsx
  * <LoginWithOTrust
@@ -97,7 +97,7 @@ export function LoginWithOTrust({
 
     try {
       const authState = state ?? auth.generateState();
-
+      
       // loginUrl is now synchronous
       const result = auth.loginUrl({
         clientId,

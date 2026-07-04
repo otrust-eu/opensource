@@ -14,8 +14,8 @@ pip install otrust
 import asyncio
 from otrust import timestamp, sign, proof, auth, configure
 
-# Configure (optional - defaults to https://otrust.eu)
-configure(base_url="https://otrust.eu", api_key="your-api-key")
+# Configure (optional - defaults to https://otrust.se)
+configure(base_url="https://otrust.se", api_key="your-api-key")
 
 async def main():
     # Create a timestamp
@@ -172,7 +172,7 @@ if params and params.get("code"):
     )
     if result.ok:
         print(f"Access token: {result.value.access_token}")
-
+        
         # Get user info
         user_result = await auth.userinfo(result.value.access_token)
         if user_result.ok:
@@ -247,7 +247,7 @@ from otrust import configure
 
 # Configure globally
 configure(
-    base_url="https://otrust.eu",
+    base_url="https://otrust.se",
     api_key="your-api-key",
     timeout=30.0,
     max_retries=3,

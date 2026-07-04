@@ -1,6 +1,6 @@
 /**
  * @otrust/react - React Components for OTRUST
- *
+ * 
  * Components:
  * - <LoginWithOTrust /> - "Login with OTRUST" button
  * - <ProofBadge /> - Display verified proof status

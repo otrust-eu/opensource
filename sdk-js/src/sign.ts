@@ -1,6 +1,6 @@
 /**
  * OTRUST SDK - Sign Service
- *
+ * 
  * Multi-party document signing with zero-knowledge proofs.
  */
 
@@ -134,16 +134,16 @@ export interface UploadOptions {
 /**
  * Upload a document for signing (temporary storage).
  * Files are stored for up to 12 hours, then automatically deleted.
- *
+ * 
  * @example
  * ```ts
  * const file = document.getElementById('fileInput').files[0];
  * const result = await sign.upload(file, { ttlHours: 6 });
- *
+ * 
  * if (result.ok) {
  *   console.log('File uploaded:', result.value.fileId);
  *   console.log('Document hash:', result.value.documentHash);
- *
+ *   
  *   // Now create a sign request
  *   const signResult = await sign.create(result.value.documentHash, {
  *     title: file.name,
@@ -158,11 +158,11 @@ export async function upload(
   options: UploadOptions = {}
 ): Promise<Result<UploadedFile>> {
   const client = getClient();
-
+  
   // Get file buffer
   let buffer: ArrayBuffer;
   let filename = options.filename || 'document';
-
+  
   if (document instanceof File) {
     buffer = await document.arrayBuffer();
     filename = options.filename || document.name;
@@ -171,12 +171,12 @@ export async function upload(
   } else {
     buffer = document;
   }
-
+  
   // Size check (25MB max)
   if (buffer.byteLength > 25 * 1024 * 1024) {
     return err(new OTrustError('validation_error', 'File must be under 25MB'));
   }
-
+  
   // Use raw fetch for binary upload
   const response = await fetch(`${client.baseUrl}/sign/upload`, {
     method: 'POST',
@@ -189,7 +189,7 @@ export async function upload(
     },
     body: buffer,
   });
-
+  
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     return err(new OTrustError(
@@ -197,9 +197,9 @@ export async function upload(
       errorData.message || `Upload failed: ${response.status}`
     ));
   }
-
+  
   const data = await response.json();
-
+  
   return ok({
     fileId: data.file_id,
     fileToken: data.file_token,
@@ -214,15 +214,15 @@ export async function upload(
 /**
  * Download a document by file ID.
  * Requires a valid signing token, view token, or file token.
- *
+ * 
  * @example
  * ```ts
  * // As a signer with their token
  * const result = await sign.downloadFile('sf_xyz789', { token: signerToken, signId: 'sr_abc123' });
- *
+ * 
  * // As creator with file token
  * const result = await sign.downloadFile('sf_xyz789', { fileToken });
- *
+ * 
  * if (result.ok) {
  *   // Create download link
  *   const url = URL.createObjectURL(result.value.blob);
@@ -240,24 +240,24 @@ export async function downloadFile(
   if (!fileId.startsWith('sf_')) {
     return err(new OTrustError('validation_error', 'Invalid file ID'));
   }
-
+  
   const client = getClient();
   const params = new URLSearchParams();
-
+  
   if (auth.token) params.set('token', auth.token);
   if (auth.signId) params.set('sign_id', auth.signId);
   if (auth.viewToken) params.set('view_token', auth.viewToken);
   if (auth.fileToken) params.set('file_token', auth.fileToken);
-
+  
   const url = `${client.baseUrl}/sign/file/${fileId}?${params.toString()}`;
-
+  
   const response = await fetch(url, {
     headers: {
       'Accept': 'application/octet-stream',
       ...client.headers,
     },
   });
-
+  
   if (!response.ok) {
     if (response.status === 410) {
       return err(new OTrustError('file_deleted', 'File has been deleted (privacy purge)'));
@@ -268,24 +268,24 @@ export async function downloadFile(
       errorData.message || `Download failed: ${response.status}`
     ));
   }
-
+  
   const blob = await response.blob();
   const contentDisposition = response.headers.get('Content-Disposition');
   const filename = contentDisposition?.match(/filename="?([^"]+)"?/)?.[1] || 'document';
   const mimeType = response.headers.get('Content-Type') || 'application/octet-stream';
-
+  
   return ok({ blob, filename, mimeType });
 }
 
 /**
  * Get sign request details for acting (signing/approving).
  * This is used by the signing party when they receive a signing link.
- *
+ * 
  * @example
  * ```ts
  * // Get request details using token from email link
  * const result = await sign.getActInfo('sr_xyz789', token);
- *
+ * 
  * if (result.ok) {
  *   console.log('Document:', result.value.title);
  *   console.log('Your role:', result.value.party.role);
@@ -300,7 +300,7 @@ export async function getActInfo(
   if (!requestId.startsWith('sr_')) {
     return err(new OTrustError('validation_error', 'Invalid sign request ID'));
   }
-
+  
   const client = getClient();
   const result = await client.get<{
     id: string;
@@ -335,13 +335,13 @@ export async function getActInfo(
       requireOtrustProof?: boolean;
     };
   }>(`/sign/${requestId}/act?token=${token}`);
-
+  
   if (!result.ok) {
     return result;
   }
-
+  
   const data = result.value;
-
+  
   return ok({
     id: data.id,
     documentHash: data.document_hash,
@@ -380,7 +380,7 @@ export async function getActInfo(
 
 /**
  * Create a new multi-party signing request.
- *
+ * 
  * @example
  * ```ts
  * // Create a sign request
@@ -393,7 +393,7 @@ export async function getActInfo(
  *   ],
  *   deadline: '7d', // 7 days
  * });
- *
+ * 
  * if (result.ok) {
  *   console.log('Sign request created:', result.value.id);
  * }
@@ -405,7 +405,7 @@ export async function create(
 ): Promise<Result<SignRequest>> {
   // Hash the document
   let documentHash: string;
-
+  
   if (document instanceof File || document instanceof Blob) {
     documentHash = await hashFile(document);
   } else if (isValidHash(document)) {
@@ -418,11 +418,11 @@ export async function create(
   if (!options.title) {
     return err(new OTrustError('validation_error', 'Title is required'));
   }
-
+  
   if (!options.creatorEmail) {
     return err(new OTrustError('validation_error', 'Creator email is required'));
   }
-
+  
   if (!options.parties || options.parties.length === 0) {
     return err(new OTrustError('validation_error', 'At least one party is required'));
   }
@@ -502,7 +502,7 @@ export async function create(
 
 /**
  * Get the status of a sign request.
- *
+ * 
  * @example
  * ```ts
  * const result = await sign.status('sr_xyz789');
@@ -514,10 +514,10 @@ export async function create(
  */
 export async function status(requestId: string, viewToken?: string): Promise<Result<SignRequest>> {
   const client = getClient();
-  const url = viewToken
+  const url = viewToken 
     ? `/sign/${requestId}?token=${viewToken}`
     : `/sign/${requestId}`;
-
+    
   const result = await client.get<{
     id: string;
     document_hash: string;
@@ -568,7 +568,7 @@ export async function status(requestId: string, viewToken?: string): Promise<Res
 
 /**
  * Cancel a sign request.
- *
+ * 
  * @example
  * ```ts
  * const result = await sign.cancel('sr_xyz789', cancelToken);
@@ -585,7 +585,7 @@ export async function cancel(requestId: string, cancelToken: string): Promise<Re
 
 /**
  * Send reminder to pending parties.
- *
+ * 
  * @example
  * ```ts
  * const result = await sign.remind('sr_xyz789', cancelToken);
@@ -609,7 +609,7 @@ export async function remind(requestId: string, cancelToken: string): Promise<Re
 
 /**
  * Verify a document hash matches the sign request.
- *
+ * 
  * @example
  * ```ts
  * const result = await sign.verifyDocument('sr_xyz789', file);
@@ -623,7 +623,7 @@ export async function verifyDocument(
   document: File | Blob | string
 ): Promise<Result<{ matches: boolean }>> {
   let documentHash: string;
-
+  
   if (document instanceof File || document instanceof Blob) {
     documentHash = await hashFile(document);
   } else if (isValidHash(document)) {
@@ -646,7 +646,7 @@ export async function verifyDocument(
 
 /**
  * Get the signature package (proof) for a completed sign request.
- *
+ * 
  * @example
  * ```ts
  * const result = await sign.getPackage('sr_xyz789');
@@ -719,12 +719,12 @@ export interface CompleteSignResult {
 
 /**
  * Complete a signature/approval/view action on a sign request.
- *
+ * 
  * @example
  * ```ts
  * // First verify proof if required
  * const proofResult = await proof.verifyWithPin('id_abc123', '123456');
- *
+ * 
  * // Then complete signature with proof
  * const result = await sign.complete('sr_xyz789', 'token_abc', documentHash, 'signed', {
  *   signature: mySignature,

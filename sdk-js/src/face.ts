@@ -1,25 +1,25 @@
 /**
  * OTRUST SDK - Face Recognition & Liveness Detection
- *
+ * 
  * Client-side face verification using face-api.js.
  * All processing happens locally - no face data is sent to servers.
- *
+ * 
  * @example
  * ```ts
  * import { face } from '@otrust/sdk';
- *
+ * 
  * // Initialize (load models)
  * await face.init();
- *
+ * 
  * // Extract face from ID document
  * const idFace = await face.detectFromImage(idImage);
- *
+ * 
  * // Start selfie verification with liveness
  * const result = await face.verifySelfie(videoElement, idFace, {
  *   requireLiveness: true,
  *   onProgress: (status) => console.log(status),
  * });
- *
+ * 
  * if (result.ok) {
  *   console.log('Match:', result.value.faceMatch);
  *   console.log('Liveness:', result.value.livenessVerified);
@@ -100,7 +100,7 @@ const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
 /**
  * Initialize face recognition models.
  * Must be called before using other face functions.
- *
+ * 
  * @example
  * ```ts
  * await face.init();
@@ -165,7 +165,7 @@ export function isInitialized(): boolean {
 
 /**
  * Detect face from an image element or canvas.
- *
+ * 
  * @example
  * ```ts
  * const idImage = document.getElementById('id-photo');
@@ -233,16 +233,16 @@ export function calculateSimilarity(desc1: Float32Array, desc2: Float32Array): n
 
 /**
  * Verify selfie against ID photo with liveness detection.
- *
+ * 
  * This is the main function for identity verification.
  * It captures video from the user's camera, matches their face
  * against the ID photo, and verifies they're alive (not a photo/video).
- *
+ * 
  * @example
  * ```ts
  * const video = document.getElementById('webcam');
  * const idFace = await face.detectFromImage(idPhoto);
- *
+ * 
  * const result = await face.verifySelfie(video, idFace.value, {
  *   requireLiveness: true,
  *   onProgress: (status) => {
@@ -270,7 +270,7 @@ export async function verifySelfie(
   } = options;
 
   const api = faceapi;
-
+  
   return new Promise((resolve) => {
     let blinksDetected = 0;
     let lastEyeState: 'open' | 'closed' | null = null;
@@ -398,7 +398,7 @@ function calculateEAR(eye: Array<{ x: number; y: number }>): number {
 
 /**
  * Quick face match without liveness (for simpler use cases).
- *
+ * 
  * @example
  * ```ts
  * const match = await face.compareFaces(idPhoto, selfiePhoto);
@@ -427,7 +427,7 @@ export async function compareFaces(
 
 /**
  * Start webcam for selfie capture.
- *
+ * 
  * @example
  * ```ts
  * const video = document.getElementById('webcam');

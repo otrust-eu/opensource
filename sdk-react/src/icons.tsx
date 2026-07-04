@@ -1,6 +1,6 @@
 /**
  * OTRUST Icon Components
- *
+ * 
  * Safe SVG icon components - no dangerouslySetInnerHTML.
  * All icons are statically defined React components.
  */

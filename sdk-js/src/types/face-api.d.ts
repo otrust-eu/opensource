@@ -1,6 +1,6 @@
 /**
  * Type definitions for face-api.js
- *
+ * 
  * These types provide better IDE support for the dynamically loaded face-api.js library.
  * The library is loaded from CDN at runtime for browser-only face recognition.
  */

@@ -35,7 +35,7 @@ describe('useTimestamp', () => {
 
     // Verify initial state is not loading
     expect(result.current.isLoading).toBe(false);
-
+    
     // Verify create function exists and can be called
     expect(typeof result.current.create).toBe('function');
   });

@@ -9,7 +9,7 @@ description = "Official Python SDK for OTRUST - Zero-knowledge timestamps, signi
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.9"
-authors = [{ name = "Kris Ledel", email = "kris@otrust.eu" }]
+authors = [{ name = "OTRUST", email = "dev@otrust.eu" }]
 keywords = [
     "otrust",
     "timestamp",
@@ -53,8 +53,8 @@ dev = [
 [project.urls]
 Homepage = "https://otrust.eu"
 Documentation = "https://otrust.eu/docs/python"
-Repository = "https://github.com/otrust-eu/opensource"
-Issues = "https://github.com/otrust-eu/opensource/issues"
+Repository = "https://github.com/otrust/sdk-python"
+Issues = "https://github.com/otrust/sdk-python/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/otrust"]

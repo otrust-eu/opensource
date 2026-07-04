@@ -60,7 +60,7 @@ describe('auth service', () => {
       const result = auth.parseCallback(
         'https://myapp.com/callback?state=state_456'
       );
-
+      
       expect(result?.token).toBeUndefined();
     });
   });

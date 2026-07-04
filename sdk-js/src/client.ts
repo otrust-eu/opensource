@@ -1,6 +1,6 @@
 /**
  * OTRUST SDK - HTTP Client
- *
+ * 
  * Universal HTTP client that works in Node.js, Deno, Bun, browsers, and edge runtimes.
  * Uses native fetch API with Result types for error handling.
  */
@@ -31,7 +31,7 @@ export function requireBrowser(feature: string): void {
 
 /**
  * Ensure we're NOT running in a browser environment.
- * Used for features that should only run server-side.
+ * Used for admin features that should only run server-side.
  */
 export function requireServer(feature: string): void {
   if (isBrowser()) {
@@ -101,7 +101,7 @@ export class Client {
   async request<T>(path: string, options: RequestOptions = {}): Promise<Result<T>> {
     const url = `${this.config.baseUrl}${path}`;
     const method = options.method ?? 'GET';
-
+    
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
@@ -110,7 +110,7 @@ export class Client {
     };
 
     let lastError: OTrustError | undefined;
-
+    
     for (let attempt = 0; attempt <= this.config.retries; attempt++) {
       try {
         // Create abort controller for timeout
@@ -132,7 +132,7 @@ export class Client {
         // Parse response
         const text = await response.text();
         let data: T | Record<string, unknown>;
-
+        
         try {
           data = text ? JSON.parse(text) : {};
         } catch {
@@ -145,14 +145,14 @@ export class Client {
             response.status,
             data as Record<string, unknown>
           );
-
+          
           // Don't retry on client errors (4xx) except rate limiting
           if (response.status >= 400 && response.status < 500 && response.status !== 429) {
             return err(error);
           }
-
+          
           lastError = error;
-
+          
           // Exponential backoff before retry
           if (attempt < this.config.retries) {
             await this.sleep(Math.min(1000 * Math.pow(2, attempt), 10000));
@@ -161,7 +161,7 @@ export class Client {
         }
 
         return ok(data as T);
-
+        
       } catch (error) {
         if (error instanceof Error) {
           if (error.name === 'AbortError') {
@@ -172,7 +172,7 @@ export class Client {
         } else {
           lastError = new OTrustError('unknown_error', String(error));
         }
-
+        
         // Exponential backoff before retry
         if (attempt < this.config.retries) {
           await this.sleep(Math.min(1000 * Math.pow(2, attempt), 10000));

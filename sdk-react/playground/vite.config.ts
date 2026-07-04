@@ -11,7 +11,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@otrust/react': path.resolve(__dirname, '../../dist/index.js'),
-      '@otrust/sdk': path.resolve(__dirname, '../../sdk-js/dist/index.js'),
+      '@otrust/sdk': path.resolve(__dirname, '../../../sdk-js/dist/index.js'),
     },
   },
 });

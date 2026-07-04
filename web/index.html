@@ -463,6 +463,8 @@
           <div class="footer-links">
             <a href="/docs">Docs</a>
             <a href="/api-docs">API</a>
+            <a href="/use-cases">Use cases</a>
+            <a href="/changelog">Changelog</a>
             <a href="https://github.com/otrust-eu" rel="noopener noreferrer">GitHub</a>
           </div>
         </div>
@@ -1351,9 +1353,12 @@
             const pendingNote = data.blockchain_status !== 'confirmed'
               ? '<p class="blockchain-pending-note">Bitcoin confirmation via OpenTimestamps typically takes 1–2 hours. Save your receipt ID to verify later.</p>'
               : '';
+            const verifyUrl = `${window.location.origin}/proof/${data.receipt_id}`;
+            const qrHtml = `<div class="receipt-qr"><img src="/api/qr?size=120&data=${encodeURIComponent(verifyUrl)}" width="120" height="120" alt="QR code for verification URL"><p class="receipt-qr-caption">Scan to verify later</p></div>`;
             resultEl.innerHTML = `
               <div class="result">
                 <h4>? Timestamp Created</h4>
+                ${qrHtml}
                 <div class="result-row"><span class="label">Receipt ID</span><span class="value">${data.receipt_id}</span></div>
                 ${claimFilename ? `<div class="result-row"><span class="label">File</span><span class="value">${claimFilename}</span></div>` : ''}
                 <div class="result-row"><span class="label">Timestamp</span><span class="value">${data.timestamp}</span></div>
@@ -1670,7 +1675,16 @@
     });
     
     // ========== RECEIPT TAB ==========
-    let currentHistoryPubkey = null; // Track if viewing another pubkey's history
+    let currentHistoryPubkey = null;
+    let receiptPollTimer = null;
+
+    function scheduleReceiptPoll() {
+      clearInterval(receiptPollTimer);
+      if (!keys?.publicKey || currentHistoryPubkey) return;
+      const hasPending = document.querySelector('#receipts-list .receipt-status.pending');
+      if (!hasPending) return;
+      receiptPollTimer = setInterval(() => loadMyReceipts(), 90000);
+    }
     
     async function loadMyReceipts(pubkeyOverride = null) {
       const loadingEl = document.getElementById('receipts-loading');
@@ -1736,6 +1750,8 @@
             showReceiptDetail(receiptId);
           });
         });
+
+        scheduleReceiptPoll();
         
       } catch (e) {
         loadingEl.style.display = 'none';
@@ -1758,10 +1774,12 @@
           return;
         }
         
+        const verifyUrl = window.location.origin + '/proof/' + receiptId;
         let html = '<div class="result"><h4>' + receiptId + '</h4>' +
+          '<div class="receipt-qr"><img src="/api/qr?size=120&data=' + encodeURIComponent(verifyUrl) + '" width="120" height="120" alt="QR code for verification URL"><p class="receipt-qr-caption">Scan to verify</p></div>' +
           '<div class="result-row"><span class="label">Hash</span><span class="value" style="word-break:break-all;">' + (data.hash || 'N/A') + '</span></div>' +
           '<div class="result-row"><span class="label">Created</span><span class="value">' + (data.created_at || 'N/A') + '</span></div>' +
-          '<div class="result-row"><span class="label">Blockchain</span><span class="value">' + (data.blockchain?.confirmed ? '? Block ' + data.blockchain.block_height : 'Pending') + '</span></div>' +
+          '<div class="result-row"><span class="label">Blockchain</span><span class="value">' + (data.blockchain?.confirmed ? '? Block ' + data.blockchain.block_height : 'Pending — checking every 90s') + '</span></div>' +
           '<div class="receipt-actions">';
         
         if (data.download_url) {
@@ -2012,7 +2030,8 @@
       URL.revokeObjectURL(url);
     };
   </script>
-  <script src="/otrust-polish.js?v=20260530mono" defer></script>
+  <script src="/js/otrust-extras.js?v=20260704ux" defer></script>
+  <script src="/otrust-polish.js?v=20260704ux" defer></script>
 </body>
 </html>
 

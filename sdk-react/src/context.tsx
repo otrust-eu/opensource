@@ -1,6 +1,6 @@
 /**
  * OTRUST React Context Provider
- *
+ * 
  * Provides SDK configuration to all child components.
  */
 
@@ -33,10 +33,10 @@ export interface OTrustProviderProps {
 
 /**
  * Provides OTRUST SDK configuration to all child components.
- *
+ * 
  * @example
  * ```tsx
- * <OTrustProvider config={{
+ * <OTrustProvider config={{ 
  *   clientId: 'my-app',
  *   redirectUri: 'https://my-app.com/callback'
  * }}>
@@ -70,7 +70,7 @@ export function OTrustProvider({ children, config = {} }: OTrustProviderProps) {
  */
 export function useOTrust(): OTrustContextValue {
   const context = useContext(OTrustContext);
-
+  
   if (!context) {
     // Return defaults if not wrapped in provider
     return {
@@ -78,6 +78,6 @@ export function useOTrust(): OTrustContextValue {
       isConfigured: false,
     };
   }
-
+  
   return context;
 }

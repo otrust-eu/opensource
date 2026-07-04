@@ -82,7 +82,7 @@ const state = auth.generateState();
 Recommended CSP headers for your application:
 
 ```
-Content-Security-Policy:
+Content-Security-Policy: 
   default-src 'self';
   connect-src 'self' https://otrust.eu;
   script-src 'self';
