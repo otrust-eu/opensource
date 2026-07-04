@@ -256,6 +256,60 @@ async function incrementUsageCounter(field, amount = 1) {
   }
 }
 
+async function incrementActivityCounter(field, amount = 1) {
+  if (!/^[a-z0-9_]{1,80}$/.test(field)) return;
+
+  const safeAmount = toUsageCount(amount) || 1;
+  const now = new Date();
+
+  try {
+    const db = getDb();
+    await db.collection('usage_counters').updateOne(
+      { _id: USAGE_COUNTER_ID },
+      {
+        $inc: { [field]: safeAmount },
+        $set: { updated_at: now },
+        $setOnInsert: { created_at: now }
+      },
+      { upsert: true }
+    );
+  } catch (error) {
+    console.error('[Usage] Activity counter update failed:', error.message);
+  }
+}
+
+async function incrementActivityCounters(fields) {
+  const increments = {};
+  for (const [field, amount] of Object.entries(fields || {})) {
+    if (!/^[a-z0-9_]{1,80}$/.test(field)) continue;
+    const safeAmount = toUsageCount(amount);
+    if (safeAmount > 0) increments[field] = safeAmount;
+  }
+  if (!Object.keys(increments).length) return;
+
+  const now = new Date();
+  try {
+    const db = getDb();
+    await db.collection('usage_counters').updateOne(
+      { _id: USAGE_COUNTER_ID },
+      {
+        $inc: increments,
+        $set: { updated_at: now },
+        $setOnInsert: { created_at: now }
+      },
+      { upsert: true }
+    );
+  } catch (error) {
+    console.error('[Usage] Activity counters update failed:', error.message);
+  }
+}
+
+const USAGE_EVENT_FIELDS = {
+  hash_computed: 'hashes_computed',
+  timestamp_tool_view: 'timestamp_tool_views',
+  sign_hash_computed: 'sign_hashes_computed'
+};
+
 async function readUsageCounters(db) {
   try {
     return await db.collection('usage_counters').findOne({ _id: USAGE_COUNTER_ID }) || {};
@@ -618,6 +672,10 @@ app.post('/claim', claimLimiter, smallJson, async (req, res) => {
     const existing = await claims.findOne({ hash, pubkey });
 
     if (existing) {
+      await incrementActivityCounters({
+        claims_submitted: 1,
+        claims_duplicate: 1
+      });
       // Return existing claim info - this is actually helpful, not an error
       return res.status(200).json({
         status: 'already_registered',
@@ -673,6 +731,11 @@ app.post('/claim', claimLimiter, smallJson, async (req, res) => {
       }
     }
 
+    await incrementActivityCounters({
+      claims_submitted: 1,
+      claims_created: 1
+    });
+
     res.status(201).json({
       status: 'ok',
       timestamp: timestamp.toISOString(),
@@ -717,6 +780,10 @@ app.post('/claim/simple', gptLimiter, smallJson, async (req, res) => {
     // Check if already exists
     const existing = await claims.findOne({ hash });
     if (existing) {
+      await incrementActivityCounters({
+        claims_submitted: 1,
+        claims_duplicate: 1
+      });
       return res.status(200).json({
         status: 'already_exists',
         message: 'This content was already timestamped.',
@@ -770,6 +837,11 @@ app.post('/claim/simple', gptLimiter, smallJson, async (req, res) => {
         console.error(`[Email] Failed to store notification: ${emailErr.message}`);
       }
     }
+
+    await incrementActivityCounters({
+      claims_submitted: 1,
+      claims_created: 1
+    });
 
     res.status(201).json({
       status: 'ok',
@@ -925,6 +997,14 @@ app.post('/claim/bulk', claimLimiter, bulkJson, async (req, res) => {
 
     const created = results.filter(r => r.status === 'created').length;
     const duplicates = results.filter(r => r.status === 'duplicate').length;
+    const submitted = created + duplicates;
+    if (submitted > 0) {
+      await incrementActivityCounters({
+        claims_submitted: submitted,
+        claims_created: created,
+        claims_duplicate: duplicates
+      });
+    }
     console.log(`[Bulk] Processed ${claims.length} claims: ${created} created, ${duplicates} duplicates, ${errors.length} errors`);
 
     res.status(201).json({
@@ -1922,6 +2002,7 @@ app.post('/sign/upload', signCreateLimiter, fileUploadLimit, async (req, res) =>
     
     // Calculate SHA-256 hash
     const hash = crypto.createHash('sha256').update(fileBuffer).digest('hex');
+    await incrementActivityCounter('sign_hashes_computed');
     
     // Generate file ID and secure file token (for creator access)
     const fileId = 'sf_' + crypto.randomBytes(16).toString('base64url');
@@ -3184,6 +3265,33 @@ app.get('/admin/rate-limits', async (req, res) => {
   }
 });
 
+const usageEventLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: process.env.NODE_ENV === 'test' ? 10000 : 600,
+  keyGenerator: getRateLimitKey,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'rate_limit_exceeded' }
+});
+
+// POST /api/usage/event - Privacy-preserving activity counters (no hash/content)
+app.post('/api/usage/event', usageEventLimiter, smallJson, async (req, res) => {
+  try {
+    const { event, count } = req.body || {};
+    const field = USAGE_EVENT_FIELDS[event];
+    if (!field) {
+      return res.status(400).json({ error: 'invalid_event' });
+    }
+
+    const safeCount = Math.min(toUsageCount(count) || 1, 100);
+    await incrementActivityCounter(field, safeCount);
+    res.json({ ok: true });
+  } catch (error) {
+    console.error('[Usage] Event error:', error.message);
+    res.status(500).json({ error: 'server_error' });
+  }
+});
+
 // GET /stats - Public statistics
 app.get('/stats', async (req, res) => {
   try {
@@ -3246,6 +3354,16 @@ app.get('/stats', async (req, res) => {
       latestClaim?.blockchain_block || 0,
       latestSign?.blockchain_block || 0
     ) || null;
+
+    const activity = {
+      hashes_computed: toUsageCount(usageCounters.hashes_computed),
+      timestamp_tool_views: toUsageCount(usageCounters.timestamp_tool_views),
+      sign_hashes_computed: toUsageCount(usageCounters.sign_hashes_computed),
+      claims_submitted: toUsageCount(usageCounters.claims_submitted),
+      claims_created: toUsageCount(usageCounters.claims_created),
+      claims_duplicate: toUsageCount(usageCounters.claims_duplicate)
+    };
+    const totalHashesComputed = activity.hashes_computed + activity.sign_hashes_computed;
     
     res.json({
       total_claims: total,
@@ -3262,7 +3380,13 @@ app.get('/stats', async (req, res) => {
       verified_records: verifiedRecords,
       verifications_processed: verificationsProcessed,
       anchored_records: anchoredRecords,
-      latest_block: latestBlock
+      latest_block: latestBlock,
+      activity,
+      hashes_computed: totalHashesComputed,
+      timestamp_tool_views: activity.timestamp_tool_views,
+      claims_submitted: activity.claims_submitted,
+      claims_created: activity.claims_created,
+      claims_duplicate: activity.claims_duplicate
     });
   } catch (error) {
     console.error('Stats error:', error.message);

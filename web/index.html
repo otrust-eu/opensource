@@ -1256,6 +1256,7 @@
         }
         
         files.push({ name: file.name, size: file.size, hash, existingData });
+        window.otrustTrackUsage?.('hash_computed');
       }
       renderFiles();
     }
@@ -1490,6 +1491,7 @@
       
       try {
         const hash = await sha256Hex(text);
+        window.otrustTrackUsage?.('hash_computed');
         if (!keys?.privateKey || !keys?.publicKey) await generateKeys();
         
         const challengeRes = await fetch('/challenge');
@@ -1581,6 +1583,7 @@
       if (e.dataTransfer.files[0]) {
         const buffer = await e.dataTransfer.files[0].arrayBuffer();
         const hash = await sha256Hex(new Uint8Array(buffer));
+        window.otrustTrackUsage?.('hash_computed');
         document.getElementById('verify-hash-input').value = hash;
         doVerify(hash);
       }
@@ -1589,6 +1592,7 @@
       if (verifyFileInput.files[0]) {
         const buffer = await verifyFileInput.files[0].arrayBuffer();
         const hash = await sha256Hex(new Uint8Array(buffer));
+        window.otrustTrackUsage?.('hash_computed');
         document.getElementById('verify-hash-input').value = hash;
         doVerify(hash);
       }
@@ -1657,6 +1661,7 @@
         const buffer = await file.arrayBuffer();
         const hash = await sha256Hex(new Uint8Array(buffer));
         compareFiles.push({ name: file.name, hash });
+        window.otrustTrackUsage?.('hash_computed');
       }
       renderCompareFiles();
     }
@@ -2084,6 +2089,7 @@
       URL.revokeObjectURL(url);
     };
   </script>
+  <script src="/js/usage-beacon.js?v=20260704activity"></script>
   <script src="/js/otrust-extras.js?v=20260704fix" defer></script>
   <script src="/otrust-polish.js?v=20260704fix" defer></script>
 </body>

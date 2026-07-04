@@ -327,6 +327,46 @@ describe('API Integration Tests', () => {
     });
   });
 
+  describe('POST /api/usage/event', () => {
+    test('increments activity counters', async () => {
+      const res = await request('/api/usage/event', {
+        method: 'POST',
+        body: { event: 'hash_computed', count: 3 }
+      });
+
+      expect(res.status).toBe(200);
+      expect(res.body.ok).toBe(true);
+
+      const stats = await request('/stats');
+      expect(stats.status).toBe(200);
+      expect(stats.body.hashes_computed).toBeGreaterThanOrEqual(3);
+      expect(stats.body.activity.hashes_computed).toBeGreaterThanOrEqual(3);
+    });
+
+    test('rejects unknown events', async () => {
+      const res = await request('/api/usage/event', {
+        method: 'POST',
+        body: { event: 'evil_event' }
+      });
+
+      expect(res.status).toBe(400);
+      expect(res.body.error).toBe('invalid_event');
+    });
+  });
+
+  describe('GET /stats activity fields', () => {
+    test('returns activity counters separate from records', async () => {
+      const res = await request('/stats');
+      expect(res.status).toBe(200);
+      expect(typeof res.body.hashes_computed).toBe('number');
+      expect(typeof res.body.timestamp_tool_views).toBe('number');
+      expect(typeof res.body.claims_submitted).toBe('number');
+      expect(typeof res.body.claims_created).toBe('number');
+      expect(typeof res.body.claims_duplicate).toBe('number');
+      expect(res.body.activity).toBeDefined();
+    });
+  });
+
   describe('POST /claim/simple', () => {
     test('creates claim without PoW for trusted sources', async () => {
       const testHash = hash('simple claim test ' + Date.now());
@@ -373,6 +413,10 @@ describe('API Integration Tests', () => {
       const db = getDb();
       const notification = await db.collection('email_notifications').findOne({ claim_id: res.body.receipt_id });
       expect(notification?.email).toBe(email);
+
+      const stats = await request('/stats');
+      expect(stats.body.claims_submitted).toBeGreaterThanOrEqual(1);
+      expect(stats.body.claims_created).toBeGreaterThanOrEqual(1);
     });
   });
 

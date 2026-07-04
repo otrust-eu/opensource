@@ -75,6 +75,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       const response = await getPageContent(tab.id);
       if (!response?.content) throw new Error('Could not read page');
       const hash = await sha256(response.content);
+      fetch(`${API}/api/usage/event`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ event: 'hash_computed', count: 1 })
+      }).catch(() => {});
       
       steps[0].status = 'done';
       steps[1].status = 'active';

@@ -215,20 +215,23 @@
     </section>
 
     <section class="metric-grid" aria-label="Live OTRUST metrics">
-      <div class="metric-card"><strong id="metric-total">-</strong><span>Total records</span></div>
+      <div class="metric-card"><strong id="metric-total">-</strong><span>Registered records</span></div>
+      <div class="metric-card"><strong id="metric-hashes">-</strong><span>Hashes computed</span></div>
+      <div class="metric-card"><strong id="metric-views">-</strong><span>Timestamp tool visits</span></div>
+      <div class="metric-card"><strong id="metric-claims-submitted">-</strong><span>Claim attempts</span></div>
       <div class="metric-card"><strong id="metric-verified">-</strong><span>Verified records</span></div>
-      <div class="metric-card"><strong id="metric-anchored">-</strong><span>Anchored records</span></div>
+      <div class="metric-card"><strong id="metric-anchored">-</strong><span>Anchored on Bitcoin</span></div>
       <div class="metric-card"><strong id="metric-block">-</strong><span>Latest Bitcoin block</span></div>
     </section>
 
     <section class="trust-sections">
       <article class="trust-section">
         <h2>What is counted</h2>
-        <p>Records include timestamp claims, signing packages, and ID packages. Verified records are records with a completed or active verification state.</p>
+        <p><strong>Registered records</strong> are unique receipts stored in the database (timestamps, sign packages, ID proofs). <strong>Hashes computed</strong> counts local SHA-256 operations in the browser — including verify/compare flows — without storing content.</p>
         <ul>
-          <li>No artificial baseline is added.</li>
-          <li>Usage events are tracked separately from records.</li>
-          <li>Counts are returned by the public <code>/stats</code> endpoint.</li>
+          <li>Re-hashing the same file counts as activity but not as a new record.</li>
+          <li>Claim attempts include duplicates that return &ldquo;already registered&rdquo;.</li>
+          <li>No artificial baseline is added. All numbers come from <code>/stats</code>.</li>
         </ul>
       </article>
       <article class="trust-section">

@@ -52,6 +52,9 @@
   function initTransparencyRefresh() {
     const ids = {
       total: 'metric-total',
+      hashes: 'metric-hashes',
+      views: 'metric-views',
+      claimsSubmitted: 'metric-claims-submitted',
       verified: 'metric-verified',
       anchored: 'metric-anchored',
       block: 'metric-block',
@@ -66,6 +69,12 @@
         const res = await fetch('/stats', { cache: 'no-store' });
         const stats = await res.json();
         document.getElementById(ids.total).textContent = formatNumber(stats.total_records);
+        const hashesEl = document.getElementById(ids.hashes);
+        if (hashesEl) hashesEl.textContent = formatNumber(stats.hashes_computed);
+        const viewsEl = document.getElementById(ids.views);
+        if (viewsEl) viewsEl.textContent = formatNumber(stats.timestamp_tool_views);
+        const claimsEl = document.getElementById(ids.claimsSubmitted);
+        if (claimsEl) claimsEl.textContent = formatNumber(stats.claims_submitted);
         document.getElementById(ids.verified).textContent = formatNumber(stats.verified_records);
         document.getElementById(ids.anchored).textContent = formatNumber(stats.anchored_records);
         document.getElementById(ids.block).textContent = stats.latest_block ? formatNumber(stats.latest_block) : 'Pending';
