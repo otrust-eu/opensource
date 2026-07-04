@@ -1072,9 +1072,8 @@ app.get('/proof/:receiptId', async (req, res) => {
       return res.status(400).json({ error: 'invalid_receipt_id' });
     }
     
-    // Check if this is an identity proof (starts with id_)
-    if (receiptId.startsWith('id_')) {
-      // Serve the proof-view.html page for identity proofs
+    // Serve proof-view for stored proof packages (identity id_* or attribute prf_*)
+    if (receiptId.startsWith('id_') || receiptId.startsWith('prf_')) {
       return serveHtmlWithNonce(path.join(__dirname, '../web/proof-view.html'))(req, res);
     }
     
