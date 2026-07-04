@@ -50,7 +50,9 @@ import {
   emailMuted,
   emailActionArea,
   emailDivider,
-  emailDetailsBox
+  emailDetailsBox,
+  emailHashBox,
+  emailWarningBox
 } from './emailTemplate.js';
 
 const app = express();
@@ -2893,20 +2895,24 @@ app.post('/api/report-abuse', smallJson, async (req, res) => {
     // Send confirmation email to reporter
     if (sendEmail) {
       try {
+        const abuseHtml = emailTemplate({
+          title: 'Report received — OTRUST',
+          preheader: 'Thank you for reporting suspicious activity',
+          content: [
+            emailHeading('Report received'),
+            emailParagraph('Thank you for reporting suspicious activity. We take all reports seriously.'),
+            emailDetailsBox([
+              ['Type', type],
+              ...(reference ? [['Reference', reference]] : [])
+            ]),
+            emailParagraph('We will investigate and take appropriate action. You may receive a follow-up email if we need more information.')
+          ].join(''),
+          product: 'Timestamp'
+        });
         await sendEmail(
           email,
-          '✓ Abuse Report Received - OTRUST',
-          `<div style="font-family:system-ui,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
-            <h2 style="color:#2d5a3d;">✓ Report Received</h2>
-            <p>Thank you for reporting suspicious activity. We take all reports seriously.</p>
-            <div style="background:#f5f5f4;padding:16px;border-radius:8px;margin:16px 0;">
-              <p style="margin:0;"><strong>Type:</strong> ${type}</p>
-              ${reference ? `<p style="margin:8px 0 0 0;"><strong>Reference:</strong> ${reference}</p>` : ''}
-            </div>
-            <p>We will investigate and take appropriate action. You may receive a follow-up email if we need more information.</p>
-            <hr style="border:none;border-top:1px solid #e5e5e5;margin:20px 0;">
-            <p style="color:#9ca3af;font-size:12px;">OTRUST • <a href="https://www.otrust.eu" style="color:#9ca3af;">otrust.eu</a></p>
-          </div>`,
+          'Report received — OTRUST',
+          abuseHtml,
           `Report Received\n\nThank you for reporting suspicious activity. We take all reports seriously.\n\nType: ${type}\n${reference ? `Reference: ${reference}\n` : ''}\nWe will investigate and take appropriate action.\n\n- OTRUST`
         );
       } catch (emailErr) {
@@ -3288,19 +3294,17 @@ app.get('/test-email', testEndpointLimiter, async (req, res) => {
   }
   
   try {
-    await sendEmail(
-      to,
-      'OTRUST Email Test',
-      `
-        <div style="font-family:system-ui,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
-          <h2 style="color:#2d5a3d;">OTRUST - Email Test</h2>
-          <p>If you're reading this, email notifications are working!</p>
-          <p style="color:#6b7280;font-size:12px;margin-top:20px;">
-            Sent at: ${new Date().toISOString()}
-          </p>
-        </div>
-      `
-    );
+    const testHtml = emailTemplate({
+      title: 'OTRUST email test',
+      preheader: 'Email notifications are working',
+      content: [
+        emailHeading('Email test'),
+        emailParagraph('If you are reading this, OTRUST email notifications are working.'),
+        emailMuted(`Sent at: ${new Date().toISOString()}`)
+      ].join(''),
+      product: 'Timestamp'
+    });
+    await sendEmail(to, 'OTRUST email test', testHtml);
     
     console.log(`[Email] Test email sent (requestId: ${req.requestId})`);
     res.json({ status: 'sent' });
@@ -3451,8 +3455,8 @@ async function sendConfirmationEmail(claim, blockHeight) {
   
   try {
     // Build HTML content using template components
-    let contentHtml = emailHeading('✓ Bitcoin Confirmation');
-    contentHtml += emailParagraph('Your timestamp has been confirmed on the Bitcoin blockchain!');
+    let contentHtml = emailHeading('Bitcoin confirmed');
+    contentHtml += emailParagraph('Your timestamp has been confirmed on the Bitcoin blockchain.');
     contentHtml += emailDetailsBox([
       ['Receipt ID', claim.id],
       ['Hash', `<code style="font-size:12px;">${claim.hash}</code>`],
@@ -3467,13 +3471,13 @@ async function sendConfirmationEmail(claim, blockHeight) {
     contentHtml += emailMuted(`Bitcoin confirmation is permanent. Open the <a href="${workspaceUrl}">timestamp workspace</a> to verify another file. Your email is deleted from our system after this message is sent.`);
     
     const html = emailTemplate({
-      title: `✓ Bitcoin Confirmation - ${claim.id}`,
+      title: `Bitcoin confirmed — ${claim.id}`,
       preheader: 'Your timestamp has been confirmed on the Bitcoin blockchain',
       content: contentHtml,
       product: 'Timestamp'
     });
     
-    await sendEmail(notification.email, `✓ Bitcoin Confirmation - ${claim.id}`, html);
+    await sendEmail(notification.email, `Bitcoin confirmed — ${claim.id}`, html);
     
     // Delete email immediately after sending (privacy)
     await db.collection('email_notifications').deleteOne({ claim_id: claim.id });
@@ -3507,12 +3511,12 @@ async function sendSignatureConfirmationEmail(signRequest, blockHeight) {
     <p style="margin:0 0 8px 0;"><strong>Bitcoin Block:</strong> ${blockHeight}</p>
     <p style="margin:0 0 8px 0;"><strong>Package Hash:</strong></p>
     <code style="font-size:11px;word-break:break-all;display:block;background:white;padding:8px;border-radius:4px;">${signRequest.package_hash}</code>
-  `, '');
+  `);
   contentHtml += emailInfoBox(`
     <strong>Document Hash:</strong>
     <code style="font-size:11px;word-break:break-all;display:block;margin-top:8px;">${signRequest.document_hash}</code>
-  `, '');
-  contentHtml += emailInfoBox(`<strong>Signatures:</strong><div style="margin-top:8px;font-size:14px;">${partyListHtml}</div>`, '');
+  `);
+  contentHtml += emailInfoBox(`<strong>Signatures:</strong><div style="margin-top:8px;font-size:14px;">${partyListHtml}</div>`);
   contentHtml += emailActionArea(emailButton('Download Proof Package', proofUrl));
   contentHtml += emailMuted('This proof is now permanently verifiable on the Bitcoin blockchain. Keep this email and/or download the proof package for your records.');
   
@@ -3680,7 +3684,7 @@ async function sendPurgeNotification(file, purgeProof) {
     <p style="margin:0 0 10px 0;"><strong>Uploaded:</strong> ${file.created_at.toISOString()}</p>
     <p style="margin:0 0 10px 0;"><strong>Purged:</strong> ${purgeProof.purged_at.toISOString()}</p>
     <p style="margin:0 0 0 0;"><strong>TTL:</strong> ${file.ttl_hours} hour(s)</p>
-  `, '');
+  `);
   contentHtml += emailInfoBox(`
     <p style="margin:0 0 10px 0;"><strong>Purge Proof</strong></p>
     <p style="font-size:12px;color:#666;margin:0 0 10px 0;">
@@ -3690,7 +3694,7 @@ async function sendPurgeNotification(file, purgeProof) {
       <strong>Original Hash:</strong><br>${purgeProof.original_hash}<br><br>
       <strong>Purge Proof:</strong><br>${purgeProof.proof_hash}
     </div>
-  `, '');
+  `);
   contentHtml += emailMuted('<strong>What this means:</strong> The document file has been permanently removed from our servers. Only the cryptographic proof of deletion remains. The signing request (if any) continues to work - signers just need their own copy of the document.');
   
   const html = emailTemplate({
@@ -4645,88 +4649,37 @@ app.post('/api/proof/email-backup', bulkJson, async (req, res) => {
       return res.status(503).json({ success: false, error: 'Email service not configured' });
     }
     
-    const html = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <style>
-          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
-          .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-          .header { background: linear-gradient(135deg, #2d5a3d, #4a7c59); color: white; padding: 30px; text-align: center; }
-          .header h1 { margin: 0; font-size: 24px; }
-          .content { padding: 30px; }
-          .warning { background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 15px; margin-bottom: 20px; }
-          .warning strong { color: #856404; }
-          .secret-box { background: #f8f9fa; border: 2px dashed #dee2e6; border-radius: 8px; padding: 20px; margin: 20px 0; }
-          .secret-box h3 { margin: 0 0 10px 0; color: #495057; }
-          .secret-box code { display: block; background: #212529; color: #00ff88; padding: 15px; border-radius: 6px; font-size: 11px; word-break: break-all; margin-top: 10px; }
-          .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
-          .info-label { color: #6c757d; }
-          .info-value { font-weight: 600; color: #212529; }
-          .btn { display: inline-block; background: #2d5a3d; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; margin-top: 20px; }
-          .footer { background: #f8f9fa; padding: 20px; text-align: center; color: #6c757d; font-size: 12px; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>OTRUST Identity Backup</h1>
-            <p style="margin: 10px 0 0 0; opacity: 0.9;">Your Recovery Information</p>
-          </div>
-          <div class="content">
-            <div class="warning">
-              <strong>IMPORTANT: Keep this email safe!</strong><br>
-              This is your ONLY way to prove ownership of your identity if you lose access.
-              Store it somewhere secure (archive folder, print it, etc.).
-            </div>
-            
-            <div class="info-row">
-              <span class="info-label">Proof ID</span>
-              <span class="info-value">${proofId}</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">Proof URL</span>
-              <span class="info-value"><a href="${shareUrl}">${shareUrl}</a></span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">Created</span>
-              <span class="info-value">${new Date().toLocaleString()}</span>
-            </div>
-            
-            <div class="secret-box">
-              <h3>Your Secret Key</h3>
-              <p style="margin: 0; color: #6c757d; font-size: 14px;">
-                This proves you own this identity. Never share it publicly.
-              </p>
-              <code>${secret}</code>
-            </div>
-            
-            <div class="secret-box">
-              <h3>Commitment Hash</h3>
-              <code>${commitment}</code>
-            </div>
-            
-            <h3>Recovery Instructions</h3>
-            <ol style="color: #495057; line-height: 1.8;">
-              <li>Store this email in a safe place (archive, print, etc.)</li>
-              <li>If you lose access, go to your proof page and click "Report Lost"</li>
-              <li>You will receive a recovery token (valid 24 hours)</li>
-              <li>Re-verify with your ID document to create a new proof</li>
-              <li>Your personnummer links you to your identity - same person = same hash</li>
-            </ol>
-            
-            <center>
-              <a href="${shareUrl}" class="btn">View Your Proof →</a>
-            </center>
-          </div>
-          <div class="footer">
-            <p>This email was sent from OTRUST at your request.</p>
-            <p>Your identity is cryptographically secured. We cannot recover it for you.</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
+    const createdAt = new Date().toLocaleString();
+    let contentHtml = emailHeading('Identity backup');
+    contentHtml += emailParagraph('Your recovery information for your OTRUST identity proof.');
+    contentHtml += emailWarningBox('<strong>Keep this email safe.</strong> This is your only way to prove ownership of your identity if you lose access. Store it somewhere secure (archive folder, print it, etc.).');
+    contentHtml += emailDetailsBox([
+      ['Proof ID', proofId],
+      ['Proof URL', `<a href="${shareUrl}" style="color:#16160f;">${shareUrl}</a>`],
+      ['Created', createdAt]
+    ]);
+    contentHtml += emailHashBox(secret, 'Your secret key');
+    contentHtml += emailMuted('This proves you own this identity. Never share it publicly.');
+    contentHtml += emailHashBox(commitment, 'Commitment hash');
+    contentHtml += emailHeading('Recovery instructions', 3);
+    contentHtml += emailParagraph([
+      '<ol style="margin:0;padding-left:20px;line-height:1.8;">',
+      '<li>Store this email in a safe place (archive, print, etc.)</li>',
+      '<li>If you lose access, go to your proof page and click "Report Lost"</li>',
+      '<li>You will receive a recovery token (valid 24 hours)</li>',
+      '<li>Re-verify with your ID document to create a new proof</li>',
+      '<li>Your personnummer links you to your identity — same person = same hash</li>',
+      '</ol>'
+    ].join(''));
+    contentHtml += emailActionArea(emailButton('View your proof', shareUrl));
+    contentHtml += emailMuted('This email was sent from OTRUST at your request. Your identity is cryptographically secured — we cannot recover it for you.');
+
+    const html = emailTemplate({
+      title: 'OTRUST identity backup',
+      preheader: 'Your recovery information — keep this email safe',
+      content: contentHtml,
+      product: 'ID'
+    });
     
     const text = `
 OTRUST IDENTITY BACKUP
@@ -4736,7 +4689,7 @@ IMPORTANT: Keep this email safe! This is your ONLY way to prove ownership.
 
 Proof ID: ${proofId}
 Proof URL: ${shareUrl}
-Created: ${new Date().toLocaleString()}
+Created: ${createdAt}
 
 YOUR SECRET KEY:
 ${secret}

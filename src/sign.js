@@ -12,6 +12,7 @@ import { verifySignature, generateKeypair, sign as cryptoSign } from './crypto.j
 import {
   emailTemplate,
   emailButton,
+  emailButtonDanger,
   emailHashBox,
   emailInfoBox,
   emailSuccessBox,
@@ -273,16 +274,16 @@ ${baseUrl}/sign`;
   
   // Document info - attachment or download (FIRST - most important)
   if (hasAttachment) {
-    contentHtml += emailSuccessBox(`<strong>Document attached to this email</strong><br><span style="font-size:13px;">${attachment.filename}</span>`, '');
+    contentHtml += emailSuccessBox(`<strong>Document attached to this email</strong><br><span style="font-size:13px;">${attachment.filename}</span>`);
   } else if (documentDownloadUrl) {
-    contentHtml += emailInfoBox(`<strong>Download Document:</strong><br><a href="${documentDownloadUrl}" style="color:#2563eb;">Download</a>`, '');
+    contentHtml += emailInfoBox(`<strong>Download document:</strong><br><a href="${documentDownloadUrl}" style="color:#16160f;text-decoration:underline;">Download</a>`);
   } else {
-    contentHtml += emailWarningBox(`<strong>The document will be sent separately by the sender.</strong><br><span style="font-size:13px;">Contact the sender if you haven't received the document.</span>`, '');
+    contentHtml += emailWarningBox(`<strong>The document will be sent separately by the sender.</strong><br><span style="font-size:13px;">Contact the sender if you haven't received the document.</span>`);
   }
   
   // Message from sender
   if (signRequest.message) {
-    contentHtml += emailInfoBox(`<strong>Message from sender:</strong><br>"${signRequest.message}"`, '');
+    contentHtml += emailInfoBox(`<strong>Message from sender:</strong><br>"${signRequest.message}"`);
   }
   
   // Document hash (collapsed/smaller)
@@ -290,12 +291,11 @@ ${baseUrl}/sign`;
   
   // One-click action buttons for signers/approvers
   if (canEmailSign) {
-    contentHtml += `
-      <div style="text-align:center;margin:32px 0 24px 0;">
-        <a href="${quickSignUrl}" style="display:inline-block;background:#2d5a3d;color:#fff;padding:16px 48px;border-radius:8px;text-decoration:none;font-weight:600;font-size:18px;margin-right:16px;">${actionWord}</a>
-        <a href="${quickDeclineUrl}" style="display:inline-block;background:#dc2626;color:#fff;padding:16px 48px;border-radius:8px;text-decoration:none;font-weight:600;font-size:18px;">Decline</a>
-      </div>
-    `;
+    contentHtml += emailActionArea(`
+      ${emailButton(actionWord, quickSignUrl)}
+      &nbsp;&nbsp;
+      ${emailButtonDanger('Decline', quickDeclineUrl)}
+    `);
   } else {
     // Viewer just gets a view button
     contentHtml += emailActionArea(emailButton(`View Document`, signUrl));
@@ -306,14 +306,12 @@ ${baseUrl}/sign`;
   
   // Safety warning and abuse reporting
   const abuseUrl = `${baseUrl}/report-abuse?ref=${signRequest.id}`;
-  contentHtml += `
-    <div style="margin-top:24px;padding:16px;background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;font-size:13px;color:#92400e;">
-      <strong>Safety Notice:</strong> Only sign documents from people you know and trust. 
-      Never sign documents under pressure or without reading them carefully.
-      <br><br>
-      <a href="${abuseUrl}" style="color:#92400e;text-decoration:underline;">Report suspicious activity</a>
-    </div>
-  `;
+  contentHtml += emailWarningBox(`
+    <strong>Safety notice:</strong> Only sign documents from people you know and trust.
+    Never sign documents under pressure or without reading them carefully.
+    <br><br>
+    <a href="${abuseUrl}" style="color:#8a6a25;text-decoration:underline;">Report suspicious activity</a>
+  `);
   
   const html = emailTemplate({
     title: subject,

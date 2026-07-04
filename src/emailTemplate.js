@@ -1,82 +1,82 @@
 /**
- * OTRUST Email Template
- * 
- * Consistent branding across all emails
- * Colors match the web design system
+ * OTRUST Email Template — Bento / Monochrome Edition (2026)
+ * Matches otrust-redesign.css: ink-on-paper, hairline borders, status green only for verified states.
  */
 
-const BRAND = {
+export const BRAND = {
   name: 'OTRUST',
   colors: {
-    // Light theme
-    accent: '#2d5a3d',
-    accentHover: '#1e4029',
-    accentLight: '#e8f0eb',
-    success: '#22c55e',
-    successLight: '#f0fdf4',
-    successBorder: '#bbf7d0',
-    warning: '#f59e0b',
-    warningLight: '#fef3c7',
-    warningBorder: '#fcd34d',
-    text: '#1a1a1a',
-    textDim: '#737373',
-    textMuted: '#999999',
-    bg: '#fafaf9',
-    bgCard: '#ffffff',
-    bgMuted: '#f5f5f4',
-    border: '#e5e5e5'
+    ink: '#16160f',
+    inkSoft: '#34342b',
+    paper: '#f6f6f2',
+    paper2: '#fbfbf8',
+    card: '#ffffff',
+    line: '#e6e6dd',
+    line2: '#d8d8cd',
+    dim: '#6c6c61',
+    faint: '#9b9b8f',
+    status: '#2f8a57',
+    statusBg: '#e9f3ec',
+    statusBorder: '#c5dcc9',
+    danger: '#9a3b2f',
+    dangerBg: '#f8ecea',
+    dangerBorder: '#e5c4be',
+    warn: '#8a6a25',
+    warnBg: '#f6f0e4',
+    warnBorder: '#e5d9b8'
   },
+  radius: '4px',
   baseUrl: process.env.BASE_URL || 'https://www.otrust.eu'
 };
 
-/**
- * Wrap content in standard email template
- */
-export function emailTemplate({ title, preheader, content, footer, product = 'Timestamp' }) {
-  const productBadge = product === 'Signed' 
-    ? `<span style="font-family: 'Georgia', serif; font-style: italic; font-size: 20px; color: ${BRAND.colors.accent}; margin-left: 4px;">Signed</span>`
-    : '';
+function productLabel(product) {
+  if (product === 'Signed') return 'SIGN';
+  if (product === 'Auth') return 'AUTH';
+  if (product === 'ID') return 'ID';
+  return 'TIMESTAMP';
+}
 
-  return `
-<!DOCTYPE html>
+/**
+ * Wrap content in standard email shell
+ */
+export function emailTemplate({ title, preheader, content, footer, product = 'Timestamp', baseUrl = BRAND.baseUrl }) {
+  const label = productLabel(product);
+  const c = BRAND.colors;
+
+  return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light">
   <title>${title}</title>
-  ${preheader ? `<!--[if !mso]><!--><span style="display:none;font-size:0;color:#fafaf9;line-height:0;max-height:0;max-width:0;opacity:0;overflow:hidden;">${preheader}</span><!--<![endif]-->` : ''}
+  ${preheader ? `<!--[if !mso]><!--><span style="display:none;font-size:0;color:${c.paper};line-height:0;max-height:0;max-width:0;opacity:0;overflow:hidden;">${preheader}</span><!--<![endif]-->` : ''}
 </head>
-<body style="margin:0;padding:0;background-color:${BRAND.colors.bg};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
-  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color:${BRAND.colors.bg};">
+<body style="margin:0;padding:0;background-color:${c.paper};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
+  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color:${c.paper};">
     <tr>
-      <td style="padding:20px 0;">
-        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="margin:0 auto;max-width:600px;background-color:${BRAND.colors.bgCard};border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.05);">
-          
-          <!-- Header -->
+      <td style="padding:28px 16px;">
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="margin:0 auto;max-width:600px;background-color:${c.card};border:1px solid ${c.line};border-radius:${BRAND.radius};overflow:hidden;">
           <tr>
-            <td style="padding:24px 32px;border-bottom:1px solid ${BRAND.colors.border};">
-              <span style="font-weight:600;font-size:18px;color:${BRAND.colors.text};">OTRUST</span>
-              ${productBadge}
+            <td style="padding:20px 28px;border-bottom:1px solid ${c.line};">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                  <td style="font-weight:700;font-size:13px;letter-spacing:0.28em;color:${c.ink};">OTRUST</td>
+                  <td align="right" style="font-size:10px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:${c.faint};">${label}</td>
+                </tr>
+              </table>
             </td>
           </tr>
-          
-          <!-- Content -->
           <tr>
-            <td style="padding:32px;">
-              ${content}
-            </td>
+            <td style="padding:28px;">${content}</td>
           </tr>
-          
-          <!-- Footer -->
           <tr>
-            <td style="padding:24px 32px;background-color:${BRAND.colors.bgMuted};border-top:1px solid ${BRAND.colors.border};">
-              <p style="margin:0;font-size:12px;color:${BRAND.colors.textMuted};">
-                ${footer || `OTRUST${product === 'Signed' ? ' Signed' : ''} · <a href="${BRAND.baseUrl}" style="color:${BRAND.colors.textMuted};">${BRAND.baseUrl}</a>`}
+            <td style="padding:18px 28px;background-color:${c.paper2};border-top:1px solid ${c.line};">
+              <p style="margin:0;font-size:11px;line-height:1.5;color:${c.faint};">
+                ${footer || `${BRAND.name} · <a href="${baseUrl}" style="color:${c.dim};text-decoration:none;">${baseUrl.replace(/^https?:\/\//, '')}</a> · Made in Sweden, Europe`}
               </p>
             </td>
           </tr>
-          
         </table>
       </td>
     </tr>
@@ -85,130 +85,100 @@ export function emailTemplate({ title, preheader, content, footer, product = 'Ti
 </html>`;
 }
 
-/**
- * Primary action button
- */
 export function emailButton(text, href, style = 'primary') {
-  const bg = style === 'primary' ? BRAND.colors.accent : BRAND.colors.bgMuted;
-  const color = style === 'primary' ? '#ffffff' : BRAND.colors.text;
-  const border = style === 'primary' ? BRAND.colors.accent : BRAND.colors.border;
-  
-  return `
-    <a href="${href}" style="display:inline-block;background-color:${bg};color:${color};padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;border:1px solid ${border};">
-      ${text}
-    </a>`;
+  const c = BRAND.colors;
+  const styles = {
+    primary: `background-color:${c.ink};color:#ffffff;border:1px solid ${c.ink};`,
+    secondary: `background-color:${c.card};color:${c.ink};border:1px solid ${c.line2};`,
+    danger: `background-color:${c.danger};color:#ffffff;border:1px solid ${c.danger};`
+  };
+  return `<a href="${href}" style="display:inline-block;${styles[style] || styles.primary}padding:12px 22px;border-radius:${BRAND.radius};text-decoration:none;font-weight:600;font-size:13px;letter-spacing:0.02em;">${text}</a>`;
 }
 
-/**
- * Secondary button (for multiple actions)
- */
 export function emailButtonSecondary(text, href) {
   return emailButton(text, href, 'secondary');
 }
 
-/**
- * Info box (neutral)
- */
-export function emailInfoBox(content, icon = 'ℹ️') {
-  return `
-    <div style="background-color:${BRAND.colors.bgMuted};padding:16px;border-radius:8px;margin:16px 0;border:1px solid ${BRAND.colors.border};">
-      ${icon ? `<span style="margin-right:8px;">${icon}</span>` : ''}${content}
-    </div>`;
+export function emailButtonDanger(text, href) {
+  return emailButton(text, href, 'danger');
 }
 
-/**
- * Success box (green)
- */
-export function emailSuccessBox(content, icon = '') {
-  return `
-    <div style="background-color:${BRAND.colors.successLight};padding:16px;border-radius:8px;margin:16px 0;border:1px solid ${BRAND.colors.successBorder};">
-      ${icon ? `<span style="margin-right:8px;">${icon}</span>` : ''}${content}
-    </div>`;
+export function emailInfoBox(content) {
+  const c = BRAND.colors;
+  return `<div style="background-color:${c.paper2};padding:14px 16px;border-radius:${BRAND.radius};margin:16px 0;border:1px solid ${c.line};color:${c.inkSoft};font-size:14px;line-height:1.55;">${content}</div>`;
 }
 
-/**
- * Warning box (yellow)
- */
-export function emailWarningBox(content, icon = '') {
-  return `
-    <div style="background-color:${BRAND.colors.warningLight};padding:16px;border-radius:8px;margin:16px 0;border:1px solid ${BRAND.colors.warningBorder};">
-      ${icon ? `<span style="margin-right:8px;">${icon}</span>` : ''}${content}
-    </div>`;
+export function emailSuccessBox(content) {
+  const c = BRAND.colors;
+  return `<div style="background-color:${c.statusBg};padding:14px 16px;border-radius:${BRAND.radius};margin:16px 0;border:1px solid ${c.statusBorder};color:${c.ink};font-size:14px;line-height:1.55;">${content}</div>`;
 }
 
-/**
- * Hash display box (for document fingerprints)
- */
-export function emailHashBox(hash, label = 'Document Fingerprint (SHA-256)') {
-  return `
-    <div style="background-color:${BRAND.colors.successLight};padding:16px;border-radius:8px;margin:16px 0;border:2px solid ${BRAND.colors.success};">
-      <strong style="color:#166534;">${label}</strong>
-      <div style="font-family:'Courier New',Courier,monospace;font-size:11px;word-break:break-all;background-color:white;padding:12px;border-radius:4px;margin-top:8px;border:1px solid ${BRAND.colors.successBorder};">
-        ${hash}
-      </div>
-    </div>`;
+export function emailWarningBox(content) {
+  const c = BRAND.colors;
+  return `<div style="background-color:${c.warnBg};padding:14px 16px;border-radius:${BRAND.radius};margin:16px 0;border:1px solid ${c.warnBorder};color:${c.inkSoft};font-size:14px;line-height:1.55;">${content}</div>`;
 }
 
-/**
- * Key-value details box
- */
+export function emailErrorBox(content) {
+  const c = BRAND.colors;
+  return `<div style="background-color:${c.dangerBg};padding:14px 16px;border-radius:${BRAND.radius};margin:16px 0;border:1px solid ${c.dangerBorder};color:${c.danger};font-size:14px;line-height:1.55;">${content}</div>`;
+}
+
+export function emailHashBox(hash, label = 'Document fingerprint (SHA-256)') {
+  const c = BRAND.colors;
+  return `<div style="background-color:${c.paper2};padding:14px 16px;border-radius:${BRAND.radius};margin:16px 0;border:1px solid ${c.line2};">
+    <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:${c.faint};margin-bottom:8px;">${label}</div>
+    <div style="font-family:'Courier New',Courier,monospace;font-size:11px;word-break:break-all;color:${c.ink};background:${c.card};padding:10px 12px;border-radius:${BRAND.radius};border:1px solid ${c.line};">${hash}</div>
+  </div>`;
+}
+
 export function emailDetailsBox(items) {
-  const rows = items.map(([label, value]) => 
-    `<p style="margin:0 0 8px 0;"><strong>${label}:</strong> ${value}</p>`
+  const c = BRAND.colors;
+  const rows = items.map(([label, value]) =>
+    `<tr><td style="padding:6px 0;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:${c.faint};vertical-align:top;width:38%;">${label}</td><td style="padding:6px 0;font-size:14px;color:${c.ink};vertical-align:top;">${value}</td></tr>`
   ).join('');
-  
-  return `
-    <div style="background-color:${BRAND.colors.bgMuted};padding:16px;border-radius:8px;margin:16px 0;">
-      ${rows}
-    </div>`;
+  return `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin:16px 0;border:1px solid ${c.line};border-radius:${BRAND.radius};background:${c.paper2};"><tr><td style="padding:14px 16px;"><table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">${rows}</table></td></tr></table>`;
 }
 
-/**
- * Title/heading
- */
 export function emailHeading(text, level = 2) {
-  const sizes = { 1: '24px', 2: '20px', 3: '16px' };
-  return `<h${level} style="color:${BRAND.colors.text};font-size:${sizes[level]};margin:0 0 16px 0;font-weight:600;">${text}</h${level}>`;
+  const c = BRAND.colors;
+  const sizes = { 1: '22px', 2: '18px', 3: '15px' };
+  return `<h${level} style="color:${c.ink};font-size:${sizes[level]};margin:0 0 14px 0;font-weight:600;line-height:1.25;letter-spacing:-0.01em;">${text}</h${level}>`;
 }
 
-/**
- * Paragraph
- */
 export function emailParagraph(text) {
-  return `<p style="color:${BRAND.colors.text};font-size:14px;line-height:1.6;margin:0 0 16px 0;">${text}</p>`;
+  const c = BRAND.colors;
+  return `<p style="color:${c.inkSoft};font-size:14px;line-height:1.65;margin:0 0 14px 0;">${text}</p>`;
 }
 
-/**
- * Muted text
- */
 export function emailMuted(text) {
-  return `<p style="color:${BRAND.colors.textDim};font-size:13px;line-height:1.5;margin:0 0 12px 0;">${text}</p>`;
+  const c = BRAND.colors;
+  return `<p style="color:${c.dim};font-size:12px;line-height:1.55;margin:0 0 12px 0;">${text}</p>`;
 }
 
-/**
- * Centered action area
- */
 export function emailActionArea(content) {
-  return `
-    <div style="text-align:center;margin:24px 0;">
-      ${content}
-    </div>`;
+  return `<div style="text-align:center;margin:22px 0;">${content}</div>`;
 }
 
-/**
- * Horizontal rule
- */
 export function emailDivider() {
-  return `<hr style="border:none;border-top:1px solid ${BRAND.colors.border};margin:24px 0;">`;
+  const c = BRAND.colors;
+  return `<hr style="border:none;border-top:1px solid ${c.line};margin:22px 0;">`;
+}
+
+export function emailEyebrow(text) {
+  const c = BRAND.colors;
+  return `<p style="margin:0 0 8px 0;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:${c.faint};">${text}</p>`;
 }
 
 export default {
+  BRAND,
   emailTemplate,
   emailButton,
   emailButtonSecondary,
+  emailButtonDanger,
   emailInfoBox,
   emailSuccessBox,
   emailWarningBox,
+  emailErrorBox,
   emailHashBox,
   emailDetailsBox,
   emailHeading,
@@ -216,5 +186,5 @@ export default {
   emailMuted,
   emailActionArea,
   emailDivider,
-  BRAND
+  emailEyebrow
 };
