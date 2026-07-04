@@ -461,27 +461,30 @@
     },
     "/receipts/{pubkey}": {
       "get": {
-        "summary": "Get receipts by public key",
-        "description": "Retrieve all timestamp receipts associated with a public key.",
+        "summary": "Get receipts by public key (removed)",
+        "description": "Deprecated. Receipt history is stored locally in the browser only. This endpoint always returns 410 Gone.",
+        "deprecated": true,
         "tags": ["Timestamps"],
         "parameters": [
           {"name": "pubkey", "in": "path", "required": true, "schema": {"type": "string"}, "description": "Ed25519 public key (64 hex chars)"}
         ],
         "responses": {
-          "200": {
-            "description": "List of receipts",
+          "410": {
+            "description": "Receipt history is browser-local only",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "pubkey": {"type": "string"},
-                    "count": {"type": "integer"},
-                    "receipts": {"type": "array", "items": {"type": "object"}}
+                    "error": {"type": "string", "example": "local_history_only"},
+                    "message": {"type": "string"}
                   }
                 }
               }
             }
+          },
+          "400": {
+            "description": "Invalid public key format"
           }
         }
       }

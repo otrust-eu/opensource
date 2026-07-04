@@ -3,6 +3,26 @@
 const API = 'https://www.otrust.eu';
 
 const NOTIFY_EMAIL_KEY = 'otrust_notify_email';
+const RECEIPTS_KEY = 'otrust_my_receipts';
+const MAX_RECEIPTS = 200;
+
+async function getMyReceipts() {
+  const stored = await chrome.storage.local.get(RECEIPTS_KEY);
+  return stored[RECEIPTS_KEY] || [];
+}
+
+async function addToMyReceipts(entry) {
+  if (!entry?.receipt_id || !entry?.hash) return;
+  const receipts = (await getMyReceipts()).filter((r) => r.receipt_id !== entry.receipt_id);
+  receipts.unshift({
+    receipt_id: entry.receipt_id,
+    hash: entry.hash,
+    filename: entry.filename || null,
+    timestamp: entry.timestamp || new Date().toISOString(),
+    blockchain_confirmed: !!entry.blockchain_confirmed
+  });
+  await chrome.storage.local.set({ [RECEIPTS_KEY]: receipts.slice(0, MAX_RECEIPTS) });
+}
 
 document.addEventListener('DOMContentLoaded', async () => {
   const timestampBtn = document.getElementById('timestamp-btn');
@@ -48,9 +68,38 @@ document.addEventListener('DOMContentLoaded', async () => {
     ).join('')}</div>`;
   }
 
-  // History button - open otrust.eu with this extension's pubkey
   historyBtn.addEventListener('click', async () => {
-    chrome.tabs.create({ url: `${API}/#history=${keys.publicKey}` });
+    const receipts = await getMyReceipts();
+    if (!receipts.length) {
+      resultEl.innerHTML = `
+        <div class="result">
+          <h4>Receipt history</h4>
+          <p style="font-size:0.8rem;color:var(--text-dim);margin-top:0.35rem;">
+            No receipts in this extension yet. Timestamps you create here are saved locally in this browser profile only.
+          </p>
+        </div>`;
+      return;
+    }
+
+    resultEl.innerHTML = `
+      <div class="history-panel">
+        <div class="history-header">
+          <strong>${receipts.length} timestamp${receipts.length !== 1 ? 's' : ''} in this extension</strong>
+        </div>
+        ${receipts.map((r) => `
+          <button type="button" class="history-item" data-receipt="${r.receipt_id}" data-hash="${r.hash}">
+            <span class="history-title">${escapeHtml(r.filename || r.receipt_id)}</span>
+            <span class="history-meta">${r.hash.slice(0, 12)}... · ${new Date(r.timestamp).toLocaleDateString()}</span>
+          </button>
+        `).join('')}
+        <p class="history-note">Saved in this browser only — not shared via URL or server lookup.</p>
+      </div>`;
+
+    resultEl.querySelectorAll('.history-item').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        chrome.tabs.create({ url: `${API}/proof/${btn.dataset.receipt}` });
+      });
+    });
   });
 
   timestampBtn.addEventListener('click', async () => {
@@ -129,6 +178,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (data.error) throw new Error(data.error);
       
       const isExisting = data.status === 'already_registered';
+      if (!isExisting && data.receipt_id) {
+        await addToMyReceipts({
+          receipt_id: data.receipt_id,
+          hash,
+          filename: response.title || 'Web page',
+          timestamp: new Date().toISOString()
+        });
+      }
       const emailNote = notifyEmail && !isExisting
         ? `<p style="font-size:0.72rem;color:var(--text-dim);margin-top:0.5rem;">We'll email you when Bitcoin confirms.</p>`
         : '';
@@ -246,6 +303,14 @@ async function sign(hash, keys) {
   const hashBytes = new Uint8Array(hash.match(/.{2}/g).map(b => parseInt(b, 16)));
   const sig = await crypto.subtle.sign({ name: 'Ed25519' }, key, hashBytes);
   return Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function escapeHtml(text) {
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
 async function solvePoW(challenge, difficulty) {

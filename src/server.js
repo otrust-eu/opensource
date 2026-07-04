@@ -1133,42 +1133,16 @@ app.post('/verify/signature', smallJson, async (req, res) => {
   }
 });
 
-// GET /receipts/:pubkey - Get all receipts for a public key
+// GET /receipts/:pubkey - Disabled: receipt history is browser-local only
 app.get('/receipts/:pubkey', verifyLimiter, async (req, res) => {
-  try {
-    const { pubkey } = req.params;
-    
-    if (!isValidPubkey(pubkey)) {
-      return res.status(400).json({ error: 'invalid_pubkey' });
-    }
-    
-    // Normalize pubkey to lowercase for consistent lookup
-    const safePubkey = pubkey.toLowerCase().trim();
-    
-    const db = getDb();
-    const claims = await db.collection('claims')
-      .find({ pubkey: safePubkey })
-      .sort({ created_at: -1 })
-      .limit(100)
-      .toArray();
-    
-    res.json({
-      pubkey: safePubkey,
-      count: claims.length,
-      receipts: claims.map(c => ({
-        receipt_id: c.id,
-        hash: c.hash,
-        filename: c.filename || null,
-        timestamp: c.created_at.toISOString ? c.created_at.toISOString() : c.created_at,
-        blockchain_confirmed: !!c.blockchain_confirmed,
-        blockchain_block: c.blockchain_block || null,
-        has_ots_proof: !!c.ots_proof
-      }))
-    });
-  } catch (error) {
-    console.error('Receipts error:', error.message);
-    res.status(500).json({ error: 'server_error' });
+  const { pubkey } = req.params;
+  if (!isValidPubkey(pubkey)) {
+    return res.status(400).json({ error: 'invalid_pubkey' });
   }
+  res.status(410).json({
+    error: 'local_history_only',
+    message: 'Receipt history is stored locally in your browser. The server does not expose per-key receipt lists.'
+  });
 });
 
 // GET /proof/:receiptId - Get OpenTimestamps proof file OR identity proof

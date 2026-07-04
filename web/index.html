@@ -702,7 +702,7 @@
             <div class="timestamp-panel-heading">
               <span>05 / Receipt ledger</span>
               <h3>History</h3>
-              <p class="tab-intro">Review timestamps for the current browser key and open receipt details.</p>
+              <p class="tab-intro">Receipts saved in this browser only — not shared via URL or server lookup.</p>
             </div>
 
             <div id="receipts-loading" style="text-align: center; padding: 2rem; color: var(--text-dim);">
@@ -1131,21 +1131,20 @@
       }
     }
     
-    async function updateHistoryCount() {
-      if (!keys?.publicKey) return;
-      try {
-        const res = await fetch('/receipts/' + keys.publicKey);
-        const data = await res.json();
-        const countBadge = document.getElementById('history-count');
-        if (data.count > 0) {
-          countBadge.textContent = data.count;
-          countBadge.style.display = 'inline';
-        } else {
-          countBadge.style.display = 'none';
-        }
-      } catch (e) {
-        // Ignore errors for badge
+    function updateHistoryCount() {
+      const countBadge = document.getElementById('history-count');
+      const count = window.otrustReceiptHistory?.getMyReceipts().length || 0;
+      if (count > 0) {
+        countBadge.textContent = count;
+        countBadge.style.display = 'inline';
+      } else {
+        countBadge.style.display = 'none';
       }
+    }
+
+    function rememberReceipt(entry) {
+      window.otrustReceiptHistory?.addToMyReceipts(entry);
+      updateHistoryCount();
     }
     
     loadKeys().catch((error) => {
@@ -1375,6 +1374,13 @@
         if (res.ok) {
           // Handle "already registered" as a warning case
           if (data.status === 'already_registered') {
+            rememberReceipt({
+              receipt_id: data.receipt_id,
+              hash: claims[0].hash,
+              filename: files[0]?.name || claims[0].filename,
+              timestamp: data.timestamp,
+              blockchain_confirmed: !!data.blockchain_confirmed
+            });
             resultEl.innerHTML = `
               <div class="result result-warning">
                 <h4>Already timestamped</h4>
@@ -1390,14 +1396,14 @@
           }
           
           if (claims.length === 1) {
-            const receiptData = {
+            const claimFilename = files[0]?.name || '';
+            rememberReceipt({
               receipt_id: data.receipt_id,
               hash: files[0]?.hash || claims[0].hash,
+              filename: claimFilename || claims[0].filename,
               timestamp: data.timestamp,
-              pubkey: keys.publicKey,
-              blockchain_status: data.blockchain_status
-            };
-            const claimFilename = files[0]?.name || '';
+              blockchain_confirmed: data.blockchain_status === 'confirmed'
+            });
             const emailNote = notifyEmail
               ? `<p class="blockchain-pending-note">We'll email <strong>${escapeHtml(notifyEmail)}</strong> when Bitcoin confirms.</p>`
               : '';
@@ -1421,6 +1427,18 @@
                 </div>
               </div>`;
           } else {
+            (data.results || []).forEach((result, index) => {
+              if (result.status !== 'created' && result.status !== 'duplicate') return;
+              const claim = claims[result.index ?? index];
+              if (!claim || !result.receipt_id) return;
+              rememberReceipt({
+                receipt_id: result.receipt_id,
+                hash: claim.hash,
+                filename: claim.filename,
+                timestamp: result.timestamp || new Date().toISOString(),
+                blockchain_confirmed: false
+              });
+            });
             const receiptIds = data.results?.filter(r => r.receipt_id).map(r => r.receipt_id) || [];
             const bulkEmailNote = notifyEmail && data.created > 0
               ? `<p class="blockchain-pending-note">We'll email <strong>${escapeHtml(notifyEmail)}</strong> as each receipt confirms on Bitcoin.</p>`
@@ -1517,12 +1535,32 @@
         const data = await res.json();
         
         if (res.ok) {
+          if (data.receipt_id) {
+            rememberReceipt({
+              receipt_id: data.receipt_id,
+              hash,
+              timestamp: data.timestamp,
+              blockchain_confirmed: data.blockchain_status === 'confirmed' || !!data.blockchain_confirmed
+            });
+          }
           document.getElementById('text-result').innerHTML = `
             <div class="result">
-              <h4>? Timestamp Created</h4>
+              <h4>Timestamp created</h4>
               <div class="result-row"><span class="label">Hash</span><span class="value">${hash.substring(0, 24)}...</span></div>
               <div class="result-row"><span class="label">Receipt ID</span><span class="value">${escapeHtml(data.receipt_id)}</span></div>
               <div class="result-row"><span class="label">Timestamp</span><span class="value">${escapeHtml(data.timestamp)}</span></div>
+            </div>`;
+        } else if (data.status === 'already_registered' && data.receipt_id) {
+          rememberReceipt({
+            receipt_id: data.receipt_id,
+            hash,
+            timestamp: data.timestamp,
+            blockchain_confirmed: !!data.blockchain_confirmed
+          });
+          document.getElementById('text-result').innerHTML = `
+            <div class="result result-warning">
+              <h4>Already timestamped</h4>
+              <div class="result-row"><span class="label">Receipt ID</span><span class="value">${escapeHtml(data.receipt_id)}</span></div>
             </div>`;
         } else {
           document.getElementById('text-result').innerHTML = `<div style="color: #dc2626; padding: 1rem; background: #fef2f2; border-radius: 8px; margin-top: 1rem;">Error: ${escapeHtml(data.error || data.message)}</div>`;
@@ -1733,89 +1771,78 @@
       compareBtn.disabled = false;
     });
     
-    // ========== RECEIPT TAB ==========
-    let currentHistoryPubkey = null;
+    // ========== RECEIPT TAB (browser-local only) ==========
     let receiptPollTimer = null;
+
+    async function refreshPendingReceiptStatuses(receipts) {
+      const pending = receipts.filter((r) => !r.blockchain_confirmed);
+      await Promise.all(pending.slice(0, 20).map(async (receipt) => {
+        try {
+          const res = await fetch('/proof/' + receipt.receipt_id);
+          if (!res.ok) return;
+          const data = await res.json();
+          if (data.blockchain?.confirmed) {
+            window.otrustReceiptHistory?.updateReceiptInHistory(receipt.receipt_id, {
+              blockchain_confirmed: true,
+              blockchain_block: data.blockchain.block_height || null
+            });
+          }
+        } catch {
+          /* ignore */
+        }
+      }));
+      return window.otrustReceiptHistory?.getMyReceipts() || receipts;
+    }
+
+    function renderReceiptList(receipts) {
+      const listEl = document.getElementById('receipts-list');
+      if (!receipts.length) {
+        listEl.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-dim);">No receipts in this browser yet. Create a timestamp to save one here.</div>';
+        updateHistoryCount();
+        return;
+      }
+
+      updateHistoryCount();
+      listEl.innerHTML = '<div class="receipts-header"><strong>' + receipts.length + ' timestamp' + (receipts.length !== 1 ? 's' : '') + ' in this browser</strong></div>' +
+        receipts.map(r => `
+          <div class="receipt-item" data-receipt="${r.receipt_id}">
+            <div class="receipt-info">
+              <div class="receipt-id">${r.filename ? '<span class="receipt-filename">' + escapeHtml(r.filename) + '</span> <span class="receipt-id-small">' + r.receipt_id + '</span>' : r.receipt_id}</div>
+              <div class="receipt-hash">${r.hash.substring(0, 24)}...</div>
+            </div>
+            <div class="receipt-meta">
+              <div class="receipt-date">${new Date(r.timestamp).toLocaleDateString()}</div>
+              <div class="receipt-status ${r.blockchain_confirmed ? 'confirmed' : 'pending'}">${r.blockchain_confirmed ? 'Confirmed' : 'Pending'}</div>
+            </div>
+          </div>
+        `).join('');
+
+      listEl.querySelectorAll('.receipt-item').forEach(item => {
+        item.addEventListener('click', () => showReceiptDetail(item.dataset.receipt));
+      });
+    }
 
     function scheduleReceiptPoll() {
       clearInterval(receiptPollTimer);
-      if (!keys?.publicKey || currentHistoryPubkey) return;
-      const hasPending = document.querySelector('#receipts-list .receipt-status.pending');
+      const hasPending = (window.otrustReceiptHistory?.getMyReceipts() || []).some((r) => !r.blockchain_confirmed);
       if (!hasPending) return;
       receiptPollTimer = setInterval(() => loadMyReceipts(), 90000);
     }
     
-    async function loadMyReceipts(pubkeyOverride = null) {
+    async function loadMyReceipts() {
       const loadingEl = document.getElementById('receipts-loading');
       const listEl = document.getElementById('receipts-list');
-      const detailEl = document.getElementById('receipt-detail');
-      
-      const pubkeyToUse = pubkeyOverride || keys?.publicKey;
-      currentHistoryPubkey = pubkeyOverride;
-      
-      if (!pubkeyToUse) {
-        loadingEl.style.display = 'none';
-        listEl.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-dim);">No key found. Go to the Keys tab to generate or import a key.</div>';
-        return;
-      }
-      
-      try {
-        loadingEl.style.display = 'block';
-        const res = await fetch('/receipts/' + pubkeyToUse);
-        const data = await res.json();
-        loadingEl.style.display = 'none';
-        
-        // Show banner if viewing another key's history
-        const bannerHtml = pubkeyOverride ? 
-          '<div style="background:var(--accent-light);border:1px solid var(--accent);border-radius:8px;padding:0.75rem;margin-bottom:1rem;font-size:0.75rem;">' +
-          '<strong>Viewing history for key:</strong> ' + pubkeyOverride.slice(0,16) + '...' +
-          '<br><a href="#" onclick="loadMyReceipts();return false;" style="color:var(--accent);">Back to my history</a></div>' : '';
-        
-        if (data.receipts.length === 0) {
-          listEl.innerHTML = bannerHtml + '<div style="text-align:center;padding:2rem;color:var(--text-dim);">No timestamps found for this key.</div>';
-          // Update badge
-          const countBadge = document.getElementById('history-count');
-          if (!pubkeyOverride) {
-            countBadge.style.display = 'none';
-          }
-          return;
-        }
-        
-        // Update badge
-        const countBadge = document.getElementById('history-count');
-        if (!pubkeyOverride) {
-          countBadge.textContent = data.count;
-          countBadge.style.display = 'inline';
-        }
-        
-        listEl.innerHTML = bannerHtml + '<div class="receipts-header"><strong>' + data.count + ' timestamp' + (data.count !== 1 ? 's' : '') + '</strong></div>' +
-          data.receipts.map(r => `
-            <div class="receipt-item" data-receipt="${r.receipt_id}">
-              <div class="receipt-info">
-                <div class="receipt-id">${r.filename ? '<span class="receipt-filename">' + escapeHtml(r.filename) + '</span> <span class="receipt-id-small">' + r.receipt_id + '</span>' : r.receipt_id}</div>
-                <div class="receipt-hash">${r.hash.substring(0, 24)}...</div>
-              </div>
-              <div class="receipt-meta">
-                <div class="receipt-date">${new Date(r.timestamp).toLocaleDateString()}</div>
-                <div class="receipt-status ${r.blockchain_confirmed ? 'confirmed' : 'pending'}">${r.blockchain_confirmed ? 'Confirmed' : 'Pending'}</div>
-              </div>
-            </div>
-          `).join('');
-        
-        // Add click handlers
-        listEl.querySelectorAll('.receipt-item').forEach(item => {
-          item.addEventListener('click', () => {
-            const receiptId = item.dataset.receipt;
-            showReceiptDetail(receiptId);
-          });
-        });
+      loadingEl.style.display = 'block';
+      listEl.innerHTML = '';
 
-        scheduleReceiptPoll();
-        
-      } catch (e) {
-        loadingEl.style.display = 'none';
-        listEl.innerHTML = '<div style="color:#dc2626;padding:1rem;">Error loading receipts: ' + escapeHtml(e.message) + '</div>';;
+      let receipts = window.otrustReceiptHistory?.getMyReceipts() || [];
+      if (receipts.some((r) => !r.blockchain_confirmed)) {
+        receipts = await refreshPendingReceiptStatuses(receipts);
       }
+
+      loadingEl.style.display = 'none';
+      renderReceiptList(receipts);
+      scheduleReceiptPoll();
     }
     
     window.showReceiptDetail = async function(receiptId) {
@@ -1879,15 +1906,12 @@
     document.querySelector('[data-tab="receipt"]').addEventListener('click', () => loadMyReceipts());
     
     // ========== URL HASH HANDLING ==========
-    // Handle #history=<pubkey> and #verify=<hash>
     function handleUrlHash() {
       const hash = window.location.hash;
       if (hash.startsWith('#history=')) {
-        const pubkey = hash.slice(9);
-        if (pubkey.length === 64 && /^[a-f0-9]+$/i.test(pubkey)) {
-          switchTab('receipt');
-          loadMyReceipts(pubkey);
-        }
+        history.replaceState(null, '', window.location.pathname + window.location.search);
+        switchTab('receipt');
+        loadMyReceipts();
       } else if (hash.startsWith('#verify=')) {
         const hashToVerify = hash.slice(8);
         if (hashToVerify.length === 64 && /^[a-f0-9]+$/i.test(hashToVerify)) {
@@ -2089,6 +2113,7 @@
       URL.revokeObjectURL(url);
     };
   </script>
+  <script src="/js/receipt-history.js?v=20260704privacy"></script>
   <script src="/js/usage-beacon.js?v=20260704activity"></script>
   <script src="/js/otrust-extras.js?v=20260704fix" defer></script>
   <script src="/otrust-polish.js?v=20260704fix" defer></script>

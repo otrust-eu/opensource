@@ -623,45 +623,15 @@ export async function createBulk(
 }
 
 /**
- * Get all receipts for a public key.
- * 
- * @example
- * ```ts
- * const result = await timestamp.getReceiptsByPubkey(pubkey);
- * if (result.ok) {
- *   console.log(`Found ${result.value.length} receipts`);
- * }
- * ```
+ * @deprecated Receipt history is stored locally in the browser only.
+ * Persist receipts client-side (localStorage or extension storage) when you create timestamps.
  */
-export async function getReceiptsByPubkey(pubkey: string): Promise<Result<Receipt[]>> {
-  const client = getClient();
-  const result = await client.get<{
-    pubkey: string;
-    count: number;
-    receipts: Array<{
-      receipt_id: string;
-      hash: string;
-      filename?: string;
-      timestamp: string;
-      blockchain_confirmed: boolean;
-      blockchain_block?: number;
-      has_ots_proof: boolean;
-    }>;
-  }>(`/receipts/${pubkey.toLowerCase()}`);
-
-  if (!result.ok) {
-    return result;
-  }
-
-  return ok(result.value.receipts.map(r => ({
-    receiptId: r.receipt_id,
-    hash: r.hash,
-    filename: r.filename,
-    timestamp: r.timestamp,
-    blockchainConfirmed: r.blockchain_confirmed,
-    blockchainBlock: r.blockchain_block,
-    hasOtsProof: r.has_ots_proof,
-  })));
+export async function getReceiptsByPubkey(_pubkey: string): Promise<Result<Receipt[]>> {
+  return err(new OTrustError(
+    'validation_error',
+    'Receipt history is browser-local only. The server does not expose per-key receipt lists.',
+    { details: { error: 'local_history_only' } }
+  ));
 }
 
 /**
