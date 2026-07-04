@@ -517,6 +517,7 @@
         <div class="sidebar-divider"></div>
         <div class="sidebar-title">Advanced</div>
         <nav class="sidebar-nav">
+          <a href="#widgets" data-section="widgets">Embed &amp; Webhooks</a>
           <a href="#cli" data-section="cli">CLI</a>
           <a href="#selfhost" data-section="selfhost">Self-Hosting</a>
         </nav>
@@ -614,7 +615,7 @@
           <div class="card">
             <h2>Open tools</h2>
             <ul>
-              <li><a href="/timestamp" style="color: var(--accent);">Timestamp Tool</a> for file and text claims, verify, compare, and receipt history.</li>
+              <li><a href="/timestamp" style="color: var(--accent);">Timestamp Tool</a> for file and text claims, verify, compare, and <strong>browser-local</strong> receipt history.</li>
               <li><a href="/sign" style="color: var(--accent);">Sign Tool</a> for request creation, signer management, and signature status.</li>
               <li><a href="/proof" style="color: var(--accent);">ID Tool</a> for ID creation and independent verifier checks.</li>
               <li><a href="/sign-in" style="color: var(--accent);">Auth Tool</a> for hosted challenge and callback flow testing.</li>
@@ -746,6 +747,21 @@ configure({
               <li><strong>Code commits</strong> – Timestamp important software releases</li>
               <li><strong>Audit trails</strong> – Create immutable logs of business events</li>
             </ul>
+          </div>
+
+          <div class="card">
+            <h2>Receipt history (browser-local)</h2>
+            <p>Your receipt list is stored in <code>localStorage</code> in the web tool and in <code>chrome.storage.local</code> in the extension. It is <strong>not</strong> uploaded to the server and cannot be listed by public key.</p>
+            <ul>
+              <li><strong>History tab</strong> – Shows timestamps created in this browser only</li>
+              <li><strong>Encrypted backup</strong> – Keys tab → export/import password-protected JSON (keys + receipts + sign history)</li>
+              <li><strong>Share proof</strong> – Download a share card (PNG) or copy verification text after creating a timestamp</li>
+              <li><strong>Bitcoin toast</strong> – History tab polls pending receipts and notifies when Bitcoin confirms</li>
+              <li><strong>SV/EN</strong> – Language toggle in the timestamp workspace header</li>
+            </ul>
+            <div class="alert alert-info">
+              <strong>API note:</strong> <code>GET /receipts/:pubkey</code> returns <code>410 Gone</code>. Persist receipts client-side when you create them, or use individual <code>/proof/:id</code> URLs for verification.
+            </div>
           </div>
         </section>
         
@@ -1022,16 +1038,15 @@ X-Admin-Key: &lt;admin-key&gt;
           
           <div class="card">
             <h2>Installation</h2>
-            <p style="margin-bottom: 1rem;">Available for Chrome and Chromium-based browsers (Edge, Brave).</p>
+            <p style="margin-bottom: 1rem;">Available for Chrome, Chromium browsers (Edge, Brave), and Firefox (load unpacked).</p>
             <a href="https://chromewebstore.google.com/detail/otrust-blockchain-timesta/gadpcgaelaihbnnijgkcfmabdmkgpdol" class="btn" target="_blank">Add to Chrome →</a>
             
-            <h3>Manual Installation</h3>
+            <h3>Manual Installation (Chrome / Firefox)</h3>
             <ol>
               <li><a href="/extension.zip" style="color: var(--accent);">Download extension.zip</a></li>
               <li>Extract to a folder</li>
-              <li>Go to <code>chrome://extensions</code></li>
-              <li>Enable "Developer mode"</li>
-              <li>Click "Load unpacked" and select the folder</li>
+              <li>Chrome: <code>chrome://extensions</code> → Developer mode → Load unpacked</li>
+              <li>Firefox: <code>about:debugging#/runtime/this-firefox</code> → Load Temporary Add-on → select <code>manifest.json</code></li>
             </ol>
           </div>
           
@@ -1039,10 +1054,12 @@ X-Admin-Key: &lt;admin-key&gt;
             <h2>Usage</h2>
             <p>Click the OTRUST icon to:</p>
             <ul>
-              <li><strong>Timestamp This Page</strong> – Creates timestamp of page content</li>
-              <li><strong>Verify</strong> – Check if page has been timestamped</li>
-              <li><strong>History</strong> – View your timestamps</li>
+              <li><strong>Create timestamp</strong> – Hash page content locally, sign, and submit</li>
+              <li><strong>Verify</strong> – Open verify flow with the current page hash</li>
+              <li><strong>History</strong> – List receipts saved in this extension profile only (not synced to otrust.eu)</li>
+              <li><strong>Email opt-in</strong> – Optional Bitcoin confirmation email</li>
             </ul>
+            <p>Extension history is separate from the web tool — each browser profile keeps its own list.</p>
           </div>
         </section>
         
@@ -1105,15 +1122,18 @@ X-Admin-Key: &lt;admin-key&gt;
           
           <div class="card">
             <h2>Telegram Bot</h2>
-            <p>Start chatting with <a href="https://t.me/OTRUSTbot" target="_blank" style="color: var(--accent);">@OTRUSTbot</a></p>
+            <p>Self-host the bot from <code>addons/telegram-bot/</code> or use <a href="https://t.me/OTRUSTbot" target="_blank" style="color: var(--accent);">@OTRUSTbot</a> when deployed.</p>
             
             <h3>Commands</h3>
             <ul>
-              <li><code>/start</code> – Introduction and help</li>
-              <li><code>/timestamp [text]</code> – Timestamp text or reply to a message</li>
-              <li><code>/help</code> – Show available commands</li>
+              <li><code>/start</code> or <code>/help</code> – Introduction</li>
+              <li><code>/hash &lt;sha256&gt;</code> – Timestamp a 64-char hash via <code>POST /claim/simple</code></li>
+              <li>Send a <strong>document</strong> – Hash file locally and timestamp</li>
+              <li><code>/status</code> – Live anchored stats from <code>/stats/badges.json</code></li>
             </ul>
-            <p>Works in private chats and groups.</p>
+            <pre><code>export TELEGRAM_BOT_TOKEN=...
+export OTRUST_API=https://www.otrust.eu
+cd addons/telegram-bot && npm start</code></pre>
           </div>
           
           <div class="card">
@@ -1140,57 +1160,88 @@ npm link  <span class="comment"># Makes 'otrust' command available</span></code>
           </div>
           
           <div class="card">
-            <h2>Timestamp Commands</h2>
-            <pre><code><span class="comment"># Timestamp a file</span>
+            <h2>Commands</h2>
+            <pre><code><span class="comment"># Generate and save keypair</span>
+otrust keygen --save
+
+<span class="comment"># Timestamp a file or raw hash</span>
 otrust claim document.pdf
+otrust claim a1b2c3...&lt;64 hex&gt;
 
-<span class="comment"># Timestamp with email receipt</span>
-otrust claim document.pdf --email you@example.com
+<span class="comment"># Verify a file or hash</span>
+otrust verify document.pdf
 
-<span class="comment"># Timestamp multiple files</span>
-otrust claim *.pdf
+<span class="comment"># Batch timestamp (max 100 files, one PoW)</span>
+otrust bulk ./docs/ --recursive
 
-<span class="comment"># Check status</span>
-otrust status ot_abc123xyz
+<span class="comment"># Batch verify hashes</span>
+otrust verify-bulk ./docs/ -r --json
 
-<span class="comment"># Download receipt when ready</span>
-otrust proof ot_abc123xyz -o document.pdf.ots
+<span class="comment"># Local CLI history (~/.otrust/history.json)</span>
+otrust history
+otrust history --json
 
-<span class="comment"># Verify a receipt</span>
-otrust verify document.pdf document.pdf.ots</code></pre>
-          </div>
-          
-          <div class="card">
-            <h2>Signature Commands</h2>
-            <pre><code><span class="comment"># Create signature request</span>
-otrust sign create document.pdf --parties alice@x.com,bob@y.com
-
-<span class="comment"># Check signature status</span>
-otrust sign status sig_xxx
-
-<span class="comment"># Sign as a party</span>
-otrust sign approve sig_xxx --token xxx</code></pre>
+<span class="comment"># Export IPFS-ready proof bundle</span>
+otrust ipfs-export ot_abc123xyz --out proof-bundle.json</code></pre>
+            <p>Run <code>otrust help</code> for the full list. Email and webhook notifications are set via the API (<code>notify_email</code>, <code>notify_webhook</code> on <code>POST /claim</code>), not CLI flags.</p>
           </div>
           
           <div class="card">
             <h2>Environment Variables</h2>
             <table>
               <tr><th>Variable</th><th>Description</th></tr>
-              <tr><td><code>OTRUST_API</code></td><td>API endpoint (default: https://otrust.eu)</td></tr>
-              <tr><td><code>OTRUST_KEY</code></td><td>Path to Ed25519 private key file</td></tr>
-              <tr><td><code>OTRUST_EMAIL</code></td><td>Default email for receipts</td></tr>
+              <tr><td><code>OTRUST_API</code></td><td>API endpoint (default: https://www.otrust.eu)</td></tr>
+              <tr><td><code>OTRUST_KEY</code></td><td>Path to Ed25519 key file (default: ~/.otrust/key.json)</td></tr>
+              <tr><td><code>OTRUST_HISTORY</code></td><td>Path to local receipt history JSON</td></tr>
             </table>
           </div>
           
           <div class="card">
             <h2>Scripting Examples</h2>
-            <pre><code><span class="comment"># Bash: Timestamp all PDFs in a folder</span>
-for f in *.pdf; do
-  otrust claim "$f" --email backup@company.com
-done
+            <pre><code><span class="comment"># Bash: timestamp all PDFs</span>
+for f in *.pdf; do otrust claim "$f"; done
 
-<span class="comment"># CI/CD: Timestamp release artifacts</span>
-otrust claim dist/*.zip --json > timestamps.json</code></pre>
+<span class="comment"># CI: batch timestamp release folder</span>
+otrust bulk dist/ --json
+
+<span class="comment"># Check proof metadata (curl)</span>
+curl -s "https://www.otrust.eu/proof/ot_abc123?format=json"</code></pre>
+          </div>
+        </section>
+
+        <!-- Embed & Webhooks -->
+        <section id="widgets" class="doc-section">
+          <div class="content-header">
+            <h1>Embed &amp; Webhooks</h1>
+            <p>Trust badges, bookmarklets, and server callbacks for Bitcoin confirmation.</p>
+          </div>
+
+          <div class="card">
+            <h2>Embeddable trust badge</h2>
+            <p>Show live anchored-record stats on your site:</p>
+            <pre><code>&lt;script src="https://www.otrust.eu/js/otrust-embed.js" data-otrust-badge&gt;&lt;/script&gt;</code></pre>
+            <p>See <a href="/embed" style="color: var(--accent);">/embed</a> for a preview. Data from <a href="/stats/badges.json" style="color: var(--accent);">/stats/badges.json</a>.</p>
+          </div>
+
+          <div class="card">
+            <h2>Bookmarklet</h2>
+            <p>Verify the current page without installing an extension. Drag the link from <a href="/bookmarklet" style="color: var(--accent);">/bookmarklet</a> to your bookmarks bar.</p>
+          </div>
+
+          <div class="card">
+            <h2>Bitcoin confirmation webhook</h2>
+            <p>Pass <code>notify_webhook</code> (HTTPS only) and optional <code>notify_webhook_secret</code> on <code>POST /claim</code>, <code>POST /claim/bulk</code>, or <code>POST /claim/simple</code>. When OpenTimestamps confirms on Bitcoin, OTRUST POSTs once and deletes the webhook URL.</p>
+            <pre><code>{
+  "event": "bitcoin_confirmed",
+  "receipt_id": "ot_abc123",
+  "hash": "sha256-hex",
+  "block_height": 912345,
+  "proof_url": "https://www.otrust.eu/proof/ot_abc123",
+  "ots_url": "https://www.otrust.eu/proof/ot_abc123?format=ots",
+  "confirmed_at": "2026-07-04T14:00:00.000Z"
+}</code></pre>
+            <p>If <code>notify_webhook_secret</code> is set, verify header <code>X-OTRUST-Signature: sha256=&lt;hmac&gt;</code> (HMAC-SHA256 of the raw JSON body).</p>
+            <p>Alternatively use <code>notify_email</code> for a one-time confirmation email (deleted after send).</p>
           </div>
         </section>
         

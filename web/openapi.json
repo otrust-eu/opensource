@@ -67,29 +67,33 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["hash", "challenge", "solution"],
+                "required": ["hash", "signature", "pubkey", "pow"],
                 "properties": {
                   "hash": {
                     "type": "string",
-                    "description": "SHA-256 hash of data to timestamp (hex format)",
+                    "description": "SHA-256 hash (64 hex chars)",
                     "example": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-                  },
-                  "challenge": {
-                    "type": "string",
-                    "description": "Challenge from /challenge endpoint"
-                  },
-                  "solution": {
-                    "type": "string",
-                    "description": "PoW solution (nonce in hex)"
-                  },
-                  "pubkey": {
-                    "type": "string",
-                    "description": "Optional Ed25519 public key for signature verification (hex)"
                   },
                   "signature": {
                     "type": "string",
-                    "description": "Optional Ed25519 signature over hash (hex)"
-                  }
+                    "description": "Ed25519 signature over hash (128 hex chars)"
+                  },
+                  "pubkey": {
+                    "type": "string",
+                    "description": "Ed25519 public key (64 hex chars)"
+                  },
+                  "pow": {
+                    "type": "object",
+                    "required": ["challenge", "nonce"],
+                    "properties": {
+                      "challenge": {"type": "string"},
+                      "nonce": {"type": "string", "description": "PoW nonce (hex)"}
+                    }
+                  },
+                  "filename": {"type": "string", "description": "Optional display name"},
+                  "notify_email": {"type": "string", "format": "email", "description": "One-time Bitcoin confirmation email"},
+                  "notify_webhook": {"type": "string", "format": "uri", "description": "HTTPS URL for Bitcoin confirmation webhook"},
+                  "notify_webhook_secret": {"type": "string", "description": "Optional HMAC secret for X-OTRUST-Signature"}
                 }
               }
             }

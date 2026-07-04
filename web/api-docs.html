@@ -734,9 +734,25 @@
           <span class="method-badge post">POST</span>
           <span>/verify</span>
         </a>
+        <a href="#post-verify-bulk" class="endpoint-link">
+          <span class="method-badge post">POST</span>
+          <span>/verify/bulk</span>
+        </a>
+        <a href="#get-stats" class="endpoint-link">
+          <span class="method-badge get">GET</span>
+          <span>/stats</span>
+        </a>
+        <a href="#get-stats-badges" class="endpoint-link">
+          <span class="method-badge get">GET</span>
+          <span>/stats/badges.json</span>
+        </a>
         <a href="#get-lookup" class="endpoint-link">
           <span class="method-badge get">GET</span>
           <span>/lookup/:hash</span>
+        </a>
+        <a href="#get-receipts-deprecated" class="endpoint-link">
+          <span class="method-badge" style="background:#9ca3af;">GONE</span>
+          <span>/receipts/:pubkey</span>
         </a>
         <a href="#get-ots" class="endpoint-link">
           <span class="method-badge get">GET</span>
@@ -764,6 +780,7 @@
     <div class="content-card">
       <h2>Access Model</h2>
       <p>Public timestamp endpoints do not require accounts or API keys. Claim creation requires an Ed25519 signature plus a challenge proof-of-work, and rate limits apply. Partner Auth endpoints are challenge-based and intended for server-side integrations.</p>
+      <p style="margin-top:0.75rem;font-size:0.9rem;color:var(--text-dim);"><strong>Receipt lists are client-side.</strong> Persist receipts in your app (<code>localStorage</code>, extension storage, or your database). <code>GET /receipts/:pubkey</code> returns <code>410 Gone</code>. Use <code>GET /proof/:receiptId</code> for individual verification.</p>
 
       <div class="endpoint" id="partner-auth">
         <div class="endpoint-header">
@@ -816,8 +833,12 @@
     <span class="property">"challenge"</span>: <span class="string">"challenge-from-/challenge"</span>,
     <span class="property">"nonce"</span>: <span class="string">"nonce-that-meets-difficulty"</span>
   },
-  <span class="property">"filename"</span>: <span class="string">"optional-display-name.pdf"</span>
+  <span class="property">"filename"</span>: <span class="string">"optional-display-name.pdf"</span>,
+  <span class="property">"notify_email"</span>: <span class="string">"you@example.com"</span>,
+  <span class="property">"notify_webhook"</span>: <span class="string">"https://your.app/hooks/otrust"</span>,
+  <span class="property">"notify_webhook_secret"</span>: <span class="string">"optional-hmac-secret"</span>
 }</code></pre>
+          <p><code>notify_email</code> triggers a one-time Bitcoin confirmation email (stored separately, deleted after send). <code>notify_webhook</code> must be HTTPS; OTRUST POSTs once on confirm with optional <code>X-OTRUST-Signature</code> HMAC. See <a href="/docs#widgets">webhook docs</a>.</p>
           <h3>Response</h3>
           <pre><code>{
   <span class="property">"status"</span>: <span class="string">"ok"</span>,
@@ -845,8 +866,11 @@
       <span class="property">"signature"</span>: <span class="string">"ed25519-signature-hex"</span>,
       <span class="property">"pubkey"</span>: <span class="string">"ed25519-public-key-hex"</span>
     }
-  ]
+  ],
+  <span class="property">"notify_email"</span>: <span class="string">"optional@example.com"</span>,
+  <span class="property">"notify_webhook"</span>: <span class="string">"https://your.app/hooks/otrust"</span>
 }</code></pre>
+          <p>One <code>notify_email</code> / <code>notify_webhook</code> applies to all newly created receipts in the batch.</p>
         </div>
       </div>
       
@@ -878,6 +902,54 @@
         </div>
       </div>
 
+      <div class="endpoint" id="post-verify-bulk">
+        <div class="endpoint-header">
+          <span class="method post">POST</span>
+          <span class="path">/verify/bulk</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Verify up to 100 hashes in one request.</p>
+          <h3>Request Body</h3>
+          <pre><code>{
+  <span class="property">"hashes"</span>: [<span class="string">"sha256-hex-1"</span>, <span class="string">"sha256-hex-2"</span>]
+}</code></pre>
+          <h3>Response</h3>
+          <pre><code>{
+  <span class="property">"status"</span>: <span class="string">"ok"</span>,
+  <span class="property">"results"</span>: [
+    { <span class="property">"hash"</span>: <span class="string">"..."</span>, <span class="property">"status"</span>: <span class="string">"found"</span>, <span class="property">"claims"</span>: [] },
+    { <span class="property">"hash"</span>: <span class="string">"..."</span>, <span class="property">"status"</span>: <span class="string">"not_found"</span> }
+  ]
+}</code></pre>
+        </div>
+      </div>
+
+      <div class="endpoint" id="get-stats">
+        <div class="endpoint-header">
+          <span class="method get">GET</span>
+          <span class="path">/stats</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Public transparency metrics: records, anchored claims, activity counters, latest Bitcoin block. See also <a href="/transparency">Trust Log</a>.</p>
+        </div>
+      </div>
+
+      <div class="endpoint" id="get-stats-badges">
+        <div class="endpoint-header">
+          <span class="method get">GET</span>
+          <span class="path">/stats/badges.json</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Compact stats for embed widgets (<a href="/embed">/embed</a>). Cached 5 minutes.</p>
+          <pre><code>{
+  <span class="property">"service"</span>: <span class="string">"OTRUST"</span>,
+  <span class="property">"anchored_records"</span>: <span class="number">1234</span>,
+  <span class="property">"latest_block"</span>: <span class="number">912345</span>,
+  <span class="property">"updated_at"</span>: <span class="string">"2026-07-04T12:00:00.000Z"</span>
+}</code></pre>
+        </div>
+      </div>
+
       <div class="endpoint" id="get-lookup">
         <div class="endpoint-header">
           <span class="method get">GET</span>
@@ -893,6 +965,16 @@
         </div>
       </div>
       
+      <div class="endpoint" id="get-receipts-deprecated">
+        <div class="endpoint-header">
+          <span class="method" style="background:#9ca3af;">GONE</span>
+          <span class="path">/receipts/:pubkey</span>
+        </div>
+        <div class="endpoint-body">
+          <p><strong>Removed.</strong> Always returns <code>410 Gone</code> with <code>error: "local_history_only"</code>. Store receipt IDs client-side when you create timestamps.</p>
+        </div>
+      </div>
+
       <div class="endpoint" id="get-ots">
         <div class="endpoint-header">
           <span class="method get">GET</span>
