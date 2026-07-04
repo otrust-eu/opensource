@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OTRUST Time-Locked Commitment</title>
+  <link rel="stylesheet" href="/otrust-redesign.css?v=20260704wave4">
+</head>
+<body data-otrust-page="docs">
+  <main style="max-width:720px;margin:2rem auto;padding:0 1rem;">
+    <h1>Time-locked commitment</h1>
+    <p style="color:var(--text-dim);">Commit to content now, reveal after a chosen date. The server stores only the hash until reveal time.</p>
+    <label>Secret content <textarea id="preimage" rows="4" style="width:100%;margin-top:0.25rem;"></textarea></label>
+    <label style="display:block;margin-top:0.75rem;">Reveal after <input type="datetime-local" id="reveal-at" style="margin-top:0.25rem;"></label>
+    <label style="display:block;margin-top:0.75rem;">Label (optional) <input type="text" id="label" style="width:100%;margin-top:0.25rem;"></label>
+    <button type="button" class="btn btn-primary" id="commit-btn" style="margin-top:0.75rem;">Create commitment</button>
+    <div id="result" style="margin-top:1.5rem;"></div>
+    <hr style="margin:2rem 0;border:none;border-top:1px solid var(--border);">
+    <h2>Reveal</h2>
+    <label>Commitment ID <input type="text" id="commit-id" style="width:100%;margin-top:0.25rem;"></label>
+    <label style="display:block;margin-top:0.75rem;">Preimage <textarea id="reveal-preimage" rows="3" style="width:100%;margin-top:0.25rem;"></textarea></label>
+    <button type="button" class="btn btn-secondary" id="reveal-btn" style="margin-top:0.75rem;">Reveal</button>
+    <div id="reveal-result" style="margin-top:1rem;"></div>
+  </main>
+  <script>
+    document.getElementById('commit-btn').addEventListener('click', async () => {
+      const preimage = document.getElementById('preimage').value;
+      const reveal_at = document.getElementById('reveal-at').value;
+      const label = document.getElementById('label').value;
+      const hashRes = await fetch('/api/commitment/preview-hash', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ preimage }) });
+      const { commitment_hash } = await hashRes.json();
+      const res = await fetch('/api/commitment', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ commitment_hash, reveal_at: new Date(reveal_at).toISOString(), label }) });
+      const data = await res.json();
+      document.getElementById('result').innerHTML = res.ok
+        ? `<p>Created <code>${data.commitment.id}</code><br>Hash: <code>${data.commitment.commitment_hash}</code><br>Locked until ${data.commitment.reveal_at}</p>`
+        : `<p style="color:#b45309;">${data.error}</p>`;
+    });
+    document.getElementById('reveal-btn').addEventListener('click', async () => {
+      const id = document.getElementById('commit-id').value.trim();
+      const preimage = document.getElementById('reveal-preimage').value;
+      const res = await fetch(`/api/commitment/${id}/reveal`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ preimage }) });
+      const data = await res.json();
+      document.getElementById('reveal-result').innerHTML = res.ok
+        ? `<p>Revealed: <pre>${data.preimage}</pre></p>`
+        : `<p style="color:#b45309;">${data.error}</p>`;
+    });
+  </script>
+</body>
+</html>

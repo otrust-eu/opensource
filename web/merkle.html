@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OTRUST Merkle Path Viewer</title>
+  <link rel="stylesheet" href="/otrust-redesign.css?v=20260704wave4">
+</head>
+<body data-otrust-page="docs">
+  <main style="max-width:720px;margin:2rem auto;padding:0 1rem;">
+    <h1>Merkle path viewer</h1>
+    <p style="color:var(--text-dim);">Visualize how an OTRUST receipt connects to Bitcoin via OpenTimestamps.</p>
+    <label>Receipt ID <input type="text" id="receipt-id" placeholder="ot_abc123…" style="width:100%;margin-top:0.25rem;padding:0.5rem;"></label>
+    <button type="button" class="btn btn-primary" id="load-btn" style="margin-top:0.75rem;">Load proof</button>
+    <div id="viz" style="margin-top:1.5rem;"></div>
+  </main>
+  <script>
+    const steps = ['Your hash', 'OTRUST receipt', 'OTS calendar', 'Bitcoin block'];
+    document.getElementById('load-btn').addEventListener('click', async () => {
+      const id = document.getElementById('receipt-id').value.trim();
+      if (!id) return;
+      const viz = document.getElementById('viz');
+      viz.innerHTML = '<p>Loading…</p>';
+      try {
+        const res = await fetch(`/proof/${id}?format=json`);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || res.status);
+        const confirmed = data.blockchain?.confirmed;
+        const block = data.blockchain?.block_height;
+        const calendars = data.blockchain?.pending_calendars || [];
+        viz.innerHTML = `
+          <div style="display:flex;flex-direction:column;gap:0.5rem;">
+            ${steps.map((s, i) => `<div style="display:flex;align-items:center;gap:0.75rem;padding:0.75rem 1rem;border:1px solid var(--border);border-radius:8px;">
+              <span style="font-size:0.7rem;color:var(--text-dim);width:1.5rem;">${i+1}</span>
+              <strong>${s}</strong>
+              ${i === 0 ? `<code style="font-size:0.75rem;">${data.hash?.slice(0,20)}…</code>` : ''}
+              ${i === 3 && confirmed ? `<span style="color:#2d5a3d;margin-left:auto;">Block ${block}</span>` : ''}
+              ${i === 2 && calendars.length ? `<span style="margin-left:auto;font-size:0.8rem;">${calendars.join(', ')}</span>` : ''}
+            </div>`).join('')}
+          </div>
+          <p style="margin-top:1rem;font-size:0.85rem;"><a href="/proof/${id}">View receipt</a> · <a href="/proof/${id}/evidence.zip">Download evidence ZIP</a></p>`;
+      } catch (e) {
+        viz.innerHTML = `<p style="color:#b45309;">${e.message}</p>`;
+      }
+    });
+  </script>
+</body>
+</html>

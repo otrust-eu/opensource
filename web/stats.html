@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OTRUST Live Stats</title>
+  <link rel="stylesheet" href="/otrust-redesign.css?v=20260704wave4">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <style>
+    .stats-hero { text-align:center;padding:2rem 1rem 1rem; }
+    .stats-counter { font-size:3rem;font-weight:700;letter-spacing:-0.03em; }
+    .stats-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.75rem;max-width:960px;margin:1.5rem auto;padding:0 1rem; }
+    .stats-card { padding:1rem 1.25rem;border:1px solid var(--border);border-radius:10px;background:var(--bg-card); }
+    .stats-card span { display:block;font-size:0.75rem;color:var(--text-dim);margin-bottom:0.35rem; }
+    .stats-card strong { font-size:1.35rem; }
+    .stats-embed { max-width:960px;margin:2rem auto;padding:0 1rem; }
+  </style>
+</head>
+<body data-otrust-page="docs">
+  <main>
+    <div class="stats-hero">
+      <h1>OTRUST Live Stats</h1>
+      <p style="color:var(--text-dim);">Public counters — updated every 60s</p>
+      <div class="stats-counter" id="anchored-counter">—</div>
+      <p style="color:var(--text-dim);font-size:0.85rem;">Bitcoin-anchored records</p>
+    </div>
+    <div class="stats-grid" id="stats-grid"></div>
+    <div class="stats-embed">
+      <h2>Embed badge</h2>
+      <script src="/js/otrust-embed.js" data-otrust-badge></script>
+      <p style="margin-top:1rem;font-size:0.85rem;"><a href="/embed">Embed docs</a> · <a href="/transparency">Transparency log</a> · <a href="/transparency/feed.xml">RSS feed</a> · <a href="/status">Status</a></p>
+    </div>
+  </main>
+  <script>
+    async function load() {
+      const [stats, badges] = await Promise.all([
+        fetch('/stats').then(r => r.json()),
+        fetch('/stats/badges.json').then(r => r.json())
+      ]);
+      document.getElementById('anchored-counter').textContent = Number(badges.anchored_records || 0).toLocaleString();
+      const items = [
+        ['Total claims', stats.total_claims],
+        ['Confirmed claims', stats.confirmed_claims],
+        ['Pending claims', stats.pending_claims],
+        ['Sign requests', stats.total_signatures],
+        ['Active ID proofs', stats.active_proofs],
+        ['Latest Bitcoin block', badges.latest_block || '—'],
+        ['Hashes computed (local)', stats.hashes_computed || 0],
+        ['Verifications processed', stats.verifications_processed || 0]
+      ];
+      document.getElementById('stats-grid').innerHTML = items.map(([k,v]) =>
+        `<div class="stats-card"><span>${k}</span><strong>${v ?? '—'}</strong></div>`
+      ).join('');
+    }
+    load().catch(() => { document.getElementById('anchored-counter').textContent = '?'; });
+    setInterval(load, 60000);
+  </script>
+</body>
+</html>

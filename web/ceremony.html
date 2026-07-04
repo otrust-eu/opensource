@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OTRUST Hash Ceremony</title>
+  <link rel="stylesheet" href="/otrust-redesign.css?v=20260704wave4">
+</head>
+<body data-otrust-page="docs">
+  <main style="max-width:720px;margin:2rem auto;padding:0 1rem;">
+    <h1>Multi-party hash ceremony</h1>
+    <p style="color:var(--text-dim);">Create a room, share the link, and collect attestations on a shared hash before anyone timestamps.</p>
+    <div id="create-panel">
+      <label>SHA-256 hash <input type="text" id="hash" placeholder="64-char hex" style="width:100%;margin-top:0.25rem;padding:0.5rem;font-family:monospace;"></label>
+      <label style="display:block;margin-top:0.75rem;">Your name <input type="text" id="name" style="width:100%;margin-top:0.25rem;padding:0.5rem;"></label>
+      <button type="button" class="btn btn-primary" id="create-btn" style="margin-top:0.75rem;">Create ceremony</button>
+    </div>
+    <div id="room-panel" hidden style="margin-top:1.5rem;">
+      <p>Room: <code id="room-id"></code> — <a id="room-link" href="#"></a></p>
+      <div id="room-status"></div>
+    </div>
+  </main>
+  <script>
+    async function pollRoom(id) {
+      const res = await fetch(`/api/ceremony/${id}`);
+      const room = await res.json();
+      document.getElementById('room-status').innerHTML = `
+        <p>Status: <strong>${room.status}</strong> · ${room.participants?.length || 0} participants · ${room.attestations?.length || 0} attestations</p>
+        <ul>${(room.participants||[]).map(p => `<li>${p.name} — ${p.pubkey.slice(0,16)}…</li>`).join('')}</ul>`;
+    }
+    document.getElementById('create-btn').addEventListener('click', async () => {
+      const hash = document.getElementById('hash').value.trim();
+      const name = document.getElementById('name').value.trim() || 'host';
+      const res = await fetch('/api/ceremony', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ hash, creator:{ name } }) });
+      const data = await res.json();
+      if (!res.ok) { alert(data.error); return; }
+      document.getElementById('create-panel').hidden = true;
+      document.getElementById('room-panel').hidden = false;
+      document.getElementById('room-id').textContent = data.room_id;
+      const link = data.join_url;
+      const a = document.getElementById('room-link');
+      a.href = link; a.textContent = link;
+      location.hash = data.room_id;
+      setInterval(() => pollRoom(data.room_id), 3000);
+      pollRoom(data.room_id);
+    });
+    if (location.hash.length > 2) {
+      document.getElementById('create-panel').hidden = true;
+      document.getElementById('room-panel').hidden = false;
+      document.getElementById('room-id').textContent = location.hash.slice(1);
+      setInterval(() => pollRoom(location.hash.slice(1)), 3000);
+      pollRoom(location.hash.slice(1));
+    }
+  </script>
+</body>
+</html>

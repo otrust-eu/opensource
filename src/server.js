@@ -38,6 +38,7 @@ import { verifySignature, verifyPow } from './crypto.js';
 import { generateChallenge, consumeChallenge } from './pow.js';
 import { startOtsProcessor, verifyTimestamp, getTimestampInfo, createTimestamp, setOnConfirmationCallback, setOnSignatureConfirmationCallback, processPendingTimestamps } from './opentimestamps.js';
 import { isValidWebhookUrl, storeWebhookNotification, dispatchConfirmationWebhook } from './webhooks.js';
+import { registerWave4Routes } from './wave4/routes.js';
 import { sendEmail } from './email.js';
 import {
   emailTemplate,
@@ -3505,6 +3506,8 @@ app.get('/stats', async (req, res) => {
     res.status(500).json({ error: 'server_error' });
   }
 });
+
+registerWave4Routes(app, { getDb, getTimestampInfo, sanitizeString, bulkJson });
 
 // Test email endpoint (protected with rate limiting and timing-safe key comparison)
 // In production, consider disabling entirely or using a more secure admin interface

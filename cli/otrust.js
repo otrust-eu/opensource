@@ -168,6 +168,27 @@ function solvePow(challenge, difficulty) {
 // API CLIENT
 // ============================================
 
+function apiRequestBinary(method, path) {
+  return new Promise((resolve, reject) => {
+    const url = new URL(path, DEFAULT_API);
+    const isHttps = url.protocol === 'https:';
+    const client = isHttps ? https : http;
+    const req = client.request({
+      hostname: url.hostname,
+      port: url.port || (isHttps ? 443 : 3000),
+      path: url.pathname + url.search,
+      method,
+      headers: { 'User-Agent': `otrust-cli/${VERSION}` }
+    }, (res) => {
+      const chunks = [];
+      res.on('data', (c) => chunks.push(c));
+      res.on('end', () => resolve({ status: res.statusCode, body: Buffer.concat(chunks) }));
+    });
+    req.on('error', reject);
+    req.end();
+  });
+}
+
 function apiRequest(method, path, data = null) {
   return new Promise((resolve, reject) => {
     const url = new URL(path, DEFAULT_API);
@@ -666,6 +687,49 @@ const commands = {
     console.log('  ' + '─'.repeat(40) + '\n');
   },
 
+  async bundle(args) {
+    const receiptId = args[0];
+    if (!receiptId) {
+      console.error('Usage: otrust bundle <receipt-id> [--out file.zip]');
+      process.exit(1);
+    }
+    const out = args.includes('--out') ? args[args.indexOf('--out') + 1] : `${receiptId}-evidence.zip`;
+    process.stdout.write('  Downloading evidence bundle... ');
+    const data = await apiRequestBinary('GET', `/proof/${receiptId}/evidence.zip`);
+    if (data.status !== 200) {
+      console.log('failed');
+      process.exit(1);
+    }
+    fs.writeFileSync(out, data.body);
+    console.log('done');
+    console.log(`  Saved: ${path.resolve(out)}`);
+  },
+
+  async 'hook-install'(args) {
+    const gitDir = path.join(process.cwd(), '.git');
+    if (!fs.existsSync(gitDir)) {
+      console.error('  Not a git repository. Run from repo root.');
+      process.exit(1);
+    }
+    const hooksDir = path.join(gitDir, 'hooks');
+    const hookPath = path.join(hooksDir, 'pre-commit');
+    const script = `#!/bin/sh
+# OTRUST pre-commit — hash staged files locally (no upload)
+STAGED=$(git diff --cached --name-only --diff-filter=ACM | grep -vE '^package-lock.json$|^pnpm-lock.yaml$' || true)
+if [ -z "$STAGED" ]; then exit 0; fi
+echo "[otrust] Hashing staged files locally..."
+for f in $STAGED; do
+  [ -f "$f" ] || continue
+  HASH=$(sha256sum "$f" 2>/dev/null | awk '{print $1}')
+  [ -n "$HASH" ] && echo "  $f → $HASH"
+done
+exit 0
+`;
+    fs.writeFileSync(hookPath, script, { mode: 0o755 });
+    console.log(`  Installed pre-commit hook: ${hookPath}`);
+    console.log('  Run: otrust claim <file> to timestamp before commit.');
+  },
+
   async 'ipfs-export'(args) {
     const receiptId = args[0];
     if (!receiptId) {
@@ -709,7 +773,9 @@ const commands = {
     bulk <files|folders>             Batch timestamp files
     verify-bulk <files|folders>      Batch verify files
     history [--json]                 List local CLI receipt history
+    bundle <receipt-id>              Download evidence ZIP
     ipfs-export <receipt-id>         Export IPFS-ready proof bundle
+    hook-install                     Install git pre-commit hash hook
 
   OPTIONS
     --save                Save key to ~/.otrust/key.json

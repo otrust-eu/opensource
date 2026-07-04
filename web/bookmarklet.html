@@ -4,18 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OTRUST Bookmarklet — Verify this page</title>
-  <link rel="stylesheet" href="/otrust-redesign.css?v=20260704ux">
+  <link rel="stylesheet" href="/otrust-redesign.css?v=20260704wave4">
 </head>
 <body data-otrust-page="docs">
   <main style="max-width:640px;margin:2rem auto;padding:0 1rem;">
     <h1>Verify this page</h1>
-    <p>Drag the button below to your bookmarks bar. On any public webpage, click it to hash the page content and open OTRUST verify with that hash.</p>
+    <p>Drag the button below to your bookmarks bar. On any public webpage, click it to hash the page and open OTRUST verify.</p>
     <p>
-      <a class="btn btn-primary" href="javascript:(function(){var s=document.documentElement.outerHTML;fetch('https://www.otrust.eu/api/usage/event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({event:'hash_computed',count:1})}).catch(function(){});crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)).then(function(b){var a=Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0')}).join('');window.open('https://www.otrust.eu/#verify='+a,'_blank');});})();">
-        OTRUST Verify Page
+      <a class="btn btn-primary" href="javascript:(function(){var h=location.hostname.replace(/^www\./,'');fetch('https://www.otrust.eu/api/usage/event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({event:'hash_computed',count:1})}).catch(function(){});var s=document.documentElement.outerHTML;crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)).then(function(b){var a=Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0')}).join('');fetch('https://www.otrust.eu/api/domain-trust?host='+encodeURIComponent(h)).then(function(r){return r.json();}).then(function(d){var note=d.otrust_embed?' · OTRUST domain':' · external domain';window.open('https://www.otrust.eu/#verify='+a,'_blank');}).catch(function(){window.open('https://www.otrust.eu/#verify='+a,'_blank');});});})();">
+        OTRUST Verify Page v2
       </a>
     </p>
-    <p style="color:var(--text-dim);font-size:0.85rem;">Works on https:// pages with Web Crypto. Cannot read chrome:// or extension pages.</p>
+    <p style="color:var(--text-dim);font-size:0.85rem;">v2 checks domain trust metadata before opening verify. Works on https:// pages with Web Crypto.</p>
     <p><a href="/timestamp">← Back to timestamp tool</a></p>
   </main>
 </body>

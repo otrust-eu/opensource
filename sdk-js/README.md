@@ -173,6 +173,17 @@ Webhook payload on Bitcoin confirm:
 
 Verify `X-OTRUST-Signature: sha256=<hmac>` when you set `notifyWebhookSecret`. Test at [/webhook-test](https://www.otrust.eu/webhook-test).
 
+Poll until Bitcoin confirms:
+
+```typescript
+const result = await timestamp.watchReceipt('ot_abc123', {
+  intervalMs: 30_000,
+  onPoll: (claim) => console.log(claim.blockchainStatus),
+});
+```
+
+Download evidence bundle: `GET /proof/:id/evidence.zip` or `otrust bundle <receipt-id>`.
+
 ### Sign Service
 
 ```typescript

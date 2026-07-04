@@ -613,6 +613,80 @@ describe('API Integration Tests', () => {
       expect(res.status).toBe(404);
     });
 
+    test('downloads evidence ZIP bundle', async () => {
+      const testHash = hash('evidence zip ' + Date.now());
+      const claimRes = await request('/claim/simple', {
+        method: 'POST',
+        body: { hash: testHash, source: 'test' }
+      });
+      const receiptId = claimRes.body.receipt_id;
+      const res = await request(`/proof/${receiptId}/evidence.zip`);
+      expect(res.status).toBe(200);
+      expect(res.text.startsWith('PK')).toBe(true); // ZIP magic
+    });
+  });
+
+  describe('Wave 4 endpoints', () => {
+    test('transparency RSS feed', async () => {
+      const res = await request('/transparency/feed.xml');
+      expect(res.status).toBe(200);
+      expect(res.text).toContain('<rss');
+      expect(res.text).toContain('OTRUST Transparency Feed');
+    });
+
+    test('domain trust lookup', async () => {
+      const res = await request('/api/domain-trust?host=otrust.eu');
+      expect(res.status).toBe(200);
+      expect(res.body.host).toBe('otrust.eu');
+      expect(res.body.otrust_embed).toBe(true);
+    });
+
+    test('ceremony create and join', async () => {
+      const testHash = hash('ceremony ' + Date.now());
+      const createRes = await request('/api/ceremony', {
+        method: 'POST',
+        body: { hash: testHash, creator: { name: 'test' } }
+      });
+      expect(createRes.status).toBe(201);
+      expect(createRes.body.room_id).toMatch(/^cer_/);
+      const joinRes = await request(`/api/ceremony/${createRes.body.room_id}/join`, {
+        method: 'POST',
+        body: { name: 'alice', pubkey: 'a'.repeat(64) }
+      });
+      expect(joinRes.status).toBe(200);
+      expect(joinRes.body.participants.length).toBe(1);
+    });
+
+    test('time-lock commitment lifecycle', async () => {
+      const preimage = 'secret-' + Date.now();
+      const hashRes = await request('/api/commitment/preview-hash', {
+        method: 'POST',
+        body: { preimage }
+      });
+      expect(hashRes.status).toBe(200);
+      const revealAt = new Date(Date.now() + 60_000).toISOString();
+      const createRes = await request('/api/commitment', {
+        method: 'POST',
+        body: { commitment_hash: hashRes.body.commitment_hash, reveal_at: revealAt, label: 'test' }
+      });
+      expect(createRes.status).toBe(201);
+      const id = createRes.body.commitment.id;
+      const getRes = await request(`/api/commitment/${id}`);
+      expect(getRes.status).toBe(200);
+      expect(getRes.body.can_reveal).toBe(false);
+    });
+
+    test('partner theme preview', async () => {
+      const res = await request('/api/partner-theme/preview', {
+        method: 'POST',
+        body: { partner_name: 'Acme', headline: 'Sign in' }
+      });
+      expect(res.status).toBe(200);
+      expect(res.body.preview.partner_name).toBe('Acme');
+    });
+  });
+
+  describe('GET /proof/:id (continued)', () => {
     test('returns proof-view HTML for prf_* attribute proof share URLs', async () => {
       const ageRes = await request('/api/proof/age', {
         method: 'POST',

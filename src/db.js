@@ -228,6 +228,10 @@ export async function createDb() {
     await authBranding.createIndex({ client_id: 1, theme_id: 1 }, { unique: true });
     await authBranding.createIndex({ client_id: 1 });
     await authBranding.createIndex({ updated_at: -1 });
+
+    const timeCommitments = db.collection('time_commitments');
+    await timeCommitments.createIndex({ id: 1 }, { unique: true });
+    await timeCommitments.createIndex({ reveal_at: 1 });
   } catch (err) {
     console.log('[DB] Auth branding index setup skipped:', err.message);
   }

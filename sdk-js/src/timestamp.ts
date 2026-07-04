@@ -357,6 +357,39 @@ export async function verifyBulk(hashes: string[]): Promise<Result<BulkVerifyRes
  * const result = await timestamp.getProof('ot_abc123');
  * ```
  */
+export interface WatchReceiptOptions {
+  /** Poll interval in ms (default 30000) */
+  intervalMs?: number;
+  /** Max wait in ms (default 2 hours) */
+  timeoutMs?: number;
+  /** Called on each poll */
+  onPoll?: (claim: TimestampClaim) => void;
+}
+
+/**
+ * Poll a receipt until Bitcoin confirms or timeout.
+ */
+export async function watchReceipt(
+  receiptId: string,
+  options?: WatchReceiptOptions
+): Promise<Result<TimestampClaim>> {
+  const intervalMs = options?.intervalMs ?? 30_000;
+  const timeoutMs = options?.timeoutMs ?? 2 * 60 * 60 * 1000;
+  const started = Date.now();
+
+  while (Date.now() - started < timeoutMs) {
+    const result = await getProof(receiptId);
+    if (!result.ok) return result;
+    options?.onPoll?.(result.value);
+    if (result.value.blockchainStatus === 'confirmed') {
+      return result;
+    }
+    await new Promise((resolve) => setTimeout(resolve, intervalMs));
+  }
+
+  return err(new OTrustError('timeout', `Receipt ${receiptId} not confirmed within timeout`));
+}
+
 export async function getProof(receiptId: string): Promise<Result<TimestampClaim>> {
   const client = getClient();
   const result = await client.get<{
@@ -722,6 +755,7 @@ export const timestamp = {
   getChallenge,
   solveChallenge,
   getProof,
+  watchReceipt,
   getReceiptsByPubkey,
   lookup,
   hash,

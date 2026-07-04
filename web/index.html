@@ -1462,7 +1462,7 @@
                 <div class="receipt-actions">
                   <button class="btn btn-secondary" onclick="downloadReceipt('${data.receipt_id}')">Download Receipt</button>
                   ${data.blockchain_status === 'confirmed' ? `<button class="btn btn-secondary" onclick="downloadCertificate('${data.receipt_id}', '${claims[0].hash}')">Download Certificate</button>` : ''}
-                  <button type="button" class="btn btn-secondary" id="share-proof-btn">Share proof</button>
+                  <div id="share-actions-slot"></div>
                 </div>
               </div>`;
             const shareOpts = {
@@ -1470,15 +1470,15 @@
               hash: claims[0].hash,
               filename: claimFilename,
               blockchainStatus: data.blockchain_status,
-              verifyUrl: verifyUrl
+              blockHeight: data.block_number,
+              verifyUrl: verifyUrl,
+              theme: 'minimal'
             };
-            document.getElementById('share-proof-btn')?.addEventListener('click', async () => {
-              try {
-                await window.otrustShareProof?.downloadShareCard(shareOpts);
-              } catch (e) {
-                alert('Share failed: ' + e.message);
-              }
-            });
+            const shareSlot = document.getElementById('share-actions-slot');
+            if (shareSlot && window.otrustShareProof) {
+              shareSlot.innerHTML = window.otrustShareProof.shareActionsHtml(shareOpts);
+              window.otrustShareProof.bindShareActions(shareSlot, shareOpts);
+            }
           } else {
             (data.results || []).forEach((result, index) => {
               if (result.status !== 'created' && result.status !== 'duplicate') return;
