@@ -3017,15 +3017,24 @@ app.post('/api/report-abuse', smallJson, async (req, res) => {
     // Send notification email to admin if configured
     if (process.env.ADMIN_EMAIL && sendEmail) {
       try {
+        const adminHtml = emailTemplate({
+          title: `Abuse report: ${type}`,
+          preheader: `New abuse report from ${email}`,
+          product: 'Timestamp',
+          content: [
+            emailHeading('New abuse report'),
+            emailDetailsBox([
+              ['Type', escapeHtml(type)],
+              ['From', escapeHtml(email)],
+              ['Reference', escapeHtml(reference || 'N/A')]
+            ]),
+            emailInfoBox(`<strong>Description</strong><p style="margin:10px 0 0 0;white-space:pre-wrap;">${escapeHtml(description)}</p>`)
+          ].join('')
+        });
         await sendEmail(
           process.env.ADMIN_EMAIL,
-          `Abuse Report: ${type}`,
-          `<h2>New Abuse Report</h2>
-          <p><strong>Type:</strong> ${type}</p>
-          <p><strong>From:</strong> ${email}</p>
-          <p><strong>Reference:</strong> ${reference || 'N/A'}</p>
-          <p><strong>Description:</strong></p>
-          <blockquote style="background:#f5f5f5;padding:1rem;border-left:4px solid #ccc;">${description}</blockquote>`,
+          `Abuse report: ${type}`,
+          adminHtml,
           `New abuse report: ${type}\nFrom: ${email}\nRef: ${reference || 'N/A'}\n\n${description}`
         );
       } catch (emailErr) {
