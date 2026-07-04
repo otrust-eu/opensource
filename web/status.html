@@ -9,18 +9,29 @@
 </head>
 <body data-otrust-page="docs">
   <main style="max-width:720px;margin:2rem auto;padding:0 1rem;">
-    <h1>OTRUST Status</h1>
-    <p id="status-summary" style="color:var(--text-dim);">Loading…</p>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;">
+      <h1 data-i18n="status.title">OTRUST Status</h1>
+      <button type="button" id="lang-toggle" title="Switch language" style="padding:0.2rem 0.45rem;border:1px solid var(--border);border-radius:4px;background:var(--bg-card);font-size:0.65rem;cursor:pointer;">SV</button>
+    </div>
+    <p id="status-summary" style="color:var(--text-dim);" data-i18n="status.loading">Loading…</p>
     <div id="status-grid" style="display:grid;gap:0.75rem;margin-top:1.5rem;"></div>
-    <p style="margin-top:2rem;font-size:0.85rem;"><a href="/transparency">Transparency log</a> · <a href="/stats">Full stats</a> · <a href="/health">Health JSON</a></p>
+    <p style="margin-top:2rem;font-size:0.85rem;">
+      <a href="/transparency" data-i18n="status.link.transparency">Transparency log</a> ·
+      <a href="/stats" data-i18n="status.link.stats">Full stats</a> ·
+      <a href="/health" data-i18n="status.link.health">Health JSON</a>
+    </p>
   </main>
+  <script src="/js/i18n.js?v=20260704pack3"></script>
   <script>
     async function loadStatus() {
       const res = await fetch('/status.json');
       const data = await res.json();
       const ok = data.status === 'operational';
-      document.getElementById('status-summary').innerHTML = ok
-        ? '<span style="color:#2d5a3d;font-weight:600;">● Operational</span> — updated ' + new Date(data.updated_at).toLocaleString()
+      const operational = window.otrustI18n?.t('status.operational') || 'Operational';
+      const summary = document.getElementById('status-summary');
+      summary.removeAttribute('data-i18n');
+      summary.innerHTML = ok
+        ? '<span style="color:#2d5a3d;font-weight:600;">● ' + operational + '</span> — ' + new Date(data.updated_at).toLocaleString()
         : '<span style="color:#b45309;font-weight:600;">● ' + (data.status || 'unknown') + '</span>';
       const items = [
         ['API', data.services?.api],
@@ -35,10 +46,14 @@
         `<div style="display:flex;justify-content:space-between;padding:0.75rem 1rem;border:1px solid var(--border);border-radius:8px;background:var(--bg-card);"><span>${k}</span><strong>${v ?? '—'}</strong></div>`
       ).join('');
     }
-    loadStatus().catch(() => {
-      document.getElementById('status-summary').textContent = 'Could not load status.';
+    document.addEventListener('DOMContentLoaded', () => {
+      loadStatus().catch(() => {
+        const summary = document.getElementById('status-summary');
+        summary.removeAttribute('data-i18n');
+        summary.textContent = window.otrustI18n?.t('status.error') || 'Could not load status.';
+      });
+      setInterval(loadStatus, 60000);
     });
-    setInterval(loadStatus, 60000);
   </script>
 </body>
 </html>

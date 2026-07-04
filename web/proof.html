@@ -47,7 +47,7 @@
       "name": "Kristian Ledel",
       "alternateName": "Kris Ledel",
       "url": "https://www.otrust.eu/about",
-      "sameAs": ["https://github.com/krisledel", "https://linkedin.com/in/kristianledel"]
+      "sameAs": ["https://github.com/krisledel", "https://www.linkedin.com/in/krisledel", "https://www.linkedin.com/company/otrustse"]
     },
     "offers": {
       "@type": "Offer",
@@ -1483,26 +1483,27 @@
     <div class="claim-card service-workspace-card proof-workspace-card">
       <div class="timestamp-dashboard-head">
         <div>
-          <span class="workspace-topline">Privacy ID workspace</span>
-          <h2>Create and verify ID packages.</h2>
-          <p>Build purpose-bound ID packages, verify them independently, and keep raw identity data out of verifier hands.</p>
+          <span class="workspace-topline" data-i18n="proof.topline">Privacy ID workspace</span>
+          <h2 data-i18n="proof.title">Create and verify ID packages.</h2>
+          <p data-i18n="proof.subtitle">Build purpose-bound ID packages, verify them independently, and keep raw identity data out of verifier hands.</p>
         </div>
         <div class="timestamp-live-meta" aria-label="ID guarantees">
-          <span>Local document parsing</span>
-          <span>Commitment record</span>
-          <span>Reusable ID URL</span>
+          <span data-i18n="proof.meta.local">Local document parsing</span>
+          <span data-i18n="proof.meta.commitment">Commitment record</span>
+          <span data-i18n="proof.meta.url">Reusable ID URL</span>
+          <button type="button" class="lang-toggle-btn" id="lang-toggle" title="Switch language" style="margin-left:0.5rem;padding:0.2rem 0.45rem;border:1px solid var(--border);border-radius:4px;background:var(--bg-card);font-size:0.65rem;cursor:pointer;">SV</button>
         </div>
       </div>
 
       <div class="timestamp-dashboard-body">
         <div class="tabs timestamp-tool-nav service-tool-nav" role="tablist" aria-label="ID actions">
           <button class="tab active" type="button" role="tab" id="tab-button-create" data-tab="create" aria-selected="true" aria-controls="tab-create">
-            <span>Create ID</span>
-            <small>Identity package</small>
+            <span data-i18n="proof.tab.create">Create ID</span>
+            <small data-i18n="proof.tab.create.sub">Identity package</small>
           </button>
           <button class="tab" type="button" role="tab" id="tab-button-verify" data-tab="verify" aria-selected="false" aria-controls="tab-verify">
-            <span>Verify</span>
-            <small>ID or URL</small>
+            <span data-i18n="proof.tab.verify">Verify</span>
+            <small data-i18n="proof.tab.verify.sub">ID or URL</small>
           </button>
         </div>
 
@@ -1511,9 +1512,9 @@
       <!-- Create ID Tab -->
       <div id="tab-create" class="tab-content active timestamp-panel" role="tabpanel" aria-labelledby="tab-button-create" tabindex="0">
         <div class="timestamp-panel-heading">
-          <span>01 / Create ID</span>
-          <h3>ID package</h3>
-          <p>Create a privacy-preserving ID package from local document checks and scoped disclosure.</p>
+          <span data-i18n="proof.create.step">01 / Create ID</span>
+          <h3 data-i18n="proof.create.heading">ID package</h3>
+          <p data-i18n="proof.create.desc">Create a privacy-preserving ID package from local document checks and scoped disclosure.</p>
         </div>
 
         <div class="proof-types">
@@ -1795,6 +1796,7 @@
   </footer>
   </div>
   <script src="/otrust-polish.js?v=20260530mono" defer></script>
+  <script src="/js/i18n.js?v=20260704pack3"></script>
 </body>
 </html>
 
