@@ -1,32 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="otrust-dashboard-shell" data-otrust-page="sign">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OTRUST Signed – Zero-Knowledge Document Signing | Blockchain E-Signature by Kristian Ledel</title>
-  <meta name="description" content="Get documents signed with blockchain-backed proof. Use local-hash mode or temporary encrypted upload. Prove WHO signed WHAT and WHEN. Created by Kristian (Kris) Ledel.">
+  <title>OTRUST Sign - Verifiable Document Signing | Blockchain E-Signature by Kristian Ledel</title>
+  <meta name="description" content="Create document signing records with blockchain-backed evidence. Use local-hash mode or temporary encrypted upload. Verify signer, hash, and time. Created by Kristian (Kris) Ledel.">
 
-  <meta name="keywords" content="document signing, e-signature, blockchain signature, zero-knowledge signing, proof of signature, digital signature, OTRUST, Kris Ledel, Kristian Ledel, electronic signature, legal signature, privacy-first signing">
+  <meta name="keywords" content="document signing, e-signature, blockchain signature, local-hash signing, proof of signature, digital signature, OTRUST, Kris Ledel, Kristian Ledel, electronic signature, legal signature, privacy-first signing">
   <meta name="author" content="Kristian Ledel">
   <meta name="creator" content="Kris Ledel">
   <link rel="author" href="https://www.otrust.eu/about">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
   <link rel="canonical" href="https://www.otrust.eu/sign">
-  <meta name="theme-color" content="#2d5a3d">
+  <meta name="theme-color" content="#16160f">
   
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://www.otrust.eu/sign">
-  <meta property="og:title" content="OTRUST Signed – Zero-Knowledge Document Signing by Kristian Ledel">
-  <meta property="og:description" content="Get documents signed with blockchain-backed proof using local hashes or temporary encrypted upload.">
+  <meta property="og:title" content="OTRUST Sign - Verifiable Document Signing by Kristian Ledel">
+  <meta property="og:description" content="Get documents signed with blockchain-backed evidence using local hashes or temporary encrypted upload.">
   <meta property="og:image" content="https://www.otrust.eu/og-image.svg">
   <meta property="og:site_name" content="OTRUST by Kristian Ledel">
   <meta property="article:author" content="Kristian Ledel">
   
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="OTRUST Signed – Blockchain E-Signature">
-  <meta name="twitter:description" content="Zero-knowledge document signing. Prove WHO signed WHAT and WHEN.">
+  <meta name="twitter:title" content="OTRUST Sign - Blockchain E-Signature">
+  <meta name="twitter:description" content="Document signing records with signer, hash, and time evidence.">
   <meta name="twitter:image" content="https://www.otrust.eu/og-image.svg">
   <meta name="twitter:creator" content="@kledel">
   
@@ -35,9 +35,9 @@
   {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    "name": "OTRUST Signed",
+    "name": "OTRUST Sign",
     "url": "https://www.otrust.eu/sign",
-    "description": "Privacy-first document signing with blockchain proof, local-hash mode, and optional temporary encrypted upload.",
+    "description": "Privacy-first document signing with blockchain evidence, local-hash mode, and optional temporary encrypted upload.",
     "applicationCategory": "SecurityApplication",
     "author": {
       "@type": "Person",
@@ -55,11 +55,8 @@
   </script>
   
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script defer data-domain="otrust.eu" src="https://plausible.io/js/script.js"></script>
-  <style>
+  <style media="not all" data-legacy-sign-inline="disabled">
     :root {
       --bg: #fafaf9;
       --bg-card: #ffffff;
@@ -67,11 +64,11 @@
       --border: #e5e5e5;
       --text: #1a1a1a;
       --text-dim: #737373;
-      --accent: #2d5a3d;
+      --accent: #16160f;
       --accent-hover: #1e4029;
       --accent-light: #e8f0eb;
       --orange: #b45309;
-      --success: #2d5a3d;
+      --success: #16160f;
       --error: #dc2626;
       --warning: #d97706;
     }
@@ -1155,257 +1152,167 @@
       margin-left: 0.3rem;
     }
     
-    /* Features Section */
-    .features-section {
-      background: var(--bg-muted);
-      border-top: 1px solid var(--border);
-      padding: 2rem 0;
-    }
-
-    .features-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 1.5rem;
-    }
-    
-    @media (min-width: 601px) {
-      .features-section {
-        padding: 3rem 0;
-      }
-      .features-container {
-        padding: 0 3rem;
-      }
-    }
-    
-    .features-title {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-    
-    .features-title h2 {
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-    }
-    
-    .features-title p {
-      color: var(--text-dim);
-      font-size: 0.85rem;
-    }
-    
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.25rem;
-      justify-items: center;
-    }
-    
-    .features-grid .feature-card {
-      width: 100%;
-      max-width: 320px;
-    }
-    
-    @media (max-width: 800px) {
-      .features-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-    
-    @media (max-width: 500px) {
-      .features-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-    
-    .feature-card {
-      background: var(--bg-card);
-      border-radius: 12px;
-      padding: 1.5rem;
-      border: 1px solid var(--border);
-      text-decoration: none;
-      color: inherit;
-      display: block;
-      transition: all 0.2s ease;
-    }
-    
-    .feature-card:hover {
-      border-color: var(--accent);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(45, 90, 61, 0.1);
-    }
-    
-    .feature-icon {
-      width: 40px;
-      height: 40px;
-      background: var(--accent-light);
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 1rem;
-    }
-    
-    .feature-icon svg {
-      width: 20px;
-      height: 20px;
-      stroke: var(--accent);
-    }
-    
-    .feature-card h3 {
-      font-size: 0.9rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-    }
-    
-    .feature-card p {
-      font-size: 0.75rem;
-      color: var(--text-dim);
-      line-height: 1.5;
-    }
-
-    .footer-wrapper {
-      border-top: 1px solid var(--border);
-      margin-top: auto;
-    }
-    
-    footer {
-      padding: 2rem 3rem;
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .footer-links {
-      display: flex;
-      gap: 1.5rem;
-    }
-    
-    .footer-links a {
-      color: var(--text-dim);
-      text-decoration: none;
-      font-size: 0.75rem;
-    }
-    
-    .footer-links a:hover { color: var(--accent); }
-    
-    .footer-copy {
-      font-size: 0.7rem;
-      color: var(--text-dim);
-    }
-    
-    @media (max-width: 600px) {
-      footer {
-        flex-direction: column;
-        gap: 1rem;
-        text-align: center;
-        padding: 1.5rem 1rem;
-      }
-      .footer-links {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 1rem;
-      }
-    }
-    
     /* Hide file input */
     #file-input {
       display: none;
     }
   </style>
-  <link rel="stylesheet" href="/otrust-polish.css?v=20260527-2">
+  <link rel="stylesheet" href="/otrust-polish.css?v=20260530mono">
+  <link rel="stylesheet" href="/otrust-redesign.css?v=20260530mono">
 </head>
-<body>
+<body data-otrust-page="sign">
   <a href="#main-content" class="skip-link">Skip to main content</a>
   
-  <nav role="navigation" aria-label="Main navigation">
-    <div class="nav-container">
-      <a href="/" class="logo">OTRUST</a>
-      <div class="nav-links">
-        <span class="nav-primary">
-          <a href="/">Timestamp</a>
-          <a href="/sign" class="active">Signed</a>
-          <a href="/proof">Proof</a>
-        </span>
-        <span class="nav-secondary" id="nav-secondary">
-          <a href="/sign-in">Sign in</a>
-          <a href="/transparency">Trust Log</a>
-          <a href="/docs">Docs</a>
-          <a href="/about">About</a>
-        </span>
-        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode"></button>
-        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu" title="Menu"><span></span></button>
-      </div>
-    </div>
-  </nav>
   
-  <main id="main-content" class="main-layout">
-    <div class="left-col">
-      <section class="hero">
-        <span class="hero-badge">Zero-Knowledge Signing</span>
-        <h1>Prove who signed what and when</h1>
-        <p>Get documents signed with blockchain-backed proof. Your document can stay on your device; only the hash is used for verification.</p>
-      </section>
-      
-      <!-- Stats -->
-      <div class="stats">
-        <div class="stat">
-          <div class="stat-value" id="stat-requests">0</div>
-          <div class="stat-label">Requests</div>
+  <main id="main-content" role="main">
+  <section class="dashboard-home" aria-label="OTRUST sign workspace">
+    <article class="dashboard-panel dashboard-landing">
+      <header class="dashboard-site-nav" aria-label="Dashboard navigation">
+        <a href="/" class="dashboard-logo">OTRUST</a>
+        <nav class="dashboard-links" aria-label="OTRUST site navigation">
+        <a href="/timestamp">Timestamp</a>
+        <a href="/proof">ID</a>
+        <a href="/sign" class="active" aria-current="page">Sign</a>
+        <a href="/sign-in">Auth</a>
+        <a href="/docs">Docs</a>
+        <a href="/api-docs">Developers</a>
+        <span class="dashboard-nav-sep" aria-hidden="true">&middot;</span>
+        <button type="button" class="dashboard-menu" aria-label="Open menu"><span></span></button>
+        </nav>
+      </header>
+
+      <section class="dashboard-hero-block">
+        <div class="dashboard-hero-copy">
+          <span class="dashboard-kicker">Sign</span>
+          <h1>Sign,<br><span>with evidence.</span></h1>
+          <p>Create a multi-party signing record around a document hash, built for auditability instead of opaque document storage.</p>
         </div>
-        <div class="stat">
-          <div class="stat-value" id="stat-signatures">0</div>
-          <div class="stat-label">Completed</div>
+        <div class="dashboard-orbit dashboard-orbit-hero" aria-hidden="true"></div>
+      </section>
+
+      <section class="dashboard-steps" id="flow" aria-labelledby="dashboard-steps-heading">
+        <span class="dashboard-kicker" id="dashboard-steps-heading">Signing flow</span>
+        <div class="dashboard-step-grid">
+          <article>
+            <div class="dashboard-step-icon dashboard-step-hash" aria-hidden="true"></div>
+            <span>01</span>
+            <h2>Upload</h2>
+            <p>Choose temporary encrypted upload, or sign a local hash without uploading the document.</p>
+          </article>
+          <article>
+            <div class="dashboard-step-icon dashboard-step-sign" aria-hidden="true"></div>
+            <span>02</span>
+            <h2>Invite</h2>
+            <p>Each signer gets a unique link to verify and sign.</p>
+          </article>
+          <article>
+            <div class="dashboard-step-icon dashboard-step-anchor" aria-hidden="true"></div>
+            <span>03</span>
+            <h2>Sign</h2>
+            <p>Ed25519 signatures bind each signer to the document hash.</p>
+          </article>
+          <article>
+            <div class="dashboard-step-icon dashboard-step-prove" aria-hidden="true"></div>
+            <span>04</span>
+            <h2>Anchor</h2>
+            <p>The final signature record is anchored to Bitcoin via OpenTimestamps.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="dashboard-principles-panel" aria-labelledby="dashboard-principles-heading">
+        <div class="dashboard-principles-copy">
+          <span class="dashboard-kicker">Useful for</span>
+          <h2 id="dashboard-principles-heading">Built for<br>audit trails.</h2>
+          <p>Common signing patterns where hash-level evidence and signer metadata matter more than storing the full file.</p>
+        </div>
+        <div class="dashboard-principles-list">
+          <article>
+            <span class="dashboard-principle-icon dashboard-principle-local" aria-hidden="true"></span>
+            <div>
+              <h3>Agreements</h3>
+              <p>Founder agreements and board records.</p>
+            </div>
+          </article>
+          <article>
+            <span class="dashboard-principle-icon dashboard-principle-zero" aria-hidden="true"></span>
+            <div>
+              <h3>Research</h3>
+              <p>Research approvals and invention disclosures.</p>
+            </div>
+          </article>
+          <article>
+            <span class="dashboard-principle-icon dashboard-principle-lock" aria-hidden="true"></span>
+            <div>
+              <h3>Partners</h3>
+              <p>Partner documents where hash-level evidence is enough.</p>
+            </div>
+          </article>
+          <article>
+            <span class="dashboard-principle-icon dashboard-principle-open" aria-hidden="true"></span>
+            <div>
+              <h3>Audit</h3>
+              <p>Independently verifiable signature metadata.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <footer class="dashboard-left-footer">
+        <strong>OTRUST</strong>
+        <span>&copy; 2026 OTRUST</span>
+        <span class="dashboard-made">Made in Sweden, Europe</span>
+        <nav aria-label="Dashboard footer">
+          <a href="/docs">Docs</a>
+          <a href="/api-docs">API</a>
+          <a href="https://github.com/otrust-eu/opensource" rel="noopener noreferrer">GitHub</a>
+          <a href="/privacy-policy">Privacy</a>
+          <a href="/terms">Terms</a>
+        </nav>
+        <a href="#main-content" class="dashboard-footer-dot" aria-label="Back to top"></a>
+      </footer>
+    </article>
+    <section class="dashboard-tool-slot" aria-label="OTRUST sign tool">
+    <section class="claim-section">
+    <div class="sign-card service-workspace-card proof-workspace-card sign-workspace-card">
+      <div class="timestamp-dashboard-head">
+        <div>
+          <span class="workspace-topline">Signature evidence workspace</span>
+          <h2>Create and track signing requests.</h2>
+          <p>Upload temporarily or keep documents local, invite parties, and produce a verifiable signature package.</p>
+        </div>
+        <div class="timestamp-live-meta" aria-label="Signing guarantees">
+          <span>Local hash option</span>
+          <span>Ed25519 signatures</span>
+          <span>Bitcoin anchored record</span>
         </div>
       </div>
-      
-      <!-- Flow -->
-      <section class="info-section">
-        <h2>Flow</h2>
-        <div class="steps">
-          <div class="step-item">
-            <span class="step-num">1</span>
-            <div>
-              <strong>Upload or Hash</strong>
-              <p>Temporary encrypted upload, or zero-knowledge with local hash only.</p>
-            </div>
-          </div>
-          <div class="step-item">
-            <span class="step-num">2</span>
-            <div>
-              <strong>Invite Parties</strong>
-              <p>Each signer gets a unique link to verify and sign.</p>
-            </div>
-          </div>
-          <div class="step-item">
-            <span class="step-num">3</span>
-            <div>
-              <strong>Cryptographic Signatures</strong>
-              <p>Ed25519 signatures prove who signed what.</p>
-            </div>
-          </div>
-          <div class="step-item">
-            <span class="step-num">4</span>
-            <div>
-              <strong>Blockchain Anchor</strong>
-              <p>Final proof anchored to Bitcoin via OpenTimestamps.</p>
-            </div>
-          </div>
+      <div class="timestamp-dashboard-body">
+        <div class="sign-tabs timestamp-tool-nav service-tool-nav" role="tablist" aria-label="Signing actions">
+          <button class="sign-tab active" type="button" role="tab" id="tab-button-create" data-tab="create" aria-selected="true" aria-controls="tab-create">
+            <span>New Request</span>
+            <small>Document flow</small>
+          </button>
+          <button class="sign-tab" type="button" role="tab" id="tab-button-history" data-tab="history" aria-selected="false" aria-controls="tab-history">
+            <span>History</span>
+            <small>Requests <span class="history-count" id="history-count" style="display: none;">0</span></small>
+          </button>
+          <button class="sign-tab" type="button" role="tab" id="tab-button-keys" data-tab="keys" aria-selected="false" aria-controls="tab-keys">
+            <span>Keys</span>
+            <small>Browser key</small>
+          </button>
         </div>
-      </section>
-    </div>
-    
-    <div class="right-col">
-    <div class="sign-card">
-      <div class="sign-tabs">
-        <button class="sign-tab active" data-tab="create">New Request</button>
-        <button class="sign-tab" data-tab="history">History<span class="history-count" id="history-count" style="display: none;">0</span></button>
-        <button class="sign-tab" data-tab="keys">Keys</button>
-      </div>
+
+        <div class="timestamp-panel-stage">
       
       <!-- Create Tab -->
-      <div id="tab-create" class="sign-tab-content active">
+      <div id="tab-create" class="sign-tab-content active timestamp-panel" role="tabpanel" aria-labelledby="tab-button-create" tabindex="0">
+        <div class="timestamp-panel-heading">
+          <span>01 / Signing request</span>
+          <h3>New request</h3>
+          <p>Create a signing package, choose delivery mode, and invite parties with optional OTRUST ID verification.</p>
+        </div>
+
         <div id="form-section">
           <div id="error-alert" class="alert alert-error" style="display: none;"></div>
         
@@ -1447,11 +1354,11 @@
               <div class="choice-content">
                 <span class="choice-icon"></span>
                 <strong>I'll Send It Myself</strong>
-                <span class="choice-desc">Zero-knowledge. Document never touches our servers.</span>
+                <span class="choice-desc">Local-hash mode. Document never touches our servers.</span>
               </div>
             </label>
           </div>
-          <div class="hint" id="delivery-hint">Document encrypted at rest. You'll receive email confirmation when it's purged with cryptographic proof of deletion.</div>
+          <div class="hint" id="delivery-hint">Document encrypted at rest. You'll receive email confirmation when it's purged with a deletion receipt.</div>
           
           <!-- TTL selection (only shown for upload mode) -->
           <div id="ttl-selection" class="ttl-options">
@@ -1494,7 +1401,7 @@
             <h3>Signing Parties</h3>
             <button class="add-party-btn" id="add-party">+ Add Party</button>
           </div>
-          <p class="hint" style="margin-bottom: 0.5rem;">Click 🔐 to require OTRUST Proof verification (verified human identity)</p>
+          <p class="hint" style="margin-bottom: 0.5rem;">Click ID to require OTRUST ID verification (verified human identity)</p>
           
           <div class="party-list" id="party-list">
             <div class="party-item">
@@ -1504,9 +1411,9 @@
                 <option value="approver">Approver</option>
                 <option value="viewer">Viewer (CC)</option>
               </select>
-              <label class="proof-required-label" title="Require this party to verify with OTRUST Proof">
+              <label class="proof-required-label" title="Require this party to verify with OTRUST ID">
                 <input type="checkbox" class="party-require-proof">
-                <span class="proof-badge">🔐</span>
+                <span class="proof-badge">ID</span>
               </label>
               <button class="remove-party" aria-label="Remove">&times;</button>
             </div>
@@ -1550,13 +1457,13 @@
       
       <!-- Success Section -->
       <div class="success-section" id="success-section">
-        <div class="success-icon">?</div>
+        <div class="success-icon">&#10003;</div>
         <h2>Signing Request Created!</h2>
         <p id="success-message">Invitations have been sent to all parties.</p>
         
-        <!-- Self-send reminder (shown only for zero-knowledge mode) -->
+        <!-- Self-send reminder (shown only for local-hash mode) -->
         <div id="self-send-reminder" class="alert alert-warning" style="display: none; text-align: left; margin-bottom: 1rem;">
-          <strong>Don't forget!</strong> You chose zero-knowledge mode. 
+          <strong>Don't forget!</strong> You chose local-hash mode.
           Send the document to your signers yourself (email, cloud link, etc).
         </div>
         
@@ -1576,7 +1483,13 @@
       </div>
       
       <!-- History Tab -->
-      <div id="tab-history" class="sign-tab-content">
+      <div id="tab-history" class="sign-tab-content timestamp-panel" role="tabpanel" aria-labelledby="tab-button-history" tabindex="0">
+        <div class="timestamp-panel-heading">
+          <span>02 / Request ledger</span>
+          <h3>History</h3>
+          <p>Track signing requests created from this browser and reopen their status pages.</p>
+        </div>
+
         <div class="my-signings-list" id="my-signings-list">
           <!-- Items populated by JavaScript -->
         </div>
@@ -1587,8 +1500,12 @@
       </div>
       
       <!-- Keys Tab -->
-      <div id="tab-keys" class="sign-tab-content">
-        <p style="color: var(--text-dim); font-size: 0.75rem; margin-bottom: 0.875rem;">Manage your Ed25519 signing keys. Stored locally in your browser.</p>
+      <div id="tab-keys" class="sign-tab-content timestamp-panel" role="tabpanel" aria-labelledby="tab-button-keys" tabindex="0">
+        <div class="timestamp-panel-heading">
+          <span>03 / Local identity</span>
+          <h3>Browser keys</h3>
+          <p>Manage your Ed25519 signing keys. Stored locally in your browser.</p>
+        </div>
         
         <div class="form-group">
           <label>Your Public Key</label>
@@ -1613,74 +1530,15 @@
           <strong>Key:</strong> Your private key is stored in this browser only. Export and backup your keys.
         </div>
       </div>
-    </div>
-    </div>
-  </main>
-  
-  <!-- Features Section -->
-  <section class="features-section">
-    <div class="features-container">
-      <div class="features-title">
-        <h2>Ways to Sign</h2>
-        <p>Create and sign documents without leaving your workflow</p>
+        </div>
       </div>
-      
-      <div class="features-grid">
-        <a href="/sign" class="feature-card">
-          <div class="feature-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/>
-              <path d="M12 6v6l4 2"/>
-            </svg>
-          </div>
-          <h3>Web Tool</h3>
-          <p>Create signing requests in your browser. Use local-hash mode for full client-side privacy, or encrypted temporary upload when signers need a download link.</p>
-        </a>
-        
-        <a href="/docs#signed" class="feature-card">
-          <div class="feature-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M4 4h16v16H4z"/>
-              <path d="M4 6l8 6 8-6"/>
-            </svg>
-          </div>
-          <h3>Sign via Email</h3>
-          <p>Email signers with sign&#64;otrust.eu in CC. Signers click Sign or Decline directly in the email.</p>
-        </a>
-        
-        <a href="/docs#signed" class="feature-card">
-          <div class="feature-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M9 12l2 2 4-4"/>
-              <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
-            </svg>
-          </div>
-          <h3>Verification</h3>
-          <p>Verify any signature package independently. Check document hash, Ed25519 signatures, and blockchain proof.</p>
-        </a>
       </div>
     </div>
+    </section>
+    </section>
   </section>
-  
-  <div class="footer-wrapper">
-  <footer role="contentinfo">
-    <div class="footer-links">
-      <a href="/">Timestamp</a>
-      <a href="/sign">Signed</a>
-      <a href="/proof">Proof</a>
-      <a href="/sign-in">Sign in</a>
-          <a href="/docs">Docs</a>
-      <a href="/about">About</a>
-      <a href="/transparency">Trust Log</a>
-      <a href="/notes/why-otrust">Technical Note</a>
-      <a href="/privacy-policy">Privacy</a>
-      <a href="/terms">Terms</a>
-      <a href="https://github.com/otrust-eu/opensource">GitHub</a>
-    </div>
-    <div class="footer-copy">OTRUST - MIT License</div>
-    <div class="footer-copy" style="font-size: 0.7rem; opacity: 0.6; margin-top: 0.5rem;">Cryptographic proof of signature intent. Legal standing varies by jurisdiction. <a href="/terms" style="color: inherit;">Terms</a></div>
-  </footer>
-  </div>
+
+</main>
   
   <script nonce="{{CSP_NONCE}}">
     // Theme toggle
@@ -1690,10 +1548,10 @@
     
     if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
       document.documentElement.setAttribute('data-theme', 'dark');
-      themeToggle.textContent = '';
+      if (themeToggle) themeToggle.textContent = '';
     }
     
-    themeToggle.addEventListener('click', () => {
+    themeToggle?.addEventListener('click', () => {
       const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
       document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
       localStorage.setItem('theme', isDark ? 'light' : 'dark');
@@ -1706,7 +1564,7 @@
 
     mobileMenuBtn?.addEventListener('click', (e) => {
       e.stopPropagation();
-      navSecondary.classList.toggle('open');
+      navSecondary?.classList.toggle('open');
       
     });
 
@@ -1867,10 +1725,10 @@
       
       // Update hint text
       if (isSelfSend) {
-        deliveryHint.textContent = 'Zero-knowledge: You share the document yourself (email, cloud link, etc). We only see the hash.';
+        deliveryHint.textContent = 'Local-hash mode: You share the document yourself (email, cloud link, etc). We only see the hash.';
       } else {
         const timeText = ttlHours === '1' ? '1 hour' : `${ttlHours} hours`;
-        deliveryHint.textContent = `Document encrypted. Auto-deleted after ${timeText}. You'll get email + purge proof when deleted.`;
+        deliveryHint.textContent = `Document encrypted. Auto-deleted after ${timeText}. You'll get email and a deletion receipt when deleted.`;
       }
     }
     
@@ -1908,7 +1766,7 @@
       const deliveryMethod = getDeliveryMethod();
       
       if (deliveryMethod === 'self') {
-        // Zero-knowledge: hash locally only
+        // Local-hash mode: hash locally only
         fileHashEl.textContent = 'Computing hash locally...';
         
         try {
@@ -2008,9 +1866,9 @@
           <option value="approver">Approver</option>
           <option value="viewer">Viewer (CC)</option>
         </select>
-        <label class="proof-required-label" title="Require this party to verify with OTRUST Proof">
+        <label class="proof-required-label" title="Require this party to verify with OTRUST ID">
           <input type="checkbox" class="party-require-proof">
-          <span class="proof-badge">🔐</span>
+          <span class="proof-badge">ID</span>
         </label>
         <button class="remove-party" aria-label="Remove">&times;</button>
       `;
@@ -2148,7 +2006,7 @@
         const docTitle = document.getElementById('title').value;
         addToMySignings(data.sign_id, data.view_token, docTitle, fileName);
         
-        // Show self-send reminder if zero-knowledge mode
+        // Show self-send reminder if local-hash mode
         const selfSendReminder = document.getElementById('self-send-reminder');
         const successMessage = document.getElementById('success-message');
         if (getDeliveryMethod() === 'self') {
@@ -2447,6 +2305,11 @@
       window.initKeyManagement();
     }
   </script>
-  <script src="/otrust-polish.js?v=20260527-2" defer></script>
+  <script src="/otrust-polish.js?v=20260530mono" defer></script>
 </body>
 </html>
+
+
+
+
+

@@ -1,23 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="otrust-dashboard-shell" data-otrust-page="api-docs">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OTRUST API Reference | Timestamping, Signing, Proof & Auth</title>
-  <meta name="description" content="REST API for OTRUST timestamping, signature verification, identity proofs, and hosted partner auth challenges.">
-  <meta name="keywords" content="timestamp API, identity proof API, hosted auth API, blockchain API, OpenTimestamps API, proof of existence API, REST API, OTRUST">
+  <title>OTRUST API Reference | Timestamping, ID, Signing & Auth</title>
+  <meta name="description" content="REST API for OTRUST timestamping, signature verification, ID packages, and hosted partner Auth challenges.">
+  <meta name="keywords" content="timestamp API, ID API, hosted auth API, blockchain API, OpenTimestamps API, evidence of existence API, REST API, OTRUST">
   <meta name="author" content="Kristian Ledel">
   <meta name="creator" content="Kris Ledel">
   <link rel="author" href="https://www.otrust.eu/about">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
   <link rel="canonical" href="https://www.otrust.eu/api-docs.html">
-  <meta name="theme-color" content="#2d5a3d">
+  <meta name="theme-color" content="#16160f">
   
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://www.otrust.eu/api-docs.html">
   <meta property="og:title" content="OTRUST API Reference">
-  <meta property="og:description" content="REST API for timestamping, signing, identity proofs, and hosted partner auth challenges.">
+  <meta property="og:description" content="REST API for timestamping, ID, signing, and hosted partner Auth challenges.">
   <meta property="og:image" content="https://www.otrust.eu/og-image.svg">
   <meta property="og:site_name" content="OTRUST">
   <meta property="article:author" content="Kristian Ledel">
@@ -25,7 +25,7 @@
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="OTRUST API Reference">
-  <meta name="twitter:description" content="APIs for timestamping, signing, identity proofs, and partner auth.">
+  <meta name="twitter:description" content="APIs for timestamping, ID, signing, and partner Auth.">
   <meta name="twitter:image" content="https://www.otrust.eu/og-image.svg">
   <meta name="twitter:creator" content="@kledel">
   
@@ -36,7 +36,7 @@
     "@type": "TechArticle",
     "name": "OTRUST API Reference",
     "url": "https://www.otrust.eu/api-docs.html",
-    "description": "REST API for timestamping, signature verification, identity proofs, and hosted partner authentication challenges.",
+    "description": "REST API for timestamping, signature verification, ID packages, and hosted partner Auth challenges.",
     "author": {
       "@type": "Person",
       "name": "Kristian Ledel",
@@ -51,9 +51,6 @@
     }
   }
   </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <!-- Privacy-respecting analytics (no cookies, no personal data) -->
   <script defer data-domain="otrust.eu" src="https://plausible.io/js/script.js"></script>
@@ -65,7 +62,7 @@
       --border: #e5e5e5;
       --text: #1a1a1a;
       --text-dim: #737373;
-      --accent: #2d5a3d;
+      --accent: #16160f;
       --accent-hover: #1e4029;
       --accent-light: #e8f0eb;
       --blue: #1d4ed8;
@@ -147,7 +144,7 @@
     }
     
     /* Navigation */
-    nav {
+    body > nav {
       background: var(--bg);
       border-bottom: 1px solid var(--border);
       position: sticky;
@@ -672,47 +669,45 @@
       }
     }
   </style>
-  <link rel="stylesheet" href="/otrust-polish.css?v=20260527-2">
+  <link rel="stylesheet" href="/otrust-polish.css?v=20260530mono">
+  <link rel="stylesheet" href="/otrust-redesign.css?v=20260530mono">
 </head>
-<body>
+<body data-otrust-page="api-docs">
   <a href="#main-content" class="skip-link">Skip to content</a>
-  <nav role="navigation" aria-label="Main navigation">
-    <div class="nav-container">
-      <a href="/" class="logo">OTRUST</a>
-      <div class="nav-links">
-        <span class="nav-primary">
-          <a href="/">Timestamp</a>
-          <a href="/sign">Signed</a>
-          <a href="/proof">Proof</a>
-        </span>
-        <span class="nav-secondary" id="nav-secondary">
-          <a href="/sign-in">Sign in</a>
-          <a href="/transparency">Trust Log</a>
-          <a href="/docs" class="docs-trigger open" id="docs-trigger">Docs</a>
-          <a href="/about">About</a>
-        </span>
-        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode"></button>
-        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu" title="Menu"><span></span></button>
-      </div>
-    </div>
-  </nav>
-  
-  <!-- Docs Submenu Bar -->
-  <div class="docs-submenu-bar open" id="docs-submenu-bar">
-    <div class="docs-submenu-container">
-      <a href="/docs">Documentation</a>
-      <a href="/api-docs" class="active">API Reference</a>
-      <a href="/playground/">SDK Playground</a>
-      <a href="https://github.com/otrust-eu/opensource" target="_blank">GitHub</a>
-    </div>
-  </div>
-  
+
   <main id="main-content" role="main">
+  <section class="dashboard-home" aria-label="OTRUST developers workspace">
+    <article class="dashboard-panel dashboard-landing dashboard-subpage-landing">
+      <header class="dashboard-site-nav" aria-label="Dashboard navigation">
+        <a href="/" class="dashboard-logo">OTRUST</a>
+        <nav class="dashboard-links" aria-label="OTRUST site navigation">
+        <a href="/timestamp">Timestamp</a>
+        <a href="/proof">ID</a>
+        <a href="/sign">Sign</a>
+        <a href="/sign-in">Auth</a>
+        <a href="/docs">Docs</a>
+        <a href="/api-docs" class="active" aria-current="page">Developers</a>
+        <span class="dashboard-nav-sep" aria-hidden="true">&middot;</span>
+        <button type="button" class="dashboard-menu" aria-label="Open menu"><span></span></button>
+        </nav>
+      </header>
+
+        <section class="dashboard-subpage-head">
+          <div class="dashboard-subpage-headcopy">
+            <span class="dashboard-kicker">Developers</span>
+          <h1>API,<br><span>for verifiable trust.</span></h1>
+          <p>Reference endpoints for timestamping, signature verification, ID checks, and hosted partner Auth challenges.</p>
+          </div>
+        </section>
+
+    </article>
+    <section class="dashboard-tool-slot" aria-label="OTRUST API content">
+      <section class="dashboard-page-panel api-dashboard-panel">
   <div class="main-layout">
     <div class="left-col">
       <span class="hero-badge">API</span>
       <h1>API Reference</h1>
-      <p>Integrate timestamping, signing, identity proofs, and hosted partner auth. Public timestamp endpoints remain account-free; partner auth uses short-lived challenges.</p>
+      <p>Integrate timestamping, ID, signing, and hosted partner Auth. Public timestamp endpoints remain account-free; partner Auth uses short-lived challenges.</p>
       
       <div class="base-url">https://www.otrust.eu</div>
       
@@ -768,7 +763,7 @@
     
     <div class="content-card">
       <h2>Access Model</h2>
-      <p>Public timestamp endpoints do not require accounts or API keys. Claim creation requires an Ed25519 signature plus a challenge proof-of-work, and rate limits apply. Partner auth endpoints are challenge-based and intended for server-side integrations.</p>
+      <p>Public timestamp endpoints do not require accounts or API keys. Claim creation requires an Ed25519 signature plus a challenge proof-of-work, and rate limits apply. Partner Auth endpoints are challenge-based and intended for server-side integrations.</p>
 
       <div class="endpoint" id="partner-auth">
         <div class="endpoint-header">
@@ -776,7 +771,7 @@
           <span class="path">/api/v1/auth/challenge</span>
         </div>
         <div class="endpoint-body">
-          <p>Create a short-lived hosted-login challenge for a partner application. The response includes the OTRUST login URL; if a <code>clientId</code> has approved branding, the hosted login and proof creation screens use that theme.</p>
+          <p>Create a short-lived hosted Auth challenge for a partner application. The response includes the OTRUST Auth URL; if a <code>clientId</code> has approved branding, the hosted Auth and ID creation screens use that theme.</p>
           <h3>Request Body</h3>
           <pre><code>{
   <span class="property">"clientId"</span>: <span class="string">"hemsted_prod"</span>,
@@ -904,7 +899,7 @@
           <span class="path">/proof/:receiptId</span>
         </div>
         <div class="endpoint-body">
-          <p>Return a human-readable proof page by default. Add <code>?format=json</code> for metadata or <code>?format=ots</code> to download the raw OpenTimestamps file.</p>
+          <p>Return a human-readable timestamp record page by default. Add <code>?format=json</code> for metadata or <code>?format=ots</code> to download the raw OpenTimestamps receipt.</p>
           <h3>Response</h3>
           <pre><code>{
   <span class="property">"status"</span>: <span class="string">"pending"</span>,
@@ -937,7 +932,7 @@
           <span class="path">/verify/blockchain</span>
         </div>
         <div class="endpoint-body">
-          <p>Verify a SHA-256 hash against a base64 OpenTimestamps proof payload.</p>
+          <p>Verify a SHA-256 hash against a base64 OpenTimestamps receipt payload.</p>
           <h3>Request Body</h3>
           <pre><code>{
   <span class="property">"hash"</span>: <span class="string">"sha256-hex-of-content"</span>,
@@ -963,7 +958,7 @@ curl -X POST https://www.otrust.eu/claim \
 <span class="comment"># 4. Check status</span>
 curl https://www.otrust.eu/proof/ot_abc123xyz?format=json
 
-<span class="comment"># 5. Download proof</span>
+<span class="comment"># 5. Download OTS receipt</span>
 curl https://www.otrust.eu/proof/ot_abc123xyz?format=ots \
   -o document.pdf.ots</code></pre>
       
@@ -1001,26 +996,23 @@ curl https://www.otrust.eu/proof/ot_abc123xyz?format=ots \
       </div>
     </div>
   </div>
-  </main>
-  
-  <div class="footer-wrapper">
-  <footer role="contentinfo">
-    <div class="footer-links">
-      <a href="/">Timestamp</a>
-      <a href="/sign">Signed</a>
-      <a href="/proof">Proof</a>
-      <a href="/sign-in">Sign in</a>
+      </section>
+    </section>
+        <footer class="dashboard-left-footer">
+        <strong>OTRUST</strong>
+        <span>&copy; 2026 OTRUST</span>
+        <span class="dashboard-made">Made in Sweden, Europe</span>
+        <nav aria-label="Dashboard footer">
           <a href="/docs">Docs</a>
-      <a href="/about">About</a>
-      <a href="/transparency">Trust Log</a>
-      <a href="/notes/why-otrust">Technical Note</a>
-      <a href="/privacy-policy">Privacy</a>
-      <a href="/terms">Terms</a>
-      <a href="https://github.com/otrust-eu/opensource">GitHub</a>
-    </div>
-    <div class="footer-copy">OTRUST - MIT License</div>
-  </footer>
-  </div>
+          <a href="/api-docs">API</a>
+          <a href="https://github.com/otrust-eu" rel="noopener noreferrer">GitHub</a>
+          <a href="/privacy-policy">Privacy</a>
+          <a href="/terms">Terms</a>
+        </nav>
+        <a href="#main-content" class="dashboard-footer-dot" aria-label="Back to top"></a>
+      </footer>
+  </section>
+  </main>
 
   <script nonce="">
     // Dark mode initialization and toggle
@@ -1083,6 +1075,11 @@ curl https://www.otrust.eu/proof/ot_abc123xyz?format=ots \
       docsTrigger.classList.toggle('open', isOpen);
     });
   </script>
-  <script src="/otrust-polish.js?v=20260527-2" defer></script>
+  <script src="/otrust-polish.js?v=20260530mono" defer></script>
 </body>
 </html>
+
+
+
+
+

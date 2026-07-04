@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login with OTRUST - Secure Authentication</title>
+  <title>OTRUST Auth - Secure Authentication</title>
   <meta name="description" content="Secure login with OTRUST. Privacy-first authentication without passwords.">
   <meta name="author" content="Kris Ledel">
   <meta name="robots" content="noindex, nofollow">
@@ -11,7 +11,7 @@
   <style>
     :root {
       --partner-bg: #f5f7fa;
-      --partner-primary: #2d5a3d;
+      --partner-primary: #16160f;
       --partner-text: #0f1b2d;
       --partner-radius: 8px;
       --partner-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -491,7 +491,7 @@
       text-decoration: none;
     }
 
-    body.partner-theme {
+    body.hemsted-theme {
       --muted-text: rgba(15, 27, 45, 0.68);
       --panel-border: rgba(15, 27, 45, 0.14);
       --panel-bg: rgba(255, 255, 255, 0.94);
@@ -501,23 +501,23 @@
         var(--partner-bg);
     }
 
-    body.partner-theme .container {
+    body.hemsted-theme .container {
       border-color: rgba(15, 27, 45, 0.14);
       box-shadow: 0 28px 80px rgba(15, 27, 45, 0.14);
     }
 
-    body.partner-theme .brand-header {
+    body.hemsted-theme .brand-header {
       padding-bottom: var(--section-gap);
       border-bottom: 1px solid rgba(15, 27, 45, 0.1);
     }
 
-    body.partner-theme .brand-header h1 {
+    body.hemsted-theme .brand-header h1 {
       max-width: 12ch;
       font-size: clamp(2rem, 7vw, 2.75rem);
       line-height: 1.03;
     }
 
-    body.partner-theme .otrust-disclosure {
+    body.hemsted-theme .otrust-disclosure {
       background: rgba(255, 255, 255, 0.78);
     }
 
@@ -564,7 +564,8 @@
       }
     }
   </style>
-  <link rel="stylesheet" href="/otrust-polish.css?v=20260527-2">
+  <link rel="stylesheet" href="/otrust-polish.css?v=20260530mono">
+  <link rel="stylesheet" href="/otrust-redesign.css?v=20260530mono">
 </head>
 <body>
   <main class="auth-shell" aria-labelledby="headline">
@@ -578,8 +579,8 @@
           </svg>
           <span>OTRUST</span>
         </div>
-        <h1 id="headline">Login with OTRUST</h1>
-        <p id="subhead">Secure authentication with your OTRUST identity proof.</p>
+        <h1 id="headline">OTRUST Auth</h1>
+        <p id="subhead">Secure authentication with your OTRUST ID.</p>
         <p class="otrust-disclosure" id="otrustDisclosure">Secure login via OTRUST. You are on otrust.eu because OTRUST handles the identity flow.</p>
         <p id="infoBlurb" class="info-blurb" hidden></p>
       </header>
@@ -600,12 +601,12 @@
         <p class="eyebrow">Identity method</p>
         <div class="method-grid">
           <button type="button" class="method-choice selected" data-proof-method="otrust-proof">
-            <strong>OTRUST Proof</strong>
-            <span>Anv&auml;nd ditt verifierade Proof ID och PIN.</span>
+            <strong>OTRUST ID</strong>
+            <span>Anv&auml;nd ditt verifierade ID och PIN.</span>
           </button>
         </div>
         <div class="method-disclosure" id="methodDisclosure" hidden>
-          <span class="method-logo">OTRUST Proof</span>
+          <span class="method-logo">OTRUST ID</span>
           <span>Prim&auml;r identitetsmetod f&ouml;r detta partner-theme.</span>
         </div>
       </section>
@@ -617,7 +618,7 @@
 
       <form id="loginForm">
         <div class="form-group">
-          <label for="proofId">Your Proof ID</label>
+          <label for="proofId">Your ID</label>
           <input type="text" id="proofId" name="proofId" placeholder="id_abc123..." autocomplete="username" required>
         </div>
 
@@ -638,11 +639,11 @@
         <button type="submit" class="btn" id="submitBtn">Verify and Continue</button>
       </form>
 
-      <div class="divider"><span>Do not have a proof?</span></div>
+      <div class="divider"><span>Do not have an ID?</span></div>
 
       <div class="no-proof">
-        <p>Create a verified identity proof to use Login with OTRUST.</p>
-        <a href="/proof.html" id="createProofLink">Create Identity Proof</a>
+        <p>Create a verified ID to use OTRUST Auth.</p>
+        <a href="/proof.html" id="createProofLink">Create ID</a>
       </div>
 
       <footer class="footer">
@@ -671,13 +672,13 @@
       logoAlt: '',
       themeId: 'default',
       backgroundColor: '#F5F7FA',
-      primaryColor: '#2D5A3D',
+      primaryColor: '#16160f',
       textColor: '#0F1B2D',
       fontFamily: 'system',
       borderRadius: 8,
       spacingScale: 'default',
-      headline: 'Login with OTRUST',
-      subhead: 'Secure authentication with your OTRUST identity proof.',
+      headline: 'OTRUST Auth',
+      subhead: 'Secure authentication with your OTRUST ID.',
       footerText: 'Powered by OTRUST',
       infoBlurb: '',
       allowedIdentityMethods: ['proof'],
@@ -732,8 +733,7 @@
       const theme = { ...DEFAULT_BRANDING, ...branding };
       const root = document.documentElement;
       const themeId = String(theme.themeId || '');
-      const hasPartnerBrand = themeId !== 'default' || Boolean(theme.logoUrl || theme.logoAlt);
-      document.body.classList.toggle('partner-theme', hasPartnerBrand);
+      document.body.classList.toggle('hemsted-theme', themeId.startsWith('hemsted_'));
 
       if (isCssColor(theme.backgroundColor)) {
         root.style.setProperty('--partner-bg', theme.backgroundColor);
@@ -763,7 +763,9 @@
       setText('headline', theme.headline || DEFAULT_BRANDING.headline);
       setText('subhead', theme.subhead || DEFAULT_BRANDING.subhead);
       setText('partnerFooter', theme.footerText || DEFAULT_BRANDING.footerText);
-      setText('otrustDisclosure', 'Secure login via OTRUST. You are on otrust.eu because OTRUST handles the identity flow.');
+      setText('otrustDisclosure', themeId.startsWith('hemsted_')
+        ? 'Identity-fl\u00f6de s\u00e4krat av OTRUST. Verifieringen sker p\u00e5 otrust.eu.'
+        : 'Secure login via OTRUST. You are on otrust.eu because OTRUST handles the identity flow.');
       document.title = `${theme.headline || DEFAULT_BRANDING.headline} | OTRUST`;
       renderIdentityMethods(theme.allowedIdentityMethods || DEFAULT_BRANDING.allowedIdentityMethods, themeId);
 
@@ -778,23 +780,23 @@
 
       const partnerLogo = document.getElementById('partnerLogo');
       const defaultBrand = document.getElementById('defaultBrand');
-      const defaultBrandText = defaultBrand.querySelector('span');
+      const defaultBrandText = defaultBrand?.querySelector('span');
       if (isSafeHttpsUrl(theme.logoUrl)) {
         partnerLogo.src = theme.logoUrl;
         partnerLogo.alt = theme.logoAlt || `${challengeData?.clientId || 'Partner'} logo`;
         partnerLogo.hidden = false;
-        defaultBrand.hidden = true;
+        if (defaultBrand) defaultBrand.hidden = true;
       } else {
         partnerLogo.removeAttribute('src');
         partnerLogo.alt = '';
         partnerLogo.hidden = true;
-        defaultBrand.hidden = false;
-        if (theme.logoAlt) {
-          defaultBrand.classList.add('partner-text-brand');
-          defaultBrandText.textContent = theme.logoAlt;
+        if (defaultBrand) defaultBrand.hidden = false;
+        if (theme.logoAlt && themeId.startsWith('hemsted_')) {
+          defaultBrand?.classList.add('partner-text-brand');
+          if (defaultBrandText) defaultBrandText.textContent = theme.logoAlt;
         } else {
-          defaultBrand.classList.remove('partner-text-brand');
-          defaultBrandText.textContent = 'OTRUST';
+          defaultBrand?.classList.remove('partner-text-brand');
+          if (defaultBrandText) defaultBrandText.textContent = 'OTRUST';
         }
       }
     }
@@ -810,7 +812,9 @@
       methodDisclosure.hidden = !usesProof;
 
       if (usesProof) {
-        document.getElementById('submitBtn').textContent = 'Verify with OTRUST Proof';
+        document.getElementById('submitBtn').textContent = String(themeId).startsWith('hemsted_')
+          ? 'Verifiera med OTRUST ID'
+          : 'Verify with OTRUST ID';
         document.querySelectorAll('[data-proof-method]').forEach(button => button.classList.add('selected'));
       } else {
         document.getElementById('submitBtn').textContent = 'Verify and Continue';
@@ -853,7 +857,7 @@
       }
 
       if (!proofId) {
-        showError('Please enter your Proof ID.');
+        showError('Please enter your ID.');
         return;
       }
 
@@ -917,7 +921,8 @@
     }
 
     function setText(id, value) {
-      document.getElementById(id).textContent = value;
+      const el = document.getElementById(id);
+      if (el) el.textContent = value;
     }
 
     function updateCreateProofLink() {
@@ -957,11 +962,11 @@
     document.getElementById('partnerLogo').addEventListener('error', () => {
       document.getElementById('partnerLogo').hidden = true;
       const defaultBrand = document.getElementById('defaultBrand');
-      const defaultBrandText = defaultBrand.querySelector('span');
-      defaultBrand.hidden = false;
-      if (challengeData?.branding?.logoAlt) {
-        defaultBrand.classList.add('partner-text-brand');
-        defaultBrandText.textContent = challengeData.branding.logoAlt;
+      const defaultBrandText = defaultBrand?.querySelector('span');
+      if (defaultBrand) defaultBrand.hidden = false;
+      if (String(challengeData?.branding?.themeId || '').startsWith('hemsted_')) {
+        defaultBrand?.classList.add('partner-text-brand');
+        if (defaultBrandText) defaultBrandText.textContent = challengeData.branding.logoAlt || 'Hemsted';
       }
     });
 
@@ -974,5 +979,11 @@
 
     loadChallenge();
   </script>
+  <script src="/otrust-polish.js?v=20260530mono" defer></script>
 </body>
 </html>
+
+
+
+
+

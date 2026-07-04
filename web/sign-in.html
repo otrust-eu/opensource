@@ -1,29 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="otrust-dashboard-shell" data-otrust-page="sign-in">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign in with OTRUST | Global eID-Ready Partner Login</title>
-  <meta name="description" content="Login with OTRUST is partner-branded identity login infrastructure by Kris Ledel, designed for global eID and digital identity flows, proof creation, and privacy-preserving callbacks.">
-  <meta name="keywords" content="Sign in with OTRUST, Login with OTRUST, global eID, electronic identity, digital identity, identity proof, Kris Ledel, Kristian Ledel, partner branded login">
+  <title>OTRUST Auth | Hosted Auth for partners</title>
+  <meta name="description" content="Hosted Auth for partner apps: short-lived challenges, visible OTRUST verification, branded login screens, and callback tokens bound to state.">
+  <meta name="keywords" content="OTRUST Auth, hosted auth, partner login, OAuth-style callback, identity ID, challenge binding">
   <meta name="author" content="Kristian Ledel">
   <meta name="creator" content="Kris Ledel">
   <link rel="author" href="https://www.otrust.eu/about">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
   <link rel="canonical" href="https://www.otrust.eu/sign-in">
-  <meta name="theme-color" content="#2d5a3d">
+  <meta name="theme-color" content="#16160f">
 
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://www.otrust.eu/sign-in">
-  <meta property="og:title" content="Sign in with OTRUST | Global eID-Ready Partner Login">
-  <meta property="og:description" content="Partner-branded identity login infrastructure by Kris Ledel for global eID, digital identity, OTRUST proofs, and privacy-preserving callbacks.">
+  <meta property="og:title" content="OTRUST Auth | Hosted Auth">
+  <meta property="og:description" content="Hosted Auth for partners: challenges, branded login, and verified callbacks.">
   <meta property="og:image" content="https://www.otrust.eu/og-image.svg">
   <meta property="og:site_name" content="OTRUST by Kristian Ledel">
   <meta property="article:author" content="Kristian Ledel">
 
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Sign in with OTRUST | Global Digital Identity Login">
-  <meta name="twitter:description" content="Global eID-ready partner login with OTRUST proof creation and branded hosted auth.">
+  <meta name="twitter:title" content="OTRUST Auth | Hosted Auth">
+  <meta name="twitter:description" content="Hosted Auth for partners with challenge binding and branded callbacks.">
   <meta name="twitter:image" content="https://www.otrust.eu/og-image.svg">
   <meta name="twitter:creator" content="@kledel">
 
@@ -31,9 +31,9 @@
   {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    "name": "Sign in with OTRUST",
+    "name": "OTRUST Auth",
     "url": "https://www.otrust.eu/sign-in",
-    "description": "Public guide for Login with OTRUST, a hosted partner authentication flow based on verified identity proofs and global eID-ready partner flows.",
+    "description": "Public guide for OTRUST Auth, a hosted partner Auth flow based on verified IDs, short-lived challenges, and callback verification.",
     "author": {
       "@type": "Person",
       "name": "Kristian Ledel",
@@ -41,10 +41,10 @@
       "url": "https://www.otrust.eu/about"
     },
     "about": [
-      {"@type": "Thing", "name": "Global eID"},
-      {"@type": "Thing", "name": "Electronic identity"},
+      {"@type": "Thing", "name": "Hosted Auth"},
+      {"@type": "Thing", "name": "ID verification"},
       {"@type": "Thing", "name": "Digital identity"},
-      {"@type": "Thing", "name": "Partner-branded login"}
+      {"@type": "Thing", "name": "Partner-branded Auth"}
     ],
     "mentions": [
       {"@type": "Person", "name": "Kristian Ledel", "alternateName": "Kris Ledel"}
@@ -64,18 +64,18 @@
     "mainEntity": [
       {
         "@type": "Question",
-        "name": "Can OTRUST be used in global eID login flows?",
+        "name": "How does hosted Auth work?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "OTRUST is designed as partner-branded identity login and proof infrastructure that can sit around electronic identity onboarding flows across markets. The upstream identity method remains explicit while OTRUST handles hosted proof creation, partner branding, callbacks, and disclosure."
+          "text": "Your app creates a short-lived challenge through the API, redirects the user to OTRUST for ID verification, and receives a callback with token and state when the challenge is satisfied. OTRUST remains visible as the verification domain."
         }
       },
       {
         "@type": "Question",
-        "name": "Can OTRUST support multiple eID providers?",
+        "name": "Can OTRUST work with regulated identity providers?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "OTRUST uses a provider-agnostic proof and challenge model, so partner flows can be designed around approved identity methods while keeping OTRUST visible as the identity proof provider."
+          "text": "OTRUST uses a provider-agnostic ID and challenge model, so partner flows can be designed around approved identity methods while keeping OTRUST visible as the verification provider."
         }
       },
       {
@@ -91,737 +91,194 @@
   </script>
 
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script defer data-domain="otrust.eu" src="https://plausible.io/js/script.js"></script>
-  <link rel="stylesheet" href="/otrust-polish.css?v=20260527-2">
+  <link rel="stylesheet" href="/otrust-polish.css?v=20260530mono">
 
-  <style>
-    :root {
-      --bg: #f8faf9;
-      --bg-card: #ffffff;
-      --bg-muted: #eef3f1;
-      --border: #d6ded9;
-      --text: #111715;
-      --text-dim: #53625d;
-      --accent: #1f6f50;
-      --accent-hover: #174f3a;
-      --accent-light: #e3f2eb;
-      --blue: #315f7d;
-      --shadow: 0 14px 38px rgba(20, 34, 28, 0.08);
-    }
-
-    [data-theme="dark"] {
-      --bg: #101412;
-      --bg-card: #171d1a;
-      --bg-muted: #202824;
-      --border: #34423b;
-      --text: #f3f7f4;
-      --text-dim: #b8c4bd;
-      --accent: #79d39b;
-      --accent-hover: #93e0ae;
-      --accent-light: #1d3528;
-      --blue: #8ab8d7;
-      --shadow: 0 18px 46px rgba(0, 0, 0, 0.26);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
-      line-height: 1.6;
-      min-height: 100vh;
-    }
-
-    .sign-in-page main {
-      width: 100%;
-    }
-
-    .skip-link {
-      background: var(--accent);
-      color: white;
-      left: 0;
-      padding: 8px 16px;
-      position: absolute;
-      text-decoration: none;
-      top: -40px;
-      z-index: 1000;
-    }
-
-    .skip-link:focus {
-      top: 0;
-    }
-
-    nav {
-      background: rgba(248, 250, 249, 0.92);
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    [data-theme="dark"] nav {
-      background: rgba(16, 20, 18, 0.92);
-    }
-
-    .nav-container {
-      align-items: center;
-      display: flex;
-      justify-content: space-between;
-      margin: 0 auto;
-      max-width: 1240px;
-      min-height: 4rem;
-      padding: 0.75rem 2rem;
-    }
-
-    .logo {
-      align-items: center;
-      color: var(--text);
-      display: inline-flex;
-      font-size: 0.95rem;
-      font-weight: 700;
-      gap: 0.62rem;
-      letter-spacing: 0.04em;
-      text-decoration: none;
-    }
-
-    .logo::before {
-      background: var(--accent);
-      border-radius: 3px;
-      content: "";
-      height: 0.68rem;
-      width: 0.68rem;
-    }
-
-    .nav-links {
-      align-items: center;
-      display: flex;
-      gap: 0.45rem;
-    }
-
-    .nav-links .nav-primary,
-    .nav-links .nav-secondary {
-      align-items: center;
-      display: flex;
-      gap: 0.12rem;
-    }
-
-    .nav-links a {
-      border-radius: 6px;
-      color: var(--text-dim);
-      font-size: 0.82rem;
-      min-height: 2.25rem;
-      padding: 0.48rem 0.68rem;
-      text-decoration: none;
-    }
-
-    .nav-links a:hover,
-    .nav-links a.active {
-      background: var(--accent-light);
-      color: var(--accent);
-    }
-
-    .theme-toggle,
-    .mobile-menu-btn {
-      align-items: center;
-      background-color: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text);
-      cursor: pointer;
-      display: inline-flex;
-      height: 2.25rem;
-      justify-content: center;
-      width: 2.25rem;
-    }
-
-    .theme-toggle {
-      font-size: 0;
-      position: relative;
-    }
-
-    .theme-toggle::before {
-      border: 1.5px solid var(--accent);
-      border-radius: 50%;
-      content: "";
-      height: 0.9rem;
-      width: 0.9rem;
-    }
-
-    .theme-toggle::after {
-      background: var(--bg-card);
-      border-radius: 50%;
-      content: "";
-      height: 0.72rem;
-      position: absolute;
-      right: 0.52rem;
-      top: 0.52rem;
-      width: 0.72rem;
-    }
-
-    [data-theme="dark"] .theme-toggle::after {
-      background: var(--bg);
-      transform: translateX(-0.25rem);
-    }
-
-    .mobile-menu-btn {
-      background-image:
-        linear-gradient(var(--text), var(--text)),
-        linear-gradient(var(--text), var(--text)),
-        linear-gradient(var(--text), var(--text));
-      background-position:
-        center calc(50% - 6px),
-        center 50%,
-        center calc(50% + 6px);
-      background-repeat: no-repeat;
-      background-size: 16px 2px;
-      display: none;
-      font-size: 0;
-    }
-
-    .docs-submenu-bar {
-      background: var(--bg-muted);
-      border-bottom: 1px solid var(--border);
-      display: none;
-    }
-
-    .docs-submenu-bar.open {
-      display: block;
-    }
-
-    .docs-submenu-container {
-      display: flex;
-      gap: 0.5rem;
-      margin: 0 auto;
-      max-width: 1240px;
-      padding: 0.55rem 2rem;
-    }
-
-    .docs-submenu-bar a {
-      border-radius: 8px;
-      color: var(--text-dim);
-      font-size: 0.8rem;
-      padding: 0.48rem 0.72rem;
-      text-decoration: none;
-    }
-
-    .docs-submenu-bar a:hover {
-      background: var(--bg-card);
-      color: var(--text);
-    }
-
-    main {
-      margin: 0 auto;
-      max-width: 1240px;
-      padding: 3.5rem 2rem 4rem;
-    }
-
-    .hero {
-      display: grid;
-      gap: 3rem;
-      grid-template-columns: minmax(0, 1fr) minmax(22rem, 0.85fr);
-      margin-bottom: 3rem;
-      max-width: none;
-    }
-
-    .hero > * {
-      min-width: 0;
-    }
-
-    .hero-badge {
-      background: var(--accent-light);
-      border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
-      border-radius: 4px;
-      color: var(--accent);
-      display: inline-block;
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      margin-bottom: 1rem;
-      padding: 0.25rem 0.55rem;
-      text-transform: uppercase;
-    }
-
-    h1 {
-      font-size: 3rem;
-      line-height: 1.04;
-      margin-bottom: 1rem;
-      max-width: 13ch;
-    }
-
-    .hero p {
-      color: var(--text-dim);
-      font-size: 1rem;
-      max-width: 38rem;
-    }
-
-    .hero-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-      margin-top: 1.5rem;
-    }
-
-    .btn {
-      align-items: center;
-      border-radius: 8px;
-      display: inline-flex;
-      font-size: 0.85rem;
-      font-weight: 700;
-      justify-content: center;
-      min-height: 2.75rem;
-      padding: 0.75rem 1rem;
-      text-decoration: none;
-    }
-
-    .btn-primary {
-      background: var(--accent);
-      border: 1px solid var(--accent-hover);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background: var(--accent-hover);
-    }
-
-    .btn-secondary {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      color: var(--text);
-    }
-
-    .auth-panel,
-    .card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      box-shadow: var(--shadow);
-    }
-
-    .auth-panel {
-      align-self: start;
-      overflow: hidden;
-    }
-
-    .auth-panel-header {
-      background: var(--bg-muted);
-      border-bottom: 1px solid var(--border);
-      padding: 1rem;
-    }
-
-    .auth-panel-header strong {
-      display: block;
-      font-size: 0.95rem;
-    }
-
-    .auth-panel-header span {
-      color: var(--text-dim);
-      display: block;
-      font-size: 0.78rem;
-      margin-top: 0.2rem;
-    }
-
-    .auth-panel-body {
-      padding: 1rem;
-    }
-
-    .auth-row {
-      align-items: flex-start;
-      display: grid;
-      gap: 0.75rem;
-      grid-template-columns: 1.7rem 1fr;
-      padding: 0.75rem 0;
-    }
-
-    .auth-row + .auth-row {
-      border-top: 1px solid var(--border);
-    }
-
-    .step-num {
-      align-items: center;
-      background: var(--accent);
-      border-radius: 4px;
-      color: var(--bg);
-      display: inline-flex;
-      font-size: 0.72rem;
-      font-weight: 700;
-      height: 1.4rem;
-      justify-content: center;
-      width: 1.4rem;
-    }
-
-    .auth-row strong {
-      display: block;
-      font-size: 0.85rem;
-    }
-
-    .auth-row p {
-      color: var(--text-dim);
-      font-size: 0.78rem;
-      line-height: 1.5;
-      margin-top: 0.2rem;
-    }
-
-    .section-title {
-      margin-bottom: 1.25rem;
-    }
-
-    .section-title h2 {
-      font-size: 1.45rem;
-      margin-bottom: 0.35rem;
-    }
-
-    .section-title p {
-      color: var(--text-dim);
-      max-width: 42rem;
-    }
-
-    .grid {
-      display: grid;
-      gap: 1rem;
-      grid-template-columns: repeat(3, 1fr);
-      margin-bottom: 3rem;
-    }
-
-    .card {
-      padding: 1.25rem;
-    }
-
-    .card h3 {
-      font-size: 0.98rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .card p,
-    .card li {
-      color: var(--text-dim);
-      font-size: 0.84rem;
-    }
-
-    .card ul {
-      margin-left: 1rem;
-    }
-
-    .eid-grid {
-      display: grid;
-      gap: 1rem;
-      grid-template-columns: 1.1fr 0.9fr;
-      margin-bottom: 3rem;
-    }
-
-    .eid-lead {
-      display: grid;
-      gap: 1rem;
-    }
-
-    .eid-keywords {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.45rem;
-      list-style: none;
-      margin: 0;
-    }
-
-    .eid-keywords li {
-      background: var(--accent-light);
-      border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
-      border-radius: 999px;
-      color: var(--accent);
-      font-size: 0.75rem;
-      font-weight: 700;
-      padding: 0.32rem 0.62rem;
-    }
-
-    .eid-provider-list {
-      display: grid;
-      gap: 0.75rem;
-    }
-
-    .eid-provider {
-      border-left: 3px solid var(--accent);
-      padding-left: 0.9rem;
-    }
-
-    .eid-provider strong {
-      display: block;
-      font-size: 0.86rem;
-      margin-bottom: 0.2rem;
-    }
-
-    .code-card {
-      display: grid;
-      gap: 1rem;
-      grid-template-columns: 1fr 1fr;
-      margin-bottom: 3rem;
-    }
-
-    pre {
-      background: #101412;
-      border-radius: 8px;
-      color: #e6efe9;
-      font-size: 0.78rem;
-      line-height: 1.55;
-      overflow-x: hidden;
-      padding: 1rem;
-    }
-
-    code {
-      font-family: 'SF Mono', Consolas, monospace;
-    }
-
-    pre code {
-      overflow-wrap: anywhere;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-
-    .note {
-      background: var(--accent-light);
-      border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
-      border-radius: 8px;
-      color: var(--accent);
-      font-size: 0.84rem;
-      padding: 1rem;
-    }
-
-    .footer-wrapper {
-      border-top: 1px solid var(--border);
-    }
-
-    footer {
-      align-items: center;
-      display: flex;
-      justify-content: space-between;
-      margin: 0 auto;
-      max-width: 1240px;
-      padding: 2rem;
-    }
-
-    .footer-links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem 1rem;
-    }
-
-    .footer-links a {
-      color: var(--text-dim);
-      font-size: 0.75rem;
-      text-decoration: none;
-    }
-
-    .footer-links a:hover {
-      color: var(--accent);
-    }
-
-    .footer-copy {
-      color: var(--text-dim);
-      font-size: 0.72rem;
-    }
-
-    @media (max-width: 900px) {
-      .hero,
-      .code-card,
-      .eid-grid,
-      .grid {
-        grid-template-columns: 1fr;
-      }
-
-      h1 {
-        font-size: 2.35rem;
-      }
-    }
-
-    @media (max-width: 760px) {
-      .nav-container {
-        padding-left: 1rem;
-        padding-right: 1rem;
-      }
-
-      .nav-links .nav-primary a {
-        font-size: 0.72rem;
-        padding: 0.38rem 0.42rem;
-      }
-
-      .nav-links .nav-secondary {
-        align-items: stretch;
-        background: var(--bg-card);
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        box-shadow: var(--shadow);
-        display: none;
-        flex-direction: column;
-        gap: 0.15rem;
-        left: 1rem;
-        padding: 0.65rem;
-        position: absolute;
-        right: 1rem;
-        top: calc(100% + 0.35rem);
-      }
-
-      .nav-links .nav-secondary.open {
-        display: flex;
-      }
-
-      .mobile-menu-btn {
-        display: inline-flex;
-      }
-
-      main {
-        padding: 2rem 1rem 3rem;
-      }
-
-      footer {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 1rem;
-        padding-left: 1rem;
-        padding-right: 1rem;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="/otrust-redesign.css?v=20260530mono">
 </head>
-<body class="sign-in-page">
+<body data-otrust-page="sign-in">
   <a href="#main-content" class="skip-link">Skip to content</a>
-  <nav role="navigation" aria-label="Main navigation">
-    <div class="nav-container">
-      <a href="/" class="logo">OTRUST</a>
-      <div class="nav-links">
-        <span class="nav-primary">
-          <a href="/">Timestamp</a>
-          <a href="/sign">Signed</a>
-          <a href="/proof">Proof</a>
-        </span>
-        <span class="nav-secondary" id="nav-secondary">
-          <a href="/sign-in" class="active">Sign in</a>
-          <a href="/docs" class="docs-trigger" id="docs-trigger">Docs</a>
-          <a href="/about">About</a>
-        </span>
-        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle color theme" title="Toggle color theme"></button>
-        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu" title="Menu"><span></span></button>
+
+  <main id="main-content" role="main">
+  <section class="dashboard-home" aria-label="OTRUST Auth workspace">
+    <article class="dashboard-panel dashboard-landing">
+      <header class="dashboard-site-nav" aria-label="Dashboard navigation">
+        <a href="/" class="dashboard-logo">OTRUST</a>
+        <nav class="dashboard-links" aria-label="OTRUST site navigation">
+        <a href="/timestamp">Timestamp</a>
+        <a href="/proof">ID</a>
+        <a href="/sign">Sign</a>
+        <a href="/sign-in" class="active" aria-current="page">Auth</a>
+        <a href="/docs">Docs</a>
+        <a href="/api-docs">Developers</a>
+        <span class="dashboard-nav-sep" aria-hidden="true">&middot;</span>
+        <button type="button" class="dashboard-menu" aria-label="Open menu"><span></span></button>
+        </nav>
+      </header>
+
+      <section class="dashboard-hero-block">
+        <div class="dashboard-hero-copy">
+          <span class="dashboard-kicker">Auth</span>
+          <h1>Hosted Auth<br><span>for partners.</span></h1>
+          <p>Create a short-lived challenge, send users to OTRUST for ID verification, then return to your registered callback with token and state.</p>
+          <div class="dashboard-actions">
+            <a href="/proof" class="dashboard-primary-action">Create ID</a>
+            <a href="/docs#proofauth" class="dashboard-text-action">Auth docs</a>
+          </div>
+        </div>
+        <div class="dashboard-orbit dashboard-orbit-hero" aria-hidden="true"></div>
+      </section>
+
+      <section class="dashboard-steps" id="flow" aria-labelledby="dashboard-steps-heading">
+        <span class="dashboard-kicker" id="dashboard-steps-heading">Auth sequence</span>
+        <div class="dashboard-step-grid">
+          <article>
+            <div class="dashboard-step-icon dashboard-step-hash" aria-hidden="true"></div>
+            <span>01</span>
+            <h2>Challenge</h2>
+            <p>Partner creates a short-lived challenge through the API.</p>
+          </article>
+          <article>
+            <div class="dashboard-step-icon dashboard-step-sign" aria-hidden="true"></div>
+            <span>02</span>
+            <h2>Hosted flow</h2>
+            <p>User completes the hosted Auth flow on otrust.eu.</p>
+          </article>
+          <article>
+            <div class="dashboard-step-icon dashboard-step-anchor" aria-hidden="true"></div>
+            <span>03</span>
+            <h2>Verify</h2>
+            <p>OTRUST verifies ID ownership and challenge binding.</p>
+          </article>
+          <article>
+            <div class="dashboard-step-icon dashboard-step-prove" aria-hidden="true"></div>
+            <span>04</span>
+            <h2>Callback</h2>
+            <p>The user returns to the registered callback with token and state.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="dashboard-principles-panel" aria-labelledby="dashboard-principles-heading">
+        <div class="dashboard-principles-copy">
+          <span class="dashboard-kicker">Production requirements</span>
+          <h2 id="dashboard-principles-heading">Partner-ready<br>hosted auth.</h2>
+          <p>Hosted Auth keeps verification on OTRUST while partners keep control of their app state, redirects and sessions.</p>
+        </div>
+        <div class="dashboard-principles-list">
+          <article>
+            <span class="dashboard-principle-icon dashboard-principle-local" aria-hidden="true"></span>
+            <div>
+              <h3>Visible domain</h3>
+              <p>The OTRUST domain remains visible during verification.</p>
+            </div>
+          </article>
+          <article>
+            <span class="dashboard-principle-icon dashboard-principle-zero" aria-hidden="true"></span>
+            <div>
+              <h3>Safe branding</h3>
+              <p>Partner branding cannot inject JavaScript.</p>
+            </div>
+          </article>
+          <article>
+            <span class="dashboard-principle-icon dashboard-principle-lock" aria-hidden="true"></span>
+            <div>
+              <h3>Bound callbacks</h3>
+              <p>Callbacks must preserve challenge, state, redirect URI, and expiry.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <footer class="dashboard-left-footer">
+        <strong>OTRUST</strong>
+        <span>&copy; 2026 OTRUST</span>
+        <span class="dashboard-made">Made in Sweden, Europe</span>
+        <nav aria-label="Dashboard footer">
+          <a href="/docs">Docs</a>
+          <a href="/api-docs">API</a>
+          <a href="https://github.com/otrust-eu/opensource" rel="noopener noreferrer">GitHub</a>
+          <a href="/privacy-policy">Privacy</a>
+          <a href="/terms">Terms</a>
+        </nav>
+        <a href="#main-content" class="dashboard-footer-dot" aria-label="Back to top"></a>
+      </footer>
+    </article>
+    <section class="dashboard-tool-slot" aria-label="OTRUST Auth tool">
+      <section class="claim-section">
+      <div class="sign-card dashboard-signin-tool auth-panel service-workspace-card signin-workspace-card" aria-label="Login with OTRUST flow">
+          <div class="timestamp-dashboard-head">
+            <div>
+              <span class="workspace-topline">Hosted auth workspace</span>
+              <h2>Create a partner Auth challenge.</h2>
+              <p>Start the same challenge-bound flow an app would create server-side and redirect users to hosted verification.</p>
+            </div>
+            <div class="timestamp-live-meta" aria-label="Auth guarantees">
+              <span>Challenge-bound callback</span>
+              <span>ID ownership verified</span>
+              <span>Partner-branded redirect</span>
+            </div>
+          </div>
+          <div class="timestamp-dashboard-body">
+            <div class="timestamp-panel-stage">
+              <div class="timestamp-panel active">
+                <div class="timestamp-panel-heading">
+                  <span>01 / Hosted Auth</span>
+                  <h3>Start redirect challenge</h3>
+                  <p>Create a short-lived challenge and open the hosted verification URL.</p>
+                </div>
+                <div class="auth-action-panel">
+                  <label for="workspace-auth-client-id" class="auth-field">
+                    <span>Client ID</span>
+                    <input id="workspace-auth-client-id" type="text" value="otrust_dashboard" autocomplete="off" spellcheck="false">
+                  </label>
+                  <label for="workspace-auth-redirect-uri" class="auth-field">
+                    <span>Redirect URI</span>
+                    <input id="workspace-auth-redirect-uri" type="url" placeholder="https://app.example/auth/callback" inputmode="url" spellcheck="false">
+                  </label>
+                  <label for="workspace-auth-proof-id" class="auth-field">
+                    <span>ID optional</span>
+                    <input id="workspace-auth-proof-id" type="text" placeholder="id_..." autocomplete="off" spellcheck="false">
+                  </label>
+                  <button type="button" id="workspace-auth-submit">Start hosted Auth</button>
+                  <div class="auth-demo-actions">
+                    <button type="button" id="workspace-auth-demo" class="btn btn-secondary">Try demo flow</button>
+                    <a href="/partners/hemsted" class="auth-branded-example">See branded example</a>
+                  </div>
+                  <p id="workspace-auth-status" class="workspace-action-status" aria-live="polite">Creates a short-lived hosted login challenge.</p>
+                </div>
+              </div>
+            </div>
+          </div>
       </div>
-    </div>
-  </nav>
-
-  <div class="docs-submenu-bar" id="docs-submenu-bar">
-    <div class="docs-submenu-container">
-      <a href="/docs">Documentation</a>
-      <a href="/api-docs">API Reference</a>
-      <a href="/playground/">SDK Playground</a>
-      <a href="https://github.com/otrust-eu/opensource" target="_blank" rel="noopener noreferrer">GitHub</a>
-    </div>
-  </div>
-
-  <main id="main-content">
-    <section class="hero">
-      <div>
-        <span class="hero-badge">Partner auth</span>
-        <h1>Hosted identity login for partner products.</h1>
-        <p>Login with OTRUST lets apps send users through a secure, branded identity-proof flow. Partners keep continuity in the user journey while OTRUST keeps the disclosure, DPO contact, and proof verification layer visible.</p>
-        <div class="hero-actions">
-          <a href="/proof" class="btn btn-primary">Create Identity Proof</a>
-          <a href="/docs.html#proofauth" class="btn btn-secondary">Read Auth Docs</a>
-        </div>
-        <div class="customer-strip customer-strip-compact" aria-label="Partner pilot">
-          <span class="customer-label">Partner pilot</span>
-          <strong>Hemsted</strong>
-          <span>Branded login and proof creation flow</span>
-          <a href="/partners/hemsted">View preview</a>
-        </div>
-      </div>
-
-      <aside class="auth-panel" aria-label="Login with OTRUST flow">
-        <div class="auth-panel-header">
-          <strong>How it works</strong>
-          <span>The real login screen opens from an app-generated challenge.</span>
-        </div>
-        <div class="auth-panel-body">
-          <div class="auth-row">
-            <span class="step-num">1</span>
-            <div>
-              <strong>Create or reuse a proof</strong>
-              <p>The user creates an OTRUST identity proof on the themed flow, or reuses an existing proof they control.</p>
-            </div>
-          </div>
-          <div class="auth-row">
-            <span class="step-num">2</span>
-            <div>
-              <strong>Open an app challenge</strong>
-              <p>The app creates a short-lived challenge and redirects the user to the OTRUST hosted login screen.</p>
-            </div>
-          </div>
-          <div class="auth-row">
-            <span class="step-num">3</span>
-            <div>
-              <strong>Verify and return</strong>
-              <p>OTRUST verifies the proof and redirects back with a token the partner application can validate.</p>
-            </div>
-          </div>
-        </div>
-      </aside>
+      </section>
     </section>
+  </section>
 
-    <section>
-      <div class="section-title">
-        <h2>What this gives partners and users</h2>
-        <p>A login flow where identity checks are explicit, scoped, reusable, and visually connected to the partner product.</p>
-      </div>
-      <div class="grid">
-        <div class="card">
-          <h3>Passwordless access</h3>
-          <p>Users authenticate by proving control of their OTRUST proof instead of creating another password.</p>
-        </div>
-        <div class="card">
-          <h3>Scoped verification</h3>
-          <p>Apps ask for scopes such as identity verification. The user only presents what the app requested.</p>
-        </div>
-        <div class="card">
-          <h3>Less data exposure</h3>
-          <p>Verification happens from proof metadata. Apps do not need raw document scans or selfie data.</p>
-        </div>
-        <div class="card">
-          <h3>Partner continuity</h3>
-          <p>Approved logo, color, headline, and footer copy follow the hosted login and proof creation screens.</p>
-        </div>
-      </div>
-    </section>
+  <section class="sign-in-details" aria-label="Auth details">
 
     <section aria-labelledby="swedish-eid-heading">
       <div class="section-title">
-        <h2 id="swedish-eid-heading">Built for global eID expectations and branded proof login.</h2>
-        <p>Across markets, B2B products need clear, regulated identity moments. OTRUST adds the hosted proof, callback, branding, and audit layer around those expectations without presenting another provider's trademark as OTRUST's own.</p>
+        <h2 id="swedish-eid-heading">Provider-neutral hosted verification</h2>
+        <p>OTRUST is the visible ID and callback layer. Upstream identity methods stay explicit in your product; OTRUST handles challenge binding, hosted verification, and the verified return to your app.</p>
       </div>
       <div class="eid-grid">
         <div class="card eid-lead">
-          <h3>Provider-neutral identity architecture</h3>
-          <p>OTRUST does not need to pretend to be the upstream eID. The product can keep the chosen identity method explicit while OTRUST handles the reusable proof and partner-branded return flow.</p>
-          <ul class="eid-keywords" aria-label="Relevant identity terms">
-            <li>Global eID</li>
-            <li>Electronic identity</li>
-            <li>Digital identity</li>
-            <li>Partner login</li>
-            <li>Identity proof</li>
-            <li>Kris Ledel</li>
-          </ul>
+          <h3>Works alongside regulated identity flows</h3>
+          <p>Use OTRUST when partners need a branded hosted step for ID creation or verification, without replacing regulated identity providers in your architecture.</p>
         </div>
         <div class="card eid-provider-list">
           <div class="eid-provider">
-            <strong>eID-ready architecture</strong>
-            <p>Use OTRUST as the branded hosted proof layer for partners that already rely on high-trust identity checks.</p>
+            <strong>Identity-provider ready architecture</strong>
+            <p>Use OTRUST as the branded hosted ID layer for partners that already rely on high-trust identity checks.</p>
           </div>
           <div class="eid-provider">
             <strong>Provider-agnostic model</strong>
-            <p>Support partner onboarding and proof creation without forcing every customer into a single identity provider model.</p>
+            <p>Support partner onboarding and ID creation without forcing every customer into a single identity provider model.</p>
           </div>
           <div class="eid-provider">
             <strong>Independent disclosure</strong>
-            <p>OTRUST remains visible as the proof and identity-processing layer, with DPO contact and auditability intact.</p>
+            <p>OTRUST remains visible as the ID and identity-processing layer, with DPO contact and auditability intact.</p>
           </div>
           <a href="/docs#proofauth" class="btn btn-secondary">Read Auth Docs</a>
         </div>
@@ -831,7 +288,7 @@
     <section>
       <div class="section-title">
         <h2>Developer integration</h2>
-        <p>Add a Login with OTRUST button by creating a challenge server-side, redirecting to the returned login URL, then verifying the callback token.</p>
+        <p>Add an OTRUST Auth button by creating a challenge server-side, redirecting to the returned Auth URL, then verifying the callback token before creating a session.</p>
       </div>
       <div class="code-card">
         <div class="card">
@@ -869,7 +326,7 @@ if (result.ok && result.value.valid) {
     <section>
       <div class="section-title">
         <h2>Partner branding</h2>
-        <p>Hosted login and proof creation can inherit approved partner colors and copy per <code>clientId</code> while keeping OTRUST disclosure, the OTRUST footer mark, and DPO contact visible.</p>
+        <p>Hosted Auth and ID creation can inherit approved partner colors and copy per <code>clientId</code> while keeping OTRUST disclosure, the OTRUST footer mark, and DPO contact visible.</p>
       </div>
       <div class="code-card">
         <div class="card">
@@ -885,8 +342,8 @@ X-Admin-Key: &lt;admin-key&gt;
   "fontFamily": "Inter",
   "borderRadius": 8,
   "spacingScale": "default",
-  "headline": "Logga in på Hemsted",
-  "subhead": "Säker inloggning med OTRUST Proof",
+  "headline": "Logga in p&aring; Hemsted",
+  "subhead": "S&auml;ker inloggning med OTRUST ID",
   "footerText": "Hemsted AB med OTRUST som identity provider",
   "autoRedirectSeconds": 3
 }</code></pre>
@@ -897,33 +354,20 @@ X-Admin-Key: &lt;admin-key&gt;
             <li>Logo must be served over HTTPS and stay below 200KB.</li>
             <li>Colors are validated as hex, rgb, or rgba values.</li>
             <li>Copy is rendered as text only, never as injected HTML.</li>
-            <li>The same theme follows users to <code>/proof?auth_challenge=...</code> if they need to create a proof first.</li>
+            <li>The same theme follows users to <code>/proof?auth_challenge=...</code> if they need to create an ID first.</li>
             <li>Every change is written to the OTRUST audit log with <code>client_id</code>, actor, fields, and timestamp.</li>
           </ul>
         </div>
       </div>
     </section>
-  </main>
+  </section>
+</main>
 
-  <div class="footer-wrapper">
-    <footer role="contentinfo">
-      <div class="footer-links">
-        <a href="/">Timestamp</a>
-        <a href="/sign">Signed</a>
-        <a href="/proof">Proof</a>
-        <a href="/sign-in">Sign in</a>
-          <a href="/docs">Docs</a>
-        <a href="/about">About</a>
-      <a href="/transparency">Trust Log</a>
-      <a href="/notes/why-otrust">Technical Note</a>
-      <a href="/privacy-policy">Privacy</a>
-        <a href="/terms">Terms</a>
-        <a href="https://github.com/otrust-eu/opensource" rel="noopener noreferrer">GitHub</a>
-      </div>
-      <div class="footer-copy">OTRUST - MIT License</div>
-    </footer>
-  </div>
-
-  <script src="/otrust-polish.js?v=20260527-2" defer></script>
+  <script src="/otrust-polish.js?v=20260530mono" defer></script>
 </body>
 </html>
+
+
+
+
+

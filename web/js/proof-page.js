@@ -1,5 +1,5 @@
 /**
- * OTRUST Proof Page JavaScript
+ * OTRUST ID Page JavaScript
  * Document upload + OCR + ZK proof generation
  */
 
@@ -52,8 +52,8 @@ const AUTH_PARTNER_DEFAULTS = {
   spacingScale: 'default',
   logoUrl: null,
   logoAlt: '',
-  headline: 'Create your OTRUST identity proof',
-  subhead: 'Create a reusable identity proof, then return to the partner login flow.',
+  headline: 'Create your OTRUST ID',
+  subhead: 'Create a reusable ID package, then return to the partner Auth flow.',
   footerText: 'Powered by OTRUST'
 };
 
@@ -105,7 +105,7 @@ async function initAuthPartnerFlow() {
     authChallengeData = data;
     applyAuthPartnerBranding(data);
   } catch (error) {
-    console.warn('[Proof] Auth partner theme unavailable:', error.message);
+    console.warn('[ID] Auth partner theme unavailable:', error.message);
   }
 }
 
@@ -135,19 +135,19 @@ function applyAuthPartnerBranding(data) {
     root.style.setProperty('--partner-font-family', `${theme.fontFamily}, Inter, system-ui, -apple-system, sans-serif`);
   }
 
-  setPlainText('authPartnerHeadline', `Create your identity proof for ${clientLabel}`);
+  setPlainText('authPartnerHeadline', `Create your ID for ${clientLabel}`);
   setPlainText('authPartnerSubhead', theme.subhead || AUTH_PARTNER_DEFAULTS.subhead);
   setPlainText('proofHeroBadge', 'Partner login proof');
   setPlainText('proofHeroTitle', `Create proof for ${clientLabel}`);
-  setPlainText('proofHeroCopy', 'Create your OTRUST identity proof in this branded flow, then continue back to the hosted login screen.');
+  setPlainText('proofHeroCopy', 'Create your OTRUST ID in this branded flow, then continue back to the hosted Auth screen.');
 
   const proofTypeCopy = document.querySelector('#proof-type-identity p');
   if (proofTypeCopy) {
-    proofTypeCopy.textContent = 'Create the identity proof required for this login flow';
+    proofTypeCopy.textContent = 'Create the ID required for this Auth flow';
   }
 
   const generateButton = document.getElementById('btn-generate-age');
-  if (generateButton) generateButton.textContent = 'Create Proof and Continue';
+  if (generateButton) generateButton.textContent = 'Create ID and Continue';
 
   const verifyTab = document.querySelector('.tab[data-tab="verify"]');
   if (verifyTab) verifyTab.style.display = 'none';
@@ -177,8 +177,8 @@ function authReturnActionHtml(proofId) {
   if (!returnUrl) return '';
   return `
     <div class="auth-return-action">
-      <p>Your identity proof is ready. Continue back to the partner login screen and enter your PIN.</p>
-      <a href="${returnUrl}" class="btn btn-primary">Continue to Sign In</a>
+      <p>Your ID is ready. Continue back to the partner Auth screen and enter your PIN.</p>
+      <a href="${returnUrl}" class="btn btn-primary">Continue to Auth</a>
     </div>
   `;
 }
@@ -1263,7 +1263,7 @@ async function generateIdentityProof() {
   
   resultDiv.innerHTML = `
     <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-muted); border-radius: 8px;">
-      <p style="color: var(--text-dim); margin-bottom: 0.5rem;"><strong>Creating Unique Identity Proof...</strong></p>
+      <p style="color: var(--text-dim); margin-bottom: 0.5rem;"><strong>Creating Unique Identity ID...</strong></p>
       <p style="color: var(--text-dim); font-size: 0.75rem;">Your personnummer is hashed (one-way) for Sybil-resistance.</p>
       <div class="progress-bar" style="height: 4px; background: var(--border); border-radius: 2px; margin-top: 0.5rem; overflow: hidden;">
         <div class="progress-fill" style="height: 100%; width: 0%; background: var(--accent); transition: width 0.3s;"></div>
@@ -1309,7 +1309,7 @@ async function generateIdentityProof() {
       
       resultDiv.innerHTML = `
         <div class="result">
-          <h4>✓ Unique Identity Proof Created</h4>
+          <h4>Unique Identity ID Created</h4>
           <div class="result-row">
             <span class="label">Statement</span>
             <span class="value">Verified unique human</span>
@@ -1327,12 +1327,12 @@ async function generateIdentityProof() {
             </span>
           </div>
           <div class="result-row">
-            <span class="label">Proof ID</span>
+            <span class="label">ID</span>
             <span class="value" style="font-family: monospace;">${data.proofId}</span>
           </div>
           <div class="result-actions">
             <button class="btn btn-secondary" id="copy-identity-link">Copy Link</button>
-            <a href="${data.shareUrl}" target="_blank" class="btn btn-secondary">Open Proof</a>
+            <a href="${data.shareUrl}" target="_blank" class="btn btn-secondary">Open ID</a>
           </div>
           <div class="result-actions" style="margin-top: 0.5rem;">
             <button class="btn btn-secondary" id="add-apple-wallet" style="background: #000; color: white;">
@@ -1476,9 +1476,9 @@ async function generateIdentityProof() {
       resultDiv.innerHTML = `
         <div class="result" style="border-color: var(--orange);">
           <h4 style="color: var(--orange);">Identity Already Verified</h4>
-          <p style="margin: 1rem 0;">You already have a unique identity proof. Each person can only have one.</p>
+          <p style="margin: 1rem 0;">You already have a unique ID. Each person can only have one.</p>
           <div class="result-row">
-            <span class="label">Existing Proof</span>
+            <span class="label">Existing ID</span>
             <span class="value">${data.existingProofId}</span>
           </div>
           <div class="result-row">
@@ -1486,13 +1486,13 @@ async function generateIdentityProof() {
             <span class="value">${new Date(data.createdAt).toLocaleDateString()}</span>
           </div>
           <div class="result-actions">
-            <a href="/proof/${data.existingProofId}" target="_blank" class="btn btn-primary">View Your Proof</a>
+            <a href="/proof/${data.existingProofId}" target="_blank" class="btn btn-primary">View Your ID</a>
           </div>
         </div>
         ${authReturnActionHtml(data.existingProofId)}
       `;
     } else {
-      showError(resultDiv, data.error || 'Failed to create identity proof');
+      showError(resultDiv, data.error || 'Failed to create ID');
     }
   } catch (err) {
     clearInterval(progressInterval);
@@ -1612,7 +1612,7 @@ async function generateAgeProof() {
       
       resultDiv.innerHTML = `
         <div class="result">
-          <h4>✓ Age Proof Generated</h4>
+          <h4>Age ID Generated</h4>
           <div class="result-row">
             <span class="label">Statement</span>
             <span class="value">Age ≥ ${minAge} years</span>
@@ -1629,7 +1629,7 @@ async function generateAgeProof() {
           </div>
           <div class="result-actions">
             <button class="btn btn-secondary" id="copy-age-link">Copy Link</button>
-            <a href="${data.shareUrl}" target="_blank" class="btn btn-secondary">Open Proof</a>
+            <a href="${data.shareUrl}" target="_blank" class="btn btn-secondary">Open ID</a>
           </div>
         </div>
         <div class="warning-box">
@@ -1740,7 +1740,7 @@ async function generateIncomeProof() {
       
       resultDiv.innerHTML = `
         <div class="result">
-          <h4>✓ Income Proof Generated</h4>
+          <h4>Income ID Generated</h4>
           <div class="result-row">
             <span class="label">Statement</span>
             <span class="value">Income ≥ $${minIncome.toLocaleString()}/year</span>
@@ -1756,7 +1756,7 @@ async function generateIncomeProof() {
           </div>
           <div class="result-actions">
             <button class="btn btn-secondary" id="copy-income-link">Copy Link</button>
-            <a href="${data.shareUrl}" target="_blank" class="btn btn-secondary">Open Proof</a>
+            <a href="${data.shareUrl}" target="_blank" class="btn btn-secondary">Open ID</a>
           </div>
         </div>
       `;
@@ -1794,7 +1794,7 @@ async function verifyProofById() {
     const verifyData = await verifyRes.json();
     
     if (verifyData.error && verifyData.error === 'Proof not found') {
-      showError(resultDiv, 'Proof not found');
+      showError(resultDiv, 'ID not found');
       return;
     }
     
@@ -1802,7 +1802,7 @@ async function verifyProofById() {
     
     resultDiv.innerHTML = `
       <div class="result" style="${verifyData.valid ? '' : 'background: #fee2e2; border-color: #f87171;'}">
-        <h4 style="${verifyData.valid ? '' : 'color: #dc2626;'}">${verifyData.valid ? '✓ Proof Valid' : '✗ Invalid Proof'}</h4>
+        <h4 style="${verifyData.valid ? '' : 'color: #dc2626;'}">${verifyData.valid ? 'ID valid' : 'Invalid ID'}</h4>
         <div class="result-row">
           <span class="label">Type</span>
           <span class="value">${verifyData.proofType || 'Unknown'}</span>

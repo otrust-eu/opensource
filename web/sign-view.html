@@ -3,15 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Signing Status – OTRUST Signed by Kris Ledel</title>
+  <title>Signing Status – OTRUST Sign by Kris Ledel</title>
   <meta name="description" content="Track the status of your document signing request. Blockchain-backed signatures by Kris Ledel.">
   <meta name="author" content="Kris Ledel">
   <meta name="robots" content="noindex">
   
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #fafaf9;
@@ -20,11 +17,11 @@
       --border: #e5e5e5;
       --text: #1a1a1a;
       --text-dim: #737373;
-      --accent: #2d5a3d;
+      --accent: #16160f;
       --accent-hover: #1e4029;
       --accent-light: #e8f0eb;
       --orange: #b45309;
-      --success: #2d5a3d;
+      --success: #16160f;
       --error: #dc2626;
       --warning: #d97706;
     }
@@ -614,7 +611,8 @@
       color: var(--accent);
     }
   </style>
-  <link rel="stylesheet" href="/otrust-polish.css?v=20260527-2">
+  <link rel="stylesheet" href="/otrust-polish.css?v=20260530mono">
+  <link rel="stylesheet" href="/otrust-redesign.css?v=20260530mono">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -624,11 +622,11 @@
       <div class="nav-links">
         <span class="nav-primary">
           <a href="/">Timestamp</a>
-          <a href="/sign">Signed</a>
-          <a href="/proof">Proof</a>
+          <a href="/sign">Sign</a>
+          <a href="/proof">ID</a>
         </span>
         <span class="nav-secondary" id="nav-secondary">
-          <a href="/sign-in">Sign in</a>
+          <a href="/sign-in">Auth</a>
           <a href="/transparency">Trust Log</a>
           <a href="/docs">Docs</a>
           <a href="/about">About</a>
@@ -651,7 +649,7 @@
     </div>
     
     <div id="content" style="display: none;">
-      <a href="/sign" class="back-link">← Back to Signed</a>
+      <a href="/sign" class="back-link">← Back to Sign</a>
       
       <div class="status-header">
         <div>
@@ -717,7 +715,7 @@
         <div class="package-card">
           <div class="package-icon"></div>
           <h3>Signature Package Ready</h3>
-          <p>All parties have completed. Download the blockchain-anchored proof.</p>
+          <p>All parties have completed. Download the blockchain-anchored record.</p>
           <p id="blockchain-info" style="font-size: 0.8rem; color: var(--accent); margin-bottom: 1rem;"></p>
           <button class="btn btn-primary" id="download-package-btn">Download Signature Package</button>
         </div>
@@ -728,7 +726,7 @@
           <div class="package-icon"></div>
           <h3>Awaiting Blockchain Confirmation</h3>
           <p>All parties have signed. The signature package is being anchored to the Bitcoin blockchain. This typically takes a few hours.</p>
-          <p style="font-size: 0.8rem; color: var(--text-dim);">You'll receive an email when the proof is ready.</p>
+          <p style="font-size: 0.8rem; color: var(--text-dim);">You'll receive an email when the record is ready.</p>
         </div>
       </div>
       
@@ -740,9 +738,9 @@
   <footer role="contentinfo">
     <div class="footer-links">
       <a href="/">Timestamp</a>
-      <a href="/sign">Signed</a>
-      <a href="/proof">Proof</a>
-      <a href="/sign-in">Sign in</a>
+      <a href="/sign">Sign</a>
+      <a href="/proof">ID</a>
+      <a href="/sign-in">Auth</a>
           <a href="/docs">Docs</a>
       <a href="/about">About</a>
       <a href="/transparency">Trust Log</a>
@@ -859,8 +857,28 @@
     
     function showError() {
       document.getElementById('loading').style.display = 'none';
-      document.getElementById('error').style.display = 'block';
+      const error = document.getElementById('error');
+      error.style.display = 'block';
       document.getElementById('content').style.display = 'none';
+
+      if (!document.getElementById('sign-view-error-actions')) {
+        const actions = document.createElement('div');
+        actions.id = 'sign-view-error-actions';
+        actions.className = 'error-actions';
+
+        const createLink = document.createElement('a');
+        createLink.href = '/sign';
+        createLink.className = 'btn btn-primary';
+        createLink.textContent = 'Create New Request';
+
+        const docsLink = document.createElement('a');
+        docsLink.href = '/docs#signed';
+        docsLink.className = 'btn btn-secondary';
+        docsLink.textContent = 'Read Signing Docs';
+
+        actions.append(createLink, docsLink);
+        error.appendChild(actions);
+      }
     }
     
     function renderSignRequest(data) {
@@ -1165,6 +1183,11 @@
     // Auto refresh
     setInterval(loadSignRequest, 30000);
   </script>
-  <script src="/otrust-polish.js?v=20260527-2" defer></script>
+  <script src="/otrust-polish.js?v=20260530mono" defer></script>
 </body>
 </html>
+
+
+
+
+

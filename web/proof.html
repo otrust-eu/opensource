@@ -1,25 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="otrust-dashboard-shell" data-otrust-page="proof">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OTRUST Proof – Zero-Knowledge Identity Verification | Blockchain</title>
-  <meta name="description" content="Prove things about yourself without revealing the underlying data. Age verification, income proofs, and membership verification using zero-knowledge cryptography.">
+  <title>OTRUST ID - Identity packages with selective disclosure</title>
+  <meta name="description" content="Create commitment-based ID packages. Verify age or unique identity with local document checks while verifiers see only the claim.">
   
   <!-- SEO Meta Tags -->
-  <meta name="keywords" content="zero-knowledge proof, commitment proof, age verification, income proof, privacy, identity verification, OTRUST, blockchain">
+  <meta name="keywords" content="commitment proof, age verification, unique identity, privacy, identity verification, OTRUST, selective disclosure">
   <meta name="author" content="Kristian Ledel">
   <meta name="creator" content="Kris Ledel">
   <link rel="author" href="https://www.otrust.eu/about">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
   <link rel="canonical" href="https://www.otrust.eu/proof">
-  <meta name="theme-color" content="#2d5a3d">
+  <meta name="theme-color" content="#16160f">
   
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://www.otrust.eu/proof">
-  <meta property="og:title" content="OTRUST Proof – Zero-Knowledge Identity Verification">
-  <meta property="og:description" content="Create privacy-preserving identity proof packages using commitments and selective disclosure.">
+  <meta property="og:title" content="OTRUST ID - Identity packages with selective disclosure">
+  <meta property="og:description" content="Create privacy-preserving ID packages using commitments and selective disclosure.">
   <meta property="og:image" content="https://www.otrust.eu/og-image.svg">
   <meta property="og:site_name" content="OTRUST by Kristian Ledel">
   <meta property="article:author" content="Kristian Ledel">
@@ -28,7 +28,7 @@
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://www.otrust.eu/proof">
-  <meta name="twitter:title" content="OTRUST Proof – Zero-Knowledge Identity Verification">
+  <meta name="twitter:title" content="OTRUST ID - Identity packages with selective disclosure">
   <meta name="twitter:description" content="Prove things about yourself without revealing the underlying data.">
   <meta name="twitter:image" content="https://www.otrust.eu/og-image.svg">
   <meta name="twitter:creator" content="@kledel">
@@ -38,9 +38,9 @@
   {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    "name": "OTRUST Proof",
+    "name": "OTRUST ID",
     "url": "https://www.otrust.eu/proof",
-    "description": "Zero-knowledge identity proofs. Prove age, income, or membership without revealing your data.",
+    "description": "Commitment-based ID packages. Verify age or unique identity without exposing underlying documents to verifiers.",
     "applicationCategory": "SecurityApplication",
     "author": {
       "@type": "Person",
@@ -58,9 +58,6 @@
   </script>
   
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script defer data-domain="otrust.eu" src="https://plausible.io/js/script.js"></script>
   <style>
     html {
@@ -73,11 +70,11 @@
       --border: #e5e5e5;
       --text: #1a1a1a;
       --text-dim: #737373;
-      --accent: #2d5a3d;
+      --accent: #16160f;
       --accent-hover: #1e4029;
       --accent-light: #e8f0eb;
       --orange: #b45309;
-      --success: #2d5a3d;
+      --success: #16160f;
       --purple: #7c3aed;
       --purple-light: #ede9fe;
     }
@@ -633,7 +630,7 @@
 
     [data-theme="dark"] .result {
       background: #1e3a24;
-      border: 1px solid #2d5a3d;
+      border: 1px solid #16160f;
     }
     
     .result h4 {
@@ -1354,103 +1351,176 @@
       }
     }
   </style>
-  <link rel="stylesheet" href="/otrust-polish.css?v=20260527-2">
+  <link rel="stylesheet" href="/otrust-polish.css?v=20260530mono">
+  <link rel="stylesheet" href="/otrust-redesign.css?v=20260530mono">
 </head>
-<body>
+<body data-otrust-page="proof">
   <a href="#main-content" class="skip-link">Skip to content</a>
-  <nav role="navigation" aria-label="Main navigation">
-    <div class="nav-container">
-      <a href="/" class="logo">OTRUST</a>
-      <div class="nav-links">
-        <span class="nav-primary">
-          <a href="/">Timestamp</a>
-          <a href="/sign">Signed</a>
-          <a href="/proof" class="active">Proof</a>
-        </span>
-        <span class="nav-secondary" id="nav-secondary">
-          <a href="/sign-in">Sign in</a>
-          <a href="/transparency">Trust Log</a>
-          <a href="/docs">Docs</a>
-          <a href="/about">About</a>
-        </span>
-        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode"></button>
-        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu" title="Menu"><span></span></button>
-      </div>
-    </div>
-  </nav>
 
   <section class="auth-partner-banner" id="authPartnerBanner" hidden>
     <div class="auth-partner-inner">
       <img id="authPartnerLogo" class="auth-partner-logo" alt="" crossorigin="anonymous" referrerpolicy="no-referrer" hidden>
       <div class="auth-partner-copy">
         <p class="auth-partner-eyebrow">Hosted identity setup</p>
-        <h2 id="authPartnerHeadline">Create your OTRUST identity proof</h2>
-        <p id="authPartnerSubhead">Create a reusable identity proof, then return to the partner login flow.</p>
+        <h2 id="authPartnerHeadline">Create your OTRUST ID</h2>
+        <p id="authPartnerSubhead">Create a reusable ID package, then return to the partner login flow.</p>
         <p class="auth-partner-disclosure">Secure identity setup via OTRUST. GDPR and DPO contact: <a href="mailto:dpo@otrust.eu">dpo@otrust.eu</a>.</p>
       </div>
     </div>
   </section>
   
   <main id="main-content" role="main">
-  <div class="main-layout">
-    <div class="left-col">
-      <section class="hero">
-        <span class="hero-badge" id="proofHeroBadge">Privacy Proofs</span>
-        <h1 id="proofHeroTitle">Prove without revealing</h1>
-        <p id="proofHeroCopy">Zero-knowledge proofs let you prove facts about yourself without exposing the underlying data. Cryptographically verified, privacy preserved.</p>
+  <section class="dashboard-home" aria-label="OTRUST ID workspace">
+    <article class="dashboard-panel dashboard-landing">
+      <header class="dashboard-site-nav" aria-label="Dashboard navigation">
+        <a href="/" class="dashboard-logo">OTRUST</a>
+        <nav class="dashboard-links" aria-label="OTRUST site navigation">
+        <a href="/timestamp">Timestamp</a>
+        <a href="/proof" class="active" aria-current="page" title="Scoped identity packages — shareable at /proof URLs">ID</a>
+        <a href="/sign">Sign</a>
+        <a href="/sign-in">Auth</a>
+        <a href="/docs">Docs</a>
+        <a href="/api-docs">Developers</a>
+        <span class="dashboard-nav-sep" aria-hidden="true">&middot;</span>
+        <button type="button" class="dashboard-menu" aria-label="Open menu"><span></span></button>
+        </nav>
+      </header>
+
+      <section class="dashboard-hero-block">
+        <div class="dashboard-hero-copy">
+          <span class="dashboard-kicker">ID</span>
+          <h1>ID,<br><span>without revealing.</span></h1>
+          <p>Prove a scoped identity claim while keeping the underlying evidence outside the public record.</p>
+          <p class="id-terminology-hint">ID packages are proof records — share the <code>/proof</code> URL or record ID so verifiers can check claims without seeing raw identity data.</p>
+        </div>
+        <div class="dashboard-orbit dashboard-orbit-hero" aria-hidden="true"></div>
       </section>
-      
-      <!-- Flow -->
-      <section class="info-section">
-        <h2>Flow</h2>
-        <div class="steps">
-          <div class="step-item">
-            <span class="step-num">1</span>
-            <div>
-              <strong>Commit</strong>
-              <p>Your data is hashed into a commitment.</p>
-            </div>
-          </div>
-          <div class="step-item">
-            <span class="step-num">2</span>
-            <div>
-              <strong>Prove</strong>
-              <p>A commitment proof shows the condition is met without exposing the underlying data.</p>
-            </div>
-          </div>
-          <div class="step-item">
-            <span class="step-num">3</span>
-            <div>
-              <strong>Verify</strong>
-              <p>Anyone can verify without seeing data.</p>
-            </div>
-          </div>
-          <div class="step-item">
-            <span class="step-num">4</span>
-            <div>
-              <strong>Share</strong>
-              <p>Share your proof URL with verifiers.</p>
-            </div>
-          </div>
+
+      <section class="dashboard-steps" id="flow" aria-labelledby="dashboard-steps-heading">
+        <span class="dashboard-kicker" id="dashboard-steps-heading">ID flow</span>
+        <div class="dashboard-step-grid">
+          <article>
+            <div class="dashboard-step-icon dashboard-step-hash" aria-hidden="true"></div>
+            <span>01</span>
+            <h2>Check</h2>
+            <p>Document and liveness checks run in your browser.</p>
+          </article>
+          <article>
+            <div class="dashboard-step-icon dashboard-step-sign" aria-hidden="true"></div>
+            <span>02</span>
+            <h2>Commit</h2>
+            <p>The claim is bound to a commitment instead of raw identity fields.</p>
+          </article>
+          <article>
+            <div class="dashboard-step-icon dashboard-step-anchor" aria-hidden="true"></div>
+            <span>03</span>
+            <h2>Verify</h2>
+            <p>Anyone can verify without seeing data.</p>
+          </article>
+          <article>
+            <div class="dashboard-step-icon dashboard-step-prove" aria-hidden="true"></div>
+            <span>04</span>
+            <h2>Share</h2>
+            <p>Share your ID URL with verifiers.</p>
+          </article>
         </div>
       </section>
-    </div>
-    
-    <!-- Main Card -->
-    <section class="claim-section">
-    <div class="claim-card">
-      <div class="tabs">
-        <button class="tab active" data-tab="create">Create Proof</button>
-        <button class="tab" data-tab="verify">Verify</button>
+
+      <section class="dashboard-principles-panel" aria-labelledby="dashboard-principles-heading">
+        <div class="dashboard-principles-copy">
+          <span class="dashboard-kicker">Boundaries</span>
+          <h2 id="dashboard-principles-heading">Prove the claim,<br>not the document.</h2>
+          <p>Verifiers receive a commitment ID package and metadata - not your passport scan or selfie.</p>
+        </div>
+        <div class="dashboard-principles-list">
+          <article>
+            <span class="dashboard-principle-icon dashboard-principle-local" aria-hidden="true"></span>
+            <div>
+              <h3>Local checks</h3>
+              <p>OCR and face matching run in your browser before any ID is created.</p>
+            </div>
+          </article>
+          <article>
+            <span class="dashboard-principle-icon dashboard-principle-zero" aria-hidden="true"></span>
+            <div>
+              <h3>Commitments</h3>
+              <p>Claims are bound to cryptographic commitments, not raw identity fields.</p>
+            </div>
+          </article>
+          <article>
+            <span class="dashboard-principle-icon dashboard-principle-lock" aria-hidden="true"></span>
+            <div>
+              <h3>Reusable URL</h3>
+              <p>Share an ID link; verifiers check the package independently.</p>
+            </div>
+          </article>
+          <article>
+            <span class="dashboard-principle-icon dashboard-principle-open" aria-hidden="true"></span>
+            <div>
+              <h3>Scoped disclosure</h3>
+              <p>Each ID is purpose-bound - age, unique identity, or similar facts only.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <footer class="dashboard-left-footer">
+        <strong>OTRUST</strong>
+        <span>&copy; 2026 OTRUST</span>
+        <span class="dashboard-made">Made in Sweden, Europe</span>
+        <nav aria-label="Dashboard footer">
+          <a href="/docs">Docs</a>
+          <a href="/api-docs">API</a>
+          <a href="https://github.com/otrust-eu/opensource" rel="noopener noreferrer">GitHub</a>
+          <a href="/privacy-policy">Privacy</a>
+          <a href="/terms">Terms</a>
+        </nav>
+        <a href="#main-content" class="dashboard-footer-dot" aria-label="Back to top"></a>
+      </footer>
+    </article>
+    <section class="dashboard-tool-slot" aria-label="OTRUST ID tool">
+<section class="claim-section">
+    <div class="claim-card service-workspace-card proof-workspace-card">
+      <div class="timestamp-dashboard-head">
+        <div>
+          <span class="workspace-topline">Privacy ID workspace</span>
+          <h2>Create and verify ID packages.</h2>
+          <p>Build purpose-bound ID packages, verify them independently, and keep raw identity data out of verifier hands.</p>
+        </div>
+        <div class="timestamp-live-meta" aria-label="ID guarantees">
+          <span>Local document parsing</span>
+          <span>Commitment record</span>
+          <span>Reusable ID URL</span>
+        </div>
       </div>
+
+      <div class="timestamp-dashboard-body">
+        <div class="tabs timestamp-tool-nav service-tool-nav" role="tablist" aria-label="ID actions">
+          <button class="tab active" type="button" role="tab" id="tab-button-create" data-tab="create" aria-selected="true" aria-controls="tab-create">
+            <span>Create ID</span>
+            <small>Identity package</small>
+          </button>
+          <button class="tab" type="button" role="tab" id="tab-button-verify" data-tab="verify" aria-selected="false" aria-controls="tab-verify">
+            <span>Verify</span>
+            <small>ID or URL</small>
+          </button>
+        </div>
+
+        <div class="timestamp-panel-stage">
       
-      <!-- Create Proof Tab -->
-      <div id="tab-create" class="tab-content active">
+      <!-- Create ID Tab -->
+      <div id="tab-create" class="tab-content active timestamp-panel" role="tabpanel" aria-labelledby="tab-button-create" tabindex="0">
+        <div class="timestamp-panel-heading">
+          <span>01 / Create ID</span>
+          <h3>ID package</h3>
+          <p>Create a privacy-preserving ID package from local document checks and scoped disclosure.</p>
+        </div>
+
         <div class="proof-types">
           <div class="proof-type selected" data-type="identity" id="proof-type-identity">
             <div class="icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="12" r="2"/><path d="M14 10h4M14 14h4"/></svg></div>
             <h3>Unique Identity</h3>
-            <p>Prove you're a unique human (one proof per person)</p>
+            <p>Create a reusable identity package for one person.</p>
           </div>
           
           <div class="proof-type" data-type="age" id="proof-type-age" style="display:none;">
@@ -1466,9 +1536,9 @@
           </div>
         </div>
         
-        <!-- Identity Proof Form (replaces Age Proof) -->
+        <!-- Identity ID Form -->
         <div id="form-identity" class="proof-form" style="display:block;">
-          <h3>Unique Identity Proof</h3>
+          <h3>Unique identity package</h3>
           
           <!-- Step 1: Upload ID -->
           <div id="age-step-1" class="verification-step active">
@@ -1487,7 +1557,7 @@
             <div id="age-preview" class="document-preview" style="display: none;">
               <div class="preview-header">
                 <span>Document uploaded</span>
-                <button class="btn-small" id="age-clear-doc">× Clear</button>
+                <button class="btn-small" id="age-clear-doc">Clear</button>
               </div>
               <div class="preview-image-container">
                 <img id="age-preview-img" alt="Document preview">
@@ -1547,14 +1617,14 @@
               <p class="nfc-hint">Hold your passport against your phone's NFC reader</p>
               <div id="nfc-status" class="nfc-status"></div>
               <button class="btn btn-secondary" id="btn-read-nfc">Read NFC Chip</button>
-              <button class="btn btn-link" id="btn-skip-nfc">Skip this step →</button>
+              <button class="btn btn-link" id="btn-skip-nfc">Skip this step ?</button>
             </div>
           </div>
           
-          <!-- Final: Generate Proof -->
+          <!-- Final: Generate ID -->
           <div id="age-step-final" class="verification-step" style="display: none;">
             <div class="step-header">
-              <span class="step-number">✓</span>
+              <span class="step-number">?</span>
               <span class="step-title">Identity Verified</span>
             </div>
             
@@ -1567,12 +1637,12 @@
               <div class="parsed-field" id="name-field" style="display: none;">
                 <label>Name:</label>
                 <input type="text" id="extracted-name" readonly style="background: var(--bg-muted); cursor: not-allowed;">
-                <span class="confidence" id="name-confidence">✓ From ID</span>
+                <span class="confidence" id="name-confidence">? From ID</span>
               </div>
               <div class="parsed-field" id="pnr-field" style="display: none;">
                 <label>Personnummer:</label>
                 <input type="text" id="extracted-pnr" readonly style="background: var(--bg-muted); cursor: not-allowed; font-family: monospace;">
-                <span class="confidence" id="pnr-confidence">✓ Verified</span>
+                <span class="confidence" id="pnr-confidence">? Verified</span>
               </div>
               <div class="parsed-field">
                 <label>Birth Date:</label>
@@ -1583,7 +1653,7 @@
             
             <!-- Age select hidden - now used for unique identity -->
             <div class="form-group" id="age-min-select" style="display: none;">
-              <label>Prove you are at least:</label>
+              <label>Verify you are at least:</label>
               <select id="min-age">
                 <option value="18">18 years old</option>
               </select>
@@ -1596,12 +1666,12 @@
             
             <div class="form-group" style="margin-top: 1rem;">
               <label for="proof-pin">Choose a 6-digit PIN code</label>
-              <input type="password" id="proof-pin" inputmode="numeric" pattern="[0-9]{6}" minlength="6" maxlength="6" placeholder="••••••" style="letter-spacing: 0.5em; text-align: center; font-size: 1.5rem; padding: 0.75rem;" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6)">
-              <p class="hint" style="font-size: 0.8rem; color: var(--text-dim); margin-top: 0.5rem;">🔐 PIN used to unlock your identity when logging in. Choose something memorable!</p>
+              <input type="password" id="proof-pin" inputmode="numeric" pattern="[0-9]{6}" minlength="6" maxlength="6" placeholder="******" style="letter-spacing: 0.5em; text-align: center; font-size: 1.5rem; padding: 0.75rem;" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6)">
+              <p class="hint" style="font-size: 0.8rem; color: var(--text-dim); margin-top: 0.5rem;">PIN used to unlock your identity when logging in. Choose something memorable!</p>
             </div>
             
             <button class="btn btn-primary" id="btn-generate-age" style="margin-top: 1rem;">
-              Create Unique Identity Proof
+              Create Unique Identity Package
             </button>
           </div>
           
@@ -1623,7 +1693,7 @@
           <div id="income-preview" class="document-preview" style="display: none;">
             <div class="preview-header">
               <span>Document uploaded</span>
-              <button class="btn-small" id="income-clear-doc">× Clear</button>
+              <button class="btn-small" id="income-clear-doc">Clear</button>
             </div>
             <div class="preview-image-container">
               <img id="income-preview-img" alt="Document preview">
@@ -1643,11 +1713,11 @@
               </div>
               <span class="confidence" id="income-confidence"></span>
             </div>
-            <p class="parsed-notice">Please verify this is correct before generating proof</p>
+            <p class="parsed-notice">Please verify this is correct before generating an ID</p>
           </div>
           
           <div class="form-group" id="income-min-select" style="display: none;">
-            <label>Prove income is at least:</label>
+              <label>Verify income is at least:</label>
             <select id="min-income">
               <option value="20000">$20,000 / year</option>
               <option value="30000">$30,000 / year</option>
@@ -1663,7 +1733,7 @@
           </div>
           
           <button class="btn btn-primary" id="btn-generate-income" style="margin-top: 1rem; display: none;">
-            Generate Income Proof
+            Generate Income ID
           </button>
           
           <div id="result-income"></div>
@@ -1671,22 +1741,30 @@
       </div>
       
       <!-- Verify Tab -->
-      <div id="tab-verify" class="tab-content">
+      <div id="tab-verify" class="tab-content timestamp-panel" role="tabpanel" aria-labelledby="tab-button-verify" tabindex="0">
+        <div class="timestamp-panel-heading">
+          <span>02 / Verify ID</span>
+          <h3>Verify any ID</h3>
+          <p>Paste an ID or verification URL to check status without seeing underlying identity data.</p>
+        </div>
+
         <div class="form-group">
-          <label>Proof ID or URL</label>
-          <input type="text" id="verify-id" placeholder="Enter proof ID or paste URL">
+          <label>ID or URL</label>
+          <input type="text" id="verify-id" placeholder="Enter ID or paste URL">
         </div>
         
         <button class="btn btn-primary" id="btn-verify">
-          Verify Proof
+          Verify ID
         </button>
         
         <div id="verify-result"></div>
       </div>
+        </div>
+      </div>
     </div>
     </section>
-  </div>
-  </main>
+    </section>
+  </section></main>
   
   <!-- Load Document OCR Library -->
   <script src="/js/document-ocr.js?v=4"></script>
@@ -1701,9 +1779,9 @@
   <footer role="contentinfo">
     <div class="footer-links">
       <a href="/">Timestamp</a>
-      <a href="/sign">Signed</a>
-      <a href="/proof">Proof</a>
-      <a href="/sign-in">Sign in</a>
+      <a href="/sign">Sign</a>
+      <a href="/proof">ID</a>
+      <a href="/sign-in">Auth</a>
           <a href="/docs">Docs</a>
       <a href="/about">About</a>
       <a href="/transparency">Trust Log</a>
@@ -1713,9 +1791,14 @@
       <a href="https://github.com/otrust-eu/opensource">GitHub</a>
     </div>
     <div class="footer-copy">OTRUST - MIT License</div>
-    <div class="footer-copy" style="font-size: 0.7rem; opacity: 0.6; margin-top: 0.5rem;">Cryptographic proof of identity claims. Raw identity data is not shown to verifiers. <a href="/terms" style="color: inherit;">Terms</a></div>
+    <div class="footer-copy" style="font-size: 0.7rem; opacity: 0.6; margin-top: 0.5rem;">Cryptographic ID claims. Raw identity data is not shown to verifiers. <a href="/terms" style="color: inherit;">Terms</a></div>
   </footer>
   </div>
-  <script src="/otrust-polish.js?v=20260527-2" defer></script>
+  <script src="/otrust-polish.js?v=20260530mono" defer></script>
 </body>
 </html>
+
+
+
+
+

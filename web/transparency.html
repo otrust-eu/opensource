@@ -7,7 +7,7 @@
   <meta name="description" content="Public OTRUST transparency log with live record counts, verified records, anchored records, latest Bitcoin block, privacy notes, and open source links.">
   <link rel="canonical" href="https://www.otrust.eu/transparency">
   <meta name="robots" content="index, follow">
-  <meta name="theme-color" content="#2d5a3d">
+  <meta name="theme-color" content="#16160f">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://www.otrust.eu/transparency">
   <meta property="og:title" content="OTRUST Transparency Log">
@@ -15,7 +15,7 @@
   <meta property="og:image" content="https://www.otrust.eu/og-image.svg">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <script defer data-domain="otrust.eu" src="https://plausible.io/js/script.js"></script>
-  <link rel="stylesheet" href="/otrust-polish.css?v=20260527-2">
+  <link rel="stylesheet" href="/otrust-polish.css?v=20260530mono">
   <style>
     .trust-page {
       max-width: 1180px;
@@ -162,6 +162,7 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="/otrust-redesign.css?v=20260530mono">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -171,11 +172,11 @@
       <div class="nav-links">
         <span class="nav-primary">
           <a href="/">Timestamp</a>
-          <a href="/sign">Signed</a>
-          <a href="/proof">Proof</a>
+          <a href="/sign">Sign</a>
+          <a href="/proof">ID</a>
         </span>
         <span class="nav-secondary" id="nav-secondary">
-          <a href="/sign-in">Sign in</a>
+          <a href="/sign-in">Auth</a>
           <a href="/transparency">Trust Log</a>
           <a href="/docs" class="docs-trigger" id="docs-trigger">Docs</a>
           <a href="/about">About</a>
@@ -208,7 +209,7 @@
       </div>
       <div class="ledger-visual" aria-label="Example trust log rows">
         <div class="ledger-row"><span>record</span><code>sha256:3b7f...a91c</code><span class="ledger-pill">stored</span></div>
-        <div class="ledger-row"><span>proof</span><code>zk:id_8f1e...c2</code><span class="ledger-pill">verified</span></div>
+        <div class="ledger-row"><span>ID</span><code>zk:id_8f1e...c2</code><span class="ledger-pill">verified</span></div>
         <div class="ledger-row"><span>anchor</span><code id="latest-block-row">bitcoin:block -</code><span class="ledger-pill">public</span></div>
       </div>
     </section>
@@ -223,7 +224,7 @@
     <section class="trust-sections">
       <article class="trust-section">
         <h2>What is counted</h2>
-        <p>Records include timestamp claims, signing packages, and proof packages. Verified records are records with a completed or active verification state.</p>
+        <p>Records include timestamp claims, signing packages, and ID packages. Verified records are records with a completed or active verification state.</p>
         <ul>
           <li>No artificial baseline is added.</li>
           <li>Usage events are tracked separately from records.</li>
@@ -232,19 +233,19 @@
       </article>
       <article class="trust-section">
         <h2>Privacy posture</h2>
-        <p>The product is designed around hashes, signatures, proof metadata, and explicit user-controlled sharing. Raw content is not needed for public verification.</p>
+        <p>The product is designed around hashes, signatures, ID metadata, and explicit user-controlled sharing. Raw content is not needed for public verification.</p>
         <ul>
           <li>File timestamping hashes in the browser.</li>
           <li>Optional notification emails are stored separately.</li>
-          <li>Identity proof views do not reveal underlying personal data.</li>
+          <li>ID views do not reveal underlying personal data.</li>
         </ul>
       </article>
       <article class="trust-section">
         <h2>Independent verification</h2>
-        <p>OTRUST uses open proof formats where possible and keeps the provider boundary visible. Production can be used hosted or self-hosted from the public repository.</p>
+        <p>OTRUST uses open verification formats where possible and keeps the provider boundary visible. Production can be used hosted or self-hosted from the public repository.</p>
         <ul>
           <li>OpenTimestamps support for Bitcoin anchoring.</li>
-          <li>Public proof URLs and downloadable receipts.</li>
+          <li>Public verification URLs and downloadable receipts.</li>
           <li>MIT-licensed open source implementation.</li>
         </ul>
       </article>
@@ -255,9 +256,9 @@
     <footer role="contentinfo">
       <div class="footer-links">
         <a href="/">Timestamp</a>
-        <a href="/sign">Signed</a>
-        <a href="/proof">Proof</a>
-        <a href="/sign-in">Sign in</a>
+        <a href="/sign">Sign</a>
+        <a href="/proof">ID</a>
+        <a href="/sign-in">Auth</a>
         <a href="/docs">Docs</a>
         <a href="/about">About</a>
       <a href="/transparency">Trust Log</a>
@@ -286,6 +287,11 @@
         document.querySelectorAll('.metric-card strong').forEach((el) => { el.textContent = 'Unavailable'; });
       });
   </script>
-  <script src="/otrust-polish.js?v=20260527-2" defer></script>
+  <script src="/otrust-polish.js?v=20260530mono" defer></script>
 </body>
 </html>
+
+
+
+
+

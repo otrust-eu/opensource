@@ -2598,11 +2598,13 @@ const serveHtmlWithNonce = (filePath) => {
 // HTML route handlers with nonce injection
 app.get('/index.html', serveHtmlWithNonce(path.join(__dirname, '../web/index.html')));
 app.get('/', serveHtmlWithNonce(path.join(__dirname, '../web/index.html')));
+app.get('/timestamp', serveHtmlWithNonce(path.join(__dirname, '../web/index.html')));
 app.get('/docs.html', serveHtmlWithNonce(path.join(__dirname, '../web/docs.html')));
 app.get('/docs', serveHtmlWithNonce(path.join(__dirname, '../web/docs.html')));
 app.get('/sign-in.html', serveHtmlWithNonce(path.join(__dirname, '../web/sign-in.html')));
 app.get('/sign-in', serveHtmlWithNonce(path.join(__dirname, '../web/sign-in.html')));
 app.get(['/signin', '/login'], (req, res) => res.redirect(301, '/sign-in'));
+app.get(['/partners/hemsted', '/partners/hemsted.html'], serveHtmlWithNonce(path.join(__dirname, '../web/partners-hemsted.html')));
 app.get('/about.html', serveHtmlWithNonce(path.join(__dirname, '../web/about.html')));
 app.get('/about', serveHtmlWithNonce(path.join(__dirname, '../web/about.html')));
 app.get('/transparency.html', serveHtmlWithNonce(path.join(__dirname, '../web/transparency.html')));

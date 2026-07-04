@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Verify Zero-Knowledge Proof – OTRUST by Kris Ledel</title>
-  <meta name="description" content="Verify a zero-knowledge proof without accessing the underlying private data. Created by Kris Ledel.">
-  <meta name="keywords" content="verify proof, zero-knowledge, ZK proof, privacy, OTRUST, Kris Ledel">
+  <title>Verify ID Package – OTRUST by Kris Ledel</title>
+  <meta name="description" content="Verify an OTRUST ID package without receiving the underlying private data. Created by Kris Ledel.">
+  <meta name="keywords" content="verify ID package, zero-knowledge, ZK proof, privacy, OTRUST, Kris Ledel">
   <meta name="author" content="Kris Ledel">
   <meta name="robots" content="noindex">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -15,9 +15,6 @@
   <link rel="manifest" href="/manifest.json">
   
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script defer data-domain="otrust.eu" src="https://plausible.io/js/script.js"></script>
   <!-- html2canvas with SRI hash for security -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" 
@@ -31,12 +28,12 @@
       --border: #e5e5e5;
       --text: #1a1a1a;
       --text-dim: #737373;
-      --accent: #2d5a3d;
+      --accent: #16160f;
       --accent-hover: #1e4029;
       --accent-light: #e8f0eb;
       --purple: #7c3aed;
       --purple-light: #ede9fe;
-      --success: #2d5a3d;
+      --success: #16160f;
       --success-light: #d1fae5;
       --error: #dc2626;
       --warning: #d97706;
@@ -603,7 +600,8 @@
       }
     }
   </style>
-  <link rel="stylesheet" href="/otrust-polish.css?v=20260527-2">
+  <link rel="stylesheet" href="/otrust-polish.css?v=20260530mono">
+  <link rel="stylesheet" href="/otrust-redesign.css?v=20260530mono">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -613,11 +611,11 @@
       <div class="nav-links">
         <span class="nav-primary">
           <a href="/">Timestamp</a>
-          <a href="/sign">Signed</a>
-          <a href="/proof" class="active">Proof</a>
+          <a href="/sign">Sign</a>
+          <a href="/proof" class="active">ID</a>
         </span>
         <span class="nav-secondary" id="nav-secondary">
-          <a href="/sign-in">Sign in</a>
+          <a href="/sign-in">Auth</a>
           <a href="/transparency">Trust Log</a>
           <a href="/docs">Docs</a>
           <a href="/about">About</a>
@@ -711,9 +709,9 @@
   <footer role="contentinfo">
     <div class="footer-links">
       <a href="/">Timestamp</a>
-      <a href="/sign">Signed</a>
-      <a href="/proof">Proof</a>
-      <a href="/sign-in">Sign in</a>
+      <a href="/sign">Sign</a>
+      <a href="/proof">ID</a>
+      <a href="/sign-in">Auth</a>
       <a href="/docs">Docs</a>
       <a href="/about">About</a>
       <a href="/transparency">Trust Log</a>
@@ -770,9 +768,18 @@
       
       try {
         const response = await fetch(`/api/proof/${proofId}`);
-        const data = await response.json();
+        let data = null;
+        try {
+          data = await response.json();
+        } catch (parseError) {
+          if (!response.ok) {
+            showError('Proof Not Found', 'This proof does not exist or has been deleted.');
+            return;
+          }
+          throw parseError;
+        }
         
-        if (!data.success) {
+        if (!response.ok || !data.success) {
           showError('Proof Not Found', 'This proof does not exist or has been deleted.');
           return;
         }
@@ -864,7 +871,7 @@
       const proofId = String(proof.id || '').replace(/"/g, '&quot;');
       const label = `Verified ${typeLabel}`;
       preview.querySelector('span:last-child').textContent = label;
-      embed.value = `<a href="${proofUrl}" data-otrust-proof="${proofId}" style="display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #d9dfdc;border-radius:8px;color:#151817;text-decoration:none;font:600 13px Inter,system-ui,sans-serif;background:#ffffff;"><span style="background:#24543a;color:#fff;border-radius:5px;padding:3px 5px;font-size:10px;letter-spacing:.05em;">OTRUST</span><span>${label}</span></a>`;
+      embed.value = `<a href="${proofUrl}" data-otrust-proof="${proofId}" style="display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #d9dfdc;border-radius:8px;color:#151817;text-decoration:none;font:600 13px Inter,system-ui,sans-serif;background:#ffffff;"><span style="background:#16160f;color:#fff;border-radius:5px;padding:3px 5px;font-size:10px;letter-spacing:.05em;">OTRUST</span><span>${label}</span></a>`;
       share.style.display = 'block';
     }
     
@@ -1514,16 +1521,28 @@
     }
     
     function showError(title, message) {
-      document.getElementById('loading').style.display = 'none';
-      document.getElementById('error').style.display = 'block';
-      document.getElementById('error').innerHTML = `
-        <div class="error-box">
-          <h2>${title}</h2>
-          <p>${message}</p>
-          <br>
-          <a href="/proof" class="btn">Create a New Proof</a>
-        </div>
-      `;
+      const loading = document.getElementById('loading');
+      const error = document.getElementById('error');
+      loading.style.display = 'none';
+      error.style.display = 'block';
+      error.textContent = '';
+
+      const box = document.createElement('div');
+      box.className = 'error-box';
+      const eyebrow = document.createElement('span');
+      eyebrow.className = 'error-eyebrow';
+      eyebrow.textContent = 'OTRUST Proof';
+      const heading = document.createElement('h2');
+      heading.textContent = title;
+      const copy = document.createElement('p');
+      copy.textContent = message;
+      const action = document.createElement('a');
+      action.href = '/proof';
+      action.className = 'btn';
+      action.textContent = 'Create a New Proof';
+
+      box.append(eyebrow, heading, copy, action);
+      error.appendChild(box);
     }
     
     // Setup button handlers
@@ -1536,6 +1555,11 @@
     // Load on page load
     loadProof();
   </script>
-  <script src="/otrust-polish.js?v=20260527-2" defer></script>
+  <script src="/otrust-polish.js?v=20260530mono" defer></script>
 </body>
 </html>
+
+
+
+
+

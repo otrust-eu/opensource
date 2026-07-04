@@ -4,18 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Why OTRUST Exists | Technical Note by Kris Ledel</title>
-  <meta name="description" content="A technical note by Kris Ledel on OTRUST, blind notary architecture, OpenTimestamps, identity proofs, and partner-branded verification flows.">
+  <meta name="description" content="A technical note by Kris Ledel on OTRUST, blind notary architecture, OpenTimestamps, ID packages, and partner-branded verification flows.">
   <link rel="canonical" href="https://www.otrust.eu/notes/why-otrust">
   <meta name="robots" content="index, follow">
-  <meta name="theme-color" content="#2d5a3d">
+  <meta name="theme-color" content="#16160f">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://www.otrust.eu/notes/why-otrust">
   <meta property="og:title" content="Why OTRUST Exists">
-  <meta property="og:description" content="A technical note on cryptographic proof infrastructure, blind notarization, and proof-first identity.">
+  <meta property="og:description" content="A technical note on cryptographic trust infrastructure, blind notarization, and ID-first identity.">
   <meta property="og:image" content="https://www.otrust.eu/og-image.svg">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <script defer data-domain="otrust.eu" src="https://plausible.io/js/script.js"></script>
-  <link rel="stylesheet" href="/otrust-polish.css?v=20260527-2">
+  <link rel="stylesheet" href="/otrust-polish.css?v=20260530mono">
   <style>
     .note-page {
       max-width: 960px;
@@ -139,6 +139,7 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="/otrust-redesign.css?v=20260530mono">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -148,11 +149,11 @@
       <div class="nav-links">
         <span class="nav-primary">
           <a href="/">Timestamp</a>
-          <a href="/sign">Signed</a>
-          <a href="/proof">Proof</a>
+          <a href="/sign">Sign</a>
+          <a href="/proof">ID</a>
         </span>
         <span class="nav-secondary" id="nav-secondary">
-          <a href="/sign-in">Sign in</a>
+          <a href="/sign-in">Auth</a>
           <a href="/transparency">Trust Log</a>
           <a href="/docs" class="docs-trigger" id="docs-trigger">Docs</a>
           <a href="/about">About</a>
@@ -186,12 +187,12 @@
 
     <div class="note-layout">
       <article class="note-body">
-        <h2>Proof before platform</h2>
-        <p>Most product trust problems are not solved by asking users to believe another dashboard. They are solved by producing artifacts that can be checked later: hashes, signatures, timestamps, proof packages, and callback records.</p>
-        <p>OTRUST starts from those artifacts. The UI exists to make proof creation usable, but the core object is the record that survives the UI.</p>
+        <h2>Verification before platform</h2>
+        <p>Most product trust problems are not solved by asking users to believe another dashboard. They are solved by producing artifacts that can be checked later: hashes, signatures, timestamps, ID packages, and callback records.</p>
+        <p>OTRUST starts from those artifacts. The UI exists to make ID creation usable, but the core object is the record that survives the UI.</p>
 
         <h2>Blind notarization</h2>
-        <p>The timestamping flow hashes content in the browser. The service receives the hash, signature, public key, timestamps, and proof metadata. It does not need the raw document to prove that the document existed.</p>
+        <p>The timestamping flow hashes content in the browser. The service receives the hash, signature, public key, timestamps, and record metadata. It does not need the raw document to verify that the document existed.</p>
         <ul>
           <li>The user keeps the original file.</li>
           <li>The public record can still be verified later.</li>
@@ -201,20 +202,20 @@
         <h2>Anchors and independence</h2>
         <p>OpenTimestamps gives OTRUST a path to external anchoring without pretending that a hosted service alone is the source of truth. A record can be useful immediately and stronger once it is anchored externally.</p>
 
-        <h2>Proof-first identity</h2>
-        <p>Identity is not only login. In B2B flows, the important question is often narrower: does this user control an approved proof, and can the relying party verify that fact without seeing more personal data than needed?</p>
-        <p>That is why OTRUST Proof and hosted partner login keep the provider boundary visible. The partner experience can be branded, but the proof processor should remain clear.</p>
+        <h2>ID-first identity</h2>
+        <p>Identity is not only login. In B2B flows, the important question is often narrower: does this user control an approved ID, and can the relying party verify that fact without seeing more personal data than needed?</p>
+        <p>That is why OTRUST ID and hosted Auth keep the provider boundary visible. The partner experience can be branded, but the ID processor should remain clear.</p>
 
         <h2>Why the boundary matters</h2>
-        <p>A trust product should not hide who performs the trust-sensitive step. OTRUST keeps URLs, disclosures, proof links, and privacy notes explicit so users know when they are interacting with OTRUST and when they return to a partner.</p>
+        <p>A trust product should not hide who performs the trust-sensitive step. OTRUST keeps URLs, disclosures, ID links, and privacy notes explicit so users know when they are interacting with OTRUST and when they return to a partner.</p>
       </article>
 
       <aside class="note-side">
         <strong>Related surfaces</strong>
         <p>These are the product areas this note refers to.</p>
         <a href="/transparency">Transparency log</a>
-        <a href="/proof">OTRUST Proof</a>
-        <a href="/sign-in">Hosted sign in</a>
+        <a href="/proof">OTRUST ID</a>
+        <a href="/sign-in">Hosted Auth</a>
         <a href="/docs#selfhost">Self-hosting docs</a>
       </aside>
     </div>
@@ -224,9 +225,9 @@
     <footer role="contentinfo">
       <div class="footer-links">
         <a href="/">Timestamp</a>
-        <a href="/sign">Signed</a>
-        <a href="/proof">Proof</a>
-        <a href="/sign-in">Sign in</a>
+        <a href="/sign">Sign</a>
+        <a href="/proof">ID</a>
+        <a href="/sign-in">Auth</a>
         <a href="/docs">Docs</a>
         <a href="/about">About</a>
       <a href="/transparency">Trust Log</a>
@@ -239,6 +240,11 @@
     </footer>
   </div>
 
-  <script src="/otrust-polish.js?v=20260527-2" defer></script>
+  <script src="/otrust-polish.js?v=20260530mono" defer></script>
 </body>
 </html>
+
+
+
+
+

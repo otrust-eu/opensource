@@ -1,23 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="otrust-dashboard-shell" data-otrust-page="docs">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Documentation – OTRUST by Kristian Ledel (Kris Ledel)</title>
-  <meta name="description" content="Complete guide to blockchain timestamping, multi-party document signing, and zero-knowledge identity proofs. Created by Kristian (Kris) Ledel.">
-  <meta name="keywords" content="blockchain timestamp, document signing, zero-knowledge proofs, commitment proofs, OTRUST docs, SDK, Kris Ledel, Kristian Ledel, privacy, blockchain developer">
+  <meta name="description" content="Complete guide to blockchain timestamping, ID packages, multi-party document signing, and hosted Auth. Created by Kristian (Kris) Ledel.">
+  <meta name="keywords" content="blockchain timestamp, document signing, commitment ID packages, OTRUST docs, SDK, Kris Ledel, Kristian Ledel, privacy, blockchain developer">
   <meta name="author" content="Kristian Ledel">
   <meta name="creator" content="Kris Ledel">
   <link rel="author" href="https://www.otrust.eu/about">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
-  <meta name="theme-color" content="#2d5a3d">
+  <meta name="theme-color" content="#16160f">
   <link rel="canonical" href="https://www.otrust.eu/docs.html">
   
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://www.otrust.eu/docs.html">
-  <meta property="og:title" content="OTRUST Documentation – Blockchain Timestamping & ZK Proofs">
-  <meta property="og:description" content="Complete guide to blockchain timestamping, document signing, and zero-knowledge proofs.">
+  <meta property="og:title" content="OTRUST Documentation - Timestamp, ID, Sign & Auth">
+  <meta property="og:description" content="Complete guide to timestamping, ID packages, document signing, and hosted Auth.">
   <meta property="og:image" content="https://www.otrust.eu/og-image.svg">
   <meta property="og:site_name" content="OTRUST by Kristian Ledel">
   <meta property="article:author" content="Kristian Ledel">
@@ -25,7 +25,7 @@
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="OTRUST Documentation">
-  <meta name="twitter:description" content="Complete guide to blockchain timestamping, document signing, and zero-knowledge proofs.">
+  <meta name="twitter:description" content="Complete guide to timestamping, ID packages, document signing, and hosted Auth.">
   <meta name="twitter:image" content="https://www.otrust.eu/og-image.svg">
   <meta name="twitter:creator" content="@kledel">
   
@@ -36,7 +36,7 @@
     "@type": "TechArticle",
     "name": "OTRUST Documentation",
     "url": "https://www.otrust.eu/docs.html",
-    "description": "Complete guide to blockchain timestamping, multi-party document signing, and zero-knowledge identity proofs.",
+    "description": "Complete guide to blockchain timestamping, ID packages, multi-party document signing, and hosted Auth.",
     "author": {
       "@type": "Person",
       "name": "Kristian Ledel",
@@ -51,9 +51,6 @@
     }
   }
   </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <script defer data-domain="otrust.eu" src="https://plausible.io/js/script.js"></script>
   <style>
@@ -64,7 +61,7 @@
       --border: #e5e5e5;
       --text: #1a1a1a;
       --text-dim: #737373;
-      --accent: #2d5a3d;
+      --accent: #16160f;
       --accent-light: #e8f0eb;
     }
     [data-theme="dark"] {
@@ -97,7 +94,7 @@
     .skip-link:focus { top: 0; }
     
     /* Navigation */
-    nav {
+    body > nav {
       background: var(--bg);
       border-bottom: 1px solid var(--border);
       position: sticky;
@@ -459,41 +456,40 @@
       .docs-submenu-container { padding: 0.5rem 1rem; gap: 1rem; flex-wrap: wrap; }
     }
   </style>
-  <link rel="stylesheet" href="/otrust-polish.css?v=20260527-2">
+  <link rel="stylesheet" href="/otrust-polish.css?v=20260530mono">
+  <link rel="stylesheet" href="/otrust-redesign.css?v=20260530mono">
 </head>
-<body>
+<body data-otrust-page="docs">
   <a href="#main-content" class="skip-link">Skip to content</a>
-  
-  <nav>
-    <div class="nav-container">
-      <a href="/" class="logo">OTRUST</a>
-      <div class="nav-links">
-        <span class="nav-primary">
-          <a href="/">Timestamp</a>
-          <a href="/sign">Signed</a>
-          <a href="/proof">Proof</a>
-        </span>
-        <span class="nav-secondary" id="nav-secondary">
-          <a href="/sign-in">Sign in</a>
-          <a href="/transparency">Trust Log</a>
-          <a href="/docs" class="docs-trigger open" id="docs-trigger">Docs</a>
-          <a href="/about">About</a>
-        </span>
-        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme"></button>
-      </div>
-    </div>
-  </nav>
-  
-  <div class="docs-submenu-bar open" id="docs-submenu-bar">
-    <div class="docs-submenu-container">
-      <a href="/docs" class="active">Documentation</a>
-      <a href="/api-docs">API Reference</a>
-      <a href="/playground/">SDK Playground</a>
-      <a href="https://github.com/otrust-eu/opensource" target="_blank">GitHub</a>
-    </div>
-  </div>
-  
-  <main id="main-content">
+
+  <main id="main-content" role="main">
+    <section class="dashboard-home" aria-label="OTRUST docs workspace">
+      <article class="dashboard-panel dashboard-landing dashboard-subpage-landing">
+        <header class="dashboard-site-nav" aria-label="Dashboard navigation">
+          <a href="/" class="dashboard-logo">OTRUST</a>
+          <nav class="dashboard-links" aria-label="OTRUST site navigation">
+          <a href="/timestamp">Timestamp</a>
+          <a href="/proof">ID</a>
+          <a href="/sign">Sign</a>
+          <a href="/sign-in">Auth</a>
+          <a href="/docs" class="active" aria-current="page">Docs</a>
+          <a href="/api-docs">Developers</a>
+          <span class="dashboard-nav-sep" aria-hidden="true">&middot;</span>
+          <button type="button" class="dashboard-menu" aria-label="Open menu"><span></span></button>
+          </nav>
+        </header>
+
+        <section class="dashboard-subpage-head">
+          <div class="dashboard-subpage-headcopy">
+            <span class="dashboard-kicker">Docs</span>
+            <h1>Guide,<br><span>for every workflow.</span></h1>
+            <p>Reference guides for timestamping, ID, signing, and hosted Auth from quick start to production integration.</p>
+          </div>
+        </section>
+
+      </article>
+      <section class="dashboard-tool-slot" aria-label="OTRUST docs content">
+        <section class="dashboard-page-panel docs-dashboard-panel">
     <div class="main-container">
       <aside class="sidebar">
         <div class="sidebar-title">Getting Started</div>
@@ -506,9 +502,9 @@
         <div class="sidebar-title">Features</div>
         <nav class="sidebar-nav">
           <a href="#timestamp" data-section="timestamp">Timestamp</a>
-          <a href="#signed" data-section="signed">Signed</a>
-          <a href="#proof" data-section="proof">Proof</a>
-          <a href="#proofauth" data-section="proofauth">Proof as Auth</a>
+          <a href="#signed" data-section="signed">Sign</a>
+          <a href="#proof" data-section="proof">ID</a>
+          <a href="#proofauth" data-section="proofauth">Auth</a>
         </nav>
         <div class="sidebar-divider"></div>
         <div class="sidebar-title">Integrations</div>
@@ -531,7 +527,7 @@
         <section id="overview" class="doc-section active">
           <div class="content-header">
             <h1>Documentation</h1>
-            <p>Learn how to use OTRUST for timestamping, document signing, identity proofs, and partner-branded login flows.</p>
+            <p>Learn how to use OTRUST for timestamping, document signing, ID packages, and partner-branded Auth flows.</p>
           </div>
           
           <div class="grid-2">
@@ -540,20 +536,20 @@
               <p>Prove when data existed using blockchain anchoring via OpenTimestamps.</p>
             </div>
             <div class="feature-card">
-              <h4>Signed</h4>
+              <h4>Sign</h4>
               <p>Multi-party document signing with Ed25519 cryptographic signatures.</p>
             </div>
             <div class="feature-card">
-              <h4>Proof</h4>
-              <p>Privacy-preserving identity proofs using commitments and selective disclosure.</p>
+              <h4>ID</h4>
+              <p>Privacy-preserving ID packages using commitments and selective disclosure.</p>
             </div>
             <div class="feature-card">
-              <h4>Sign in</h4>
-              <p>Hosted auth challenges that let partner apps verify proof ownership without raw identity data.</p>
+              <h4>Auth</h4>
+              <p>Hosted Auth challenges that let partner apps verify ID ownership without receiving raw identity data.</p>
             </div>
             <div class="feature-card">
               <h4>Privacy-First</h4>
-              <p>Timestamp hashing happens in your browser. Signing supports local-hash mode or encrypted temporary upload.</p>
+              <p>Timestamp hashing happens in your browser. ID checks and signing use local-first flows where possible.</p>
             </div>
           </div>
           
@@ -564,7 +560,7 @@
             <div class="grid-2" style="margin-top: 1rem;">
               <a href="#web" class="feature-card" style="text-decoration: none; color: inherit;" onclick="showSection('web')">
                 <h4>Web Tools</h4>
-                <p>Timestamp, Signed, and Proof in your browser.</p>
+                <p>Timestamp, Sign, and ID in your browser.</p>
               </a>
               <a href="#sdk" class="feature-card" style="text-decoration: none; color: inherit;" onclick="showSection('sdk')">
                 <h4>SDK</h4>
@@ -580,7 +576,7 @@
               </a>
               <a href="#proofauth" class="feature-card" style="text-decoration: none; color: inherit;" onclick="showSection('proofauth')">
                 <h4>Partner Auth</h4>
-                <p>Challenge-based sign-in with branded hosted screens.</p>
+                <p>Challenge-based Auth with branded hosted screens.</p>
               </a>
             </div>
           </div>
@@ -590,160 +586,47 @@
         <section id="web" class="doc-section">
           <div class="content-header">
             <h1>Web Tools</h1>
-            <p>Three browser-first tools. No installation required; the server stores only the cryptographic metadata needed for verification.</p>
+            <p>Use this section as the web entrypoint. Detailed flows live in the dedicated sections: Timestamp, ID, Sign, and Auth.</p>
           </div>
-          
-          <!-- Timestamp Tool -->
+
           <div class="card">
-            <h2>Timestamp Tool</h2>
-            <p>Prove when any file existed using Bitcoin blockchain anchoring.</p>
-            
-            <div class="steps">
-              <div class="step">
-                <span class="step-num">1</span>
-                <div class="step-content">
-                  <strong>Drop your file</strong>
-                  <p>Drag any file into the upload area. The file is hashed locally – nothing is uploaded.</p>
-                </div>
-              </div>
-              <div class="step">
-                <span class="step-num">2</span>
-                <div class="step-content">
-                  <strong>Click "Timestamp"</strong>
-                  <p>Only the SHA-256 hash is sent to the server.</p>
-                </div>
-              </div>
-              <div class="step">
-                <span class="step-num">3</span>
-                <div class="step-content">
-                  <strong>Save your receipt</strong>
-                  <p>Download the receipt JSON with your claim ID.</p>
-                </div>
-              </div>
-              <div class="step">
-                <span class="step-num">4</span>
-                <div class="step-content">
-                  <strong>Wait for blockchain confirmation</strong>
-                  <p>OpenTimestamps anchors to Bitcoin every ~1 hour. Download your .ots proof when ready.</p>
-                </div>
-              </div>
+            <h2>Tool index</h2>
+            <div class="grid-2" style="margin-top: 1rem;">
+              <a href="#timestamp" class="feature-card" style="text-decoration: none; color: inherit;" onclick="showSection('timestamp')">
+                <h4>Timestamp</h4>
+                <p>Hash locally and anchor record metadata to Bitcoin via OpenTimestamps.</p>
+              </a>
+              <a href="#signed" class="feature-card" style="text-decoration: none; color: inherit;" onclick="showSection('signed')">
+                <h4>Sign</h4>
+                <p>Create multi-party signing records around document hashes.</p>
+              </a>
+              <a href="#proof" class="feature-card" style="text-decoration: none; color: inherit;" onclick="showSection('proof')">
+                <h4>ID</h4>
+                <p>Create commitment-based ID packages for selective disclosure.</p>
+              </a>
+              <a href="#proofauth" class="feature-card" style="text-decoration: none; color: inherit;" onclick="showSection('proofauth')">
+                <h4>Auth</h4>
+                <p>Run hosted, challenge-bound Auth with callback verification.</p>
+              </a>
             </div>
-            
-            <h3>Verify a Timestamp</h3>
-            <p>Go to the Verify tab, upload your original file and the .ots proof file. Or use any OpenTimestamps client:</p>
-            <pre><code>pip install opentimestamps-client
-ots verify document.pdf.ots</code></pre>
-            
-            <a href="/" class="btn" style="margin-top: 1rem;">Open Timestamp Tool →</a>
           </div>
-          
-          <!-- Signed Tool -->
+
           <div class="card">
-            <h2>Signed Tool</h2>
-            <p>Multi-party document signing with Ed25519 cryptographic signatures.</p>
-            
-            <div class="steps">
-              <div class="step">
-                <span class="step-num">1</span>
-                <div class="step-content">
-                  <strong>Upload your document</strong>
-                  <p>Choose local-hash mode to keep the document on your device, or temporary encrypted upload when signers need a download link.</p>
-                </div>
-              </div>
-              <div class="step">
-                <span class="step-num">2</span>
-                <div class="step-content">
-                  <strong>Add signing parties</strong>
-                  <p>Enter email addresses. Choose parallel or sequential signing order.</p>
-                </div>
-              </div>
-              <div class="step">
-                <span class="step-num">3</span>
-                <div class="step-content">
-                  <strong>Send invitations</strong>
-                  <p>Each party receives an email with a unique signing link.</p>
-                </div>
-              </div>
-              <div class="step">
-                <span class="step-num">4</span>
-                <div class="step-content">
-                  <strong>Parties sign</strong>
-                  <p>Each signer generates an Ed25519 keypair and signs the document hash.</p>
-                </div>
-              </div>
-              <div class="step">
-                <span class="step-num">5</span>
-                <div class="step-content">
-                  <strong>Blockchain anchored</strong>
-                  <p>Complete signature package is timestamped on Bitcoin when all parties sign.</p>
-                </div>
-              </div>
-            </div>
-            
-            <h3>Verify Signatures</h3>
-            <p>Go to the Status tab and enter your signature ID (sig_xxx). View who has signed and cryptographic proof of each signature.</p>
-            
-            <a href="/sign" class="btn" style="margin-top: 1rem;">Open Signed Tool →</a>
-          </div>
-          
-          <!-- Proof Tool -->
-          <div class="card">
-            <h2>Proof Tool</h2>
-            <p>Create privacy-preserving identity proof packages. Prove facts using commitments without exposing the underlying data.</p>
-            
-            <div class="steps">
-              <div class="step">
-                <span class="step-num">1</span>
-                <div class="step-content">
-                  <strong>Choose proof type</strong>
-                  <p>Unique Identity (Sybil-resistant proof you're human) or Age 18+ verification.</p>
-                </div>
-              </div>
-              <div class="step">
-                <span class="step-num">2</span>
-                <div class="step-content">
-                  <strong>Scan your ID</strong>
-                  <p>Passport, driver's license, or national ID. OCR runs entirely in your browser.</p>
-                </div>
-              </div>
-              <div class="step">
-                <span class="step-num">3</span>
-                <div class="step-content">
-                  <strong>Take a selfie</strong>
-                  <p>Liveness detection with face matching. All processing is client-side.</p>
-                </div>
-              </div>
-              <div class="step">
-                <span class="step-num">4</span>
-                <div class="step-content">
-                  <strong>Generate proof package</strong>
-                  <p>The proof package stores commitments and public verification metadata, not raw identity data.</p>
-                </div>
-              </div>
-              <div class="step">
-                <span class="step-num">5</span>
-                <div class="step-content">
-                  <strong>Get your proof</strong>
-                  <p>Receive shareable URL and QR code. Add to Apple Wallet where supported.</p>
-                </div>
-              </div>
-            </div>
-            
-            <h3>Verify a Proof</h3>
-            <p>Anyone can verify a proof URL. Only the proof is verified – no personal data is revealed.</p>
-            
-            <a href="/proof" class="btn" style="margin-top: 1rem;">Open Proof Tool →</a>
-          </div>
-          
-          <!-- Privacy Note -->
-          <div class="card">
-            <h2>Privacy by Design</h2>
-            <p>All three tools share the same privacy principles:</p>
+            <h2>Open tools</h2>
             <ul>
-              <li><strong>Client-side hashing</strong> – Timestamp files are hashed in your browser</li>
-              <li><strong>Local-first signing</strong> – Documents can stay client-side, with encrypted temporary upload available when needed</li>
-              <li><strong>Minimal data</strong> – The service stores hashes, signatures, public keys, timestamps, and proof metadata</li>
-              <li><strong>Verifiable</strong> – All proofs can be independently verified without trusting OTRUST</li>
+              <li><a href="/timestamp" style="color: var(--accent);">Timestamp Tool</a> for file and text claims, verify, compare, and receipt history.</li>
+              <li><a href="/sign" style="color: var(--accent);">Sign Tool</a> for request creation, signer management, and signature status.</li>
+              <li><a href="/proof" style="color: var(--accent);">ID Tool</a> for ID creation and independent verifier checks.</li>
+              <li><a href="/sign-in" style="color: var(--accent);">Auth Tool</a> for hosted challenge and callback flow testing.</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h2>Shared privacy model</h2>
+            <ul>
+              <li><strong>Local-first processing:</strong> hashing and sensitive checks run in the browser where possible.</li>
+              <li><strong>Minimal server data:</strong> store ID metadata needed for verification, not raw source content.</li>
+              <li><strong>Independent verification:</strong> records can be checked without trusting private backend state alone.</li>
             </ul>
           </div>
         </section>
@@ -795,8 +678,8 @@ print(verification.status)  <span class="comment"># 'confirmed'</span></code></p
               <tr><th>Module</th><th>Description</th></tr>
               <tr><td><code>timestamp</code></td><td>Create and verify blockchain timestamps</td></tr>
               <tr><td><code>sign</code></td><td>Multi-party document signing</td></tr>
-              <tr><td><code>proof</code></td><td>Zero-knowledge identity proofs</td></tr>
-              <tr><td><code>auth</code></td><td>Login with OTRUST authentication</td></tr>
+              <tr><td><code>proof</code></td><td>Privacy-preserving ID packages</td></tr>
+              <tr><td><code>auth</code></td><td>Hosted OTRUST Auth flows</td></tr>
               <tr><td><code>sha256</code>, <code>hashFile</code></td><td>Hashing utilities</td></tr>
               <tr><td><code>generateEd25519Keypair</code></td><td>Cryptographic key generation</td></tr>
             </table>
@@ -807,7 +690,7 @@ print(verification.status)  <span class="comment"># 'confirmed'</span></code></p
           <div class="card">
             <h2>React Components</h2>
             <pre><code>npm install @otrust/react</code></pre>
-            <pre><code>import { TimestampWidget, LoginButton, ProofBadge } from '@otrust/react'
+            <pre><code>import { TimestampWidget, LoginButton, IDBadge } from '@otrust/react'
 
 <span class="comment">// Ready-to-use timestamp widget</span>
 &lt;TimestampWidget onSuccess={(id) =&gt; console.log(id)} /&gt;
@@ -815,8 +698,8 @@ print(verification.status)  <span class="comment"># 'confirmed'</span></code></p
 <span class="comment">// Login with OTRUST button</span>
 &lt;LoginButton onAuth={(user) =&gt; setUser(user)} /&gt;
 
-<span class="comment">// Display proof verification badge</span>
-&lt;ProofBadge proofId="prf_xxx" /&gt;</code></pre>
+<span class="comment">// Display ID verification badge</span>
+&lt;IDBadge id="id_xxx" /&gt;</code></pre>
           </div>
           
           <div class="card">
@@ -836,7 +719,7 @@ configure({
         <section id="timestamp" class="doc-section">
           <div class="content-header">
             <h1>Timestamp</h1>
-            <p>Prove when data existed using Bitcoin blockchain anchoring.</p>
+            <p>Verify when data existed using Bitcoin blockchain anchoring.</p>
           </div>
           
           <div class="card">
@@ -846,7 +729,7 @@ configure({
               <li>Only the hash is sent to OTRUST</li>
               <li>OTRUST aggregates hashes and creates a Merkle tree</li>
               <li>The Merkle root is anchored to Bitcoin via OpenTimestamps</li>
-              <li>You receive a .ots proof file for independent verification</li>
+              <li>You receive a .ots receipt file for independent verification</li>
             </ol>
             
             <div class="alert alert-info">
@@ -866,11 +749,11 @@ configure({
           </div>
         </section>
         
-        <!-- Signed -->
+        <!-- Sign -->
         <section id="signed" class="doc-section">
           <div class="content-header">
-            <h1>Signed</h1>
-            <p>Multi-party document signing with cryptographic proof.</p>
+            <h1>Sign</h1>
+            <p>Multi-party document signing with cryptographic evidence.</p>
           </div>
           
           <div class="card">
@@ -880,7 +763,7 @@ configure({
                 <span class="step-num">1</span>
                 <div class="step-content">
                   <strong>Upload your document</strong>
-                  <p>Drop a PDF or any file. It's hashed locally – never uploaded.</p>
+                  <p>Choose local-hash mode or temporary encrypted upload when signers need a download link.</p>
                 </div>
               </div>
               <div class="step">
@@ -900,8 +783,8 @@ configure({
               <div class="step">
                 <span class="step-num">4</span>
                 <div class="step-content">
-                  <strong>Blockchain anchored</strong>
-                  <p>Complete signature package is timestamped on Bitcoin.</p>
+                  <strong>Anchored record</strong>
+                  <p>The complete signature package is anchored to Bitcoin via OpenTimestamps.</p>
                 </div>
               </div>
             </div>
@@ -909,7 +792,7 @@ configure({
           </div>
           
           <div class="card">
-            <h2>Signing Modes</h2>
+            <h2>Signing Order</h2>
             <table>
               <tr><th>Mode</th><th>Description</th><th>Use Case</th></tr>
               <tr><td><strong>Parallel</strong></td><td>All parties sign simultaneously</td><td>Simple agreements</td></tr>
@@ -937,15 +820,15 @@ configure({
           </div>
         </section>
         
-        <!-- Proof -->
+        <!-- ID -->
         <section id="proof" class="doc-section">
           <div class="content-header">
-            <h1>Proof</h1>
-            <p>Privacy-preserving identity proofs using commitments and selective disclosure.</p>
+            <h1>ID</h1>
+            <p>Privacy-preserving ID packages using commitments and selective disclosure.</p>
           </div>
           
           <div class="card">
-            <h2>Proof flow</h2>
+            <h2>ID flow</h2>
             <div class="steps">
               <div class="step">
                 <span class="step-num">1</span>
@@ -964,89 +847,90 @@ configure({
               <div class="step">
                 <span class="step-num">3</span>
                 <div class="step-content">
-                  <strong>Generate proof package</strong>
-                  <p>A commitment proof records the claim without revealing the underlying data.</p>
+                  <strong>Generate ID package</strong>
+                  <p>A commitment record preserves the claim without revealing the underlying data.</p>
                 </div>
               </div>
               <div class="step">
                 <span class="step-num">4</span>
                 <div class="step-content">
-                  <strong>Get your proof</strong>
+                  <strong>Get your ID</strong>
                   <p>Receive a URL. Add to Apple Wallet where supported.</p>
                 </div>
               </div>
             </div>
-            <a href="/proof" class="btn" style="margin-top: 1rem;">Create Proof →</a>
+            <a href="/proof" class="btn" style="margin-top: 1rem;">Create ID &rarr;</a>
           </div>
           
           <div class="card">
-            <h2>Proof Types</h2>
+            <h2>ID Types</h2>
+            <p class="text-dim" style="margin-bottom: 1rem;">The public web tool currently offers <strong>Unique Identity</strong> and <strong>Age 18+</strong>. Additional ID types below are documented for roadmap and API consumers.</p>
             <table>
-              <tr><th>Type</th><th>What It Proves</th><th>Use Case</th></tr>
-              <tr><td><strong>Unique Identity</strong></td><td>You're a unique human</td><td>Sybil resistance, voting, airdrops</td></tr>
-              <tr><td><strong>Age (18+)</strong></td><td>You're at least 18</td><td>Age verification, alcohol, gambling</td></tr>
-              <tr><td><strong>Income</strong></td><td>Income above threshold</td><td>Credit applications, rentals</td></tr>
-              <tr><td><strong>Membership</strong></td><td>Member of a group</td><td>Access control, communities</td></tr>
+              <tr><th>Type</th><th>What It Verifies</th><th>Status</th></tr>
+              <tr><td><strong>Unique Identity</strong></td><td>One reusable ID package per person where configured</td><td>Available in web tool</td></tr>
+              <tr><td><strong>Age (18+)</strong></td><td>You're at least 18</td><td>Available in web tool</td></tr>
+              <tr><td><strong>Income</strong></td><td>Income above threshold</td><td>Documented; not in public UI yet</td></tr>
+              <tr><td><strong>Membership</strong></td><td>Member of a group</td><td>Documented; not in public UI yet</td></tr>
             </table>
             
             <div class="alert alert-info">
-              <strong>Privacy:</strong> All processing (OCR, face matching, proof generation) happens in your browser. Your ID and photos never leave your device.
+              <strong>Privacy:</strong> Sensitive checks run in your browser. Stored data focuses on commitment packages and metadata, not raw ID images or selfies.
             </div>
           </div>
           
           <div class="card">
             <h2>Technical Details</h2>
-            <h3>Commitment Proof Packages</h3>
-            <p>The current public beta uses SHA-256 field commitments and proof packages instead of server-side Circom/SNARK dependencies. Proof packages are designed to reveal the claim and verification metadata without exposing the raw input.</p>
+            <h3>Commitment ID Packages</h3>
+            <p>The current public beta uses SHA-256 field commitments and ID packages instead of server-side Circom/SNARK dependencies. ID packages are designed to reveal the claim and verification metadata without exposing the raw input.</p>
             <ul>
-              <li><strong>Age</strong> - proves an age threshold without storing the birthdate</li>
-              <li><strong>Income</strong> - proves a threshold without storing the exact income</li>
-              <li><strong>Membership</strong> - proves membership metadata without exposing the raw member identifier</li>
+              <li><strong>Age</strong> - verifies an age threshold without storing the birthdate</li>
+              <li><strong>Income</strong> - verifies a threshold without storing the exact income</li>
+              <li><strong>Membership</strong> - verifies membership metadata without exposing the raw member identifier</li>
             </ul>
             
             <h3>Verification</h3>
-            <p>Stored proof packages can be checked through the public proof endpoints. Advanced browser-generated proofs can still be submitted, but the backend no longer depends on a vulnerable server-side SNARK toolchain.</p>
+            <p>Stored ID packages can be checked through the public verification endpoints. Advanced browser-generated IDs can still be submitted, but the backend no longer depends on a vulnerable server-side SNARK toolchain.</p>
           </div>
         </section>
         
-        <!-- Proof as Auth -->
+        <!-- Auth -->
         <section id="proofauth" class="doc-section">
           <div class="content-header">
-            <h1>Proof as Auth</h1>
-            <p>Use zero-knowledge proofs for passwordless authentication.</p>
+            <h1>Auth</h1>
+            <p>Use hosted ID verification for challenge-bound partner Auth.</p>
           </div>
           
           <div class="card">
             <h2>Authentication flow</h2>
-            <p>"Login with OTRUST" lets users authenticate using their identity proof without revealing personal data.</p>
+            <p>OTRUST Auth lets users authenticate with an ID package without sharing raw identity documents with the partner.</p>
             
             <div class="steps">
               <div class="step">
                 <span class="step-num">1</span>
                 <div class="step-content">
-                  <strong>User clicks "Login with OTRUST"</strong>
+                  <strong>User starts OTRUST Auth</strong>
                   <p>Your app creates an authentication challenge.</p>
                 </div>
               </div>
               <div class="step">
                 <span class="step-num">2</span>
                 <div class="step-content">
-                  <strong>User scans QR or opens link</strong>
-                  <p>Redirects to OTRUST to present their proof.</p>
+                  <strong>User opens the hosted Auth URL</strong>
+                  <p>The user is redirected to OTRUST to present or create an ID.</p>
                 </div>
               </div>
               <div class="step">
                 <span class="step-num">3</span>
                 <div class="step-content">
-                  <strong>ZK proof is verified</strong>
-                  <p>OTRUST verifies the proof without seeing the underlying data.</p>
+                  <strong>ID package verified</strong>
+                  <p>OTRUST verifies ID ownership and challenge binding without exposing underlying identity documents.</p>
                 </div>
               </div>
               <div class="step">
                 <span class="step-num">4</span>
                 <div class="step-content">
-                  <strong>Callback with verified claims</strong>
-                  <p>Your app receives verified attributes (e.g., "is adult", "is unique").</p>
+                  <strong>Callback with token and state</strong>
+                  <p>Your app receives a signed token and verifies it server-side before creating a session.</p>
                 </div>
               </div>
             </div>
@@ -1054,24 +938,26 @@ configure({
           
           <div class="card">
             <h2>SDK Integration</h2>
-            <pre><code><span class="comment">// Create auth challenge</span>
+            <pre><code><span class="comment">// Create hosted Auth challenge</span>
 import { auth } from '@otrust/sdk'
 
+const state = auth.generateState()
 const challenge = await auth.createChallenge({
-  claims: ['unique', 'adult'],
-  callback: 'https://yourapp.com/auth/callback'
+  clientId: 'my-app',
+  redirectUri: 'https://yourapp.com/auth/callback',
+  scope: ['identity'],
+  state
 })
 
-<span class="comment">// Redirect user or show QR</span>
-window.location.href = challenge.authUrl</code></pre>
+<span class="comment">// Redirect user to OTRUST</span>
+window.location.href = challenge.loginUrl</code></pre>
             
             <h3>Verify Callback</h3>
             <pre><code><span class="comment">// In your callback handler</span>
-const result = await auth.verifyCallback(token)
+const result = await auth.verify(token)
 
-if (result.verified) {
-  console.log(result.claims) <span class="comment">// { unique: true, adult: true }</span>
-  console.log(result.proofId) <span class="comment">// prf_xxx for audit</span>
+if (result.valid) {
+  console.log(result.proofId) <span class="comment">// id_xxx for audit</span>
 }</code></pre>
           </div>
 
@@ -1090,13 +976,13 @@ X-Admin-Key: &lt;admin-key&gt;
   "fontFamily": "Inter",
   "borderRadius": 8,
   "spacingScale": "default",
-  "headline": "Sign in to Acme",
-  "subhead": "Secure verification with OTRUST Proof",
+  "headline": "Start Auth with Acme",
+  "subhead": "Secure verification with OTRUST ID",
   "footerText": "Acme uses OTRUST as identity provider",
   "autoRedirectSeconds": 3
 }</code></pre>
             <div class="alert alert-info">
-              <strong>Security:</strong> OTRUST disclosure, the OTRUST footer mark, and the DPO contact stay visible. The same theme follows <code>/proof?auth_challenge=...</code> when a user needs to create a proof first. Theme values are sanitized and all theme changes are written to the audit log.
+              <strong>Security:</strong> OTRUST disclosure, the OTRUST footer mark, and the DPO contact stay visible. The same theme follows <code>/proof?auth_challenge=...</code> when a user needs to create an ID first. Theme values are sanitized and all theme changes are written to the audit log.
             </div>
           </div>
 
@@ -1105,10 +991,10 @@ X-Admin-Key: &lt;admin-key&gt;
             <pre><code>import { LoginButton } from '@otrust/react'
 
 &lt;LoginButton
-  claims={['unique', 'adult']}
+  scope={['identity']}
   onSuccess={(user) =&gt; {
     console.log(user.verified) <span class="comment">// true</span>
-    console.log(user.claims)   <span class="comment">// { unique: true, adult: true }</span>
+    console.log(user.proofId)   <span class="comment">// id_xxx</span>
   }}
 /&gt;</code></pre>
           </div>
@@ -1117,12 +1003,12 @@ X-Admin-Key: &lt;admin-key&gt;
             <h2>Available Claims</h2>
             <table>
               <tr><th>Claim</th><th>Description</th><th>Use Case</th></tr>
-              <tr><td><code>unique</code></td><td>User is a unique human</td><td>One account per person</td></tr>
-              <tr><td><code>adult</code></td><td>User is 18+</td><td>Age-gated content</td></tr>
+              <tr><td><code>identity</code></td><td>User controls a verified ID package</td><td>One account per verified ID</td></tr>
+              <tr><td><code>adult</code></td><td>User satisfies an age threshold where available</td><td>Age-gated content</td></tr>
             </table>
             
             <div class="alert alert-info">
-              <strong>Privacy:</strong> Claims are verified without revealing the user's actual identity, birthdate, or any personal information.
+              <strong>Privacy:</strong> Claims are verified without exposing raw identity documents to the partner application.
             </div>
           </div>
         </section>
@@ -1202,7 +1088,7 @@ X-Admin-Key: &lt;admin-key&gt;
               <li>Compose an email with content to timestamp</li>
               <li>Add attachments if needed</li>
               <li>Send to <strong>timestamp&#64;otrust.eu</strong></li>
-              <li>Receive reply with claim ID and proof links</li>
+              <li>Receive reply with claim ID and verification links</li>
             </ol>
             
             <h3>What Gets Timestamped</h3>
@@ -1267,10 +1153,10 @@ otrust claim *.pdf
 <span class="comment"># Check status</span>
 otrust status ot_abc123xyz
 
-<span class="comment"># Download proof when ready</span>
+<span class="comment"># Download receipt when ready</span>
 otrust proof ot_abc123xyz -o document.pdf.ots
 
-<span class="comment"># Verify a proof</span>
+<span class="comment"># Verify a receipt</span>
 otrust verify document.pdf document.pdf.ots</code></pre>
           </div>
           
@@ -1318,7 +1204,7 @@ otrust claim dist/*.zip --json > timestamps.json</code></pre>
           <div class="card">
             <h2>Included</h2>
             <ul>
-              <li>Express server for timestamping, signing, proof, auth, and verification APIs</li>
+              <li>Express server for timestamping, ID, signing, Auth, and verification APIs</li>
               <li>Static web UI and OpenAPI documentation</li>
               <li>TypeScript SDK</li>
               <li>Python SDK</li>
@@ -1382,24 +1268,23 @@ node cli/otrust.js verify 000000000000000000000000000000000000000000000000000000
         </section>
       </div>
     </div>
-  </main>
-  
-  <footer>
-    <div class="footer-links">
-      <a href="/">Timestamp</a>
-      <a href="/sign">Signed</a>
-      <a href="/proof">Proof</a>
-      <a href="/sign-in">Sign in</a>
+        </section>
+      </section>
+          <footer class="dashboard-left-footer">
+        <strong>OTRUST</strong>
+        <span>&copy; 2026 OTRUST</span>
+        <span class="dashboard-made">Made in Sweden, Europe</span>
+        <nav aria-label="Dashboard footer">
           <a href="/docs">Docs</a>
-      <a href="/about">About</a>
-      <a href="/transparency">Trust Log</a>
-      <a href="/notes/why-otrust">Technical Note</a>
-      <a href="/privacy-policy">Privacy</a>
-      <a href="/terms">Terms</a>
-      <a href="https://github.com/otrust-eu/opensource">GitHub</a>
-    </div>
-    <div class="footer-copy">OTRUST - MIT License</div>
-  </footer>
+          <a href="/api-docs">API</a>
+          <a href="https://github.com/otrust-eu" rel="noopener noreferrer">GitHub</a>
+          <a href="/privacy-policy">Privacy</a>
+          <a href="/terms">Terms</a>
+        </nav>
+        <a href="#main-content" class="dashboard-footer-dot" aria-label="Back to top"></a>
+      </footer>
+  </section>
+  </main>
   
   <script nonce="">
     // Theme
@@ -1462,6 +1347,11 @@ node cli/otrust.js verify 000000000000000000000000000000000000000000000000000000
       docsTrigger.classList.toggle('open');
     });
   </script>
-  <script src="/otrust-polish.js?v=20260527-2" defer></script>
+  <script src="/otrust-polish.js?v=20260530mono" defer></script>
 </body>
 </html>
+
+
+
+
+

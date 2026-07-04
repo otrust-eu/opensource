@@ -388,11 +388,13 @@
       margin-bottom: 16px;
     }
   </style>
+  <link rel="stylesheet" href="/otrust-polish.css?v=20260530mono">
+  <link rel="stylesheet" href="/otrust-redesign.css?v=20260530mono">
 </head>
 <body>
   <div class="logo">
     <h1>O<span>TRUST</span></h1>
-    <p>Zero-Knowledge Timestamping & Document Signing</p>
+    <p>Timestamp, ID, Sign and Auth infrastructure</p>
   </div>
   
   <div class="wizard">
@@ -448,7 +450,7 @@
       <div class="toggle-group">
         <div class="info">
           <h4>Document Signing</h4>
-          <p>Multi-party document signing with zero-knowledge</p>
+          <p>Multi-party document signing with local-hash support</p>
         </div>
         <label class="toggle">
           <input type="checkbox" id="featureSign" checked>
@@ -816,5 +818,11 @@
     // Auto-fill base URL
     document.getElementById('baseUrl').placeholder = window.location.origin;
   </script>
+  <script src="/otrust-polish.js?v=20260530mono" defer></script>
 </body>
 </html>
+
+
+
+
+

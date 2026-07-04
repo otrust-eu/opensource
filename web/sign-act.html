@@ -3,15 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign Document – OTRUST Signed by Kris Ledel</title>
-  <meta name="description" content="Verify and sign a document with blockchain-backed proof. Created by Kris Ledel.">
+  <title>Sign Document – OTRUST Sign by Kris Ledel</title>
+  <meta name="description" content="Verify and sign a document with blockchain-backed evidence. Created by Kris Ledel.">
   <meta name="author" content="Kris Ledel">
   <meta name="robots" content="noindex">
   
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #fafaf9;
@@ -20,11 +17,11 @@
       --border: #e5e5e5;
       --text: #1a1a1a;
       --text-dim: #737373;
-      --accent: #2d5a3d;
+      --accent: #16160f;
       --accent-hover: #1e4029;
       --accent-light: #e8f0eb;
       --orange: #b45309;
-      --success: #2d5a3d;
+      --success: #16160f;
       --error: #dc2626;
       --warning: #d97706;
     }
@@ -957,7 +954,8 @@
     .not-your-turn h3 { font-size: 0.9rem; margin-bottom: 0.35rem; }
     .not-your-turn p { font-size: 0.8rem; color: var(--text-dim); }
   </style>
-  <link rel="stylesheet" href="/otrust-polish.css?v=20260527-2">
+  <link rel="stylesheet" href="/otrust-polish.css?v=20260530mono">
+  <link rel="stylesheet" href="/otrust-redesign.css?v=20260530mono">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -967,11 +965,11 @@
       <div class="nav-links">
         <span class="nav-primary">
           <a href="/">Timestamp</a>
-          <a href="/sign">Signed</a>
-          <a href="/proof">Proof</a>
+          <a href="/sign">Sign</a>
+          <a href="/proof">ID</a>
         </span>
         <span class="nav-secondary" id="nav-secondary">
-          <a href="/sign-in">Sign in</a>
+          <a href="/sign-in">Auth</a>
           <a href="/transparency">Trust Log</a>
           <a href="/docs">Docs</a>
           <a href="/about">About</a>
@@ -1180,7 +1178,7 @@
                 <span id="proof-required-indicator" style="display: none; font-size: 0.7rem; background: #dc2626; color: white; padding: 2px 8px; border-radius: 10px;">Required</span>
                 <input type="checkbox" id="use-otrust-proof" style="width: 18px; height: 18px; accent-color: var(--accent);">
                 <label for="use-otrust-proof" style="font-weight: 600; font-size: 0.9rem; cursor: pointer;">
-                  🔐 Verify with OTRUST Proof
+                  Verify with OTRUST ID
                 </label>
                 <span id="proof-optional-badge" style="font-size: 0.7rem; background: var(--accent); color: white; padding: 2px 8px; border-radius: 10px;">Optional</span>
               </div>
@@ -1189,7 +1187,7 @@
               </p>
               <div id="otrust-proof-fields" style="display: none;">
                 <div style="margin-bottom: 0.75rem;">
-                  <label style="font-size: 0.75rem; font-weight: 500; display: block; margin-bottom: 0.25rem;">Proof ID</label>
+                  <label style="font-size: 0.75rem; font-weight: 500; display: block; margin-bottom: 0.25rem;">ID</label>
                   <input type="text" id="sign-proof-id" placeholder="id_abc123..." style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; background: var(--bg-card); color: var(--text);">
                 </div>
                 <div>
@@ -1198,7 +1196,7 @@
                 </div>
                 <div id="otrust-proof-error" style="display: none; margin-top: 0.5rem; padding: 0.5rem; background: #fee2e2; color: #dc2626; border-radius: 4px; font-size: 0.8rem;"></div>
                 <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.5rem;">
-                  Don't have a proof? <a href="/proof" target="_blank" style="color: var(--accent);">Create one here</a>
+                  Don't have an ID? <a href="/proof" target="_blank" style="color: var(--accent);">Create one here</a>
                 </p>
               </div>
             </div>
@@ -1243,9 +1241,9 @@
   <footer role="contentinfo">
     <div class="footer-links">
       <a href="/">Timestamp</a>
-      <a href="/sign">Signed</a>
-      <a href="/proof">Proof</a>
-      <a href="/sign-in">Sign in</a>
+      <a href="/sign">Sign</a>
+      <a href="/proof">ID</a>
+      <a href="/sign-in">Auth</a>
           <a href="/docs">Docs</a>
       <a href="/about">About</a>
       <a href="/transparency">Trust Log</a>
@@ -1325,7 +1323,7 @@
         proofCheckbox.disabled = true; // Can't uncheck
         proofCheckbox.style.display = 'none'; // Hide checkbox completely
         proofFields.style.display = 'block';
-        proofDescription.textContent = 'The sender requires you to verify your identity with an OTRUST Proof before signing.';
+        proofDescription.textContent = 'The sender requires you to verify your identity with an OTRUST ID before signing.';
         proofSection.style.borderColor = '#dc2626';
         proofSection.style.background = '#fef2f2';
       } else {
@@ -1450,7 +1448,7 @@
             <div class="info-title">✓ This document was timestamped</div>
             <div class="info-details">
               ${date} • ${status}<br>
-              <a href="/proof/${data.timestamp.receipt_id}" target="_blank" style="color: inherit;">View timestamp proof →</a>
+              <a href="/proof/${data.timestamp.receipt_id}" target="_blank" style="color: inherit;">View timestamp record →</a>
             </div>
           `;
           infoEl.style.display = 'block';
@@ -1927,7 +1925,7 @@
         const data = await res.json();
         
         if (!res.ok) {
-          errorDiv.textContent = data.message || 'Failed to verify OTRUST Proof';
+          errorDiv.textContent = data.message || 'Failed to verify OTRUST ID';
           errorDiv.style.display = 'block';
           return null;
         }
@@ -1956,8 +1954,8 @@
         
         if (!proofId || !pin) {
           errorDiv.textContent = proofRequired 
-            ? 'OTRUST Proof verification is required. Enter your Proof ID and PIN.'
-            : 'Enter Proof ID and PIN';
+            ? 'OTRUST ID verification is required. Enter your ID and PIN.'
+            : 'Enter ID and PIN';
           errorDiv.style.display = 'block';
           return;
         }
@@ -1971,13 +1969,13 @@
         
         // Validate Proof ID format
         if (!proofId.startsWith('id_') || proofId.length < 10) {
-          errorDiv.textContent = 'Invalid Proof ID format';
+          errorDiv.textContent = 'Invalid ID format';
           errorDiv.style.display = 'block';
           return;
         }
         
         signBtn.disabled = true;
-        signBtn.querySelector('.btn-text').textContent = 'Verifying OTRUST Proof...';
+        signBtn.querySelector('.btn-text').textContent = 'Verifying OTRUST ID...';
         
         otrustProofData = await verifyOtrustProof(proofId, pin);
         if (!otrustProofData) {
@@ -2138,6 +2136,11 @@
     getCsrfToken();
     loadSignRequest();
   </script>
-  <script src="/otrust-polish.js?v=20260527-2" defer></script>
+  <script src="/otrust-polish.js?v=20260530mono" defer></script>
 </body>
 </html>
+
+
+
+
+

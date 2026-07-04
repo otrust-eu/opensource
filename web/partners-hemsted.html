@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hemsted OTRUST Auth Flow | OTRUST</title>
+  <meta name="description" content="Hemsted-branded hosted OTRUST ID verification with visible OTRUST disclosure, challenge-bound login, and callback-safe redirect handling.">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <link rel="canonical" href="https://www.otrust.eu/partners/hemsted">
+  <meta name="theme-color" content="#16160f">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.otrust.eu/partners/hemsted">
+  <meta property="og:title" content="Hemsted OTRUST Auth Flow | OTRUST">
+  <meta property="og:description" content="Hemsted-branded hosted OTRUST ID verification with clear OTRUST disclosure and redirect-safe partner login.">
+  <meta property="og:image" content="https://www.otrust.eu/og-image.svg">
+  <meta property="og:site_name" content="OTRUST">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Hemsted OTRUST Auth Flow",
+    "url": "https://www.otrust.eu/partners/hemsted",
+    "description": "Hemsted-branded hosted OTRUST ID verification with visible OTRUST disclosure and callback-safe redirect handling."
+  }
+  </script>
+
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <script defer data-domain="otrust.eu" src="https://plausible.io/js/script.js"></script>
+  <link rel="stylesheet" href="/css/common.css">
+  <link rel="stylesheet" href="/otrust-polish.css?v=20260530mono">
+  <link rel="stylesheet" href="/partners-hemsted.css?v=20260526-1">
+  <link rel="stylesheet" href="/otrust-redesign.css?v=20260530mono">
+</head>
+<body class="partner-site">
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <nav role="navigation" aria-label="Main navigation">
+    <div class="nav-container">
+      <a href="/" class="logo">OTRUST</a>
+      <div class="nav-links">
+        <span class="nav-primary">
+          <a href="/">Timestamp</a>
+          <a href="/sign">Sign</a>
+          <a href="/proof">ID</a>
+        </span>
+        <span class="nav-secondary" id="nav-secondary">
+          <a href="/sign-in">Auth</a>
+          <a href="/transparency">Trust Log</a>
+          <a href="/docs" class="docs-trigger" id="docs-trigger">Docs</a>
+          <a href="/about">About</a>
+        </span>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle color theme" title="Toggle color theme"></button>
+        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu" title="Menu"><span></span></button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="docs-submenu-bar" id="docs-submenu-bar">
+    <div class="docs-submenu-container">
+      <a href="/docs">Documentation</a>
+      <a href="/api-docs">API Reference</a>
+      <a href="/playground/">SDK Playground</a>
+      <a href="https://github.com/otrust-eu/opensource" target="_blank" rel="noopener noreferrer">GitHub</a>
+    </div>
+  </div>
+
+  <main id="main-content" class="partner-page">
+    <section class="partner-hero partner-spec-hero" aria-labelledby="partner-heading">
+      <div class="partner-hero-copy">
+        <span class="hero-badge">Partner Auth flow</span>
+        <h1 id="partner-heading">Hemsted-branded OTRUST ID verification.</h1>
+        <p>Hemsted users can complete challenge-bound OTRUST ID verification on <code>otrust.eu</code> with Hemsted context preserved and OTRUST disclosure visible throughout the hosted flow.</p>
+
+        <div class="partner-actions">
+          <a href="/sign-in" class="btn btn-primary">How partner Auth works</a>
+          <a href="/api-docs#partner-auth" class="btn btn-secondary">Open API reference</a>
+        </div>
+
+        <dl class="partner-meta-grid" aria-label="Hemsted hosted Auth flow metadata">
+          <div>
+            <dt>Partner</dt>
+            <dd>Hemsted AB</dd>
+          </div>
+          <div>
+            <dt>Status</dt>
+            <dd>Hosted theme active</dd>
+          </div>
+          <div>
+            <dt>Method</dt>
+            <dd>OTRUST ID</dd>
+          </div>
+          <div>
+            <dt>Primary flow</dt>
+            <dd><code>/auth/login?challenge=ch_...</code></dd>
+          </div>
+        </dl>
+      </div>
+
+      <aside class="partner-preview-shell" aria-label="Hemsted branded OTRUST login preview">
+        <div class="partner-browser-bar">
+          <span></span>
+          <strong>otrust.eu/auth/login?challenge=ch_hemsted</strong>
+        </div>
+        <div class="partner-screen hemsted-theme">
+          <div class="partner-screen-grid">
+            <div class="hemsted-side">
+              <div class="hemsted-mark" aria-label="Hemsted">Hemsted</div>
+              <div class="hemsted-product-frame">
+                <span>P&aring;g&aring;ende session</span>
+                <strong>Verifierad &aring;tkomst</strong>
+                <p>Hemsted beg&auml;r en identitetskontroll innan anv&auml;ndaren forts&auml;tter.</p>
+              </div>
+              <div class="partner-assurance">
+                <span></span>
+                <p>Hemsted branding stays visible, while OTRUST remains explicit as the ID verifier.</p>
+              </div>
+            </div>
+
+            <div class="hemsted-login-panel">
+              <div class="partner-provider-row">
+                <span class="partner-lock" aria-hidden="true"></span>
+                <span>S&auml;ker verifiering via OTRUST</span>
+              </div>
+              <h2>Verifiera &aring;tkomst till Hemsted</h2>
+              <p>Bekr&auml;fta identiteten i det hosted OTRUST-fl&ouml;det. Hemsted-k&auml;nslan finns kvar medan verifieringen sker p&aring; otrust.eu.</p>
+
+              <div class="partner-method-actions" aria-label="OTRUST verification action preview">
+                <button type="button">Forts&auml;tt med OTRUST ID</button>
+                <button type="button" class="secondary">Skapa verifierad identitet</button>
+              </div>
+
+              <div class="partner-method-row">
+                <span class="trust-mark">OTRUST</span>
+                <span>Identity flow secured by OTRUST</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="partner-screen-footer">
+            <span>&copy; Hemsted AB &middot; OTRUST ID verifier</span>
+            <span>dpo@otrust.eu</span>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="partner-summary-section" aria-labelledby="summary-heading">
+      <div class="partner-section-title">
+        <span class="section-kicker">Hosted flow</span>
+        <h2 id="summary-heading">Hemsted sessions verify with OTRUST ID.</h2>
+        <p>When Hemsted starts an Auth session, OTRUST presents a hosted ID-verification screen tied to that challenge. Hemsted branding provides context, and OTRUST disclosure makes it clear that verification happens on <code>otrust.eu</code>.</p>
+      </div>
+
+      <div class="partner-value-grid">
+        <article class="partner-value-card">
+          <span>Step 01</span>
+          <h3>Challenge starts at Hemsted</h3>
+          <p>Hemsted creates the short-lived auth challenge and sends the user to the hosted OTRUST login URL.</p>
+        </article>
+        <article class="partner-value-card">
+          <span>Step 02</span>
+          <h3>ID verification on OTRUST</h3>
+          <p>The user verifies control of an OTRUST ID on <code>otrust.eu</code> with Hemsted-approved visual context.</p>
+        </article>
+        <article class="partner-value-card">
+          <span>Step 03</span>
+          <h3>Return after verification</h3>
+          <p>OTRUST redirects back to Hemsted's registered callback with the expected token and state handling.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="partner-spec-section" aria-labelledby="controls-heading">
+      <div class="partner-section-title">
+        <span class="section-kicker">Production controls</span>
+        <h2 id="controls-heading">Theme configuration for Hemsted's hosted Auth flow.</h2>
+        <p>The hosted theme controls brand presentation only. It does not change challenge creation, callback handling, token verification, or registered redirect behavior.</p>
+      </div>
+
+      <div class="partner-control-grid">
+        <article class="partner-control-panel">
+          <h3>Visual branding</h3>
+          <dl class="partner-control-list">
+            <div><dt>Logo</dt><dd>SVG/PNG URL, max 240x60px, 200KB asset cap</dd></div>
+            <div><dt>Background</dt><dd>Hex, rgb, or rgba with OTRUST fallback</dd></div>
+            <div><dt>Primary color</dt><dd>Buttons and key highlights</dd></div>
+            <div><dt>Text color</dt><dd>Defaults to <code>#0F1B2D</code></dd></div>
+            <div><dt>Font</dt><dd>Approved HTTPS self-hosted URL or system font stack</dd></div>
+            <div><dt>Radius / spacing</dt><dd>4-12px radius, tight/default/loose spacing</dd></div>
+          </dl>
+        </article>
+
+        <article class="partner-control-panel">
+          <h3>Copy</h3>
+          <dl class="partner-control-list">
+            <div><dt>Headline</dt><dd>Logga in p&aring; Hemsted</dd></div>
+            <div><dt>Subhead</dt><dd>S&auml;ker identitetsverifiering via OTRUST</dd></div>
+            <div><dt>Footer</dt><dd>&copy; Hemsted AB &middot; OTRUST ID verifier</dd></div>
+            <div><dt>Info blurb</dt><dd>Short explanation that verification happens on <code>otrust.eu</code></dd></div>
+            <div><dt>Disclosure</dt><dd>OTRUST remains visible as the ID-verification layer</dd></div>
+          </dl>
+        </article>
+
+        <article class="partner-control-panel">
+          <h3>Behavior</h3>
+          <dl class="partner-control-list">
+            <div><dt>Verification method</dt><dd>OTRUST ID</dd></div>
+            <div><dt>Auto-return</dt><dd>Minimum success-delay before callback redirect</dd></div>
+            <div><dt>Challenge scope</dt><dd>Theme follows <code>/proof?auth_challenge=...</code></dd></div>
+            <div><dt>Callback</dt><dd>Registered redirect URL and state are preserved unchanged</dd></div>
+          </dl>
+        </article>
+      </div>
+    </section>
+
+    <section class="partner-guardrail-section" aria-labelledby="guardrail-heading">
+      <div class="partner-section-title">
+        <span class="section-kicker">Trust guarantees</span>
+        <h2 id="guardrail-heading">OTRUST remains visible throughout verification.</h2>
+        <p>The hosted page keeps verification ownership clear while allowing Hemsted-approved branding on the Auth flow.</p>
+      </div>
+
+      <div class="partner-guardrail-grid">
+        <article><span>01</span><strong>OTRUST footer mark</strong><p>Users must know who verifies the Auth flow.</p></article>
+        <article><span>02</span><strong>OTRUST disclosure line</strong><p>At least one visible row: "S&auml;ker verifiering via OTRUST".</p></article>
+        <article><span>03</span><strong>Method honesty</strong><p>The flow says OTRUST ID because that is the active verification method.</p></article>
+        <article><span>04</span><strong>URL honesty</strong><p>The browser stays on <code>otrust.eu</code>. That is a feature, not a bug.</p></article>
+        <article><span>05</span><strong>DPO contact</strong><p>OTRUST GDPR/DPO link remains visible for ID-verification questions.</p></article>
+      </div>
+    </section>
+
+    <section class="partner-flow-section" aria-labelledby="live-flow-heading">
+      <div class="partner-section-title">
+        <span class="section-kicker">Live flow</span>
+        <h2 id="live-flow-heading">Challenge-bound verification, unchanged callback.</h2>
+        <p>Hemsted creates the challenge server-side and redirects to the OTRUST hosted Auth URL. After ID verification, OTRUST returns to Hemsted's registered callback with the same token/code and state behavior as the standard hosted flow.</p>
+      </div>
+
+      <div class="partner-flow-grid partner-option-grid">
+        <article class="partner-step-card">
+          <span>01</span>
+          <h3>Partner creates challenge</h3>
+          <p>Hemsted starts the session and receives an OTRUST hosted login URL tied to that short-lived challenge.</p>
+        </article>
+        <article class="partner-step-card">
+          <span>02</span>
+          <h3>User verifies ID</h3>
+          <p>The user completes OTRUST ID verification on <code>otrust.eu</code> with Hemsted branding and OTRUST disclosure visible.</p>
+        </article>
+        <article class="partner-step-card">
+          <span>03</span>
+          <h3>Callback returns to Hemsted</h3>
+          <p>The callback remains registered, scoped, and state-bound. Partner branding does not change auth semantics.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="partner-cta-band partner-contact-band" aria-labelledby="contact-heading">
+      <div>
+        <span>Integration</span>
+        <strong id="contact-heading">Build with hosted OTRUST Auth.</strong>
+        <p>Use the auth API to create a challenge, redirect to the hosted login URL, and verify the returned token server-side.</p>
+      </div>
+      <a href="/api-docs#partner-auth" class="btn btn-primary">Open API reference</a>
+    </section>
+  </main>
+
+  <div class="footer-wrapper">
+    <footer role="contentinfo">
+      <div class="footer-links">
+        <a href="/">Timestamp</a>
+        <a href="/sign">Sign</a>
+        <a href="/proof">ID</a>
+        <a href="/sign-in">Auth</a>
+          <a href="/docs">Docs</a>
+        <a href="/about">About</a>
+      <a href="/transparency">Trust Log</a>
+      <a href="/notes/why-otrust">Technical Note</a>
+      <a href="/privacy-policy">Privacy</a>
+        <a href="/terms">Terms</a>
+        <a href="https://github.com/otrust-eu/opensource" rel="noopener noreferrer">GitHub</a>
+      </div>
+      <div class="footer-copy">OTRUST - MIT License</div>
+    </footer>
+  </div>
+
+  <script src="/otrust-polish.js?v=20260530mono" defer></script>
+</body>
+</html>
+
+
+
+
+
