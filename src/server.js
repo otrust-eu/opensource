@@ -50,9 +50,7 @@ import {
   emailMuted,
   emailActionArea,
   emailDivider,
-  emailDetailsBox,
-  emailHashBox,
-  emailWarningBox
+  emailDetailsBox
 } from './emailTemplate.js';
 
 const app = express();
@@ -703,7 +701,7 @@ const gptLimiter = rateLimit({
 
 app.post('/claim/simple', gptLimiter, smallJson, async (req, res) => {
   try {
-    const { hash, source } = req.body;
+    const { hash, source, notify_email } = req.body;
 
     if (!isValidHash(hash)) {
       return res.status(400).json({ error: 'invalid_hash', message: 'Hash must be 64 hex characters (SHA-256)' });
@@ -757,6 +755,21 @@ app.post('/claim/simple', gptLimiter, smallJson, async (req, res) => {
       ots_pending: otsProof ? true : false,
       ots_submitted_at: otsProof ? timestamp : null
     });
+
+    const validEmail = notify_email && isValidEmail(notify_email) && !hasEmailInjection(notify_email)
+      ? notify_email
+      : null;
+    if (validEmail) {
+      try {
+        await db.collection('email_notifications').insertOne({
+          claim_id: receiptId,
+          email: validEmail,
+          created_at: timestamp
+        });
+      } catch (emailErr) {
+        console.error(`[Email] Failed to store notification: ${emailErr.message}`);
+      }
+    }
 
     res.status(201).json({
       status: 'ok',

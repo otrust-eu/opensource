@@ -15,9 +15,12 @@ const targetRoot = path.resolve(process.argv[2] || process.env.OPENSOURCE_DIR ||
 const SYNC_PATHS = [
   'src/server.js',
   'src/sign.js',
+  'src/emailTemplate.js',
   'src/zkproof.js',
   'src/crypto.js',
   'src/db.js',
+  'test/email.test.js',
+  'test/api.test.js',
   'web',
   'sdk-js',
   'sdk-python',
