@@ -20,7 +20,13 @@
       'backup.desc': 'Export keys and local history as a password-protected file. Import on another browser in this profile.',
       'toast.confirmed': 'Bitcoin confirmed!',
       'share.copy': 'Copy share text',
-      'share.png': 'Download share card'
+      'share.png': 'Download share card',
+      'sign.topline': 'Signature evidence workspace',
+      'sign.title': 'Create and track signing requests.',
+      'sign.subtitle': 'Upload temporarily or keep documents local, invite parties, and produce a verifiable signature package.',
+      'sign.history.intro': 'Your signed documents list is stored in this browser only.',
+      'proof.title': 'ID & verification',
+      'proof.subtitle': 'Create commitment-based ID packages and verify proofs independently.'
     },
     sv: {
       'workspace.topline': 'Lokal-först arbetsyta',
@@ -37,7 +43,13 @@
       'backup.desc': 'Exportera nycklar och lokal historik som lösenordsskyddad fil. Importera i en annan webbläsare.',
       'toast.confirmed': 'Bitcoin bekräftad!',
       'share.copy': 'Kopiera delningstext',
-      'share.png': 'Ladda ner delningskort'
+      'share.png': 'Ladda ner delningskort',
+      'sign.topline': 'Signeringsbevis arbetsyta',
+      'sign.title': 'Skapa och följ signeringsförfrågningar.',
+      'sign.subtitle': 'Ladda upp tillfälligt eller behåll dokument lokalt, bjud in parter och skapa ett verifierbart signaturpaket.',
+      'sign.history.intro': 'Din lista över signerade dokument sparas bara i den här webbläsaren.',
+      'proof.title': 'ID & verifiering',
+      'proof.subtitle': 'Skapa commitment-baserade ID-paket och verifiera bevis självständigt.'
     }
   };
 

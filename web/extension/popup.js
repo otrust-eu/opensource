@@ -68,6 +68,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     ).join('')}</div>`;
   }
 
+  document.getElementById('backup-export-btn')?.addEventListener('click', async () => {
+    const password = prompt('Backup password (min 8 chars):');
+    if (!password) return;
+    try {
+      const backup = await exportEncryptedBackup(password);
+      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `otrust-extension-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      alert('Backup failed: ' + e.message);
+    }
+  });
+
   historyBtn.addEventListener('click', async () => {
     const receipts = await getMyReceipts();
     if (!receipts.length) {
@@ -315,6 +332,57 @@ async function sign(hash, keys) {
   const hashBytes = new Uint8Array(hash.match(/.{2}/g).map(b => parseInt(b, 16)));
   const sig = await crypto.subtle.sign({ name: 'Ed25519' }, key, hashBytes);
   return Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function deriveBackupKey(password, salt) {
+  const enc = new TextEncoder();
+  const material = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt, iterations: 120000, hash: 'SHA-256' },
+    material,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['encrypt', 'decrypt']
+  );
+}
+
+function b64(bytes) {
+  return btoa(String.fromCharCode(...bytes));
+}
+
+function fromB64(str) {
+  const bin = atob(str);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes;
+}
+
+async function exportEncryptedBackup(password) {
+  if (!password || password.length < 8) throw new Error('Password must be at least 8 characters');
+  const stored = await chrome.storage.local.get(['otrust_keys', RECEIPTS_KEY, NOTIFY_EMAIL_KEY]);
+  const payload = {
+    version: 1,
+    exported_at: new Date().toISOString(),
+    source: 'extension',
+    keys: stored.otrust_keys || null,
+    receipts: stored[RECEIPTS_KEY] || [],
+    notify_email: stored[NOTIFY_EMAIL_KEY] || null
+  };
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const key = await deriveBackupKey(password, salt);
+  const ciphertext = await crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv },
+    key,
+    new TextEncoder().encode(JSON.stringify(payload))
+  );
+  return {
+    format: 'otrust-local-backup',
+    version: 1,
+    salt: b64(salt),
+    iv: b64(iv),
+    ciphertext: b64(new Uint8Array(ciphertext))
+  };
 }
 
 function escapeHtml(text) {

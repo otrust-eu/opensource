@@ -1291,6 +1291,11 @@ function renderProofPage(claim, info, receiptId) {
     dateStyle: 'medium', 
     timeStyle: 'short' 
   }) + ' UTC' : null;
+
+  const baseUrl = process.env.BASE_URL || 'https://www.otrust.eu';
+  const proofUrl = `${baseUrl}/proof/${receiptId}`;
+  const ogImage = `${baseUrl}/api/qr?size=630&data=${encodeURIComponent(proofUrl)}`;
+  const ogDescription = `${statusText} · SHA-256 ${escapeHtml(shortHash)}${claim.filename ? ` · ${escapeHtml(claim.filename)}` : ''}`;
   
   return `<!DOCTYPE html>
 <html lang="en">
@@ -1299,6 +1304,16 @@ function renderProofPage(claim, info, receiptId) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Timestamp Proof - ${receiptSafe} | OTRUST</title>
   <meta name="description" content="Blockchain timestamp proof for hash ${escapeHtml(shortHash)}">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="${escapeHtml(proofUrl)}">
+  <meta property="og:title" content="OTRUST proof ${receiptSafe}">
+  <meta property="og:description" content="${ogDescription}">
+  <meta property="og:image" content="${escapeHtml(ogImage)}">
+  <meta property="og:site_name" content="OTRUST">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="OTRUST proof ${receiptSafe}">
+  <meta name="twitter:description" content="${ogDescription}">
+  <meta name="twitter:image" content="${escapeHtml(ogImage)}">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <style>
     :root {
@@ -3170,6 +3185,53 @@ app.get('/health', async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ status: 'error', message: error.message });
+  }
+});
+
+// GET /status.json - Public operational status (for status page & monitoring)
+app.get('/status.json', async (req, res) => {
+  try {
+    const db = getDb();
+    const claims = db.collection('claims');
+    const signRequests = db.collection('sign_requests');
+
+    const [totalClaims, confirmedClaims, pendingOts, signPendingOts, latestClaim] = await Promise.all([
+      claims.countDocuments(),
+      claims.countDocuments({ blockchain_confirmed: true }),
+      claims.countDocuments({ ots_pending: true }),
+      signRequests.countDocuments({ status: 'completed', ots_pending: true }),
+      claims.findOne(
+        { blockchain_confirmed: true, blockchain_block: { $exists: true } },
+        { sort: { blockchain_block: -1 } }
+      )
+    ]);
+
+    res.set('Cache-Control', 'public, max-age=60');
+    res.json({
+      status: 'operational',
+      service: 'OTRUST',
+      version: '2.0.0',
+      updated_at: new Date().toISOString(),
+      services: {
+        api: 'ok',
+        database: 'ok',
+        email: config.features.email ? (sendEmail ? 'configured' : 'disabled') : 'off',
+        ots_processor: process.env.NODE_ENV === 'test' ? 'paused' : 'active'
+      },
+      metrics: {
+        total_claims: totalClaims,
+        confirmed_claims: confirmedClaims,
+        pending_ots_claims: pendingOts,
+        pending_ots_signatures: signPendingOts,
+        latest_bitcoin_block: latestClaim?.blockchain_block || null
+      },
+      links: {
+        transparency: `${process.env.BASE_URL || 'https://www.otrust.eu'}/transparency`,
+        stats: `${process.env.BASE_URL || 'https://www.otrust.eu'}/stats`
+      }
+    });
+  } catch (error) {
+    res.status(503).json({ status: 'degraded', message: error.message });
   }
 });
 

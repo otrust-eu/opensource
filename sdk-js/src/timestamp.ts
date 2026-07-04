@@ -539,7 +539,7 @@ export async function createWithPoW(
   signature: string,
   pubkey: string,
   pow: ProofOfWork,
-  options?: { filename?: string; email?: string }
+  options?: { filename?: string; email?: string; notifyWebhook?: string; notifyWebhookSecret?: string }
 ): Promise<Result<TimestampClaim>> {
   if (!isValidHash(hash)) {
     return err(new OTrustError('validation_error', 'Invalid hash format'));
@@ -558,6 +558,8 @@ export async function createWithPoW(
     pow,
     filename: options?.filename,
     notify_email: options?.email,
+    notify_webhook: options?.notifyWebhook,
+    notify_webhook_secret: options?.notifyWebhookSecret,
   });
 
   if (!result.ok) {

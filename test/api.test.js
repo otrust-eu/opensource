@@ -377,6 +377,15 @@ describe('API Integration Tests', () => {
     });
   });
 
+  describe('GET /status.json', () => {
+    test('returns operational status', async () => {
+      const res = await request('/status.json');
+      expect(res.status).toBe(200);
+      expect(res.body.status).toBe('operational');
+      expect(res.body.services?.api).toBe('ok');
+    });
+  });
+
   describe('POST /claim/simple', () => {
     test('creates claim without PoW for trusted sources', async () => {
       const testHash = hash('simple claim test ' + Date.now());

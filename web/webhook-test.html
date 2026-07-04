@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OTRUST Webhook Tester</title>
+  <link rel="stylesheet" href="/otrust-redesign.css?v=20260704ux">
+</head>
+<body data-otrust-page="docs">
+  <main style="max-width:760px;margin:2rem auto;padding:0 1rem;">
+    <h1>Webhook signature tester</h1>
+    <p>Verify <code>X-OTRUST-Signature</code> HMAC for Bitcoin confirmation webhooks. Use the same secret you pass as <code>notify_webhook_secret</code> on claim.</p>
+
+    <label style="display:block;margin-top:1rem;font-size:0.85rem;">Webhook secret</label>
+    <input id="secret" type="password" style="width:100%;padding:0.6rem;border:1px solid var(--border);border-radius:6px;" placeholder="your-secret">
+
+    <label style="display:block;margin-top:1rem;font-size:0.85rem;">JSON payload</label>
+    <textarea id="payload" rows="12" style="width:100%;padding:0.75rem;font-family:monospace;font-size:0.8rem;border:1px solid var(--border);border-radius:6px;">{
+  "event": "bitcoin_confirmed",
+  "receipt_id": "ot_example123",
+  "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "block_height": 912345,
+  "proof_url": "https://www.otrust.eu/proof/ot_example123",
+  "ots_url": "https://www.otrust.eu/proof/ot_example123?format=ots",
+  "confirmed_at": "2026-07-04T14:00:00.000Z"
+}</textarea>
+
+    <button type="button" class="btn btn-primary" id="compute" style="margin-top:1rem;">Compute signature</button>
+
+    <pre id="output" style="margin-top:1rem;padding:1rem;background:#f5f5f4;border-radius:8px;white-space:pre-wrap;"></pre>
+
+    <p style="margin-top:1.5rem;font-size:0.85rem;"><a href="/docs#widgets">Webhook docs</a> · Try <a href="https://webhook.site" target="_blank" rel="noopener">webhook.site</a> as a temporary endpoint.</p>
+  </main>
+  <script>
+    document.getElementById('compute').addEventListener('click', async () => {
+      const secret = document.getElementById('secret').value;
+      const body = document.getElementById('payload').value.trim();
+      if (!secret) { alert('Enter a secret'); return; }
+      try { JSON.parse(body); } catch { alert('Invalid JSON'); return; }
+      const enc = new TextEncoder();
+      const key = await crypto.subtle.importKey('raw', enc.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+      const sig = await crypto.subtle.sign('HMAC', key, enc.encode(body));
+      const hex = Array.from(new Uint8Array(sig)).map((b) => b.toString(16).padStart(2, '0')).join('');
+      document.getElementById('output').textContent = 'Header to expect:\\nX-OTRUST-Signature: sha256=' + hex;
+    });
+  </script>
+</body>
+</html>

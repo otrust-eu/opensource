@@ -140,6 +140,39 @@ const hash = await timestamp.hash(file, (progress) => {
 });
 ```
 
+#### Notifications & client-side receipt history
+
+Receipt lists are **browser-local** — `GET /receipts/:pubkey` returns `410 Gone`. Persist `receiptId` when you create a claim:
+
+```typescript
+// With PoW + signed claim (webhook on Bitcoin confirm):
+const result = await timestamp.createWithPoW(hash, signature, pubkey, pow, {
+  email: 'you@example.com',
+  notifyWebhook: 'https://app.example/hooks/otrust',
+  notifyWebhookSecret: 'your-hmac-secret',
+});
+
+if (result.ok) {
+  localStorage.setItem('last_receipt', result.value.receiptId);
+}
+```
+
+`timestamp.getReceiptsByPubkey()` is **deprecated** — use your own storage instead.
+
+Webhook payload on Bitcoin confirm:
+
+```json
+{
+  "event": "bitcoin_confirmed",
+  "receipt_id": "ot_abc123",
+  "hash": "sha256-hex",
+  "block_height": 912345,
+  "proof_url": "https://www.otrust.eu/proof/ot_abc123"
+}
+```
+
+Verify `X-OTRUST-Signature: sha256=<hmac>` when you set `notifyWebhookSecret`. Test at [/webhook-test](https://www.otrust.eu/webhook-test).
+
 ### Sign Service
 
 ```typescript

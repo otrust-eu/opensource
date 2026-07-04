@@ -1277,14 +1277,15 @@
     <div class="sign-card service-workspace-card proof-workspace-card sign-workspace-card">
       <div class="timestamp-dashboard-head">
         <div>
-          <span class="workspace-topline">Signature evidence workspace</span>
-          <h2>Create and track signing requests.</h2>
-          <p>Upload temporarily or keep documents local, invite parties, and produce a verifiable signature package.</p>
+          <span class="workspace-topline" data-i18n="sign.topline">Signature evidence workspace</span>
+          <h2 data-i18n="sign.title">Create and track signing requests.</h2>
+          <p data-i18n="sign.subtitle">Upload temporarily or keep documents local, invite parties, and produce a verifiable signature package.</p>
         </div>
         <div class="timestamp-live-meta" aria-label="Signing guarantees">
           <span>Local hash option</span>
           <span>Ed25519 signatures</span>
           <span>Bitcoin anchored record</span>
+          <button type="button" class="lang-toggle-btn" id="lang-toggle" title="Switch language" style="margin-left:0.5rem;padding:0.2rem 0.45rem;border:1px solid var(--border);border-radius:4px;background:var(--bg-card);font-size:0.65rem;cursor:pointer;">SV</button>
         </div>
       </div>
       <div class="timestamp-dashboard-body">
@@ -1487,7 +1488,7 @@
         <div class="timestamp-panel-heading">
           <span>02 / Request ledger</span>
           <h3>History</h3>
-          <p>Track signing requests created from this browser and reopen their status pages.</p>
+          <p data-i18n="sign.history.intro">Track signing requests created from this browser and reopen their status pages. Stored in this browser only.</p>
         </div>
 
         <div class="my-signings-list" id="my-signings-list">
@@ -2307,6 +2308,7 @@
     }
   </script>
   <script src="/js/usage-beacon.js?v=20260704activity"></script>
+  <script src="/js/i18n.js?v=20260704pack2"></script>
   <script src="/otrust-polish.js?v=20260530mono" defer></script>
 </body>
 </html>

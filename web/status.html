@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OTRUST Status</title>
+  <link rel="stylesheet" href="/otrust-redesign.css?v=20260704ux">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body data-otrust-page="docs">
+  <main style="max-width:720px;margin:2rem auto;padding:0 1rem;">
+    <h1>OTRUST Status</h1>
+    <p id="status-summary" style="color:var(--text-dim);">Loading…</p>
+    <div id="status-grid" style="display:grid;gap:0.75rem;margin-top:1.5rem;"></div>
+    <p style="margin-top:2rem;font-size:0.85rem;"><a href="/transparency">Transparency log</a> · <a href="/stats">Full stats</a> · <a href="/health">Health JSON</a></p>
+  </main>
+  <script>
+    async function loadStatus() {
+      const res = await fetch('/status.json');
+      const data = await res.json();
+      const ok = data.status === 'operational';
+      document.getElementById('status-summary').innerHTML = ok
+        ? '<span style="color:#2d5a3d;font-weight:600;">● Operational</span> — updated ' + new Date(data.updated_at).toLocaleString()
+        : '<span style="color:#b45309;font-weight:600;">● ' + (data.status || 'unknown') + '</span>';
+      const items = [
+        ['API', data.services?.api],
+        ['Database', data.services?.database],
+        ['OTS processor', data.services?.ots_processor],
+        ['Email', data.services?.email],
+        ['Confirmed claims', data.metrics?.confirmed_claims],
+        ['Pending OTS (claims)', data.metrics?.pending_ots_claims],
+        ['Latest Bitcoin block', data.metrics?.latest_bitcoin_block || '—']
+      ];
+      document.getElementById('status-grid').innerHTML = items.map(([k, v]) =>
+        `<div style="display:flex;justify-content:space-between;padding:0.75rem 1rem;border:1px solid var(--border);border-radius:8px;background:var(--bg-card);"><span>${k}</span><strong>${v ?? '—'}</strong></div>`
+      ).join('');
+    }
+    loadStatus().catch(() => {
+      document.getElementById('status-summary').textContent = 'Could not load status.';
+    });
+    setInterval(loadStatus, 60000);
+  </script>
+</body>
+</html>
