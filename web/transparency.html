@@ -239,6 +239,8 @@
         <p>The product is designed around hashes, signatures, ID metadata, and explicit user-controlled sharing. Raw content is not needed for public verification.</p>
         <ul>
           <li>File timestamping hashes in the browser.</li>
+          <li>Timestamp and Sign history lists are stored in your browser only (<code>localStorage</code> or extension storage) — not on the server and not shareable by public key or URL.</li>
+          <li>The server does not expose per-key receipt lists; individual proof URLs still work if you have the receipt ID.</li>
           <li>Optional notification emails are stored separately.</li>
           <li>ID views do not reveal underlying personal data.</li>
         </ul>

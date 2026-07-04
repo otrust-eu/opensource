@@ -49,7 +49,7 @@
     <section class="hero">
       <h1>Privacy Policy</h1>
       <p>We built OTRUST so you do not have to trust us blindly. We minimize data by design and keep sensitive checks local when possible.</p>
-      <p class="last-updated">Last updated: January 6, 2026</p>
+      <p class="last-updated">Last updated: July 4, 2026</p>
     </section>
 
     <section class="tldr">
@@ -70,6 +70,10 @@
         <div class="tldr-item">
           <span class="tldr-icon" aria-hidden="true"></span>
           <p><strong>Auth:</strong> hosted challenges, callback binding, and partner context with visible OTRUST processing.</p>
+        </div>
+        <div class="tldr-item">
+          <span class="tldr-icon" aria-hidden="true"></span>
+          <p><strong>History:</strong> your timestamp and Sign receipt lists stay in this browser only — not synced to the server or shared via public key.</p>
         </div>
         <div class="tldr-item">
           <span class="tldr-icon" aria-hidden="true"></span>
@@ -99,6 +103,10 @@
           </ul>
         </div>
       </div>
+      <div class="info-card">
+        <h4>Browser-local history</h4>
+        <p>Receipt lists in the Timestamp tool and browser extension are saved in your browser (<code>localStorage</code> or extension storage). They are not uploaded, not listed by public key on the server, and not passed in URLs. Clearing site data or using another browser or device starts with an empty list. Individual proof pages remain public if someone knows the receipt ID.</p>
+      </div>
     </section>
 
     <section class="section">
@@ -125,6 +133,10 @@
       <div class="info-card">
         <h4>Permanent signature evidence</h4>
         <p>Signature records include document hash, signer-provided identifiers, cryptographic signatures, and timestamps so records can be verified later.</p>
+      </div>
+      <div class="info-card">
+        <h4>Browser-local signing history</h4>
+        <p>Your list of documents you have signed is stored in this browser only, the same way as timestamp receipts. It is not exposed as a server-side list tied to your key.</p>
       </div>
     </section>
 
