@@ -32,17 +32,17 @@
 
   function initChangelogBanner() {
     if (localStorage.getItem(STORAGE.changelog) === '1') return;
-    const hero = document.querySelector('.bento-hero-copy');
-    if (!hero) return;
+    const anchor = document.querySelector('.bento-hero-actions');
+    if (!anchor) return;
 
     const note = document.createElement('p');
     note.className = 'otrust-changelog-banner';
     note.innerHTML = `
-      <span>Jul 2026: Bento redesign, Bitcoin anchoring UX, live transparency stats.</span>
-      <a href="/changelog">What&rsquo;s new</a>
-      <button type="button" aria-label="Dismiss">×</button>
+      <span>What&rsquo;s new: bento UX, Bitcoin alerts, live transparency.</span>
+      <a href="/changelog">Changelog</a>
+      <button type="button" aria-label="Dismiss">&times;</button>
     `;
-    hero.appendChild(note);
+    anchor.insertAdjacentElement('afterend', note);
     note.querySelector('button')?.addEventListener('click', () => {
       localStorage.setItem(STORAGE.changelog, '1');
       note.remove();

@@ -1141,8 +1141,25 @@ body[data-otrust-page="timestamp"] .otrust-sidebar { display: none !important; }
 
 /* ---- footer ---- */
 .bento-footer {
-  display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap;
-  border-top: 1px solid var(--otrust-line); margin-top: 1.6rem; padding: 1.6rem 0 0.4rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.25rem;
+  border-top: 1px solid var(--otrust-line);
+  margin-top: 1.6rem;
+  padding: 1.6rem 0 0.4rem;
+}
+.bento-footer-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+@media (min-width: 900px) {
+  .bento-footer {
+    grid-template-columns: minmax(12rem, 1fr) minmax(0, 2fr);
+    align-items: start;
+  }
+  .bento-footer-meta { grid-column: 1; }
+  .bento-footer .footer-nav-groups { grid-column: 2; justify-content: flex-end; }
 }
 .bento-footer .footer-brand { font-weight: 700; letter-spacing: 0.3em; font-size: 0.8rem; color: var(--otrust-ink); text-decoration: none; }
 .bento-footer .footer-copy { font-size: 0.72rem; color: var(--otrust-faint); }
@@ -4469,14 +4486,6 @@ body.otrust-page-note .dashboard-page-panel .note-side {
   border: 1px solid var(--otrust-line-2); background: var(--otrust-card); border-radius: var(--ot-radius);
   padding: 0.45rem 0.85rem; font-size: 0.72rem; cursor: pointer;
 }
-.otrust-changelog-banner {
-  display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap; margin-top: 0.85rem;
-  font-size: 0.78rem; color: var(--otrust-dim);
-}
-.otrust-changelog-banner a { color: var(--otrust-ink); }
-.otrust-changelog-banner button {
-  border: none; background: none; cursor: pointer; font-size: 1.1rem; line-height: 1; color: var(--otrust-faint);
-}
 .receipt-qr { margin: 0.75rem 0; text-align: left; }
 .receipt-qr img { border: 1px solid var(--otrust-line); border-radius: 6px; background: #fff; }
 .receipt-qr-caption { margin: 0.35rem 0 0; font-size: 0.72rem; color: var(--otrust-faint); }
@@ -4484,8 +4493,42 @@ body.otrust-page-note .dashboard-page-panel .note-side {
   display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.45rem;
   font-size: 0.78rem; color: var(--otrust-ink); cursor: pointer;
 }
-.notify-email-opt input { width: auto; margin: 0; }
+.notify-email-opt input { width: auto; margin: 0; flex-shrink: 0; }
 .notify-email-group input[type="email"]:disabled { opacity: 0.45; }
+.form-group .notify-email-opt,
+.dashboard-home.otrust-subpage-shell .dashboard-tool-slot .notify-email-opt {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--otrust-ink);
+}
+.form-group .notify-email-opt > span,
+.dashboard-home.otrust-subpage-shell .dashboard-tool-slot .notify-email-opt > span {
+  display: inline;
+  margin: 0;
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--otrust-ink);
+}
+.otrust-changelog-banner {
+  display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap;
+  width: 100%; margin-top: 0.85rem; padding: 0.55rem 0.75rem;
+  border: 1px solid var(--otrust-line); border-radius: var(--ot-radius);
+  background: var(--otrust-paper); font-size: 0.78rem; color: var(--otrust-dim);
+}
+.otrust-changelog-banner a { color: var(--otrust-ink); text-decoration: none; }
+.otrust-changelog-banner a:hover { text-decoration: underline; }
+.otrust-changelog-banner button {
+  margin-left: auto; border: none; background: none; cursor: pointer;
+  font-size: 1.1rem; line-height: 1; color: var(--otrust-faint);
+}
 
 .changelog-page, .health-page, .use-cases-page, .partner-preview-page {
   max-width: 920px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem;

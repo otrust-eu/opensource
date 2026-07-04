@@ -217,7 +217,7 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <!-- Privacy-respecting analytics (no cookies, no personal data) -->
   <script defer data-domain="otrust.eu" src="https://plausible.io/js/script.js"></script>
-  <link rel="stylesheet" href="/otrust-redesign.css?v=20260704ux">
+  <link rel="stylesheet" href="/otrust-redesign.css?v=20260704fix">
 </head>
 <body data-otrust-page="home">
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -446,8 +446,10 @@
     </div>
 
     <footer class="bento-footer">
-      <a href="/" class="footer-brand">OTRUST</a>
-      <span class="footer-copy">&copy; 2026 OTRUST <span class="made-in-eu" aria-hidden="true">&middot; Made in Sweden, Europe</span></span>
+      <div class="bento-footer-meta">
+        <a href="/" class="footer-brand">OTRUST</a>
+        <span class="footer-copy">&copy; 2026 OTRUST <span class="made-in-eu" aria-hidden="true">&middot; Made in Sweden, Europe</span></span>
+      </div>
       <nav class="footer-nav-groups" aria-label="Footer">
         <div class="footer-nav-group">
           <span class="footer-nav-label">Use OTRUST</span>
@@ -1267,7 +1269,7 @@
             warningHtml += `
               <div class="existing-warning">
                 Timestamped on ${new Date(ts.created_at).toLocaleDateString()}
-                ${ts.blockchain_confirmed ? '? Confirmed' : 'Pending'}
+                ${ts.blockchain_confirmed ? 'Confirmed' : 'Pending'}
                 <a href="/proof/${ts.receipt_id}" target="_blank" rel="noopener noreferrer">View</a>
               </div>
             `;
@@ -1374,10 +1376,10 @@
           if (data.status === 'already_registered') {
             resultEl.innerHTML = `
               <div class="result result-warning">
-                <h4>?? Already Timestamped</h4>
+                <h4>Already timestamped</h4>
                 <p style="color: var(--text-dim); font-size: 0.8rem; margin-bottom: 1rem;">This content was already registered on <strong>${new Date(data.timestamp).toLocaleDateString()}</strong>. No new timestamp created.</p>
                 <div class="result-row"><span class="label">Receipt ID</span><span class="value">${data.receipt_id}</span></div>
-                <div class="result-row"><span class="label">Blockchain</span><span class="value">${data.blockchain_confirmed ? '? Confirmed' : 'Pending confirmation'}</span></div>
+                <div class="result-row"><span class="label">Blockchain</span><span class="value">${data.blockchain_confirmed ? 'Confirmed' : 'Pending confirmation'}</span></div>
               </div>`;
             files = [];
             renderFiles();
@@ -1405,7 +1407,7 @@
             const qrHtml = `<div class="receipt-qr"><img src="/api/qr?size=120&data=${encodeURIComponent(verifyUrl)}" width="120" height="120" alt="QR code for verification URL"><p class="receipt-qr-caption">Scan to verify later</p></div>`;
             resultEl.innerHTML = `
               <div class="result">
-                <h4>? Timestamp Created</h4>
+                <h4>Timestamp created</h4>
                 ${qrHtml}
                 <div class="result-row"><span class="label">Receipt ID</span><span class="value">${data.receipt_id}</span></div>
                 ${claimFilename ? `<div class="result-row"><span class="label">File</span><span class="value">${claimFilename}</span></div>` : ''}
@@ -1424,7 +1426,7 @@
               : '';
             resultEl.innerHTML = `
               <div class="result">
-                <h4>? Batch Processed</h4>
+                <h4>Batch processed</h4>
                 ${bulkEmailNote}
                 <div class="result-row"><span class="label">Created</span><span class="value">${data.created}</span></div>
                 <div class="result-row"><span class="label">Duplicates</span><span class="value">${data.duplicates}</span></div>
@@ -1439,7 +1441,7 @@
           const errorMsg = escapeHtml(data.message || data.error || 'Something went wrong');
           resultEl.innerHTML = `
             <div style="padding: 1rem; background: #fef2f2; border-radius: 8px; margin-top: 1rem; border-left: 4px solid #dc2626;">
-              <strong style="color: #dc2626;">?? ${errorMsg}</strong>
+              <strong style="color: #dc2626;">${errorMsg}</strong>
               ${data.error === 'rate_limit_exceeded' ? '<p style="color: #666; font-size: 0.8rem; margin-top: 0.5rem;">Please wait a moment and try again.</p>' : ''}
             </div>`;
         }
@@ -1455,7 +1457,7 @@
     function setStep(step, state) {
       const el = document.getElementById('step-' + step);
       el.className = 'progress-step ' + state;
-      if (state === 'done') el.querySelector('.icon').textContent = '?';
+      if (state === 'done') el.querySelector('.icon').textContent = '\u2713';
     }
     
     async function solvePow(challenge, difficulty) {
@@ -1613,11 +1615,11 @@
         if (data.status === 'found') {
           const claim = data.claims[0];
           resultEl.innerHTML = '<div class="result">' +
-            '<h4>? Verified</h4>' +
+            '<h4>Verified</h4>' +
             '<div class="result-row"><span class="label">Hash</span><span class="value">' + hash.substring(0, 20) + '...</span></div>' +
             '<div class="result-row"><span class="label">Timestamp</span><span class="value">' + claim.timestamp + '</span></div>' +
             '<div class="result-row"><span class="label">Receipt ID</span><span class="value">' + claim.receipt_id + '</span></div>' +
-            '<div class="result-row"><span class="label">Blockchain</span><span class="value">' + (claim.blockchain_confirmed ? '? Confirmed' : 'Pending') + '</span></div>' +
+            '<div class="result-row"><span class="label">Blockchain</span><span class="value">' + (claim.blockchain_confirmed ? 'Confirmed' : 'Pending') + '</span></div>' +
             (data.claims.length > 1 ? '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--text-dim);">+ ' + (data.claims.length - 1) + ' more claim(s)</div>' : '') +
           '</div>';
         } else {
@@ -1701,7 +1703,7 @@
         let html = '<div style="margin-top:1rem;">';
         
         if (duplicates.length > 0) {
-          html += '<div style="background:#fef3c7;border:1px solid #fcd34d;border-radius:8px;padding:1rem;margin-bottom:1rem;"><strong>?? Duplicates Found</strong><ul style="margin:0.5rem 0 0 1rem;font-size:0.85rem;">';
+          html += '<div style="background:#fef3c7;border:1px solid #fcd34d;border-radius:8px;padding:1rem;margin-bottom:1rem;"><strong>Duplicates found</strong><ul style="margin:0.5rem 0 0 1rem;font-size:0.85rem;">';
           duplicates.forEach(([hash, names]) => {
             html += '<li>' + names.join(', ') + '</li>';
           });
@@ -1762,7 +1764,7 @@
         const bannerHtml = pubkeyOverride ? 
           '<div style="background:var(--accent-light);border:1px solid var(--accent);border-radius:8px;padding:0.75rem;margin-bottom:1rem;font-size:0.75rem;">' +
           '<strong>Viewing history for key:</strong> ' + pubkeyOverride.slice(0,16) + '...' +
-          '<br><a href="#" onclick="loadMyReceipts();return false;" style="color:var(--accent);">? Back to my history</a></div>' : '';
+          '<br><a href="#" onclick="loadMyReceipts();return false;" style="color:var(--accent);">Back to my history</a></div>' : '';
         
         if (data.receipts.length === 0) {
           listEl.innerHTML = bannerHtml + '<div style="text-align:center;padding:2rem;color:var(--text-dim);">No timestamps found for this key.</div>';
@@ -1790,7 +1792,7 @@
               </div>
               <div class="receipt-meta">
                 <div class="receipt-date">${new Date(r.timestamp).toLocaleDateString()}</div>
-                <div class="receipt-status ${r.blockchain_confirmed ? 'confirmed' : 'pending'}">${r.blockchain_confirmed ? '? Confirmed' : 'Pending'}</div>
+                <div class="receipt-status ${r.blockchain_confirmed ? 'confirmed' : 'pending'}">${r.blockchain_confirmed ? 'Confirmed' : 'Pending'}</div>
               </div>
             </div>
           `).join('');
@@ -1831,7 +1833,7 @@
           '<div class="receipt-qr"><img src="/api/qr?size=120&data=' + encodeURIComponent(verifyUrl) + '" width="120" height="120" alt="QR code for verification URL"><p class="receipt-qr-caption">Scan to verify</p></div>' +
           '<div class="result-row"><span class="label">Hash</span><span class="value" style="word-break:break-all;">' + (data.hash || 'N/A') + '</span></div>' +
           '<div class="result-row"><span class="label">Created</span><span class="value">' + (data.created_at || 'N/A') + '</span></div>' +
-          '<div class="result-row"><span class="label">Blockchain</span><span class="value">' + (data.blockchain?.confirmed ? '? Block ' + data.blockchain.block_height : 'Pending — checking every 90s') + '</span></div>' +
+          '<div class="result-row"><span class="label">Blockchain</span><span class="value">' + (data.blockchain?.confirmed ? 'Block ' + data.blockchain.block_height : 'Pending — checking every 90s') + '</span></div>' +
           '<div class="receipt-actions">';
         
         if (data.download_url) {
@@ -2031,7 +2033,7 @@
           <div class="field-label">Blockchain Status</div>
           <div class="field-value ${data.blockchain?.confirmed ? 'verified' : 'pending'}">
             ${data.blockchain?.confirmed 
-              ? '? Confirmed in Block #' + data.blockchain.block_height
+              ? 'Confirmed in block #' + data.blockchain.block_height
               : 'Pending blockchain confirmation'}
           </div>
         </div>
@@ -2082,8 +2084,8 @@
       URL.revokeObjectURL(url);
     };
   </script>
-  <script src="/js/otrust-extras.js?v=20260704ux" defer></script>
-  <script src="/otrust-polish.js?v=20260704ux" defer></script>
+  <script src="/js/otrust-extras.js?v=20260704fix" defer></script>
+  <script src="/otrust-polish.js?v=20260704fix" defer></script>
 </body>
 </html>
 
