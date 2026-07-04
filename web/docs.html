@@ -757,7 +757,7 @@ configure({
               <li><strong>Encrypted backup</strong> – Keys tab → export/import password-protected JSON (keys + receipts + sign history)</li>
               <li><strong>Share proof</strong> – Download a share card (PNG) or copy verification text after creating a timestamp</li>
               <li><strong>Bitcoin toast</strong> – History tab polls pending receipts and notifies when Bitcoin confirms</li>
-              <li><strong>SV/EN</strong> – Language toggle in the timestamp workspace header</li>
+
             </ul>
             <div class="alert alert-info">
               <strong>API note:</strong> <code>GET /receipts/:pubkey</code> returns <code>410 Gone</code>. Persist receipts client-side when you create them, or use individual <code>/proof/:id</code> URLs for verification.
@@ -1221,7 +1221,7 @@ curl -s "https://www.otrust.eu/proof/ot_abc123?format=json"</code></pre>
             <p>Show live anchored-record stats on your site:</p>
             <pre><code>&lt;script src="https://www.otrust.eu/js/otrust-embed.js" data-otrust-badge&gt;&lt;/script&gt;</code></pre>
             <p>See <a href="/embed" style="color: var(--accent);">/embed</a> for a preview. Data from <a href="/stats/badges.json" style="color: var(--accent);">/stats/badges.json</a>.</p>
-            <pre><code>&lt;script src="https://www.otrust.eu/js/otrust-embed.js" data-otrust-badge data-otrust-theme="dark" data-otrust-lang="sv"&gt;&lt;/script&gt;</code></pre>
+            <pre><code>&lt;script src="https://www.otrust.eu/js/otrust-embed.js" data-otrust-badge data-otrust-theme="dark"&gt;&lt;/script&gt;</code></pre>
           </div>
 
           <div class="card">

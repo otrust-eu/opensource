@@ -2,19 +2,14 @@
  * OTRUST embeddable trust badge v2
  * Usage:
  *   <script src="https://www.otrust.eu/js/otrust-embed.js" data-otrust-badge></script>
- *   <script src="..." data-otrust-badge data-otrust-theme="dark" data-otrust-lang="sv"></script>
+ *   <script src="..." data-otrust-badge data-otrust-theme="dark"></script>
  */
 (function () {
   const script = document.currentScript;
   const API = script?.dataset?.api || 'https://www.otrust.eu/stats/badges.json';
   const theme = (script?.dataset?.otrustTheme || script?.dataset?.theme || 'light').toLowerCase();
-  const lang = (script?.dataset?.otrustLang || script?.dataset?.lang || 'en').toLowerCase();
 
-  const LABELS = {
-    en: { anchored: 'anchored', block: 'block', fallback: 'Trust infrastructure' },
-    sv: { anchored: 'förankrade', block: 'block', fallback: 'Trust-infrastruktur' }
-  };
-  const L = LABELS[lang] || LABELS.en;
+  const LABELS = { anchored: 'anchored', block: 'block', fallback: 'Trust infrastructure' };
 
   const THEMES = {
     light: { bg: '#fafaf9', border: '#e5e5e5', text: '#1a1a1a', dot: '#2d5a3d' },
@@ -37,9 +32,9 @@
       const data = await res.json();
       wrap.innerHTML = `
         <span style="width:8px;height:8px;border-radius:50%;background:${T.dot};display:inline-block;"></span>
-        <span><strong>OTRUST</strong> · ${Number(data.anchored_records || 0).toLocaleString()} ${L.anchored} · ${L.block} ${data.latest_block || '—'}</span>`;
+        <span><strong>OTRUST</strong> · ${Number(data.anchored_records || 0).toLocaleString()} ${LABELS.anchored} · ${LABELS.block} ${data.latest_block || '—'}</span>`;
     } catch {
-      wrap.innerHTML = `<span><strong>OTRUST</strong> · ${L.fallback}</span>`;
+      wrap.innerHTML = `<span><strong>OTRUST</strong> · ${LABELS.fallback}</span>`;
     }
 
     if (script?.parentElement) {
@@ -55,5 +50,5 @@
     renderBadge();
   }
 
-  window.OTRUSTEmbed = { renderBadge, theme, lang };
+  window.OTRUSTEmbed = { renderBadge, theme };
 })();

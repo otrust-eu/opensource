@@ -602,12 +602,12 @@
         <div class="method-grid">
           <button type="button" class="method-choice selected" data-proof-method="otrust-proof">
             <strong>OTRUST ID</strong>
-            <span>Anv&auml;nd ditt verifierade ID och PIN.</span>
+            <span>Use your verified ID and PIN.</span>
           </button>
         </div>
         <div class="method-disclosure" id="methodDisclosure" hidden>
           <span class="method-logo">OTRUST ID</span>
-          <span>Prim&auml;r identitetsmetod f&ouml;r detta partner-theme.</span>
+          <span>Primary identity method for this partner theme.</span>
         </div>
       </section>
 
@@ -812,9 +812,7 @@
       methodDisclosure.hidden = !usesProof;
 
       if (usesProof) {
-        document.getElementById('submitBtn').textContent = String(themeId).startsWith('hemsted_')
-          ? 'Verifiera med OTRUST ID'
-          : 'Verify with OTRUST ID';
+        document.getElementById('submitBtn').textContent = 'Verify with OTRUST ID';
         document.querySelectorAll('[data-proof-method]').forEach(button => button.classList.add('selected'));
       } else {
         document.getElementById('submitBtn').textContent = 'Verify and Continue';
