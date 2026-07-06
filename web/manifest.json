@@ -1,8 +1,8 @@
 {
-  "name": "OTRUST Identity",
-  "short_name": "OTRUST ID",
-  "description": "Your verified digital identity",
-  "start_url": "/proof/",
+  "name": "OTRUST",
+  "short_name": "OTRUST",
+  "description": "Cryptographic trust infrastructure for timestamps, ID packages, signing and hosted Auth flows.",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#2d5a3d",
   "theme_color": "#2d5a3d",

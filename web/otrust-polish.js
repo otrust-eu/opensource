@@ -114,6 +114,7 @@
     if (primary) {
       primary.innerHTML = `
         <a href="/timestamp">Timestamp</a>
+        <a href="/proof">ID</a>
         <a href="/sign">Sign</a>
         <a href="/sign-in">Auth</a>
       `;
@@ -179,6 +180,7 @@
         <div class="nav-links">
           <span class="nav-primary">
             <a href="/timestamp">Timestamp</a>
+            <a href="/proof">ID</a>
             <a href="/sign">Sign</a>
             <a href="/sign-in">Auth</a>
           </span>
@@ -3378,7 +3380,6 @@
         <div class="footer-links">
           <a href="/timestamp">Timestamp</a>
           <a href="/sign">Sign</a>
-          <a href="/about">About</a>
           <a href="/sign-in">Auth</a>
           <a href="/docs">Docs</a>
           <a href="/api-docs">Developers</a>
@@ -3386,6 +3387,7 @@
           <a href="/privacy-policy">Privacy</a>
           <a href="/terms">Terms</a>
           <a href="https://github.com/otrust-eu/opensource" rel="noopener noreferrer">GitHub</a>
+          <a href="/about">About</a>
         </div>
         <div class="footer-copy">OTRUST — MIT License</div>
       </footer>

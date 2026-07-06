@@ -1272,11 +1272,23 @@ body[data-otrust-page="timestamp"] .footer-wrapper { display: none; }
   .bento-hero, .bento-band, .bento-c05 { grid-column: span 12; }
   .bento-c01, .bento-c02, .bento-c03, .bento-c04, .bento-c06, .bento-c07 { grid-column: span 6; }
   .bento-hero { min-height: 360px; }
+  .bento-hero { order: 1; }
+  .bento-c01 { order: 2; }
+  .bento-c02 { order: 3; }
+  .bento-c03 { order: 4; }
+  .bento-c04 { order: 5; }
+  .bento-band { order: 6; }
 }
 @media (max-width: 760px) {
   .bento-nav .dashboard-links a { display: inline-block !important; }
   .dashboard-menu { display: inline-block; }
   .bento-grid > * { grid-column: span 12 !important; }
+  .bento-hero { order: 1 !important; }
+  .bento-c01 { order: 2 !important; }
+  .bento-c02 { order: 3 !important; }
+  .bento-c03 { order: 4 !important; }
+  .bento-c04 { order: 5 !important; }
+  .bento-band { order: 6 !important; }
   .bento-band-steps { grid-template-columns: repeat(2, 1fr); gap: 1.4rem; }
   .bento-band-steps li::after { display: none; }
   .bento-principles { grid-template-columns: 1fr; }
@@ -1291,7 +1303,8 @@ body[data-otrust-page="timestamp"] .footer-wrapper { display: none; }
 }
 
 /* Sketch-matched index layout. The full timestamp workspace stays available
-   on /timestamp; the home index is the bento surface from the reference. */
+   on /timestamp; the home index is the bento surface from the reference.
+   Mobile: reorder to group the 4 function cards together after hero. */
 body[data-otrust-page="home"] .dashboard-tool-slot,
 body.otrust-page-home .dashboard-tool-slot {
   display: none;
@@ -1909,6 +1922,13 @@ body[data-otrust-page="quickstart"] p {
     grid-column: span 6;
   }
 
+  .bento-hero { order: 1 !important; }
+  .bento-c01 { order: 2 !important; }
+  .bento-c02 { order: 3 !important; }
+  .bento-c03 { order: 4 !important; }
+  .bento-c04 { order: 5 !important; }
+  .bento-band { order: 6 !important; }
+
   .bento-hero {
     min-height: 620px;
   }
@@ -1989,6 +2009,14 @@ body[data-otrust-page="quickstart"] p {
     border-top: 1px solid var(--otrust-line);
     padding: 1.1rem 0.8rem;
   }
+
+  .bento-grid > * { grid-column: span 12 !important; }
+  .bento-hero { order: 1 !important; }
+  .bento-c01 { order: 2 !important; }
+  .bento-c02 { order: 3 !important; }
+  .bento-c03 { order: 4 !important; }
+  .bento-c04 { order: 5 !important; }
+  .bento-band { order: 6 !important; }
 }
 
 @media (max-width: 520px) {

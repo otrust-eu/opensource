@@ -47,7 +47,8 @@ function generateKeypair() {
   }
   
   // Verify PKCS8 Ed25519 OID (1.3.101.112 = 2b 65 70)
-  const oid = privateKey.slice(7, 10);
+  // OID tag at 7-8 (06 03), value at 9-11
+  const oid = privateKey.slice(9, 12);
   if (oid[0] !== 0x2b || oid[1] !== 0x65 || oid[2] !== 0x70) {
     throw new Error('Invalid Ed25519 PKCS8 OID');
   }
@@ -178,7 +179,10 @@ function apiRequestBinary(method, path) {
       port: url.port || (isHttps ? 443 : 3000),
       path: url.pathname + url.search,
       method,
-      headers: { 'User-Agent': `otrust-cli/${VERSION}` }
+      headers: { 
+        'User-Agent': `otrust-cli/${VERSION}`,
+        'Origin': DEFAULT_API.replace(/\/$/, '')
+      }
     }, (res) => {
       const chunks = [];
       res.on('data', (c) => chunks.push(c));
@@ -202,7 +206,8 @@ function apiRequest(method, path, data = null) {
       method,
       headers: {
         'Content-Type': 'application/json',
-        'User-Agent': `otrust-cli/${VERSION}`
+        'User-Agent': `otrust-cli/${VERSION}`,
+        'Origin': DEFAULT_API.replace(/\/$/, '')
       }
     };
 
