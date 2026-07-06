@@ -75,10 +75,10 @@ export const config = {
     sign: getConfig('ENABLE_SIGN', true),
     
     // Email notifications
-    email: getConfig('ENABLE_EMAIL', false),
+    email: getConfig('ENABLE_EMAIL', true),
     
     // Bitcoin blockchain anchoring via OpenTimestamps
-    blockchain: getConfig('ENABLE_BLOCKCHAIN', false),
+    blockchain: getConfig('ENABLE_BLOCKCHAIN', true),
     
     // Web UI (disable for API-only mode)
     webUi: getConfig('ENABLE_WEB_UI', true),
