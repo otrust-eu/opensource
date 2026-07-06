@@ -114,6 +114,7 @@
     if (primary) {
       primary.innerHTML = `
         <a href="/timestamp">Timestamp</a>
+        <a href="/proof">ID</a>
         <a href="/sign">Sign</a>
         <a href="/sign-in">Auth</a>
       `;
@@ -179,6 +180,7 @@
         <div class="nav-links">
           <span class="nav-primary">
             <a href="/timestamp">Timestamp</a>
+            <a href="/proof">ID</a>
             <a href="/sign">Sign</a>
             <a href="/sign-in">Auth</a>
           </span>
