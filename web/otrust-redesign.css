@@ -1957,27 +1957,18 @@ body[data-otrust-page="quickstart"] p {
     margin: auto 1.4rem 1.6rem;
   }
 
-  /* Mobile: force single column in correct order */
-  .bento-grid > * { grid-column: span 12 !important; }
-  .bento-hero { order: 1 !important; }
-  .bento-c01 { order: 2 !important; }
-  .bento-c02 { order: 3 !important; }
-  .bento-c03 { order: 4 !important; }
-  .bento-c04 { order: 5 !important; }
-  .bento-band { order: 6 !important; }
-  .bento-principles { order: 7 !important; }
-  .bento-c05 { order: 8 !important; }
-  .bento-c06 { order: 9 !important; }
-  .bento-c07 { order: 10 !important; }
-
-  /* Strong override for mobile: force flex column to follow source order */
+  /* Mobile: force normal block stacking in source order.
+     Desired: hero + 01 TS + 02 ID + 03 Sign + 04 Auth + band steps,
+     THEN principles ("Trust is earned by design" + 4 items) + 05 + 06 + 07 */
   .bento-grid {
-    display: flex !important;
-    flex-direction: column !important;
+    display: block !important;
   }
   .bento-grid > * {
+    display: block !important;
     width: 100% !important;
     margin-bottom: 8px !important;
+    grid-column: auto !important;
+    grid-row: auto !important;
     order: 0 !important;
   }
 
