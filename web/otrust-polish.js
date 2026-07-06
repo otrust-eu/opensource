@@ -363,12 +363,6 @@
       detail: 'Hash locally, anchor records, verify later.'
     },
     {
-      key: 'proof',
-      href: '/proof',
-      label: 'ID',
-      detail: 'Verify identity facts without exposing raw data.'
-    },
-    {
       key: 'sign',
       href: '/sign',
       label: 'Sign',
