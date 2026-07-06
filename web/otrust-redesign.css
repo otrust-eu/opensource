@@ -1282,13 +1282,9 @@ body[data-otrust-page="timestamp"] .footer-wrapper { display: none; }
 @media (max-width: 760px) {
   .bento-nav .dashboard-links a { display: inline-block !important; }
   .dashboard-menu { display: inline-block; }
-  .bento-grid > * { grid-column: span 12 !important; }
-  .bento-hero { order: 1 !important; }
-  .bento-c01 { order: 2 !important; }
-  .bento-c02 { order: 3 !important; }
-  .bento-c03 { order: 4 !important; }
-  .bento-c04 { order: 5 !important; }
-  .bento-band { order: 6 !important; }
+
+  /* mobile specific, but main flex override is later in file */
+
   .bento-band-steps { grid-template-columns: repeat(2, 1fr); gap: 1.4rem; }
   .bento-band-steps li::after { display: none; }
   .bento-principles { grid-template-columns: 1fr; }
@@ -1928,6 +1924,10 @@ body[data-otrust-page="quickstart"] p {
   .bento-c03 { order: 4 !important; }
   .bento-c04 { order: 5 !important; }
   .bento-band { order: 6 !important; }
+  .bento-principles { order: 7 !important; }
+  .bento-c05 { order: 8 !important; }
+  .bento-c06 { order: 9 !important; }
+  .bento-c07 { order: 10 !important; }
 
   .bento-hero {
     min-height: 620px;
@@ -1972,6 +1972,17 @@ body[data-otrust-page="quickstart"] p {
 
   .bento-hero-foot {
     margin: auto 1.4rem 1.6rem;
+  }
+
+  /* Strong override for mobile: force flex column to follow source order */
+  .bento-grid {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  .bento-grid > * {
+    width: 100% !important;
+    margin-bottom: 8px !important;
+    order: 0 !important;
   }
 
   .bento-hero-burst {
