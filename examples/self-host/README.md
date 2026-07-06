@@ -5,8 +5,8 @@
 ## 60 seconds
 
 ```bash
-git clone https://github.com/otrust-eu/core.git
-cd core
+git clone https://github.com/otrust-eu/opensource.git
+cd opensource
 ./scripts/quickstart.sh
 ```
 

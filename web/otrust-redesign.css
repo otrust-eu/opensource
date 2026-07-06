@@ -1308,7 +1308,7 @@ main#main-content > .dashboard-home.otrust-bento,
 
 .bento-grid {
   grid-template-columns: repeat(24, minmax(0, 1fr));
-  grid-template-rows: 440px auto 100px 60px auto;
+  grid-template-rows: 440px minmax(420px, auto) 100px 60px auto;
   gap: 8px;
 }
 .bento-c02, .bento-c04 {
@@ -1317,7 +1317,7 @@ main#main-content > .dashboard-home.otrust-bento,
 
 /* Quickstart page - make it match the rest of the site, readable width, good typography */
 body[data-otrust-page="quickstart"] main#main-content {
-  max-width: 960px;
+  max-width: var(--ot-maxw);
   margin: 2.5rem auto;
   padding: 0 1.25rem 4rem;
 }
@@ -1329,6 +1329,10 @@ body[data-otrust-page="quickstart"] .content-card h3 {
 body[data-otrust-page="quickstart"] pre {
   font-size: 0.9rem;
   line-height: 1.5;
+}
+body[data-otrust-page="quickstart"] p {
+  font-size: 1rem;
+  line-height: 1.6;
 }
 
 .bento-hero {
@@ -2009,6 +2013,11 @@ body[data-otrust-page="quickstart"] pre {
   cursor: pointer;
   overflow: hidden;
   transition: border-color 0.16s ease, background 0.16s ease, transform 0.16s ease;
+}
+
+.bento-function-card.bento-c02,
+.bento-function-card.bento-c04 {
+  overflow: visible;
 }
 
 .bento-function-card:hover {
