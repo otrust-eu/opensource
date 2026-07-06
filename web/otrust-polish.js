@@ -695,6 +695,7 @@
 
   const DASHBOARD_NAV_LINKS = [
     ['/timestamp', 'Timestamp'],
+    ['/proof', 'ID'],
     ['/sign', 'Sign'],
     ['/sign-in', 'Auth']
   ];
