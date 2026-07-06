@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OTRUST Developer Portal</title>
+  <link rel="stylesheet" href="/otrust-redesign.css?v=20260706">
+  <link rel="stylesheet" href="/otrust-polish.css?v=20260706">
+  <style>
+    main { max-width: 900px; margin: 2rem auto; padding: 0 1rem 3rem; }
+    .card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
+    .row { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: end; margin-top: 0.75rem; }
+    label { display: block; font-size: 0.85rem; color: #4b5563; margin-bottom: 0.25rem; }
+    input, select, textarea { width: 100%; padding: 0.55rem 0.65rem; border: 1px solid #d1d5db; border-radius: 8px; font: inherit; }
+    button { padding: 0.55rem 0.9rem; border-radius: 8px; border: 0; background: #16160f; color: #fff; cursor: pointer; font: inherit; }
+    button.secondary { background: #f3f4f6; color: #111; border: 1px solid #d1d5db; }
+    pre { background: #f8fafc; padding: 0.75rem; border-radius: 8px; overflow: auto; font-size: 0.82rem; }
+    .muted { color: #6b7280; font-size: 0.9rem; }
+    .ok { color: #166534; }
+    .err { color: #b91c1c; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th, td { text-align: left; padding: 0.45rem 0.35rem; border-bottom: 1px solid #eee; }
+  </style>
+</head>
+<body data-otrust-page="docs">
+  <a href="#main-content" class="skip-link">Skip to content</a>
+
+  <nav role="navigation" aria-label="Main navigation">
+    <div class="nav-container">
+      <a href="/" class="logo">OTRUST</a>
+      <div class="nav-links">
+        <span class="nav-primary">
+          <a href="/timestamp">Timestamp</a>
+          <a href="/sign">Sign</a>
+          <a href="/sign-in">Auth</a>
+        </span>
+        <span class="nav-secondary" id="nav-secondary">
+          <a href="/docs" class="docs-trigger" id="docs-trigger">Docs</a>
+          <a href="/api-docs">Developers</a>
+          <a href="/about">About</a>
+        </span>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode"></button>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main-content">
+    <h1>Developer portal</h1>
+    <p class="muted"><strong>Self-host first.</strong> This runs on <em>your</em> server — not a SaaS tier. Admin: <code>X-Admin-Key</code>. Integrators: issued API keys. <a href="/quickstart.html">60-second setup →</a></p>
+
+    <section class="card">
+      <h2>Admin session</h2>
+      <div class="row">
+        <div style="flex:1;min-width:220px;">
+          <label for="adminKey">Admin key</label>
+          <input id="adminKey" type="password" placeholder="X-Admin-Key" autocomplete="off">
+        </div>
+        <div style="flex:1;min-width:220px;">
+          <label for="orgId">Organization ID</label>
+          <input id="orgId" placeholder="org_..." autocomplete="off">
+        </div>
+        <button type="button" id="saveSession">Save</button>
+      </div>
+      <p class="muted" style="margin-top:0.75rem;">Create an org: <code>POST /api/v1/platform/organizations</code></p>
+      <div class="row">
+        <div style="flex:1;min-width:220px;">
+          <label for="orgName">New org name</label>
+          <input id="orgName" placeholder="Acme Corp">
+        </div>
+        <button type="button" id="createOrg">Create organization</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>API keys</h2>
+      <div class="row">
+        <div style="flex:1;min-width:200px;">
+          <label for="keyLabel">Label</label>
+          <input id="keyLabel" value="integration">
+        </div>
+        <button type="button" id="createKey">Create API key</button>
+        <button type="button" class="secondary" id="listKeys">Refresh keys</button>
+      </div>
+      <pre id="keyOutput">No key created yet.</pre>
+      <table id="keysTable" hidden>
+        <thead><tr><th>Prefix</th><th>Label</th><th>Scopes</th><th>Created</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <h2>Webhooks</h2>
+      <div class="row">
+        <div style="flex:2;min-width:260px;">
+          <label for="apiKey">API key (Bearer)</label>
+          <input id="apiKey" type="password" placeholder="otrust_live_...">
+        </div>
+        <div style="flex:2;min-width:260px;">
+          <label for="hookUrl">Endpoint URL (HTTPS)</label>
+          <input id="hookUrl" placeholder="https://example.com/hooks/otrust">
+        </div>
+        <button type="button" id="createEndpoint">Register endpoint</button>
+        <button type="button" class="secondary" id="testWebhook">Send test event</button>
+      </div>
+      <pre id="hookOutput">Register an endpoint with an API key that has <code>webhook:manage</code> scope.</pre>
+      <h3>Recent deliveries</h3>
+      <button type="button" class="secondary" id="listDeliveries">Refresh deliveries</button>
+      <table id="deliveriesTable" style="margin-top:0.75rem;">
+        <thead><tr><th>Event</th><th>Status</th><th>Attempts</th><th>Code</th></tr></thead>
+        <tbody id="deliveriesBody"></tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <h2>Usage</h2>
+      <button type="button" class="secondary" id="loadUsage">Load usage (API key)</button>
+      <pre id="usageOutput">—</pre>
+    </section>
+  </main>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const state = {
+      adminKey: sessionStorage.getItem('otrust_admin_key') || '',
+      orgId: sessionStorage.getItem('otrust_org_id') || '',
+      apiKey: sessionStorage.getItem('otrust_api_key') || ''
+    };
+
+    function syncInputs() {
+      $('adminKey').value = state.adminKey;
+      $('orgId').value = state.orgId;
+      $('apiKey').value = state.apiKey;
+    }
+
+    $('saveSession').onclick = () => {
+      state.adminKey = $('adminKey').value.trim();
+      state.orgId = $('orgId').value.trim();
+      state.apiKey = $('apiKey').value.trim();
+      sessionStorage.setItem('otrust_admin_key', state.adminKey);
+      sessionStorage.setItem('otrust_org_id', state.orgId);
+      sessionStorage.setItem('otrust_api_key', state.apiKey);
+      $('keyOutput').textContent = 'Session saved.';
+    };
+
+    async function adminFetch(path, opts = {}) {
+      const res = await fetch(path, {
+        ...opts,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Key': state.adminKey,
+          ...(opts.headers || {})
+        },
+        body: opts.body ? JSON.stringify(opts.body) : undefined
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.message || data.error || res.statusText);
+      return data;
+    }
+
+    async function apiFetch(path, opts = {}) {
+      const res = await fetch(path, {
+        ...opts,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${state.apiKey}`,
+          ...(opts.headers || {})
+        },
+        body: opts.body ? JSON.stringify(opts.body) : undefined
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.message || data.error || res.statusText);
+      return data;
+    }
+
+    $('createOrg').onclick = async () => {
+      try {
+        const data = await adminFetch('/api/v1/platform/organizations', {
+          method: 'POST',
+          body: { name: $('orgName').value.trim() || 'New Organization' }
+        });
+        state.orgId = data.organization.id;
+        $('orgId').value = state.orgId;
+        sessionStorage.setItem('otrust_org_id', state.orgId);
+        $('keyOutput').textContent = JSON.stringify(data, null, 2);
+      } catch (e) {
+        $('keyOutput').textContent = e.message;
+      }
+    };
+
+    $('createKey').onclick = async () => {
+      try {
+        const data = await adminFetch(`/api/v1/platform/organizations/${state.orgId}/api-keys`, {
+          method: 'POST',
+          body: {
+            label: $('keyLabel').value.trim(),
+            scopes: ['timestamp:write', 'timestamp:read', 'webhook:manage', 'sign:write', 'sign:read', 'auth:challenge']
+          }
+        });
+        state.apiKey = data.secret;
+        $('apiKey').value = state.apiKey;
+        sessionStorage.setItem('otrust_api_key', state.apiKey);
+        $('keyOutput').textContent = JSON.stringify(data, null, 2);
+      } catch (e) {
+        $('keyOutput').textContent = e.message;
+      }
+    };
+
+    $('listKeys').onclick = async () => {
+      try {
+        const data = await adminFetch(`/api/v1/platform/organizations/${state.orgId}/api-keys`);
+        const tbody = $('keysTable').querySelector('tbody');
+        tbody.replaceChildren();
+        for (const k of data.api_keys || []) {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${k.prefix}</td><td>${k.label}</td><td>${(k.scopes || []).join(', ')}</td><td>${k.created_at || ''}</td>`;
+          tbody.appendChild(tr);
+        }
+        $('keysTable').hidden = false;
+      } catch (e) {
+        $('keyOutput').textContent = e.message;
+      }
+    };
+
+    $('createEndpoint').onclick = async () => {
+      try {
+        const data = await apiFetch('/api/v1/platform/webhooks/endpoints', {
+          method: 'POST',
+          body: {
+            url: $('hookUrl').value.trim(),
+            events: ['timestamp.created', 'timestamp.confirmed', 'sign.completed', 'auth.success']
+          }
+        });
+        $('hookOutput').textContent = JSON.stringify(data, null, 2);
+      } catch (e) {
+        $('hookOutput').textContent = e.message;
+      }
+    };
+
+    $('testWebhook').onclick = async () => {
+      try {
+        const data = await apiFetch('/api/v1/platform/webhooks/test', {
+          method: 'POST',
+          body: { event: 'timestamp.created' }
+        });
+        $('hookOutput').textContent = JSON.stringify(data, null, 2);
+        $('listDeliveries').click();
+      } catch (e) {
+        $('hookOutput').textContent = e.message;
+      }
+    };
+
+    $('listDeliveries').onclick = async () => {
+      try {
+        const data = await apiFetch('/api/v1/platform/webhooks/deliveries');
+        const body = $('deliveriesBody');
+        body.replaceChildren();
+        for (const d of data.deliveries || []) {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${d.event_type}</td><td>${d.status}</td><td>${d.attempts}</td><td>${d.response_code ?? '—'}</td>`;
+          body.appendChild(tr);
+        }
+      } catch (e) {
+        $('hookOutput').textContent = e.message;
+      }
+    };
+
+    $('loadUsage').onclick = async () => {
+      try {
+        const data = await apiFetch('/api/v1/platform/usage');
+        $('usageOutput').textContent = JSON.stringify(data, null, 2);
+      } catch (e) {
+        $('usageOutput').textContent = e.message;
+      }
+    };
+
+    syncInputs();
+  </script>
+
+  <script src="/otrust-polish.js?v=20260706" defer></script>
+
+  <div class="footer-wrapper">
+    <footer role="contentinfo">
+      <div class="footer-links">
+        <a href="/timestamp">Timestamp</a>
+        <a href="/sign">Sign</a>
+        <a href="/about">About</a>
+        <a href="/sign-in">Auth</a>
+        <a href="/docs">Docs</a>
+        <a href="/api-docs">Developers</a>
+        <a href="/transparency">Trust Log</a>
+        <a href="/privacy-policy">Privacy</a>
+        <a href="/terms">Terms</a>
+        <a href="https://github.com/otrust-eu/opensource" rel="noopener noreferrer">GitHub</a>
+      </div>
+      <div class="footer-copy">OTRUST — MIT License</div>
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,5 +1,9 @@
 /**
  * Encrypted browser-local backup (keys + receipt + signing history).
+ *
+ * This is the main mechanism for cross-device proof management.
+ * Receipts live only in localStorage by design (no accounts / zero-knowledge).
+ * Use export + import when moving to a new browser/device.
  */
 (function () {
   const BACKUP_VERSION = 1;

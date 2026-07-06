@@ -1,31 +1,32 @@
-# OTRUST Local Development Environment
-# Usage: docker-compose up
-
-version: '3.8'
+# OTRUST — production self-host in one command:
+#   ADMIN_KEY=$(openssl rand -hex 32) docker compose up -d --build
+# Or: ./scripts/quickstart.sh
 
 services:
   app:
     build: .
     ports:
-      - "8080:8080"
+      - "${PORT:-3000}:3000"
     environment:
-      - NODE_ENV=development
-      - PORT=8080
+      - NODE_ENV=production
+      - PORT=3000
       - MONGODB_URL=mongodb://mongodb:27017
       - MONGODB_DB=otrust
+      - ADMIN_KEY=${ADMIN_KEY:-}
+      - BASE_URL=${BASE_URL:-http://localhost:3000}
     depends_on:
       mongodb:
         condition: service_healthy
-    volumes:
-      # Mount source for hot reload (optional)
-      - ./src:/app/src:ro
-      - ./web:/app/web:ro
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
     restart: unless-stopped
 
   mongodb:
     image: mongo:7
-    ports:
-      - "27017:27017"
     volumes:
       - mongodb_data:/data/db
     healthcheck:
@@ -35,7 +36,6 @@ services:
       retries: 5
     restart: unless-stopped
 
-  # Optional: MongoDB web UI
   mongo-express:
     image: mongo-express:latest
     ports:

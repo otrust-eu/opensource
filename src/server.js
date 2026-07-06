@@ -26,6 +26,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import validator from 'validator';
 import { v4 as uuidv4 } from 'uuid';
+import os from 'os';
 import { createDb, getDb, closeDb, logSecurityEvent as logAuditEvent } from './db.js';
 import archiver from 'archiver';
 import QRCode from 'qrcode';
@@ -37,8 +38,12 @@ const __dirname = path.dirname(__filename);
 import { verifySignature, verifyPow } from './crypto.js';
 import { generateChallenge, consumeChallenge } from './pow.js';
 import { startOtsProcessor, verifyTimestamp, getTimestampInfo, createTimestamp, setOnConfirmationCallback, setOnSignatureConfirmationCallback, processPendingTimestamps } from './opentimestamps.js';
-import { isValidWebhookUrl, storeWebhookNotification, dispatchConfirmationWebhook } from './webhooks.js';
+import { isValidWebhookUrl, storeWebhookNotification, dispatchConfirmationWebhook, emitWebhookEvent, processWebhookRetries } from './webhooks.js';
 import { registerWave4Routes } from './wave4/routes.js';
+import { createApiKeyMiddleware } from './platform/middleware.js';
+import { createIdempotencyMiddleware } from './platform/idempotency.js';
+import { registerPlatformRoutes } from './platform/routes.js';
+import { checkClaimAllowance, incrementOrgClaimUsage } from './hosted/billing.js';
 import { sendEmail } from './email.js';
 import {
   emailTemplate,
@@ -206,10 +211,13 @@ app.use(compression());
 // HTTP Parameter Pollution protection
 app.use(hpp());
 
-// Custom key generator for rate limiting - uses forwarded IP in production
+// Resolve organization from API key (optional — anonymous requests keep IP rate limits)
+app.use(createApiKeyMiddleware({ getDb }));
+app.use(createIdempotencyMiddleware({ getDb }));
+
+// Custom key generator for rate limiting — org when API key present, else IP
 const getRateLimitKey = (req) => {
-  // In production behind Railway, use the real client IP
-  // X-Forwarded-For is trusted because trust proxy = 1
+  if (req.orgId) return `org:${req.orgId}`;
   return req.ip || req.connection.remoteAddress || 'unknown';
 };
 
@@ -509,6 +517,24 @@ app.get('/api/v1', (req, res) => {
           'GET /admin/auth-branding/:clientId/:themeId',
           'PUT /admin/auth-branding/:clientId/:themeId'
         ]
+      },
+      platform: {
+        description: 'Developer platform — organizations, API keys, webhooks',
+        endpoints: [
+          'GET /api/v1/platform/me',
+          'GET /api/v1/platform/usage',
+          'GET /api/v1/platform/scopes',
+          'POST /api/v1/platform/organizations',
+          'GET /api/v1/platform/organizations',
+          'POST /api/v1/platform/organizations/:orgId/api-keys',
+          'GET /api/v1/platform/organizations/:orgId/api-keys',
+          'DELETE /api/v1/platform/organizations/:orgId/api-keys/:keyId',
+          'POST /api/v1/platform/webhooks/endpoints',
+          'GET /api/v1/platform/webhooks/endpoints',
+          'DELETE /api/v1/platform/webhooks/endpoints/:endpointId',
+          'GET /api/v1/platform/webhooks/deliveries',
+          'POST /api/v1/platform/webhooks/test'
+        ]
       }
     },
     docs: 'https://www.otrust.eu/api-docs'
@@ -689,6 +715,8 @@ app.post('/claim', claimLimiter, smallJson, async (req, res) => {
       });
     }
 
+    if (!(await ensureOrgClaimAllowed(req, res))) return;
+
     const receiptId = 'ot_' + generateReceiptId();
     const timestamp = new Date();
 
@@ -711,6 +739,7 @@ app.post('/claim', claimLimiter, smallJson, async (req, res) => {
       pubkey,
       signature,
       filename: sanitizedFilename,
+      org_id: req.orgId || null,
       created_at: timestamp,
       blockchain_tx: null,
       blockchain_confirmed: false,
@@ -745,6 +774,14 @@ app.post('/claim', claimLimiter, smallJson, async (req, res) => {
       claims_submitted: 1,
       claims_created: 1
     });
+    if (req.orgId) await incrementOrgClaimUsage(getDb(), req.orgId);
+
+    await emitOrgWebhook('timestamp.created', {
+      receipt_id: receiptId,
+      hash,
+      proof_url: `${config.baseUrl || 'https://www.otrust.eu'}/proof/${receiptId}`,
+      created_at: timestamp.toISOString()
+    }, { orgId: req.orgId || null, legacyClaimId: receiptId });
 
     res.status(201).json({
       status: 'ok',
@@ -804,6 +841,8 @@ app.post('/claim/simple', gptLimiter, smallJson, async (req, res) => {
       });
     }
 
+    if (!(await ensureOrgClaimAllowed(req, res))) return;
+
     const receiptId = 'ot_' + generateReceiptId();
     const timestamp = new Date();
     
@@ -825,6 +864,7 @@ app.post('/claim/simple', gptLimiter, smallJson, async (req, res) => {
       pubkey: gptPubkey,
       signature: null,
       source: sanitizedSource,
+      org_id: req.orgId || null,
       created_at: timestamp,
       blockchain_tx: null,
       blockchain_confirmed: false,
@@ -860,6 +900,14 @@ app.post('/claim/simple', gptLimiter, smallJson, async (req, res) => {
       claims_submitted: 1,
       claims_created: 1
     });
+    if (req.orgId) await incrementOrgClaimUsage(getDb(), req.orgId);
+
+    await emitOrgWebhook('timestamp.created', {
+      receipt_id: receiptId,
+      hash,
+      proof_url: `${config.baseUrl || 'https://www.otrust.eu'}/proof/${receiptId}`,
+      created_at: timestamp.toISOString()
+    }, { orgId: req.orgId || null, legacyClaimId: receiptId });
 
     res.status(201).json({
       status: 'ok',
@@ -2299,9 +2347,17 @@ app.post('/sign/create', signCreateLimiter, smallJson, async (req, res) => {
       signingOrder: signing_order || 'parallel',
       deadline,
       creatorEmail: creator_email,
-      message: sanitizedMessage
+      message: sanitizedMessage,
+      orgId: req.orgId || null
     });
     
+    await emitOrgWebhook('sign.created', {
+      sign_id: result.sign_id,
+      document_hash,
+      title: sanitizedTitle,
+      parties_count: parties.length
+    }, { orgId: req.orgId || null });
+
     res.status(201).json(result);
     
   } catch (error) {
@@ -2459,6 +2515,33 @@ app.post('/sign/:id/complete', signActLimiter, smallJson, async (req, res) => {
       userAgent,
       otrustProof  // Optional: verified OTRUST Proof data for extra identity verification
     });
+
+    const db = getDb();
+    const signRequest = await db.collection('sign_requests').findOne({ id });
+    const orgId = signRequest?.org_id || null;
+
+    if (action === 'declined') {
+      await emitOrgWebhook('sign.declined', {
+        sign_id: id,
+        document_hash,
+        status: signRequest?.status || 'declined'
+      }, { orgId });
+    } else {
+      await emitOrgWebhook('sign.party_signed', {
+        sign_id: id,
+        document_hash,
+        action,
+        completed: !!result.completed
+      }, { orgId });
+    }
+
+    if (result.completed) {
+      await emitOrgWebhook('sign.completed', {
+        sign_id: id,
+        document_hash,
+        completed_at: new Date().toISOString()
+      }, { orgId });
+    }
     
     res.json(result);
     
@@ -2742,8 +2825,15 @@ app.get(['/partners/preview', '/partners-preview.html'], serveHtmlWithNonce(path
 app.get(['/changelog', '/changelog.html'], serveHtmlWithNonce(path.join(__dirname, '../web/changelog.html')));
 app.get(['/use-cases', '/use-cases.html'], serveHtmlWithNonce(path.join(__dirname, '../web/use-cases.html')));
 app.get(['/health-check', '/health-check.html'], serveHtmlWithNonce(path.join(__dirname, '../web/health-check.html')));
+app.get(['/status', '/status.html'], serveHtmlWithNonce(path.join(__dirname, '../web/status.html')));
+app.get(['/embed', '/embed.html'], serveHtmlWithNonce(path.join(__dirname, '../web/embed.html')));
+app.get(['/bookmarklet', '/bookmarklet.html'], serveHtmlWithNonce(path.join(__dirname, '../web/bookmarklet.html')));
+app.get(['/webhook-test', '/webhook-test.html'], serveHtmlWithNonce(path.join(__dirname, '../web/webhook-test.html')));
+app.get(['/merkle', '/merkle.html'], serveHtmlWithNonce(path.join(__dirname, '../web/merkle.html')));
+app.get(['/partner-builder', '/partner-builder.html'], serveHtmlWithNonce(path.join(__dirname, '../web/partner-builder.html')));
 app.get('/about.html', serveHtmlWithNonce(path.join(__dirname, '../web/about.html')));
 app.get('/about', serveHtmlWithNonce(path.join(__dirname, '../web/about.html')));
+app.get(['/krisledel', '/krisledel.html'], serveHtmlWithNonce(path.join(__dirname, '../web/krisledel.html')));
 app.get('/transparency.html', serveHtmlWithNonce(path.join(__dirname, '../web/transparency.html')));
 app.get('/transparency', serveHtmlWithNonce(path.join(__dirname, '../web/transparency.html')));
 app.get('/notes/why-otrust', serveHtmlWithNonce(path.join(__dirname, '../web/notes-why-otrust.html')));
@@ -3508,6 +3598,7 @@ app.get('/stats', async (req, res) => {
 });
 
 registerWave4Routes(app, { getDb, getTimestampInfo, sanitizeString, bulkJson });
+registerPlatformRoutes(app, { getDb, hasValidAdminKey, smallJson });
 
 // Test email endpoint (protected with rate limiting and timing-safe key comparison)
 // In production, consider disabling entirely or using a more secure admin interface
@@ -3688,6 +3779,28 @@ function hasEmailInjection(email) {
     /subject:/i         // Subject header
   ];
   return injectionPatterns.some(pattern => pattern.test(email));
+}
+
+async function emitOrgWebhook(type, data, { orgId = null, legacyClaimId = null } = {}) {
+  try {
+    const db = getDb();
+    if (!db) return;
+    await emitWebhookEvent(db, { orgId, type, data, legacyClaimId });
+  } catch (err) {
+    console.error(`[Webhook] ${type}:`, err.message);
+  }
+}
+
+async function ensureOrgClaimAllowed(req, res) {
+  if (!req.orgId) return true;
+  const db = getDb();
+  const org = await db.collection('organizations').findOne({ id: req.orgId });
+  const check = await checkClaimAllowance(db, org);
+  if (!check.allowed) {
+    res.status(429).json(check);
+    return false;
+  }
+  return true;
 }
 
 // Notify claim owner when Bitcoin anchor is confirmed (webhook + optional email)
@@ -5460,6 +5573,7 @@ app.post('/api/v1/auth/challenge', bulkJson, async (req, res) => {
       scope: safeScope,
       state: safeState,
       challenge,
+      orgId: req.orgId || null,
       createdAt: Date.now(),
       expiresAt: Date.now() + 5 * 60 * 1000, // 5 minutes
       used: false
@@ -5827,6 +5941,14 @@ app.post('/api/v1/auth/prove', bulkJson, async (req, res) => {
     authChallenges.delete(challengeId);
 
     await incrementUsageCounter('auth_proof_verifications');
+
+    if (challenge.orgId) {
+      await emitOrgWebhook('auth.success', {
+        client_id: challenge.clientId,
+        proof_id: safeProofId,
+        scope: challenge.scope
+      }, { orgId: challenge.orgId });
+    }
     
     res.json({
       success: true,
@@ -6013,6 +6135,11 @@ export async function startServer(port = PORT) {
   if (process.env.NODE_ENV !== 'test') {
     startOtsProcessor(Number(process.env.OTS_BATCH_INTERVAL_MS || 5 * 60 * 1000));
     startFilePurgeProcessor(Number(process.env.FILE_PURGE_INTERVAL_MS || 60 * 1000));
+    setInterval(() => {
+      processWebhookRetries(getDb()).catch((err) => {
+        console.error('[Webhook] Retry processor error:', err.message);
+      });
+    }, Number(process.env.WEBHOOK_RETRY_INTERVAL_MS || 60_000));
   }
 
   // Log email status
@@ -6029,6 +6156,24 @@ export async function startServer(port = PORT) {
     const server = app.listen(port, () => {
       const address = server.address();
       console.log(`[otrust] Blind notary running on port ${address.port}`);
+
+      // Get all accessible addresses (helpful when connecting from other devices on the network)
+      const interfaces = os.networkInterfaces();
+      const accessible = [];
+      for (const name of Object.keys(interfaces)) {
+        for (const iface of interfaces[name]) {
+          if (iface.family === 'IPv4' && !iface.internal) {
+            accessible.push(`http://${iface.address}:${address.port}`);
+          }
+        }
+      }
+      if (accessible.length > 0) {
+        console.log('[otrust] Accessible on:');
+        accessible.forEach(u => console.log('  ' + u));
+      } else {
+        console.log(`[otrust] Local: http://localhost:${address.port}`);
+      }
+
       console.log('[otrust] No IP logging. Zero-knowledge architecture.');
       if (config.features.blockchain) console.log('[otrust] OpenTimestamps Bitcoin anchoring enabled.');
       if (config.features.sign) console.log('[otrust] Document signing enabled.');

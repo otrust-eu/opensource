@@ -1,0 +1,37 @@
+# Timestamp every release on Bitcoin — copy to .github/workflows/
+#
+# Option A: your self-hosted OTRUST (recommended)
+#   secrets.OTRUST_API       → https://otrust.yourcompany.com
+#   secrets.OTRUST_API_KEY   → otrust_live_... from /developers.html
+#
+# Option B: otrust.eu hosted service (no API key required for basic use)
+
+name: Timestamp release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  timestamp:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Timestamp release artifacts
+        id: timestamp
+        uses: otrust-eu/core/.github/actions/otrust-timestamp@v2
+        with:
+          files: dist/** CHANGELOG.md
+          api: ${{ secrets.OTRUST_API || 'https://www.otrust.eu' }}
+          api-key: ${{ secrets.OTRUST_API_KEY }}
+          idempotency-key: release-${{ github.event.release.tag_name || github.sha }}
+          wait-for-confirmation: '0'
+
+      - name: Summary
+        run: |
+          echo "## OTRUST release evidence" >> "$GITHUB_STEP_SUMMARY"
+          echo "Receipts: ${{ steps.timestamp.outputs.receipt_ids }}" >> "$GITHUB_STEP_SUMMARY"

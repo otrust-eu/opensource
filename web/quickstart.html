@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Self-host OTRUST — 60 seconds</title>
+  <meta name="description" content="Run your own OTRUST instance. One command. Full platform. You own the server.">
+  <link rel="stylesheet" href="/otrust-redesign.css?v=20260713">
+  <link rel="stylesheet" href="/otrust-polish.css?v=20260713">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <style>
+    /* Quickstart specific to ensure readable, consistent look with the redesign */
+    body[data-otrust-page="quickstart"] main#main-content {
+      max-width: 960px;
+      margin: 2.5rem auto;
+      padding: 0 1.25rem 4rem;
+    }
+    body[data-otrust-page="quickstart"] .content-card h3 {
+      font-size: 1.15rem;
+      margin: 0 0 0.6rem;
+      color: var(--text);
+    }
+    body[data-otrust-page="quickstart"] pre {
+      font-size: 0.92rem;
+      line-height: 1.55;
+      padding: 1rem 1.1rem;
+    }
+    body[data-otrust-page="quickstart"] .content-card {
+      padding: 1.4rem 1.5rem;
+    }
+  </style>
+</head>
+<body data-otrust-page="quickstart">
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <nav role="navigation" aria-label="Main navigation">
+    <div class="nav-container">
+      <a href="/" class="logo">OTRUST</a>
+      <div class="nav-links">
+        <span class="nav-primary">
+          <a href="/timestamp">Timestamp</a>
+          <a href="/sign">Sign</a>
+          <a href="/sign-in">Auth</a>
+        </span>
+        <span class="nav-secondary" id="nav-secondary">
+          <a href="/docs">Docs</a>
+          <a href="/api-docs">Developers</a>
+          <a href="/about">About</a>
+        </span>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode"></button>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main-content" role="main">
+    <p style="font-size: 0.9rem; margin-bottom: 1.5rem;"><a href="/">← Back to OTRUST</a></p>
+
+    <h1>Run your own.<br>Don't trust ours.</h1>
+    <p style="margin-bottom: 2rem;">Use <a href="https://www.otrust.eu">otrust.eu</a> on the web — or run your own instance in 60 seconds. Zero-knowledge: we only see hashes, never your files.</p>
+
+    <div class="content-card" style="margin: 2rem 0;">
+      <h3>Step 1 — 60 seconds</h3>
+      <pre>git clone https://github.com/otrust-eu/core.git
+cd core
+./scripts/quickstart.sh</pre>
+    </div>
+
+    <div class="content-card" style="margin: 2rem 0;">
+      <h3>Step 2 — API keys &amp; webhooks</h3>
+      <p>Open <code>/developers.html</code> on your instance. Create an org with your admin key. Issue API keys. Register webhooks.</p>
+      <a href="/developers.html" class="btn btn-primary">Developer portal</a>
+    </div>
+
+    <div class="content-card" style="margin: 2rem 0;">
+      <h3>Step 3 — Every release, timestamped on Bitcoin</h3>
+      <pre># .github/workflows/timestamp-release.yml
+# Copy from examples/github-action/timestamp-release.yml
+
+secrets.OTRUST_API      → https://otrust.yourcompany.com
+secrets.OTRUST_API_KEY  → from developer portal</pre>
+    </div>
+
+    <div class="content-card" style="background: var(--bg-muted); border: 1px solid var(--line); margin-top: 2rem;">
+      <strong style="color: var(--text);">Self-host rule:</strong> never set <code>HOSTED_MODE</code>. Plan limits apply only on the hosted service at otrust.eu. Your instance — your rules, unlimited platform features.
+    </div>
+
+    <p style="font-size: 0.9rem; margin-top: 2rem; color: var(--text-dim);">MIT licensed. Full source. Proofs verify forever — even if we disappear.</p>
+  </main>
+
+  <div class="footer-wrapper">
+    <footer role="contentinfo">
+      <div class="footer-links">
+        <a href="/timestamp">Timestamp</a>
+        <a href="/sign">Sign</a>
+        <a href="/about">About</a>
+        <a href="/sign-in">Auth</a>
+        <a href="/docs">Docs</a>
+        <a href="/api-docs">Developers</a>
+        <a href="/privacy-policy">Privacy</a>
+        <a href="/terms">Terms</a>
+        <a href="https://github.com/otrust-eu/opensource" rel="noopener noreferrer">GitHub</a>
+      </div>
+      <div class="footer-copy">OTRUST — MIT License</div>
+    </footer>
+  </div>
+
+  <script src="/otrust-polish.js?v=20260713" defer></script>
+</body>
+</html>

@@ -47,6 +47,10 @@ export function requireServer(feature: string): void {
 export interface ClientConfig {
   /** Base URL for the OTRUST API (default: https://otrust.eu) */
   baseUrl?: string;
+  /** API key (otrust_live_... or otrust_test_...) */
+  apiKey?: string;
+  /** live (default) or sandbox (test keys / mock OTS on server) */
+  environment?: 'live' | 'sandbox';
   /** Request timeout in milliseconds (default: 30000) */
   timeout?: number;
   /** Number of retry attempts for failed requests (default: 3) */
@@ -64,25 +68,50 @@ export interface RequestOptions {
   body?: unknown;
   timeout?: number;
   signal?: AbortSignal;
+  /** Idempotency-Key for safe POST retries */
+  idempotencyKey?: string;
 }
 
 /** Default configuration */
-const DEFAULT_CONFIG: Required<Omit<ClientConfig, 'headers' | 'fetch'>> = {
+const DEFAULT_CONFIG = {
   baseUrl: 'https://otrust.eu',
   timeout: 30000,
   retries: 3,
+  apiKey: undefined as string | undefined,
+  environment: 'live' as const,
+};
+
+type ResolvedClientConfig = {
+  baseUrl: string;
+  timeout: number;
+  retries: number;
+  headers: Record<string, string>;
+  apiKey?: string;
+  environment?: 'live' | 'sandbox';
+  fetch: typeof fetch;
 };
 
 /** HTTP Client class */
 export class Client {
-  private config: Required<Omit<ClientConfig, 'fetch'>> & { fetch: typeof fetch };
+  private config: ResolvedClientConfig;
 
   constructor(config: ClientConfig = {}) {
+    const env = config.environment === 'sandbox' ? 'sandbox' : 'live';
+    const sandboxUrl = (typeof process !== 'undefined' && process.env?.OTRUST_SANDBOX_URL)
+      ? process.env.OTRUST_SANDBOX_URL
+      : 'https://sandbox.otrust.eu';
+    const baseUrl = config.baseUrl ?? (env === 'sandbox' ? sandboxUrl : DEFAULT_CONFIG.baseUrl);
+
+    const headers: Record<string, string> = { ...(config.headers ?? {}) };
+    if (config.apiKey) {
+      headers.Authorization = `Bearer ${config.apiKey}`;
+    }
+
     this.config = {
-      baseUrl: config.baseUrl ?? DEFAULT_CONFIG.baseUrl,
+      baseUrl,
       timeout: config.timeout ?? DEFAULT_CONFIG.timeout,
       retries: config.retries ?? DEFAULT_CONFIG.retries,
-      headers: config.headers ?? {},
+      headers,
       fetch: config.fetch ?? globalThis.fetch.bind(globalThis),
     };
   }
@@ -108,6 +137,10 @@ export class Client {
       ...this.config.headers,
       ...options.headers,
     };
+
+    if (options.idempotencyKey) {
+      headers['Idempotency-Key'] = options.idempotencyKey;
+    }
 
     let lastError: OTrustError | undefined;
     
@@ -214,6 +247,7 @@ export class Client {
     if (config.timeout !== undefined) this.config.timeout = config.timeout;
     if (config.retries !== undefined) this.config.retries = config.retries;
     if (config.headers !== undefined) this.config.headers = { ...this.config.headers, ...config.headers };
+    if (config.apiKey !== undefined) this.config.headers.Authorization = `Bearer ${config.apiKey}`;
     if (config.fetch !== undefined) this.config.fetch = config.fetch;
   }
 }

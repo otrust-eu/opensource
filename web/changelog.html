@@ -7,10 +7,30 @@
   <meta name="description" content="Recent OTRUST product updates: bento redesign, Bitcoin anchoring UX, live transparency, and self-host improvements.">
   <link rel="canonical" href="https://www.otrust.eu/changelog">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <link rel="stylesheet" href="/otrust-redesign.css?v=20260704ux">
+  <link rel="stylesheet" href="/otrust-redesign.css?v=20260706">
 </head>
 <body data-otrust-page="changelog">
   <a href="#main-content" class="skip-link">Skip to content</a>
+
+  <nav role="navigation" aria-label="Main navigation">
+    <div class="nav-container">
+      <a href="/" class="logo">OTRUST</a>
+      <div class="nav-links">
+        <span class="nav-primary">
+          <a href="/timestamp">Timestamp</a>
+          <a href="/sign">Sign</a>
+          <a href="/sign-in">Auth</a>
+        </span>
+        <span class="nav-secondary" id="nav-secondary">
+          <a href="/docs" class="docs-trigger" id="docs-trigger">Docs</a>
+          <a href="/api-docs">Developers</a>
+          <a href="/about">About</a>
+        </span>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode"></button>
+      </div>
+    </div>
+  </nav>
+
   <main id="main-content" class="changelog-page" role="main">
     <header class="changelog-head">
       <a href="/" class="dashboard-logo">OTRUST</a>
@@ -99,11 +119,24 @@
       </ul>
     </article>
 
-    <footer class="changelog-foot">
-      <a href="/">← Back to OTRUST</a>
-      <a href="https://github.com/otrust-eu/opensource" rel="noopener noreferrer">Open source repo</a>
+  <div class="footer-wrapper">
+    <footer role="contentinfo">
+      <div class="footer-links">
+        <a href="/timestamp">Timestamp</a>
+        <a href="/sign">Sign</a>
+        <a href="/about">About</a>
+        <a href="/sign-in">Auth</a>
+        <a href="/docs">Docs</a>
+        <a href="/api-docs">Developers</a>
+        <a href="/transparency">Trust Log</a>
+        <a href="/privacy-policy">Privacy</a>
+        <a href="/terms">Terms</a>
+        <a href="https://github.com/otrust-eu/opensource" rel="noopener noreferrer">GitHub</a>
+      </div>
+      <div class="footer-copy">OTRUST — MIT License</div>
     </footer>
+  </div>
   </main>
-  <script src="/otrust-polish.js?v=20260704ux" defer></script>
+  <script src="/otrust-polish.js?v=20260706" defer></script>
 </body>
 </html>

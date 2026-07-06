@@ -59,7 +59,8 @@ export async function createSignRequest({
   signingOrder,
   deadline,
   creatorEmail,
-  message
+  message,
+  orgId
 }) {
   const db = getDb();
   const signId = generateSignId();
@@ -148,7 +149,8 @@ export async function createSignRequest({
     cancelled_at: null,
     cancelled_reason: null,
     package_hash: null,
-    ots_proof: null
+    ots_proof: null,
+    org_id: orgId || null
   };
   
   await db.collection('sign_requests').insertOne(signRequest);

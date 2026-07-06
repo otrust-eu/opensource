@@ -611,8 +611,8 @@
       color: var(--accent);
     }
   </style>
-  <link rel="stylesheet" href="/otrust-polish.css?v=20260530mono">
-  <link rel="stylesheet" href="/otrust-redesign.css?v=20260530mono">
+  <link rel="stylesheet" href="/otrust-polish.css?v=20260706">
+  <link rel="stylesheet" href="/otrust-redesign.css?v=20260706">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -621,18 +621,17 @@
       <a href="/" class="logo">OTRUST</a>
       <div class="nav-links">
         <span class="nav-primary">
-          <a href="/">Timestamp</a>
+          <a href="/timestamp">Timestamp</a>
           <a href="/sign">Sign</a>
-          <a href="/proof">ID</a>
+          <a href="/sign-in">Auth</a>
         </span>
         <span class="nav-secondary" id="nav-secondary">
-          <a href="/sign-in">Auth</a>
           <a href="/transparency">Trust Log</a>
           <a href="/docs">Docs</a>
+          <a href="/api-docs">Developers</a>
           <a href="/about">About</a>
         </span>
         <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode"></button>
-        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu" title="Menu"><span></span></button>
       </div>
     </div>
   </nav>
@@ -737,17 +736,17 @@
   <div class="footer-wrapper">
   <footer role="contentinfo">
     <div class="footer-links">
-      <a href="/">Timestamp</a>
+      <a href="/timestamp">Timestamp</a>
       <a href="/sign">Sign</a>
-      <a href="/proof">ID</a>
-      <a href="/sign-in">Auth</a>
-          <a href="/docs">Docs</a>
       <a href="/about">About</a>
+      <a href="/sign-in">Auth</a>
+      <a href="/docs">Docs</a>
+      <a href="/api-docs">API</a>
       <a href="/transparency">Trust Log</a>
       <a href="/notes/why-otrust">Technical Note</a>
       <a href="/privacy-policy">Privacy</a>
       <a href="/terms">Terms</a>
-      <a href="https://github.com/otrust-eu/opensource">GitHub</a>
+      <a href="https://github.com/otrust-eu/opensource" rel="noopener noreferrer">GitHub</a>
     </div>
     <div class="footer-copy">OTRUST - MIT License</div>
   </footer>
@@ -1183,7 +1182,7 @@
     // Auto refresh
     setInterval(loadSignRequest, 30000);
   </script>
-  <script src="/otrust-polish.js?v=20260530mono" defer></script>
+  <script src="/otrust-polish.js?v=20260706" defer></script>
 </body>
 </html>
 

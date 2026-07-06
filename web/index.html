@@ -9,7 +9,7 @@
   <!-- SEO Meta Tags -->
   <meta name="author" content="Kristian Ledel">
   <meta name="creator" content="Kris Ledel">
-  <link rel="author" href="https://www.otrust.eu/about">
+  <link rel="author" href="https://www.otrust.eu/krisledel">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
   <link rel="canonical" href="https://www.otrust.eu/">
   <meta name="theme-color" content="#16160f">
@@ -56,8 +56,9 @@
       "@type": "Person",
       "name": "Kristian Ledel",
       "alternateName": "Kris Ledel",
-      "url": "https://www.otrust.eu/about",
+      "url": "https://www.otrust.eu/krisledel",
       "sameAs": [
+        "https://krisledel.com/",
         "https://github.com/krisledel",
         "https://www.linkedin.com/in/krisledel"
       ],
@@ -68,7 +69,7 @@
       "@type": "Person",
       "name": "Kristian Ledel",
       "alternateName": "Kris Ledel",
-      "url": "https://www.otrust.eu/about"
+      "url": "https://www.otrust.eu/krisledel"
     },
     "offers": {
       "@type": "Offer",
@@ -106,8 +107,9 @@
       "@type": "Person",
       "name": "Kristian Ledel",
       "alternateName": "Kris Ledel",
-      "url": "https://www.otrust.eu/about",
+      "url": "https://www.otrust.eu/krisledel",
       "sameAs": [
+        "https://krisledel.com/",
         "https://github.com/krisledel",
         "https://www.linkedin.com/in/krisledel"
       ]
@@ -178,12 +180,13 @@
     "@type": "Person",
     "name": "Kristian Ledel",
     "alternateName": ["Kris Ledel", "krisledel"],
-    "url": "https://www.otrust.eu/about",
+    "url": "https://www.otrust.eu/krisledel",
     "jobTitle": "Founder & Developer",
-    "description": "Kristian Ledel is a Swedish software developer and entrepreneur who created OTRUST, a cryptographic trust infrastructure platform for timestamping, ID, signing, and hosted partner Auth.",
+    "description": "Kris Ledel is a Swedish tech founder who built OTRUST — zero-knowledge Bitcoin timestamping and open-source blind notary infrastructure at otrust.eu.",
     "knowsAbout": ["blockchain technology", "cryptography", "Bitcoin", "OpenTimestamps", "digital signatures", "web security", "electronic identity", "digital identity"],
     "nationality": {"@type": "Country", "name": "Sweden"},
     "sameAs": [
+      "https://krisledel.com/",
       "https://github.com/krisledel",
       "https://www.linkedin.com/in/krisledel",
       "https://github.com/otrust-eu"
@@ -208,7 +211,7 @@
     "@type": "BreadcrumbList",
     "itemListElement": [
       {"@type": "ListItem", "position": 1, "name": "OTRUST by Kristian Ledel", "item": "https://www.otrust.eu/"},
-      {"@type": "ListItem", "position": 2, "name": "About Kris Ledel", "item": "https://www.otrust.eu/about"},
+      {"@type": "ListItem", "position": 2, "name": "Kris Ledel", "item": "https://www.otrust.eu/krisledel"},
       {"@type": "ListItem", "position": 3, "name": "Documentation", "item": "https://www.otrust.eu/docs"},
       {"@type": "ListItem", "position": 4, "name": "API Reference", "item": "https://www.otrust.eu/api-docs"}
     ]
@@ -218,7 +221,7 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <!-- Privacy-respecting analytics (no cookies, no personal data) -->
   <script defer data-domain="otrust.eu" src="https://plausible.io/js/script.js"></script>
-  <link rel="stylesheet" href="/otrust-redesign.css?v=20260704fix">
+  <link rel="stylesheet" href="/otrust-redesign.css?v=20260713">
 </head>
 <body data-otrust-page="home">
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -233,10 +236,8 @@
           <a href="/" class="dashboard-logo">OTRUST</a>
           <nav class="dashboard-links" aria-label="OTRUST site navigation">
             <a href="/timestamp">Timestamp</a>
-            <a href="/proof" title="Scoped identity packages — shareable at /proof URLs">ID</a>
             <a href="/sign">Sign</a>
             <a href="/sign-in" class="bento-nav-cta">Auth</a>
-            <button type="button" class="dashboard-menu" aria-label="Open menu"><span></span></button>
           </nav>
         </header>
         <div class="bento-hero-copy">
@@ -247,6 +248,10 @@
             <a class="bento-primary-action" href="/timestamp#timestamp-tool">
               <span aria-hidden="true"></span>
               <strong>Timestamp a file</strong>
+            </a>
+            <a class="bento-selfhost" href="/quickstart.html">
+              <span>Self-host in 60s</span>
+              <span aria-hidden="true">&rarr;</span>
             </a>
             <a class="bento-text-action" href="#flow">How it works <span aria-hidden="true">&darr;</span></a>
           </div>
@@ -284,7 +289,6 @@
       <a class="bento-card bento-function-card bento-c02" href="/proof" aria-label="Open ID">
         <div class="bento-card-head">
           <span class="bento-num">02</span><span class="bento-rule-sm" aria-hidden="true"></span>
-          <span class="bento-dot-mark" aria-hidden="true"></span>
         </div>
         <h2 class="bento-card-title">ID</h2>
         <p class="bento-card-lede">Create or verify scoped ID packages without exposing raw identity data.</p>
@@ -456,8 +460,8 @@
           <span class="footer-nav-label">Use OTRUST</span>
           <div class="footer-links">
             <a href="/timestamp">Timestamp</a>
-            <a href="/proof">ID</a>
             <a href="/sign">Sign</a>
+            <a href="/about">About</a>
             <a href="/sign-in">Auth</a>
           </div>
         </div>
@@ -516,19 +520,15 @@
             <span>History</span>
             <small>Receipts <span class="history-count" id="history-count" style="display: none;">0</span></small>
           </button>
-          <button class="tab tab-more-toggle" type="button" id="tab-more-toggle" aria-expanded="false">
-            <span>More</span>
-            <small>Compare, keys, API</small>
-          </button>
-          <button class="tab tab-advanced" type="button" role="tab" id="tab-button-compare" data-tab="compare" aria-selected="false" aria-controls="tab-compare">
+          <button class="tab" type="button" role="tab" id="tab-button-compare" data-tab="compare" aria-selected="false" aria-controls="tab-compare">
             <span>Compare</span>
             <small>Bulk check</small>
           </button>
-          <button class="tab tab-advanced" type="button" role="tab" id="tab-button-keys" data-tab="keys" aria-selected="false" aria-controls="tab-keys">
+          <button class="tab" type="button" role="tab" id="tab-button-keys" data-tab="keys" aria-selected="false" aria-controls="tab-keys">
             <span>Keys</span>
             <small>Browser key</small>
           </button>
-          <button class="tab tab-advanced" type="button" role="tab" id="tab-button-integrations" data-tab="integrations" aria-selected="false" aria-controls="tab-integrations">
+          <button class="tab" type="button" role="tab" id="tab-button-integrations" data-tab="integrations" aria-selected="false" aria-controls="tab-integrations">
             <span>Integrations</span>
             <small>SDKs and API</small>
           </button>
@@ -704,7 +704,23 @@
             <div class="timestamp-panel-heading">
               <span>05 / Receipt ledger</span>
               <h3>History</h3>
-              <p class="tab-intro">Receipts saved in this browser only — not shared via URL or server lookup.</p>
+              <p class="tab-intro">Receipts saved in this browser only. <strong>No cloud sync.</strong> Use the backup below to move them to another device.</p>
+
+              <div class="cross-device-note" style="margin: 1rem 0; padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-muted); font-size: 0.9rem;">
+                <strong>Cross-device backup (by design):</strong> Receipts live only in this browser. 
+                No cloud sync — this is intentional for privacy and zero-knowledge (we never see your data).
+                To use on another device: export an encrypted backup, then import on the other browser.
+                <a href="/about">Read why on the About page</a>.
+                <div style="margin-top: 0.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                  <button type="button" class="btn btn-secondary btn-small" id="receipt-export-backup-btn">Export encrypted backup</button>
+                  <button type="button" class="btn btn-secondary btn-small" id="receipt-export-plain-btn" title="Plain JSON (not encrypted) — only for your own devices">Export plain JSON</button>
+                  <label class="btn btn-secondary btn-small" style="cursor:pointer;">
+                    Import backup
+                    <input type="file" id="receipt-import-backup-input" accept=".json,application/json" hidden>
+                  </label>
+                </div>
+              </div>
+
               <div id="bitcoin-toast" class="bitcoin-toast" role="status" aria-live="polite" hidden></div>
             </div>
 
@@ -745,12 +761,13 @@
               </div>
 
               <div class="security-note">
-                <strong>Important:</strong> Your private key is stored in this browser only. Export and backup your keys.
+                <strong>Important:</strong> Your private key is stored in this browser only. 
+                Export and backup your keys + receipts. <a href="/about">Why this design?</a>
               </div>
 
               <div class="info-card" style="margin-top:1rem;">
                 <h4>Encrypted backup</h4>
-                <p style="font-size:0.85rem;color:var(--text-dim);">Export keys and local history as a password-protected file. Import on another browser in this profile.</p>
+                <p style="font-size:0.85rem;color:var(--text-dim);">Exports keys + all your local receipts/signings. Best used via the <strong>History</strong> tab for receipt-focused backup. <a href="/about">Why local-only?</a></p>
                 <div class="key-actions" style="margin-top:0.75rem;">
                   <button type="button" class="btn btn-secondary" id="export-backup-btn">Export backup</button>
                   <label class="btn btn-secondary" style="cursor:pointer;">
@@ -963,11 +980,17 @@
     <div class="footer-copy">&copy; 2026 OTRUST</div>
     <div class="footer-made">Made in Sweden, Europe</div>
     <div class="footer-links">
+      <a href="/timestamp">Timestamp</a>
+      <a href="/sign">Sign</a>
+      <a href="/about">About</a>
+      <a href="/sign-in">Auth</a>
       <a href="/docs">Docs</a>
       <a href="/api-docs">API</a>
-      <a href="https://github.com/otrust-eu/opensource" rel="noopener noreferrer">GitHub</a>
+      <a href="/transparency">Trust Log</a>
+      <a href="/notes/why-otrust">Technical Note</a>
       <a href="/privacy-policy">Privacy</a>
       <a href="/terms">Terms</a>
+      <a href="https://github.com/otrust-eu/opensource" rel="noopener noreferrer">GitHub</a>
     </div>
     <a class="footer-dot" href="/" aria-label="Back to top"></a>
   </footer>
@@ -1189,25 +1212,11 @@
       console.warn('Signing keys will be generated when needed:', error.message);
     });
     
-    // Tab switching - exposed globally for onclick handlers
-    const advancedTabs = new Set(['compare', 'keys', 'integrations']);
-
-    function revealAdvancedTabs() {
-      const nav = document.querySelector('.timestamp-tool-nav');
-      const toggle = document.getElementById('tab-more-toggle');
-      if (!nav || nav.classList.contains('show-advanced')) return;
-      nav.classList.add('show-advanced');
-      toggle?.setAttribute('aria-expanded', 'true');
-      toggle?.classList.add('active');
-    }
-
     function switchTab(tabName) {
       // Whitelist allowed tab names to prevent XSS
       const allowedTabs = ['file', 'text', 'verify', 'compare', 'receipt', 'keys', 'integrations'];
       if (!allowedTabs.includes(tabName)) return;
 
-      if (advancedTabs.has(tabName)) revealAdvancedTabs();
-      
       const targetTab = document.querySelector(`.tab[data-tab="${tabName}"]`);
       const targetContent = document.getElementById('tab-' + tabName);
       
@@ -1241,14 +1250,6 @@
       tab.addEventListener('click', () => {
         switchTab(tab.dataset.tab);
       });
-    });
-
-    const moreToggle = document.getElementById('tab-more-toggle');
-    const tabNav = document.querySelector('.timestamp-tool-nav');
-    moreToggle?.addEventListener('click', () => {
-      const expanded = tabNav?.classList.toggle('show-advanced');
-      moreToggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
-      moreToggle.classList.toggle('active', !!expanded);
     });
 
     function enableDropzoneKeyboard(zone, input) {
@@ -1308,7 +1309,7 @@
               <div class="existing-warning">
                 Timestamped on ${new Date(ts.created_at).toLocaleDateString()}
                 ${ts.blockchain_confirmed ? 'Confirmed' : 'Pending'}
-                <a href="/proof/${ts.receipt_id}" target="_blank" rel="noopener noreferrer">View</a>
+                <a href="/proof/${ts.receipt_id}" target="_blank" rel="noopener noreferrer" title="View this timestamp receipt">View receipt</a>
               </div>
             `;
           }
@@ -1864,7 +1865,7 @@
     function renderReceiptList(receipts) {
       const listEl = document.getElementById('receipts-list');
       if (!receipts.length) {
-        listEl.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-dim);">No receipts in this browser yet. Create a timestamp to save one here.</div>';
+        listEl.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-dim);">No receipts in this browser yet. Create a timestamp to save one here.<br><small style="opacity:0.7">Why local-only? <a href="/about">Read about our design</a>. Use the backup buttons above to move between devices.</small></div>';
         updateHistoryCount();
         return;
       }
@@ -2180,11 +2181,63 @@
       try {
         const result = await window.otrustLocalBackup.importEncryptedBackup(file, password);
         updateHistoryCount();
+        if (typeof loadMyReceipts === 'function') await loadMyReceipts();
         alert(`Imported ${result.receipts} receipts, ${result.signings} signings${result.hasKeys ? ', keys restored' : ''}.`);
       } catch (err) {
         alert('Import failed: ' + err.message);
       }
       e.target.value = '';
+    });
+
+    // New prominent backup controls in the Receipt/History tab
+    document.getElementById('receipt-export-backup-btn')?.addEventListener('click', async () => {
+      const password = prompt('Create a strong backup password (min 8 chars).\n\nThis encrypted file can restore your receipts and keys on any other device/browser.');
+      if (!password) return;
+      try {
+        const backup = await window.otrustLocalBackup.exportEncryptedBackup(password);
+        window.otrustLocalBackup.downloadBackupFile(backup, `otrust-receipts-backup-${new Date().toISOString().slice(0,10)}.json`);
+      } catch (e) {
+        alert('Export failed: ' + e.message);
+      }
+    });
+
+    document.getElementById('receipt-import-backup-input')?.addEventListener('change', async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const password = prompt('Enter the password you used when exporting this backup:');
+      if (!password) return;
+      try {
+        const result = await window.otrustLocalBackup.importEncryptedBackup(file, password);
+        updateHistoryCount();
+        if (typeof loadMyReceipts === 'function') await loadMyReceipts();
+        alert(`Restored ${result.receipts} receipts${result.hasKeys ? ' + keys' : ''}.`);
+      } catch (err) {
+        alert('Import failed: ' + err.message);
+      }
+      e.target.value = '';
+    });
+
+    // Plain JSON export (for advanced users moving between their own devices)
+    document.getElementById('receipt-export-plain-btn')?.addEventListener('click', () => {
+      const receipts = window.otrustReceiptHistory?.getMyReceipts() || [];
+      if (!receipts.length) {
+        alert('No receipts to export.');
+        return;
+      }
+      const data = {
+        exported_at: new Date().toISOString(),
+        note: 'Plain (unencrypted) export of your local receipts. Keep this file secure.',
+        receipts
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `otrust-receipts-${new Date().toISOString().slice(0,10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     });
 
     window.downloadBulkReceipts = function() {
@@ -2211,13 +2264,13 @@
     .bitcoin-toast { margin:0 0 1rem;padding:0.75rem 1rem;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:8px;color:#2d5a3d;font-size:0.85rem;opacity:0;transition:opacity 0.3s; }
     .bitcoin-toast.visible { opacity:1; }
   </style>
-  <script src="/js/receipt-history.js?v=20260704privacy"></script>
-  <script src="/js/local-backup.js?v=20260704pack"></script>
-  <script src="/js/share-proof.js?v=20260704pack"></script>
+  <script src="/js/receipt-history.js?v=20260713"></script>
+  <script src="/js/local-backup.js?v=20260713"></script>
+  <script src="/js/share-proof.js?v=20260713"></script>
 
-  <script src="/js/usage-beacon.js?v=20260704activity"></script>
-  <script src="/js/otrust-extras.js?v=20260704fix" defer></script>
-  <script src="/otrust-polish.js?v=20260704fix" defer></script>
+  <script src="/js/usage-beacon.js?v=20260713"></script>
+  <script src="/js/otrust-extras.js?v=20260713" defer></script>
+  <script src="/otrust-polish.js?v=20260713" defer></script>
 </body>
 </html>
 

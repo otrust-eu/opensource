@@ -1,0 +1,75 @@
+name: Publish OTRUST Timestamp Action
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Semver without v prefix (e.g. 2.0.0)
+        required: true
+        default: '2.0.0'
+  push:
+    tags:
+      - 'otrust-timestamp-v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create tag (manual dispatch)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          TAG="otrust-timestamp-v${{ inputs.version }}"
+          git tag -a "$TAG" -m "OTRUST Timestamp Action ${{ inputs.version }}"
+          git push origin "$TAG"
+
+      - name: Resolve tag
+        id: meta
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tag=otrust-timestamp-v${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${{ steps.meta.outputs.tag }}"
+          VER="${TAG#otrust-timestamp-v}"
+          NOTES_FILE=$(mktemp)
+          cat > "$NOTES_FILE" <<EOF
+          ## OTRUST Timestamp Action v${VER}
+
+          Timestamp CI artifacts on your self-hosted OTRUST instance.
+
+          \`\`\`yaml
+          - uses: otrust-eu/core/.github/actions/otrust-timestamp@${TAG}
+            with:
+              files: dist/**
+              api: \${{ secrets.OTRUST_API }}
+              api-key: \${{ secrets.OTRUST_API_KEY }}
+          \`\`\`
+
+          **Marketplace:** Repository → Actions tab → select this action → Publish (one-time setup).
+
+          Self-host: \`./scripts/quickstart.sh\`
+          EOF
+          gh release view "$TAG" 2>/dev/null || gh release create "$TAG" --title "OTRUST Timestamp Action v${VER}" --notes-file "$NOTES_FILE"
+
+      - name: Update floating major tag (v2)
+        run: |
+          TAG="${{ steps.meta.outputs.tag }}"
+          VER="${TAG#otrust-timestamp-v}"
+          MAJOR="v${VER%%.*}"
+          git tag -f "$MAJOR" "$TAG"
+          git push -f origin "$MAJOR"

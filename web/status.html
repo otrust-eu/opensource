@@ -4,11 +4,32 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OTRUST Status</title>
-  <link rel="stylesheet" href="/otrust-redesign.css?v=20260704ux">
+  <link rel="stylesheet" href="/otrust-redesign.css?v=20260706">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 </head>
 <body data-otrust-page="docs">
-  <main style="max-width:720px;margin:2rem auto;padding:0 1rem;">
+  <a href="#main-content" class="skip-link">Skip to content</a>
+
+  <nav role="navigation" aria-label="Main navigation">
+    <div class="nav-container">
+      <a href="/" class="logo">OTRUST</a>
+      <div class="nav-links">
+        <span class="nav-primary">
+          <a href="/timestamp">Timestamp</a>
+          <a href="/sign">Sign</a>
+          <a href="/sign-in">Auth</a>
+        </span>
+        <span class="nav-secondary" id="nav-secondary">
+          <a href="/docs" class="docs-trigger" id="docs-trigger">Docs</a>
+          <a href="/api-docs">Developers</a>
+          <a href="/about">About</a>
+        </span>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode"></button>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main-content" style="max-width:720px;margin:2rem auto;padding:0 1rem;">
     <h1>OTRUST Status</h1>
     <p id="status-summary" style="color:var(--text-dim);">Loading…</p>
     <div id="status-grid" style="display:grid;gap:0.75rem;margin-top:1.5rem;"></div>
@@ -40,5 +61,22 @@
     });
     setInterval(loadStatus, 60000);
   </script>
+  <div class="footer-wrapper">
+    <footer role="contentinfo">
+      <div class="footer-links">
+        <a href="/timestamp">Timestamp</a>
+        <a href="/sign">Sign</a>
+        <a href="/about">About</a>
+        <a href="/sign-in">Auth</a>
+        <a href="/docs">Docs</a>
+        <a href="/api-docs">Developers</a>
+        <a href="/transparency">Trust Log</a>
+        <a href="/privacy-policy">Privacy</a>
+        <a href="/terms">Terms</a>
+        <a href="https://github.com/otrust-eu/opensource" rel="noopener noreferrer">GitHub</a>
+      </div>
+      <div class="footer-copy">OTRUST — MIT License</div>
+    </footer>
+  </div>
 </body>
 </html>

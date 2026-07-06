@@ -20,6 +20,8 @@ class ClientConfig:
     """Configuration for the OTRUST client."""
 
     base_url: str = "https://otrust.eu"
+    api_key: str | None = None
+    environment: str = "live"
     timeout: float = 30.0
     retries: int = 3
     retry_delay: float = 1.0
@@ -32,6 +34,8 @@ _config = ClientConfig()
 
 def configure(
     base_url: str | None = None,
+    api_key: str | None = None,
+    environment: str | None = None,
     timeout: float | None = None,
     retries: int | None = None,
     retry_delay: float | None = None,
@@ -58,6 +62,13 @@ def configure(
 
     if base_url is not None:
         _config.base_url = base_url.rstrip("/")
+    if environment == "sandbox" and base_url is None:
+        _config.base_url = "https://sandbox.otrust.eu"
+    if api_key is not None:
+        _config.api_key = api_key
+        _config.headers["Authorization"] = f"Bearer {api_key}"
+    if environment is not None:
+        _config.environment = environment
     if timeout is not None:
         _config.timeout = timeout
     if retries is not None:

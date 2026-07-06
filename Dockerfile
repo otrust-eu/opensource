@@ -15,6 +15,9 @@ RUN npm ci --only=production
 # Copy source code
 COPY . .
 
+# Build generated assets (e.g. browser extension.zip) so they are present in image
+RUN npm run build:extension
+
 # Set environment
 ENV NODE_ENV=production
 ENV PORT=3000

@@ -19,7 +19,13 @@ const inMemoryCollections = {
   email_notifications: [],
   auth_branding: [],
   audit_log: [],
-  usage_counters: []
+  usage_counters: [],
+  organizations: [],
+  api_keys: [],
+  webhook_endpoints: [],
+  webhook_deliveries: [],
+  webhook_notifications: [],
+  idempotency_keys: []
 };
 
 function matchesQuery(doc, query = {}) {
@@ -232,6 +238,28 @@ export async function createDb() {
     const timeCommitments = db.collection('time_commitments');
     await timeCommitments.createIndex({ id: 1 }, { unique: true });
     await timeCommitments.createIndex({ reveal_at: 1 });
+
+    const organizations = db.collection('organizations');
+    await organizations.createIndex({ id: 1 }, { unique: true });
+    await organizations.createIndex({ created_at: -1 });
+
+    const apiKeys = db.collection('api_keys');
+    await apiKeys.createIndex({ key_hash: 1 }, { unique: true });
+    await apiKeys.createIndex({ org_id: 1 });
+    await apiKeys.createIndex({ key_id: 1 }, { unique: true });
+
+    const webhookEndpoints = db.collection('webhook_endpoints');
+    await webhookEndpoints.createIndex({ endpoint_id: 1 }, { unique: true });
+    await webhookEndpoints.createIndex({ org_id: 1 });
+
+    const webhookDeliveries = db.collection('webhook_deliveries');
+    await webhookDeliveries.createIndex({ delivery_id: 1 }, { unique: true });
+    await webhookDeliveries.createIndex({ org_id: 1, created_at: -1 });
+    await webhookDeliveries.createIndex({ status: 1, next_retry_at: 1 });
+
+    const idempotencyKeys = db.collection('idempotency_keys');
+    await idempotencyKeys.createIndex({ key: 1 }, { unique: true });
+    await idempotencyKeys.createIndex({ expires_at: 1 }, { expireAfterSeconds: 0 });
   } catch (err) {
     console.log('[DB] Auth branding index setup skipped:', err.message);
   }

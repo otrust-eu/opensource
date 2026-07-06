@@ -1,0 +1,32 @@
+name: Signed Release Evidence
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  timestamp-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Hash release tag
+        id: tag
+        run: |
+          HASH=$(echo -n "${{ github.event.release.tag_name }}" | sha256sum | awk '{print $1}')
+          echo "hash=$HASH" >> "$GITHUB_OUTPUT"
+
+      - name: Timestamp via OTRUST
+        uses: ./.github/actions/otrust-timestamp
+        with:
+          files: README.md
+          api: https://www.otrust.eu
+
+      - name: Write evidence summary
+        run: |
+          echo "## OTRUST Release Evidence" >> "$GITHUB_STEP_SUMMARY"
+          echo "Tag: ${{ github.event.release.tag_name }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Receipts: ${{ steps.timestamp.outputs.receipt_ids }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Verify at https://www.otrust.eu/transparency" >> "$GITHUB_STEP_SUMMARY"

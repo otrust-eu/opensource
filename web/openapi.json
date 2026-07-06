@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "OTRUST Blockchain Timestamp API",
-    "version": "0.3.0",
+    "version": "1.0.0",
     "description": "Free, zero-knowledge REST API for blockchain-anchored timestamping. Prove data existed at a specific time using Bitcoin blockchain and OpenTimestamps.",
     "contact": {
       "name": "OTRUST",
@@ -814,9 +814,68 @@
           }
         }
       }
+    },
+    "/api/v1/platform/me": {
+      "get": {
+        "summary": "Platform identity for API key",
+        "tags": ["Platform"],
+        "security": [{ "ApiKeyAuth": [] }],
+        "responses": {
+          "200": { "description": "Org and key metadata" },
+          "401": { "description": "Missing or invalid API key" }
+        }
+      }
+    },
+    "/api/v1/platform/scopes": {
+      "get": {
+        "summary": "List available API key scopes",
+        "tags": ["Platform"],
+        "responses": { "200": { "description": "Scope list" } }
+      }
+    },
+    "/api/v1/platform/organizations": {
+      "post": {
+        "summary": "Create organization (admin)",
+        "tags": ["Platform"],
+        "responses": { "201": { "description": "Organization created" } }
+      },
+      "get": {
+        "summary": "List organizations (admin)",
+        "tags": ["Platform"],
+        "responses": { "200": { "description": "Organization list" } }
+      }
+    },
+    "/api/v1/platform/webhooks/endpoints": {
+      "post": {
+        "summary": "Register webhook endpoint",
+        "tags": ["Platform"],
+        "security": [{ "ApiKeyAuth": [] }],
+        "responses": { "201": { "description": "Endpoint created" } }
+      },
+      "get": {
+        "summary": "List webhook endpoints",
+        "tags": ["Platform"],
+        "security": [{ "ApiKeyAuth": [] }],
+        "responses": { "200": { "description": "Endpoint list" } }
+      }
+    },
+    "/api/v1/platform/webhooks/deliveries": {
+      "get": {
+        "summary": "Webhook delivery log",
+        "tags": ["Platform"],
+        "security": [{ "ApiKeyAuth": [] }],
+        "responses": { "200": { "description": "Deliveries" } }
+      }
     }
   },
   "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Bearer otrust_live_... or X-OTRUST-Key header"
+      }
+    },
     "schemas": {
       "Error": {
         "type": "object",
@@ -855,6 +914,10 @@
     {
       "name": "Info",
       "description": "Service information and health"
+    },
+    {
+      "name": "Platform",
+      "description": "Developer platform — API keys, webhooks, usage"
     }
   ]
 }

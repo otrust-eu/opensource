@@ -4,18 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Why OTRUST Exists | Technical Note by Kris Ledel</title>
-  <meta name="description" content="A technical note by Kris Ledel on OTRUST, blind notary architecture, OpenTimestamps, ID packages, and partner-branded verification flows.">
+  <meta name="description" content="In research on cognition Kris Ledel kept running into the problem: how to prove something existed before a date without sharing the idea? Technical note on the blind notary architecture that became OTRUST.">
   <link rel="canonical" href="https://www.otrust.eu/notes/why-otrust">
   <meta name="robots" content="index, follow">
   <meta name="theme-color" content="#16160f">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://www.otrust.eu/notes/why-otrust">
   <meta property="og:title" content="Why OTRUST Exists">
-  <meta property="og:description" content="A technical note on cryptographic trust infrastructure, blind notarization, and ID-first identity.">
+  <meta property="og:description" content="How do you prove something existed before a certain date without sharing the idea? Technical note on blind notarization and the architecture behind OTRUST.">
   <meta property="og:image" content="https://www.otrust.eu/og-image.svg">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <script defer data-domain="otrust.eu" src="https://plausible.io/js/script.js"></script>
-  <link rel="stylesheet" href="/otrust-polish.css?v=20260530mono">
+  <link rel="stylesheet" href="/otrust-polish.css?v=20260706">
   <style>
     .note-page {
       max-width: 960px;
@@ -139,7 +139,7 @@
       }
     }
   </style>
-  <link rel="stylesheet" href="/otrust-redesign.css?v=20260530mono">
+  <link rel="stylesheet" href="/otrust-redesign.css?v=20260706">
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -148,18 +148,17 @@
       <a href="/" class="logo">OTRUST</a>
       <div class="nav-links">
         <span class="nav-primary">
-          <a href="/">Timestamp</a>
+          <a href="/timestamp">Timestamp</a>
           <a href="/sign">Sign</a>
-          <a href="/proof">ID</a>
+          <a href="/sign-in">Auth</a>
         </span>
         <span class="nav-secondary" id="nav-secondary">
-          <a href="/sign-in">Auth</a>
           <a href="/transparency">Trust Log</a>
           <a href="/docs" class="docs-trigger" id="docs-trigger">Docs</a>
+          <a href="/api-docs">Developers</a>
           <a href="/about">About</a>
         </span>
         <button class="theme-toggle" id="theme-toggle" aria-label="Toggle color theme" title="Toggle color theme"></button>
-        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu" title="Menu"><span></span></button>
       </div>
     </div>
   </nav>
@@ -177,7 +176,7 @@
     <header class="note-head">
       <span class="note-kicker">Founder technical note</span>
       <h1>Why OTRUST exists.</h1>
-      <p>OTRUST is built around a simple idea: useful trust infrastructure should prove specific facts without demanding unnecessary custody over the underlying material.</p>
+      <p>In research on cognition I kept running into the problem: how do you prove something existed before a certain date without sharing the idea? OTRUST is the answer — local-first, hash-only, anchored to Bitcoin.</p>
       <div class="note-meta">
         <span>Kris Ledel</span>
         <span>Updated May 27, 2026</span>
@@ -224,14 +223,14 @@
   <div class="footer-wrapper">
     <footer role="contentinfo">
       <div class="footer-links">
-        <a href="/">Timestamp</a>
+        <a href="/timestamp">Timestamp</a>
         <a href="/sign">Sign</a>
-        <a href="/proof">ID</a>
+        <a href="/about">About</a>
         <a href="/sign-in">Auth</a>
         <a href="/docs">Docs</a>
-        <a href="/about">About</a>
-      <a href="/transparency">Trust Log</a>
-      <a href="/notes/why-otrust">Technical Note</a>
+        <a href="/api-docs">API</a>
+        <a href="/transparency">Trust Log</a>
+        <a href="/notes/why-otrust">Technical Note</a>
         <a href="/privacy-policy">Privacy</a>
         <a href="/terms">Terms</a>
         <a href="https://github.com/otrust-eu/opensource" rel="noopener noreferrer">GitHub</a>
@@ -240,7 +239,7 @@
     </footer>
   </div>
 
-  <script src="/otrust-polish.js?v=20260530mono" defer></script>
+  <script src="/otrust-polish.js?v=20260706" defer></script>
 </body>
 </html>
 

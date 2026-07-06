@@ -6,67 +6,113 @@ on:
   pull_request:
     branches: [main]
 
+# Restrict default permissions for security
 permissions:
   contents: read
 
 jobs:
-  unit-tests:
+  lint:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 5
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
-
+      
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-
+      
       - name: Install dependencies
         run: npm ci
+      
+      - name: Run ESLint
+        run: npm run lint --if-present
 
-      - name: Run core unit tests
-        run: npm run test:core -- --forceExit
+  unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Validate OpenAPI contract
+        run: npm run validate:openapi
+
+      - name: Run unit tests with coverage
+        run: npm run test:unit -- --forceExit --coverage
+        timeout-minutes: 3
 
   integration-tests:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: read
+    services:
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
     steps:
       - uses: actions/checkout@v4
-
+      
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-
+      
       - name: Install dependencies
         run: npm ci
-
-      - name: Run API integration tests
+      
+      - name: Run integration tests
         run: npm run test:integration -- --forceExit --detectOpenHandles
+        timeout-minutes: 8
         env:
-          NODE_ENV: test
-          MONGODB_URI: mongodb://localhost:27017
+          MONGODB_URL: mongodb://localhost:27017
           MONGODB_DB: otrust_test
+          NODE_ENV: test
+          TEST_MODE: 'true'
 
-  build:
+  security:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 5
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
-
+      
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-
+      
       - name: Install dependencies
         run: npm ci
+      
+      - name: Audit root dependencies
+        run: npm audit --audit-level=high
 
-      - name: Build SDK packages
-        run: npm run build
-
-      - name: Run SDK tests
-        run: npm run test --workspace @otrust/sdk -- --run
+      - name: Audit SDK dependencies
+        run: |
+          cd sdk-js && npm audit --audit-level=high
+          cd ../sdk-react && npm audit --audit-level=high

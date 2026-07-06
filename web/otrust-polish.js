@@ -13,6 +13,7 @@
     '/report-abuse',
     '/notes/why-otrust',
     '/notes-why-otrust',
+    '/krisledel',
     '/partners/hemsted',
     '/partners-hemsted'
   ]);
@@ -113,7 +114,6 @@
     if (primary) {
       primary.innerHTML = `
         <a href="/timestamp">Timestamp</a>
-        <a href="/proof">ID</a>
         <a href="/sign">Sign</a>
         <a href="/sign-in">Auth</a>
       `;
@@ -157,7 +157,6 @@
   }
 
   function closeMobileMenu(navLinks) {
-    const menuButton = navLinks.querySelector('.mobile-menu-btn');
     const navSecondary = navLinks.querySelector('.nav-secondary');
     const mobilePanel = navLinks.closest('nav')?.querySelector('.mobile-nav-panel');
 
@@ -165,11 +164,40 @@
     navSecondary?.classList.remove('open');
     mobilePanel?.classList.remove('open');
     if (mobilePanel) mobilePanel.hidden = true;
-    menuButton?.classList.remove('open');
-    menuButton?.setAttribute('aria-expanded', 'false');
+  }
+
+  function injectStandardNav() {
+    if (document.querySelector('nav[role="navigation"]') || document.querySelector('.dashboard-home') || document.querySelector('.nav-links')) return false;
+
+    const body = document.body;
+    const nav = document.createElement('nav');
+    nav.setAttribute('role', 'navigation');
+    nav.setAttribute('aria-label', 'Main navigation');
+    nav.innerHTML = `
+      <div class="nav-container">
+        <a href="/" class="logo">OTRUST</a>
+        <div class="nav-links">
+          <span class="nav-primary">
+            <a href="/timestamp">Timestamp</a>
+            <a href="/sign">Sign</a>
+            <a href="/sign-in">Auth</a>
+          </span>
+          <span class="nav-secondary" id="nav-secondary">
+            <a href="/docs" class="docs-trigger" id="docs-trigger">Docs</a>
+            <a href="/api-docs">Developers</a>
+            <a href="/about">About</a>
+          </span>
+          <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode"></button>
+        </div>
+      </div>
+    `;
+    body.insertBefore(nav, body.firstChild.nextSibling || body.firstChild);
+    return true;
   }
 
   function hydrateNav() {
+    injectStandardNav();
+
     if (document.querySelector('.dashboard-home')) {
       return false;
     }
@@ -186,24 +214,12 @@
     if (navSecondary && !navSecondary.id) navSecondary.id = 'nav-secondary';
 
     const themeButton = ensureButton(navLinks, 'theme-toggle', 'theme-toggle', 'Toggle color theme');
-    const menuButton = ensureButton(navLinks, 'mobile-menu-btn', 'mobile-menu-btn', 'Menu');
+    // mobile menu button removed as requested - no hamburger
     const mobilePanel = buildMobileNavPanel(nav, navLinks);
     const docsBar = document.getElementById('docs-submenu-bar') || document.querySelector('.docs-submenu-bar');
     const docsTrigger = navLinks.querySelector('.docs-trigger');
 
-    menuButton.setAttribute('aria-controls', mobilePanel.id);
-    menuButton.setAttribute('aria-expanded', 'false');
-    menuButton.addEventListener('click', (event) => {
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      const isOpen = !mobilePanel.classList.contains('open');
-      navLinks.classList.toggle('nav-open', isOpen);
-      if (navSecondary) navSecondary.classList.toggle('open', isOpen);
-      mobilePanel.classList.toggle('open', isOpen);
-      mobilePanel.hidden = !isOpen;
-      menuButton.classList.toggle('open', isOpen);
-      menuButton.setAttribute('aria-expanded', String(isOpen));
-    }, true);
+    // Hamburger menu removed per request - mobile panel still built for potential future use, but no button
 
     themeButton.addEventListener('click', (event) => {
       event.preventDefault();
@@ -453,6 +469,21 @@
       trust: ['Never treat a client callback as final without server verification.', 'Preserve state and expiry checks for hosted Auth.', 'Prefer hash references over document uploads where possible.'],
       actions: [['View endpoints', '/api-docs'], ['Open playground', '/playground/']]
     },
+    founder: {
+      shellMode: 'compact',
+      kicker: 'Why',
+      title: 'Prior art, without disclosure.',
+      body: 'In my research on cognition I kept running into the same problem: how do you prove something existed before a certain date without sharing the idea? That’s why I built OTRUST.',
+      stepsTitle: 'The constraint',
+      stepLabels: ['Keep the work', 'Hash locally', 'Timestamp', 'Verify later'],
+      steps: ['The invention stays private until you choose otherwise.', 'Only a cryptographic hash leaves your machine.', 'The record anchors to an independent timeline.', 'Anyone can verify existence — not content.'],
+      trustTitle: 'What it avoids',
+      principlesHeading: 'Proof,<br>not exposure.',
+      principlesLead: 'Publishing early, filing first, or handing files to a platform each trade secrecy for evidence. Hash-first timestamping does not.',
+      trustLabels: ['No upload', 'No custody', 'No trust-me', 'Open source'],
+      trust: ['Raw files are not required for a valid proof.', 'OTRUST does not need to hold your work.', 'Verification is cryptographic, not reputational.', 'The core path is open and self-hostable.'],
+      actions: [['Use otrust.eu', '/'], ['Technical note', '/notes/why-otrust']]
+    },
     about: {
       shellMode: 'compact',
       kicker: 'About',
@@ -629,6 +660,7 @@
     if (normalized === '/api-docs') return 'api';
     if (normalized === '/playground') return 'playground';
     if (normalized === '/about') return 'about';
+    if (normalized === '/krisledel') return 'founder';
     if (normalized === '/privacy-policy') return 'privacy';
     if (normalized === '/terms') return 'terms';
     if (normalized === '/transparency') return 'transparency';
@@ -720,7 +752,6 @@
     }
     nav.innerHTML = `
       ${anchors}
-      <button type="button" class="dashboard-menu" aria-label="Open menu"><span></span></button>
     `;
   }
 
@@ -733,7 +764,6 @@
       <a href="/" class="dashboard-logo">OTRUST</a>
       <nav class="dashboard-links" aria-label="OTRUST site navigation">
         ${anchors}
-        <button type="button" class="dashboard-menu" aria-label="Open menu"><span></span></button>
       </nav>
     `;
   }
@@ -743,7 +773,7 @@
     return (
       Boolean(document.querySelector('.dashboard-site-nav, .dashboard-home')) ||
       root.classList.contains('otrust-dashboard-shell') ||
-      ['home', 'timestamp', 'proof', 'sign', 'signin', 'docs', 'api', 'about', 'legal', 'transparency', 'note', 'partner', 'support', 'playground', 'install', 'setup', 'swagger', 'camera', 'auth'].includes(page)
+      ['home', 'timestamp', 'proof', 'sign', 'signin', 'docs', 'api', 'about', 'founder', 'legal', 'transparency', 'note', 'partner', 'support', 'playground', 'install', 'setup', 'swagger', 'camera', 'auth'].includes(page)
     );
   }
 
@@ -831,6 +861,7 @@
       docs: ['READ THE MODEL', 'OR OPEN API DOCS', 'Security  &middot;  Verification'],
       api: ['EXPLORE ENDPOINTS', 'OR OPEN PLAYGROUND', 'JSON  &middot;  Server verify'],
       about: ['FOUR TOOLS', 'ONE VERIFICATION MODEL', 'Local-first  &middot;  Open source'],
+      founder: ['PRIOR ART', 'WITHOUT DISCLOSURE', 'Hash locally  &middot;  Verify later'],
       privacy: ['LOCAL-FIRST DATA', 'CLEAR RETENTION', 'No raw files  &middot;  Scoped IDs'],
       terms: ['SERVICE BOUNDARIES', 'VERIFICATION DUTIES', 'Evidence  &middot;  Dependencies']
     };
@@ -1112,7 +1143,7 @@
     normalizeSubpageTemplate(dashboardHome);
   }
 
-  const dashboardShellSkipPages = new Set(['home', 'timestamp', 'proof', 'sign', 'signin']);
+  const dashboardShellSkipPages = new Set(['home', 'timestamp', 'proof', 'sign', 'signin', 'quickstart']);
 
   const dashboardBodyWrapPages = new Set(['install', 'setup', 'swagger', 'camera', 'playground']);
 
@@ -1266,7 +1297,7 @@
       });
     }
 
-    if (page === 'about') {
+    if (page === 'about' || page === 'founder') {
       const layout = panel.querySelector('.main-layout');
       panel.querySelector('.left-col')?.remove();
       layout?.classList.add('dashboard-panel-single-col');
@@ -1597,6 +1628,7 @@
       normalized === '/api-docs' ? 'api' :
       normalized === '/playground' || normalized.startsWith('/playground/') ? 'playground' :
       normalized === '/about' ? 'about' :
+      normalized === '/krisledel' ? 'founder' :
       normalized === '/privacy-policy' || normalized === '/terms' ? 'legal' :
       normalized.startsWith('/partners') ? 'partner' :
       normalized.startsWith('/transparency') ? 'transparency' :
@@ -3266,7 +3298,7 @@
   }
 
   function initDashboardQuickActions() {
-    if (document.querySelector('.dashboard-site-nav')) initDashboardMenu();
+    // dashboard menu (hamburger) removed per user request
     if (root.dataset.otrustPage !== 'home' || !document.querySelector('.dashboard-home')) return;
     initDashboardTimestamp();
     initDashboardProof();
@@ -3278,6 +3310,87 @@
     if (document.querySelector('.dashboard-home')) {
       document.documentElement.classList.add('otrust-dashboard-shell');
     }
+  }
+
+  function initFounderEasterEgg() {
+    const target = '/krisledel';
+    const path = window.location.pathname.replace(/\.html$/, '').replace(/\/$/, '') || '/';
+    if (path === '/krisledel') return;
+
+    function goFounder() {
+      window.location.assign(target);
+    }
+
+    const konami = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyA'];
+    let konamiStep = 0;
+
+    document.addEventListener('keydown', (event) => {
+      if (event.repeat) return;
+      if (event.target && ['INPUT', 'TEXTAREA', 'SELECT'].includes(event.target.tagName)) return;
+
+      if (event.code === konami[konamiStep]) {
+        konamiStep += 1;
+        if (konamiStep === konami.length) goFounder();
+        return;
+      }
+
+      konamiStep = event.code === konami[0] ? 1 : 0;
+    });
+
+    if (path !== '/about') return;
+
+    const founder = Array.from(document.querySelectorAll('.content-card strong, article strong'))
+      .find((node) => node.textContent.trim() === 'Kris Ledel');
+    if (!founder) return;
+
+    let founderClicks = 0;
+    let founderTimer = null;
+
+    founder.addEventListener('click', () => {
+      founderClicks += 1;
+      clearTimeout(founderTimer);
+      if (founderClicks >= 3) {
+        goFounder();
+        return;
+      }
+      founderTimer = setTimeout(() => {
+        founderClicks = 0;
+      }, 2000);
+    });
+  }
+
+  function normalizeFooter() {
+    // Deluxe: ensure pages without a rich footer get a consistent simple one
+    if (document.querySelector('.footer-wrapper') || document.querySelector('.dashboard-home') || document.querySelector('.changelog-page')) return;
+
+    const main = document.querySelector('main');
+    if (!main) return;
+
+    // Broad for most content pages (legal, docs, simple, etc.)
+    const page = document.body.dataset.otrustPage || document.documentElement.className || '';
+    const path = window.location.pathname;
+    if (path.match(/\/(proof|sign|timestamp|auth|quickstart|playground)/)) return; // keep tool pages as-is
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'footer-wrapper';
+    wrapper.innerHTML = `
+      <footer role="contentinfo">
+        <div class="footer-links">
+          <a href="/timestamp">Timestamp</a>
+          <a href="/sign">Sign</a>
+          <a href="/about">About</a>
+          <a href="/sign-in">Auth</a>
+          <a href="/docs">Docs</a>
+          <a href="/api-docs">Developers</a>
+          <a href="/transparency">Trust Log</a>
+          <a href="/privacy-policy">Privacy</a>
+          <a href="/terms">Terms</a>
+          <a href="https://github.com/otrust-eu/opensource" rel="noopener noreferrer">GitHub</a>
+        </div>
+        <div class="footer-copy">OTRUST — MIT License</div>
+      </footer>
+    `;
+    document.body.appendChild(wrapper);
   }
 
   function initEnhancements() {
@@ -3293,6 +3406,8 @@
     initStatsWidgets();
     initCodeCopyButtons();
     initScrollReveal();
+    initFounderEasterEgg();
+    normalizeFooter();
   }
 
   initTheme();

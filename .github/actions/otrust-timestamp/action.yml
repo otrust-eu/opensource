@@ -1,0 +1,91 @@
+name: OTRUST Timestamp
+description: Bitcoin-anchor release artifacts via your self-hosted OTRUST instance
+author: OTRUST
+branding:
+  icon: clock
+  color: orange
+inputs:
+  files:
+    description: Glob or space-separated files to timestamp
+    required: true
+  api:
+    description: OTRUST API base URL
+    required: false
+    default: https://www.otrust.eu
+  api-key:
+    description: Organization API key (otrust_live_... or otrust_test_...)
+    required: false
+    default: ''
+  idempotency-key:
+    description: Optional Idempotency-Key for safe retries
+    required: false
+    default: ''
+  wait-for-confirmation:
+    description: Poll until Bitcoin confirmation (minutes, 0 = skip)
+    required: false
+    default: '0'
+outputs:
+  receipt_ids:
+    description: JSON array of { file, receipt, proof_url }
+  evidence_urls:
+    description: JSON array of evidence.zip URLs
+runs:
+  using: composite
+  steps:
+    - name: Timestamp files
+      shell: bash
+      run: |
+        API="${{ inputs.api }}"
+        API_KEY="${{ inputs.api-key }}"
+        IDEM="${{ inputs.idempotency-key }}"
+        WAIT_MIN="${{ inputs.wait-for-confirmation }}"
+        RECEIPTS="[]"
+        EVIDENCE="[]"
+
+        shopt -s nullglob
+        FILES=()
+        for pattern in ${{ inputs.files }}; do
+          for f in $pattern; do
+            [ -f "$f" ] && FILES+=("$f")
+          done
+        done
+
+        for f in "${FILES[@]}"; do
+          HASH=$(sha256sum "$f" | awk '{print $1}')
+
+          CURL_ARGS=(-sf -X POST "$API/claim/simple" \
+            -H "Content-Type: application/json" \
+            -H "Origin: $API")
+
+          if [ -n "$API_KEY" ]; then
+            CURL_ARGS+=(-H "Authorization: Bearer $API_KEY")
+          fi
+          if [ -n "$IDEM" ]; then
+            CURL_ARGS+=(-H "Idempotency-Key: ${IDEM}-$(basename "$f")")
+          fi
+
+          RESP=$(curl "${CURL_ARGS[@]}" \
+            -d "{\"hash\":\"$HASH\",\"source\":\"github-action\",\"filename\":\"$(basename "$f")\"}")
+
+          RID=$(echo "$RESP" | node -e "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{try{console.log(JSON.parse(d).receipt_id||'')}catch{}})")
+          PROOF="$API/proof/$RID"
+          echo "$f → $RID"
+
+          RECEIPTS=$(node -e "const a=JSON.parse(process.argv[1]);a.push({file:process.argv[2],receipt:process.argv[3],proof_url:process.argv[4]});console.log(JSON.stringify(a))" "$RECEIPTS" "$f" "$RID" "$PROOF")
+          EVIDENCE=$(node -e "const a=JSON.parse(process.argv[1]);a.push({file:process.argv[2],evidence_url:process.argv[3]});console.log(JSON.stringify(a))" "$EVIDENCE" "$f" "$PROOF/evidence.zip")
+
+          if [ -n "$WAIT_MIN" ] && [ "$WAIT_MIN" != "0" ] && [ -n "$RID" ]; then
+            end=$(( $(date +%s) + WAIT_MIN * 60 ))
+            while [ $(date +%s) -lt $end ]; do
+              STATUS=$(curl -sf "$API/proof/$RID" -H 'Accept: application/json' 2>/dev/null | node -e "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{try{const j=JSON.parse(d);console.log(j.blockchain_confirmed?'yes':'no')}catch{console.log('no')}})" || echo "no")
+              if [ "$STATUS" = "yes" ]; then
+                echo "Confirmed: $RID"
+                break
+              fi
+              sleep 30
+            done
+          fi
+        done
+
+        echo "receipt_ids=$RECEIPTS" >> "$GITHUB_OUTPUT"
+        echo "evidence_urls=$EVIDENCE" >> "$GITHUB_OUTPUT"
