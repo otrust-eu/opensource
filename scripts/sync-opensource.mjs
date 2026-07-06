@@ -87,6 +87,25 @@ if (fs.existsSync(gitignorePath)) {
   }
 }
 
+// Ensure README in opensource points to the opensource repo for cloning (not core)
+const readmePath = path.join(targetRoot, 'README.md');
+if (fs.existsSync(readmePath)) {
+  let readme = fs.readFileSync(readmePath, 'utf8');
+  const original = readme;
+  readme = readme.replace(
+    /git clone https:\/\/github.com\/otrust-eu\/core\.git/g,
+    'git clone https://github.com/otrust-eu/opensource.git'
+  );
+  readme = readme.replace(
+    /cd core/g,
+    'cd opensource'
+  );
+  if (readme !== original) {
+    fs.writeFileSync(readmePath, readme);
+    console.log('  ✓ updated README clone command to opensource repo');
+  }
+}
+
 console.log('\nDone. Run tests in opensource:');
 console.log(`  cd ${targetRoot}`);
 console.log('  npm ci && npm run test:core && npm run test:integration');

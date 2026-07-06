@@ -905,7 +905,7 @@ export default function App() {
           <a href="https://otrust.eu/docs">Documentation</a>
           <a href="https://otrust.eu/api-docs">API Reference</a>
           <a href="https://otrust.eu/playground/" className="active">SDK Playground</a>
-          <a href="https://github.com/otrust-eu/core" target="_blank">GitHub ↗</a>
+          <a href="https://github.com/otrust-eu/opensource" target="_blank">GitHub ↗</a>
         </div>
       </div>
       <main className="app-main">
