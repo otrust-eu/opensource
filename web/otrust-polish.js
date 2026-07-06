@@ -693,7 +693,6 @@
 
   const DASHBOARD_NAV_LINKS = [
     ['/timestamp', 'Timestamp'],
-    ['/proof', 'ID'],
     ['/sign', 'Sign'],
     ['/sign-in', 'Auth']
   ];
@@ -811,7 +810,6 @@
 
   const dashboardSidebarLinks = [
     { key: 'timestamp', href: '/timestamp', label: 'TIMESTAMP' },
-    { key: 'proof', href: '/proof', label: 'ID' },
     { key: 'sign', href: '/sign', label: 'SIGN' },
     { key: 'signin', href: '/sign-in', label: 'AUTH' }
   ];

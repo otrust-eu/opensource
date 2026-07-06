@@ -2143,6 +2143,8 @@ body[data-otrust-page="quickstart"] p {
 }
 
 @media (max-width: 760px) {
+  .subpage-function-rail { display: none; } /* avoid duplicate menu with top nav on mobile subpages */
+
   .bento-function-card .bento-card-title {
     font-size: 1.8rem;
   }
