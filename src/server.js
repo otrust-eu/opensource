@@ -45,6 +45,7 @@ import { createIdempotencyMiddleware } from './platform/idempotency.js';
 import { registerPlatformRoutes } from './platform/routes.js';
 import { checkClaimAllowance, incrementOrgClaimUsage } from './hosted/billing.js';
 import { sendEmail } from './email.js';
+import { getProductionRedirectUrl } from './canonical-url.js';
 import {
   emailTemplate,
   emailButton,
@@ -61,6 +62,10 @@ import {
 } from './emailTemplate.js';
 
 const app = express();
+// Railway terminates TLS at one trusted proxy.
+app.set('trust proxy', 1);
+
+const DASHBOARD_CACHE_VERSION = '20260723-03';
 const PORT = config.port || process.env.PORT || 3000;
 const IS_PRODUCTION = config.isProduction || process.env.NODE_ENV === 'production';
 const CORS_ORIGINS = String(config.security.corsOrigins || '')
@@ -122,14 +127,21 @@ app.use((req, res, next) => {
   next();
 });
 
-// Force HTTPS in production (skip for health checks and desktop app)
+// Force HTTPS and collapse the public apex domain to the canonical www host.
 const IS_DESKTOP = process.env.OTRUST_DESKTOP === 'true';
 if (IS_PRODUCTION && !IS_DESKTOP) {
   app.use((req, res, next) => {
     if (req.path === '/health') return next();
-    if (req.headers['x-forwarded-proto'] !== 'https') {
-      return res.redirect(301, `https://${req.headers.host}${req.url}`);
-    }
+
+    const redirectUrl = getProductionRedirectUrl({
+      host: req.get('host'),
+      forwardedProto: req.get('x-forwarded-proto'),
+      originalUrl: req.originalUrl,
+      isProduction: true,
+      canonicalHost: process.env.CANONICAL_HOST || 'www.otrust.eu'
+    });
+    if (redirectUrl) return res.redirect(301, redirectUrl);
+
     next();
   });
 }
@@ -201,10 +213,6 @@ app.use((req, res, next) => {
 
 // Disable Express signature
 app.disable('x-powered-by');
-
-// Trust proxy - Railway sets X-Forwarded-For
-// 1 = trust only first proxy (prevents spoofing)
-app.set('trust proxy', 1);
 
 app.use(compression());
 
@@ -455,15 +463,12 @@ app.use((req, res, next) => {
   const isLocalhost = origin && (origin.includes('localhost') || origin.includes('127.0.0.1'));
   
   if (origin && (CORS_ORIGINS.includes(origin) || isExtension || isLocalhost)) {
+    res.vary('Origin');
     res.header('Access-Control-Allow-Origin', origin);
-  } else if (!origin) {
-    // Allow requests without Origin (same-origin, curl, Postman)
-    res.header('Access-Control-Allow-Origin', '*');
   }
   
   res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
-  res.header('Access-Control-Allow-Credentials', 'false');
   if (req.method === 'OPTIONS') return res.sendStatus(204);
   next();
 });
@@ -2793,14 +2798,13 @@ const serveHtmlWithNonce = (filePath) => {
   return (req, res) => {
     try {
       let html = fs.readFileSync(filePath, 'utf8');
-      const dashboardCacheVersion = '20260601-02';
       // Replace nonce placeholders in inline <script> tags
       // SECURITY: [^"]* is bounded by " character and is safe from ReDoS
       html = html.replace(/nonce="[^"]*"/g, `nonce="${req.cspNonce}"`);
       html = html
-        .replace(/\/otrust-polish\.css\?v=[^"'\s<>]+/g, `/otrust-polish.css?v=${dashboardCacheVersion}`)
-        .replace(/\/otrust-redesign\.css\?v=[^"'\s<>]+/g, `/otrust-redesign.css?v=${dashboardCacheVersion}`)
-        .replace(/\/otrust-polish\.js\?v=[^"'\s<>]+/g, `/otrust-polish.js?v=${dashboardCacheVersion}`);
+        .replace(/\/otrust-polish\.css\?v=[^"'\s<>]+/g, `/otrust-polish.css?v=${DASHBOARD_CACHE_VERSION}`)
+        .replace(/\/otrust-redesign\.css\?v=[^"'\s<>]+/g, `/otrust-redesign.css?v=${DASHBOARD_CACHE_VERSION}`)
+        .replace(/\/otrust-polish\.js\?v=[^"'\s<>]+/g, `/otrust-polish.js?v=${DASHBOARD_CACHE_VERSION}`);
       res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
       res.send(html);
@@ -3023,20 +3027,25 @@ function quickResponsePage(title, message, status, docTitle = null) {
 // Redirect favicon.ico to favicon.svg
 app.get('/favicon.ico', (req, res) => res.redirect(301, '/favicon.svg'));
 
+app.use((req, res, next) => {
+  res.locals.otrustVersionedAsset = (
+    req.method === 'GET' &&
+    req.query.v === DASHBOARD_CACHE_VERSION &&
+    /\.(?:css|js)$/.test(req.path)
+  );
+  next();
+});
+
 app.use(express.static(path.join(__dirname, '../web'), {
   maxAge: '1d',
   etag: true,
   lastModified: true,
-  setHeaders: (res, path) => {
+  setHeaders: (res, filePath) => {
     // Prevent caching of HTML files (but these shouldn't be served by static now)
-    if (path.endsWith('.html')) {
+    if (filePath.endsWith('.html')) {
       res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-    } else if (
-      path.endsWith('otrust-redesign.css') ||
-      path.endsWith('otrust-polish.css') ||
-      path.endsWith('otrust-polish.js')
-    ) {
-      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    } else if (res.locals.otrustVersionedAsset) {
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
     }
   }
 }));

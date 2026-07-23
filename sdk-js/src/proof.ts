@@ -303,6 +303,10 @@ export async function age(options: {
   birthDate: string;
   minAge: number;
 }): Promise<Result<AgeProof>> {
+  if (!options.birthDate?.trim()) {
+    return err(new OTrustError('validation_error', 'Birth date is required'));
+  }
+
   const client = getClient();
   const result = await client.post<{
     success: boolean;
@@ -345,6 +349,14 @@ export async function membership(options: {
   organizationId: string;
   organizationName?: string;
 }): Promise<Result<MembershipProof>> {
+  if (!options.memberId?.trim()) {
+    return err(new OTrustError('validation_error', 'Member ID is required'));
+  }
+
+  if (!options.organizationId?.trim()) {
+    return err(new OTrustError('validation_error', 'Organization ID is required'));
+  }
+
   const client = getClient();
   const result = await client.post<{
     success: boolean;

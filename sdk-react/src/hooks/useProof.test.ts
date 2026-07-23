@@ -1,6 +1,16 @@
 import { describe, it, expect, vi } from 'vitest';
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { useProof } from './useProof';
+
+const { verifyMock } = vi.hoisted(() => ({
+  verifyMock: vi.fn(),
+}));
+
+vi.mock('@otrust/sdk', () => ({
+  proof: {
+    verify: verifyMock,
+  },
+}));
 
 describe('useProof', () => {
   it('returns initial state', () => {
@@ -31,17 +41,23 @@ describe('useProof', () => {
 
   it('sets loading state during verify', async () => {
     const { result } = renderHook(() => useProof());
+    let finishRequest!: (value: { ok: false; error: Error }) => void;
+    verifyMock.mockImplementationOnce(() => new Promise((resolve) => {
+      finishRequest = resolve;
+    }));
+    let request!: Promise<unknown>;
 
-    // Start verify (will fail due to no API, but should set loading)
     act(() => {
-      result.current.verify('id_test123');
+      request = result.current.verify('id_test123');
     });
 
     expect(result.current.isLoading).toBe(true);
 
-    // Wait for it to complete
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
+    await act(async () => {
+      finishRequest({ ok: false, error: new Error('Verification failed') });
+      await request;
     });
+
+    expect(result.current.isLoading).toBe(false);
   });
 });

@@ -749,6 +749,17 @@
     nav.innerHTML = `
       ${anchors}
     `;
+
+    let menuButton = header.querySelector('.dashboard-menu');
+    if (!menuButton) {
+      menuButton = document.createElement('button');
+      menuButton.type = 'button';
+      menuButton.className = 'dashboard-menu';
+      menuButton.setAttribute('aria-label', 'Open navigation menu');
+      menuButton.setAttribute('title', 'Navigation');
+      menuButton.innerHTML = '<span aria-hidden="true"></span>';
+      header.appendChild(menuButton);
+    }
   }
 
   function dashboardNavMarkup() {
@@ -3228,6 +3239,7 @@
     header.classList.remove('menu-open');
     button.classList.remove('open');
     button.setAttribute('aria-expanded', 'false');
+    button.setAttribute('aria-label', 'Open navigation menu');
   }
 
   function initDashboardMenu() {
@@ -3277,6 +3289,7 @@
         header.classList.toggle('menu-open', isOpen);
         button.classList.toggle('open', isOpen);
         button.setAttribute('aria-expanded', String(isOpen));
+        button.setAttribute('aria-label', isOpen ? 'Close navigation menu' : 'Open navigation menu');
       });
 
       header.dataset.dashboardMenuReady = 'true';

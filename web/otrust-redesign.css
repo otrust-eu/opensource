@@ -1937,6 +1937,65 @@ body[data-otrust-page="quickstart"] p {
 }
 
 @media (max-width: 760px) {
+  .dashboard-site-nav .dashboard-logo {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .dashboard-site-nav {
+    position: relative !important;
+  }
+
+  .dashboard-site-nav .dashboard-links {
+    display: none !important;
+  }
+
+  .dashboard-site-nav .dashboard-menu {
+    display: inline-block;
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+  }
+
+  .dashboard-menu span,
+  .dashboard-menu span::before,
+  .dashboard-menu span::after {
+    left: 13px;
+    width: 16px;
+  }
+
+  .dashboard-menu span {
+    top: 21px;
+  }
+
+  .dashboard-mobile-panel a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .dashboard-site-nav .dashboard-mobile-panel {
+    top: calc(100% + 8px);
+    right: 0;
+  }
+
+  .bento-selfhost,
+  .bento-text-action {
+    min-height: 44px;
+  }
+
+  .bento-footer .footer-links a,
+  .dashboard-home.otrust-subpage-shell .dashboard-left-footer nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .dashboard-home.otrust-subpage-shell .dashboard-tool-slot button {
+    min-height: 44px;
+  }
+
   .bento-hero {
     min-height: 560px;
   }
@@ -4264,6 +4323,12 @@ body.otrust-page-note .dashboard-page-panel .note-side {
 
   .api-dashboard-panel .endpoint-link {
     overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 760px) {
+  body:not([data-otrust-page="home"]) .dashboard-home.otrust-subpage-shell > .otrust-sidebar {
+    display: none !important;
   }
 }
 

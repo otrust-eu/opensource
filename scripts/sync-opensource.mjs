@@ -6,14 +6,14 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { execSync } from 'child_process';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const coreRoot = path.resolve(__dirname, '..');
-const targetRoot = path.resolve(process.argv[2] || process.env.OPENSOURCE_DIR || path.join(coreRoot, '..', 'otrust'));
+const targetRoot = path.resolve(process.argv[2] || process.env.OPENSOURCE_DIR || path.join(coreRoot, '..', 'opensource'));
 
 const SYNC_PATHS = [
   'src/server.js',
+  'src/canonical-url.js',
   'src/sign.js',
   'src/emailTemplate.js',
   'src/zkproof.js',
@@ -30,6 +30,7 @@ const SYNC_PATHS = [
   'src/platform',
   'test/email.test.js',
   'test/api.test.js',
+  'test/canonical-url.test.js',
   'web',
   'sdk-js',
   'sdk-python',
@@ -73,11 +74,15 @@ for (const rel of SYNC_PATHS) {
   }
   fs.mkdirSync(path.dirname(dest), { recursive: true });
   const stat = fs.statSync(src);
+  fs.rmSync(dest, { recursive: true, force: true });
   if (stat.isDirectory()) {
-    fs.mkdirSync(dest, { recursive: true });
-    execSync(`rsync -a --delete "${src}/" "${dest}/"`, { stdio: 'inherit' });
+    fs.cpSync(src, dest, {
+      recursive: true,
+      force: true,
+      preserveTimestamps: true
+    });
   } else {
-    execSync(`rsync -a "${src}" "${dest}"`, { stdio: 'inherit' });
+    fs.copyFileSync(src, dest);
   }
   console.log(`  ✓ ${rel}`);
 }
