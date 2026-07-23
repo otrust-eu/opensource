@@ -150,3 +150,11 @@ jobs:
             npm audit --prefix sdk-js --audit-level=high --package-lock-only
             npm audit --prefix sdk-react --audit-level=high --package-lock-only
           fi
+
+      - name: Audit addon dependencies
+        run: |
+          for dir in addons/email-worker addons/sign-email-worker addons/whatsapp-bot addons/telegram-bot; do
+            if [ -f "$dir/package-lock.json" ]; then
+              npm audit --prefix "$dir" --audit-level=low --package-lock-only
+            fi
+          done
