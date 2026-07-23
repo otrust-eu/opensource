@@ -3,6 +3,23 @@
  */
 import { test, expect } from '@playwright/test';
 
+async function getDashboardNavigation(page) {
+  const nav = page.locator('.dashboard-site-nav:visible').first();
+  await expect(nav).toBeVisible();
+
+  const menu = nav.getByRole('button', { name: 'Open navigation menu' });
+  if (await menu.isVisible()) {
+    await menu.click();
+    const links = nav.locator('.dashboard-mobile-panel:visible');
+    await expect(links).toBeVisible();
+    return { nav, links };
+  }
+
+  const links = nav.locator('.dashboard-links:visible');
+  await expect(links).toBeVisible();
+  return { nav, links };
+}
+
 test.describe('Homepage', () => {
   test('loads successfully', async ({ page }) => {
     await page.goto('/');
@@ -12,7 +29,7 @@ test.describe('Homepage', () => {
 
     // Check main elements are visible
     await expect(page.locator('h1')).toBeVisible();
-    await expect(page.getByText(/timestamp/i).first()).toBeVisible();
+    await expect(page.locator('.bento-function-card').getByRole('heading', { name: 'Timestamp', exact: true })).toBeVisible();
   });
 
   test('has working navigation', async ({ page }) => {
@@ -20,9 +37,9 @@ test.describe('Homepage', () => {
 
     // Check nav links - now includes ID to match 4 core workflows
     const links = ['Timestamp', 'ID', 'Sign', 'Auth'];
-    const nav = page.locator('.dashboard-site-nav').first();
+    const { links: navLinks } = await getDashboardNavigation(page);
     for (const link of links) {
-      await expect(nav.getByRole('link', { name: new RegExp(link, 'i') }).first()).toBeVisible();
+      await expect(navLinks.getByRole('link', { name: new RegExp(link, 'i') }).first()).toBeVisible();
     }
   });
 
@@ -112,32 +129,31 @@ test.describe('Public navigation', () => {
 
     for (const route of routes) {
       await page.goto(route);
-      const nav = page.locator('.dashboard-site-nav:visible').first();
-      await expect(nav).toBeVisible();
-      await expect(nav.getByRole('link', { name: 'Timestamp' })).toBeVisible();
-      await expect(nav.getByRole('link', { name: 'ID' })).toBeVisible();
-      await expect(nav.getByRole('link', { name: 'Sign' })).toBeVisible();
-      await expect(nav.getByRole('link', { name: 'Auth' })).toBeVisible();
-      const navLinks = await nav.getByRole('link').evaluateAll((links) =>
-        links.map((link) => ({
+      const { nav, links } = await getDashboardNavigation(page);
+      await expect(nav.getByRole('link', { name: 'OTRUST', exact: true })).toBeVisible();
+      await expect(links.getByRole('link', { name: 'Timestamp' })).toBeVisible();
+      await expect(links.getByRole('link', { name: 'ID' })).toBeVisible();
+      await expect(links.getByRole('link', { name: 'Sign' })).toBeVisible();
+      await expect(links.getByRole('link', { name: 'Auth' })).toBeVisible();
+      const navLinks = await links.getByRole('link').evaluateAll((items) =>
+        items.map((link) => ({
           label: link.textContent?.replace(/\s+/g, ' ').trim(),
           href: link.getAttribute('href')
         }))
       );
-      const labels = navLinks.map((link) => link.label);
-      expect(labels).toContain('OTRUST');
-      expect(labels).toContain('Timestamp');
-      expect(labels).toContain('ID');
-      expect(labels).toContain('Sign');
-      expect(labels).toContain('Auth');
+      const labels = [
+        'OTRUST',
+        ...navLinks.map((link) => link.label)
+      ];
+      expect(labels).toEqual(expectedTopNav);
       const navHrefByLabel = Object.fromEntries(navLinks.map((link) => [link.label, link.href]));
       expect(navHrefByLabel.ID).toMatch(/\/proof$/);
       expect(navHrefByLabel.Auth).toMatch(/\/sign-in$/);
 
       if (route !== '/playground/') {
         const footer = page.locator('footer').first();
-        const footerLabels = await footer.getByRole('link').evaluateAll((links) =>
-          links
+        const footerLabels = await footer.getByRole('link').evaluateAll((footerLinks) =>
+          footerLinks
             .map((link) => link.textContent?.replace(/\s+/g, ' ').trim())
             .filter(Boolean)
         );
