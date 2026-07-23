@@ -4,9 +4,9 @@
   "type": "module",
   "description": "OTRUST ZK Proof Circuits",
   "scripts": {
-    "compile:age": "circom ageProof.circom --r1cs --wasm --sym -o build",
-    "compile:income": "circom incomeProof.circom --r1cs --wasm --sym -o build",
-    "compile:membership": "circom membershipProof.circom --r1cs --wasm --sym -o build",
+    "compile:age": "circom ageProof.circom -l .. --r1cs --wasm --sym -o build",
+    "compile:income": "circom incomeProof.circom -l .. --r1cs --wasm --sym -o build",
+    "compile:membership": "circom membershipProof.circom -l .. --r1cs --wasm --sym -o build",
     "compile:all": "node scripts/prepare-build.js && npm run compile:age && npm run compile:income && npm run compile:membership",
     "setup:age": "node scripts/trusted-setup.js ageProof",
     "setup:income": "node scripts/trusted-setup.js incomeProof",
