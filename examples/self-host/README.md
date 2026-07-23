@@ -10,10 +10,13 @@ cd opensource
 ./scripts/quickstart.sh
 ```
 
+On Windows PowerShell, run `.\scripts\quickstart.ps1` instead.
+
 Or manually:
 
 ```bash
 export ADMIN_KEY=$(openssl rand -hex 32)
+export AUTH_SECRET=$(openssl rand -hex 32)
 docker compose up -d --build
 ```
 
@@ -21,7 +24,7 @@ Open `http://localhost:3000/developers.html` — create org, API key, webhook.
 
 ## Production checklist
 
-1. Set `ADMIN_KEY` to a strong random secret (32+ bytes)
+1. Set `ADMIN_KEY` and `AUTH_SECRET` to separate strong random secrets (32+ bytes)
 2. Use managed MongoDB or a replicated cluster
 3. Set `BASE_URL` to your public HTTPS URL
 4. **Do not** set `HOSTED_MODE` — plan limits apply only on otrust.eu hosted service

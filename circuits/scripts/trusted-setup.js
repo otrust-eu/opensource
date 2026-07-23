@@ -6,6 +6,7 @@
  */
 
 import { execFile } from 'child_process';
+import { createHash, randomBytes } from 'crypto';
 import { promisify } from 'util';
 import * as snarkjs from 'snarkjs';
 import fs from 'fs';
@@ -15,6 +16,34 @@ import { fileURLToPath } from 'url';
 const execFileAsync = promisify(execFile);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const BUILD_DIR = path.join(__dirname, '..', 'build');
+const PTAU_URL = 'https://storage.googleapis.com/zkevm/ptau/powersOfTau28_hez_final_14.ptau';
+const PTAU_HASH = 'eeefbcf7c3803b523c94112023c7ff89558f9b8e0cf5d6cdcba3ade60f168af4a181c9c21774b94fbae6c90411995f7d854d02ebd93fb66043dbb06f17a831c1';
+
+function hashFile(filePath) {
+  const hash = createHash('blake2b512');
+  hash.update(fs.readFileSync(filePath));
+  return hash.digest('hex');
+}
+
+async function ensurePowersOfTau(ptauPath) {
+  if (fs.existsSync(ptauPath) && hashFile(ptauPath) === PTAU_HASH) {
+    return;
+  }
+
+  fs.rmSync(ptauPath, { force: true });
+  const downloadPath = `${ptauPath}.download`;
+  fs.rmSync(downloadPath, { force: true });
+
+  console.log('Downloading Powers of Tau (14) from the snarkjs ceremony archive...');
+  await execFileAsync('curl', ['-fL', PTAU_URL, '-o', downloadPath]);
+
+  if (hashFile(downloadPath) !== PTAU_HASH) {
+    fs.rmSync(downloadPath, { force: true });
+    throw new Error('Powers of Tau checksum mismatch');
+  }
+
+  fs.renameSync(downloadPath, ptauPath);
+}
 
 // Validate circuit name to prevent path traversal
 function validateCircuitName(name) {
@@ -46,17 +75,8 @@ async function trustedSetup(circuitName) {
     process.exit(1);
   }
   
-  // Download Powers of Tau if needed (using Hermez ceremony)
-  // Using execFile with array arguments to prevent shell injection
-  if (!fs.existsSync(ptauPath)) {
-    console.log('📥 Downloading Powers of Tau (14) from Hermez...');
-    await execFileAsync('curl', [
-      '-L',
-      'https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_14.ptau',
-      '-o',
-      ptauPath
-    ]);
-  }
+  // Download and verify the prepared phase-2 ceremony transcript.
+  await ensurePowersOfTau(ptauPath);
   
   // Phase 2: Circuit-specific setup
   console.log('⚙️  Running circuit-specific setup...');
@@ -68,7 +88,12 @@ async function trustedSetup(circuitName) {
   await snarkjs.zKey.newZKey(r1csPath, ptauPath, zkey0Path);
   
   // Contribute randomness (in production, do multi-party)
-  await snarkjs.zKey.contribute(zkey0Path, zkey1Path, 'OTRUST Contribution', 'random-entropy-' + Date.now());
+  await snarkjs.zKey.contribute(
+    zkey0Path,
+    zkey1Path,
+    'OTRUST Contribution',
+    randomBytes(32).toString('hex')
+  );
   
   // Apply beacon (using Bitcoin block hash or similar for randomness)
   const beaconHash = '0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20';
@@ -85,16 +110,7 @@ async function trustedSetup(circuitName) {
   console.log(`✅ Trusted setup complete!`);
   console.log(`   📁 Proving key: ${zkeyPath}`);
   console.log(`   📁 Verification key: ${vkeyPath}`);
-  
-  // Verify the setup
-  console.log('\n🔍 Verifying setup...');
-  const isValid = await snarkjs.zKey.verifyFromR1cs(r1csPath, ptauPath, zkeyPath);
-  if (isValid) {
-    console.log('✅ Setup verified successfully!');
-  } else {
-    console.error('❌ Setup verification failed!');
-    process.exit(1);
-  }
+  console.log('Run npm test to verify the proving key end to end.');
 }
 
 // Run
@@ -105,7 +121,9 @@ if (!circuitName) {
   process.exit(1);
 }
 
-trustedSetup(circuitName).catch(err => {
-  console.error('Error:', err);
-  process.exit(1);
-});
+trustedSetup(circuitName)
+  .then(() => process.exit(0))
+  .catch(err => {
+    console.error('Error:', err);
+    process.exit(1);
+  });

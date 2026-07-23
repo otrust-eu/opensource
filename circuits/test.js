@@ -68,6 +68,9 @@ async function testAgeProof() {
   const startVerify = Date.now();
   const isValid = await snarkjs.groth16.verify(vkey, publicSignals, proof);
   const verifyTime = Date.now() - startVerify;
+  if (!isValid) {
+    throw new Error('Age proof verification failed');
+  }
   
   console.log(`   ${isValid ? '✅' : '❌'} Proof is ${isValid ? 'VALID' : 'INVALID'} (${verifyTime}ms)`);
   
@@ -128,9 +131,60 @@ async function testIncomeProof() {
   const startVerify = Date.now();
   const isValid = await snarkjs.groth16.verify(vkey, publicSignals, proof);
   const verifyTime = Date.now() - startVerify;
+  if (!isValid) {
+    throw new Error('Income proof verification failed');
+  }
   
   console.log(`   ${isValid ? '✅' : '❌'} Proof is ${isValid ? 'VALID' : 'INVALID'} (${verifyTime}ms)`);
   
+  return { proof, publicSignals, isValid, proveTime, verifyTime };
+}
+
+async function testMembershipProof() {
+  console.log('\nTesting Membership Proof Circuit');
+  console.log('=' .repeat(50));
+
+  const poseidon = await buildPoseidon();
+  const secret = BigInt('112233445566778899');
+  const externalNullifier = BigInt('20260723');
+  const pathElements = Array.from({ length: 20 }, (_, index) => BigInt(index + 1));
+  const pathIndices = Array.from({ length: 20 }, (_, index) => index % 2);
+
+  let root = poseidon([secret]);
+  for (let index = 0; index < pathElements.length; index++) {
+    root = pathIndices[index] === 0
+      ? poseidon([root, pathElements[index]])
+      : poseidon([pathElements[index], root]);
+  }
+
+  const input = {
+    secret: secret.toString(),
+    pathElements: pathElements.map(String),
+    pathIndices,
+    merkleRoot: poseidon.F.toString(root),
+    nullifierHash: poseidon.F.toString(poseidon([secret, externalNullifier])),
+    externalNullifier: externalNullifier.toString()
+  };
+
+  const wasmPath = path.join(BUILD_DIR, 'membershipProof_js', 'membershipProof.wasm');
+  const zkeyPath = path.join(BUILD_DIR, 'membershipProof_final.zkey');
+  const vkeyPath = path.join(BUILD_DIR, 'membershipProof_vkey.json');
+
+  console.log('\nGenerating proof...');
+  const startProve = Date.now();
+  const { proof, publicSignals } = await snarkjs.groth16.fullProve(input, wasmPath, zkeyPath);
+  const proveTime = Date.now() - startProve;
+
+  console.log('\nVerifying proof...');
+  const vkey = JSON.parse(fs.readFileSync(vkeyPath, 'utf8'));
+  const startVerify = Date.now();
+  const isValid = await snarkjs.groth16.verify(vkey, publicSignals, proof);
+  const verifyTime = Date.now() - startVerify;
+  if (!isValid) {
+    throw new Error('Membership proof verification failed');
+  }
+
+  console.log(`   Proof is VALID (prove: ${proveTime}ms, verify: ${verifyTime}ms)`);
   return { proof, publicSignals, isValid, proveTime, verifyTime };
 }
 
@@ -140,11 +194,13 @@ async function main() {
   
   const ageResult = await testAgeProof();
   const incomeResult = await testIncomeProof();
+  const membershipResult = await testMembershipProof();
   
   console.log('\n📊 Summary');
   console.log('=' .repeat(50));
   console.log(`Age Proof:    ${ageResult.isValid ? '✅' : '❌'} (prove: ${ageResult.proveTime}ms, verify: ${ageResult.verifyTime}ms)`);
   console.log(`Income Proof: ${incomeResult.isValid ? '✅' : '❌'} (prove: ${incomeResult.proveTime}ms, verify: ${incomeResult.verifyTime}ms)`);
+  console.log(`Membership:   ${membershipResult.isValid ? '✅' : '❌'} (prove: ${membershipResult.proveTime}ms, verify: ${membershipResult.verifyTime}ms)`);
   
   // Export proof as JSON for web use
   console.log('\n📦 Exporting sample proof...');
@@ -156,7 +212,9 @@ async function main() {
   console.log('   Saved to build/sample_proof.json');
 }
 
-main().catch(err => {
-  console.error('Test failed:', err);
-  process.exit(1);
-});
+main()
+  .then(() => process.exit(0))
+  .catch(err => {
+    console.error('Test failed:', err);
+    process.exit(1);
+  });

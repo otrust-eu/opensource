@@ -37,6 +37,21 @@ describe('Production URL redirects', () => {
     })).toBe('https://trust.example.com/timestamp');
   });
 
+  test.each([
+    'localhost:3000',
+    '127.0.0.1:3000',
+    '192.168.1.20:3000',
+    '10.0.0.20:3000',
+    '[::1]:3000'
+  ])('keeps local self-hosting on HTTP for %s', (host) => {
+    expect(getProductionRedirectUrl({
+      host,
+      forwardedProto: 'http',
+      originalUrl: '/timestamp',
+      isProduction: true
+    })).toBeNull();
+  });
+
   test('does not redirect outside production', () => {
     expect(getProductionRedirectUrl({
       host: 'otrust.eu',

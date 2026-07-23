@@ -11,6 +11,31 @@ function normalizeHostname(value) {
   }
 }
 
+function isLocalHostname(hostname) {
+  const value = String(hostname || '').replace(/^\[|\]$/g, '');
+  if (
+    value === 'localhost' ||
+    value.endsWith('.localhost') ||
+    value === 'host.docker.internal' ||
+    value === '::1' ||
+    value === '0.0.0.0' ||
+    value.startsWith('127.')
+  ) {
+    return true;
+  }
+
+  const octets = value.split('.').map(Number);
+  if (octets.length !== 4 || octets.some((part) => !Number.isInteger(part) || part < 0 || part > 255)) {
+    return false;
+  }
+
+  return (
+    octets[0] === 10 ||
+    (octets[0] === 172 && octets[1] >= 16 && octets[1] <= 31) ||
+    (octets[0] === 192 && octets[1] === 168)
+  );
+}
+
 export function getProductionRedirectUrl({
   host,
   forwardedProto,
@@ -23,7 +48,7 @@ export function getProductionRedirectUrl({
   const incomingHostname = normalizeHostname(host);
   const normalizedCanonicalHost = normalizeHostname(canonicalHost);
   const proto = String(forwardedProto || '').split(',')[0].trim().toLowerCase();
-  const needsHttps = proto !== 'https';
+  const needsHttps = proto !== 'https' && !isLocalHostname(incomingHostname);
   const needsCanonicalHost = (
     OTRUST_PUBLIC_HOSTS.has(incomingHostname) &&
     OTRUST_PUBLIC_HOSTS.has(normalizedCanonicalHost) &&

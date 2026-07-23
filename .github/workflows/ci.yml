@@ -92,6 +92,35 @@ jobs:
           NODE_ENV: test
           TEST_MODE: 'true'
 
+  circuits:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install circuit dependencies
+        run: npm ci --prefix circuits
+
+      - name: Install Circom 2.2.3
+        run: |
+          curl -fsSL https://github.com/iden3/circom/releases/download/v2.2.3/circom-linux-amd64 -o /tmp/circom
+          echo "85342c7ff332d948df7c0c50ecf201e6129349aef550ce873f3c811b79fe53a3  /tmp/circom" | sha256sum -c -
+          chmod +x /tmp/circom
+          sudo mv /tmp/circom /usr/local/bin/circom
+
+      - name: Build circuits and proving keys
+        run: npm run build --prefix circuits
+
+      - name: Generate and verify proofs
+        run: npm test --prefix circuits
+
   security:
     runs-on: ubuntu-latest
     timeout-minutes: 5

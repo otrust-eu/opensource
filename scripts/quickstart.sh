@@ -7,7 +7,8 @@ cd "$ROOT"
 
 PORT="${PORT:-3000}"
 ADMIN_KEY="${ADMIN_KEY:-$(openssl rand -hex 32 2>/dev/null || head -c 32 /dev/urandom | xxd -p -c 64)}"
-export ADMIN_KEY PORT
+AUTH_SECRET="${AUTH_SECRET:-$(openssl rand -hex 32 2>/dev/null || head -c 32 /dev/urandom | xxd -p -c 64)}"
+export ADMIN_KEY AUTH_SECRET PORT
 
 if ! command -v docker >/dev/null 2>&1; then
   echo "Docker required. Install: https://docs.docker.com/get-docker/"
@@ -15,7 +16,7 @@ if ! command -v docker >/dev/null 2>&1; then
 fi
 
 echo "→ Starting OTRUST (MongoDB + app) on http://localhost:${PORT}"
-ADMIN_KEY="$ADMIN_KEY" PORT="$PORT" docker compose up -d --build
+ADMIN_KEY="$ADMIN_KEY" AUTH_SECRET="$AUTH_SECRET" PORT="$PORT" docker compose up -d --build
 
 echo "→ Waiting for health check..."
 for i in $(seq 1 30); do

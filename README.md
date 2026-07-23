@@ -13,13 +13,25 @@ Zero-knowledge timestamping and document signing. We only see hashes — never y
 
 ## Run your own — 60 seconds
 
+Linux and macOS:
+
 ```bash
 git clone https://github.com/otrust-eu/opensource.git
 cd opensource
 ./scripts/quickstart.sh
 ```
 
+Windows PowerShell:
+
+```powershell
+git clone https://github.com/otrust-eu/opensource.git
+Set-Location opensource
+.\scripts\quickstart.ps1
+```
+
 Open `http://localhost:3000` — full platform (API keys, webhooks, SDK). You own the server. No tiers. No Stripe. No trusting our infra.
+
+If port 3000 is occupied, use `PORT=3010 ./scripts/quickstart.sh` or `.\scripts\quickstart.ps1 -Port 3010`.
 
 See [examples/self-host/README.md](examples/self-host/README.md) for production checklist.
 
@@ -105,17 +117,18 @@ See [API Documentation](https://www.otrust.eu/api-docs.html) for full reference.
 
 ```bash
 export ADMIN_KEY=$(openssl rand -hex 32)
+export AUTH_SECRET=$(openssl rand -hex 32)
 docker compose up -d --build
 # → http://localhost:3000
 ```
 
-Or `./scripts/quickstart.sh` (generates `ADMIN_KEY`, waits for health).
+Or use `./scripts/quickstart.sh` on Linux/macOS or `.\scripts\quickstart.ps1` on Windows. Both generate `ADMIN_KEY` and `AUTH_SECRET`, then wait for health.
 
 ### Node.js — development
 
 ```bash
-npm install
-cp .env.example .env   # set MONGODB_URL, ADMIN_KEY
+npm ci
+cp .env.example .env   # set MONGODB_URL, ADMIN_KEY, AUTH_SECRET
 npm run dev
 ```
 
@@ -127,6 +140,7 @@ npm run dev
 | `MONGODB_DB` | Database name | `otrust` |
 | `PORT` | Server port | `3000` |
 | `ADMIN_KEY` | Platform admin (`X-Admin-Key`) | — **required in prod** |
+| `AUTH_SECRET` | Stable signing secret for hosted auth tokens | — **required in prod** |
 | `BASE_URL` | Public URL for links/webhooks | `http://localhost:3000` |
 | `HOSTED_MODE` | Plan limits on otrust.eu hosted service | unset = unlimited |
 
@@ -233,7 +247,7 @@ MIT © OTRUST
 |---------|-------------|
 | `npm start` | Start production server |
 | `npm run dev` | Start with hot-reload (watch mode) |
-| `npm test` | Run all Jest tests |
+| `npm test` | Run the default test suite |
 | `npm run test:unit` | Run unit tests only |
 | `npm run test:integration` | Run API integration tests |
 | `npm run test:coverage` | Run tests with coverage report |
@@ -242,6 +256,7 @@ MIT © OTRUST
 | `npm run build` | Build extension + SDKs |
 | `npm run build:extension` | Build browser extension zip |
 | `./scripts/quickstart.sh` | Docker self-host bootstrap |
+| `.\scripts\quickstart.ps1` | Docker self-host bootstrap on Windows |
 
 ## 🤝 Contributing
 

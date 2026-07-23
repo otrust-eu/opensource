@@ -45,7 +45,9 @@ const SYNC_PATHS = [
   'circuits',
   'examples',
   'scripts/build-extension.js',
+  'scripts/quickstart.ps1',
   'scripts/quickstart.sh',
+  '.dockerignore',
   'docker-compose.yml',
   'Dockerfile',
   '.env.example',
@@ -120,6 +122,10 @@ if (fs.existsSync(readmePath)) {
   readme = readme.replace(
     /cd core/g,
     'cd opensource'
+  );
+  readme = readme.replace(
+    /Set-Location core/g,
+    'Set-Location opensource'
   );
   if (readme !== original) {
     fs.writeFileSync(readmePath, readme);
