@@ -115,8 +115,8 @@ jobs:
       - name: Audit SDK dependencies
         run: |
           if node -e "const pkg = require('./package.json'); process.exit(Array.isArray(pkg.workspaces) ? 0 : 1)"; then
-            npm audit --workspace @otrust/sdk --audit-level=high
-            npm audit --workspace @otrust/react --audit-level=high
+            (cd sdk-js && npm audit --audit-level=high)
+            (cd sdk-react && npm audit --audit-level=high)
           else
             npm audit --prefix sdk-js --audit-level=high --package-lock-only
             npm audit --prefix sdk-react --audit-level=high --package-lock-only
