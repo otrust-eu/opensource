@@ -121,6 +121,9 @@ jobs:
       - name: Generate and verify proofs
         run: npm test --prefix circuits
 
+      - name: Verify published browser artifacts
+        run: npm run verify:published --prefix circuits
+
   security:
     runs-on: ubuntu-latest
     timeout-minutes: 5

@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "hashAlgorithm": "sha256",
+  "compiler": {
+    "name": "circom",
+    "version": "unknown",
+    "reproducible": false
+  },
+  "ceremony": {
+    "status": "legacy-development",
+    "productionReady": false,
+    "coordinator": null,
+    "finalizedAt": null,
+    "transcriptUrl": null,
+    "contributions": [],
+    "beacon": null,
+    "note": "These artifacts predate the documented multi-party ceremony and cannot be reproduced from the pinned compiler."
+  },
+  "powersOfTau": {
+    "url": "https://storage.googleapis.com/zkevm/ptau/powersOfTau28_hez_final_14.ptau",
+    "blake2b512": "eeefbcf7c3803b523c94112023c7ff89558f9b8e0cf5d6cdcba3ade60f168af4a181c9c21774b94fbae6c90411995f7d854d02ebd93fb66043dbb06f17a831c1"
+  },
+  "circuits": {
+    "ageProof": {
+      "source": {
+        "file": "circuits/ageProof.circom",
+        "bytes": 3187,
+        "sha256": "b04d4591feeb07667ca8fe939cb6e8c6507baed9c7ad210e231f43c92161cc15"
+      },
+      "r1cs": null,
+      "artifacts": {
+        "wasm": {
+          "file": "ageProof.wasm",
+          "bytes": 2004098,
+          "sha256": "a583dc81983c33dfb6d4791bb3cf967523de16fd361aed841670b896d67fc06d"
+        },
+        "zkey": {
+          "file": "ageProof_final.zkey",
+          "bytes": 452300,
+          "sha256": "3bc87bc4908d4a2133e360dfc2e6e4c9629757f3e9ead4cd2bd49f2602d8d76e"
+        },
+        "vkey": {
+          "file": "ageProof_vkey.json",
+          "bytes": 4252,
+          "sha256": "377a325f4a747b0ae95eb0e6ad53567e78c8fdba5fa5cf2a63a73102f52845a1"
+        }
+      }
+    },
+    "incomeProof": {
+      "source": {
+        "file": "circuits/incomeProof.circom",
+        "bytes": 1700,
+        "sha256": "6742c4d4ea15802f28d306def1bb3463aa2dddc5f7d7dfb2709ef39ef555d36b"
+      },
+      "r1cs": null,
+      "artifacts": {
+        "wasm": {
+          "file": "incomeProof.wasm",
+          "bytes": 1750491,
+          "sha256": "aea25096cd74b2f6dd3d12de646725705cdd433890bc8bec579223ea39326d4c"
+        },
+        "zkey": {
+          "file": "incomeProof_final.zkey",
+          "bytes": 192224,
+          "sha256": "5d1aa3ce5b8ca9e8d206e31e8f9639957b7570c3b58ef86538af954cb1d3c169"
+        },
+        "vkey": {
+          "file": "incomeProof_vkey.json",
+          "bytes": 3852,
+          "sha256": "b6d72d0622b3fe80be5880b72937fdd829127c3d0a4ddd10449ab84191e0156e"
+        }
+      }
+    }
+  }
+}

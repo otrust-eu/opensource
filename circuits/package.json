@@ -13,7 +13,9 @@
     "setup:membership": "node scripts/trusted-setup.js membershipProof",
     "setup": "npm run setup:age && npm run setup:income && npm run setup:membership",
     "build": "npm run compile:all && npm run setup",
-    "test": "node test.js"
+    "test": "node test.js",
+    "verify:published": "node scripts/verify-published.js",
+    "verify:production": "node scripts/verify-published.js --require-production"
   },
   "dependencies": {
     "circomlib": "^2.0.5",

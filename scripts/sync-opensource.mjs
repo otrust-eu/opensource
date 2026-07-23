@@ -67,6 +67,11 @@ const SYNC_PATHS = [
   'lighthouserc.json'
 ];
 
+function shouldCopy(sourceRoot, sourcePath) {
+  const relativePath = path.relative(sourceRoot, sourcePath);
+  return !relativePath.split(path.sep).includes('node_modules');
+}
+
 if (!fs.existsSync(targetRoot)) {
   console.error(`Target not found: ${targetRoot}`);
   console.error('Set OPENSOURCE_DIR or pass the opensource clone path as the first argument.');
@@ -89,7 +94,8 @@ for (const rel of SYNC_PATHS) {
     fs.cpSync(src, dest, {
       recursive: true,
       force: true,
-      preserveTimestamps: true
+      preserveTimestamps: true,
+      filter: (sourcePath) => shouldCopy(src, sourcePath)
     });
   } else {
     fs.copyFileSync(src, dest);

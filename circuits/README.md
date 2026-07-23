@@ -27,3 +27,20 @@ three circuits. Generated files are written to `build/` and are not committed.
 The generated keys use a single local contribution and are intended for
 development and evaluation. Run a documented multi-party ceremony before using
 Groth16 proving keys in production.
+
+## Published browser artifacts
+
+The browser artifacts in `../web/circuits/` are tracked by
+`../web/circuits/manifest.json`. Verify their checksums, proving and verification
+key pairing, and end-to-end proof generation with:
+
+```bash
+npm run verify:published
+```
+
+The current artifacts are explicitly classified as legacy development
+artifacts. `npm run verify:production` fails until a completed ceremony,
+independent contributions, a public beacon, compiler provenance, and R1CS hashes
+are recorded in the manifest.
+
+See [CEREMONY.md](CEREMONY.md) for the production ceremony and release process.
