@@ -17,7 +17,7 @@ function extractPageContent() {
   // Get the main text content of the page
   const selectors = ['article', 'main', '[role="main"]', '.content', '#content'];
   let content = '';
-  
+
   for (const selector of selectors) {
     const el = document.querySelector(selector);
     if (el) {
@@ -25,13 +25,13 @@ function extractPageContent() {
       break;
     }
   }
-  
+
   if (!content) {
     content = document.body.innerText;
   }
-  
+
   content = content.replace(/\s+/g, ' ').trim();
-  
+
   return `---OTRUST---
 URL: ${window.location.href}
 Title: ${document.title}

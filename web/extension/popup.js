@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Progress UI helper
   function showProgress(steps) {
-    return `<div class="progress-section">${steps.map(s => 
+    return `<div class="progress-section">${steps.map(s =>
       `<div class="progress-step ${s.status}">
         <span class="icon">${s.status === 'done' ? '✓' : s.status === 'active' ? '<span class="spinner"></span>' : '○'}</span>
         ${s.label}
@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   timestampBtn.addEventListener('click', async () => {
     timestampBtn.disabled = true;
-    
+
     const steps = [
       { label: 'Reading page', status: 'active' },
       { label: 'Proof-of-work', status: '' },
@@ -132,12 +132,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-      
+
       // Check for restricted URLs
       if (!tab.url || tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://') || tab.url.startsWith('about:')) {
         throw new Error('Cannot timestamp browser pages. Open a website first.');
       }
-      
+
       const response = await getPageContent(tab.id);
       if (!response?.content) throw new Error('Could not read page');
       const hash = await sha256(response.content);
@@ -146,11 +146,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ event: 'hash_computed', count: 1 })
       }).catch(() => {});
-      
+
       steps[0].status = 'done';
       steps[1].status = 'active';
       resultEl.innerHTML = showProgress(steps);
-      
+
       // Get PoW challenge
       const challengeRes = await fetch(`${API}/challenge`);
       if (!challengeRes.ok) throw new Error('Server unavailable');
@@ -158,22 +158,22 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (!challenge.challenge || challenge.difficulty === undefined) {
         throw new Error('Invalid challenge response');
       }
-      
+
       // Solve PoW
       const nonce = await solvePoW(challenge.challenge, challenge.difficulty);
-      
+
       steps[1].status = 'done';
       steps[2].status = 'active';
       resultEl.innerHTML = showProgress(steps);
-      
+
       // Get/create keys & sign
       const keys = await getKeys();
       const sig = await sign(hash, keys);
-      
+
       steps[2].status = 'done';
       steps[3].status = 'active';
       resultEl.innerHTML = showProgress(steps);
-      
+
       const notifyEmail = notifyOptIn?.checked ? notifyEmailInput?.value?.trim() : '';
       if (notifyEmail) await chrome.storage.local.set({ [NOTIFY_EMAIL_KEY]: notifyEmail });
 
@@ -189,11 +189,11 @@ document.addEventListener('DOMContentLoaded', async () => {
           notify_email: notifyEmail || undefined
         })
       });
-      
+
       const data = await res.json();
-      
+
       if (data.error) throw new Error(data.error);
-      
+
       const isExisting = data.status === 'already_registered';
       if (!isExisting && data.receipt_id) {
         await addToMyReceipts({
@@ -234,11 +234,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   verifyBtn.addEventListener('click', async () => {
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-      
+
       if (!tab.url || tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://') || tab.url.startsWith('about:')) {
         throw new Error('Cannot verify browser pages. Open a website first.');
       }
-      
+
       const response = await getPageContent(tab.id);
       const hash = await sha256(response.content);
       chrome.tabs.create({ url: `${API}/#verify=${hash}` });
@@ -257,16 +257,16 @@ async function getPageContent(tabId) {
   } catch (e) {
     // Content script not loaded, inject it
   }
-  
+
   // Inject content script and try again
   await chrome.scripting.executeScript({
     target: { tabId },
     files: ['content.js']
   });
-  
+
   // Wait a moment for injection
   await new Promise(r => setTimeout(r, 100));
-  
+
   const response = await chrome.tabs.sendMessage(tabId, { action: 'getPageContent' });
   if (!response?.content) throw new Error('Could not read page content. Try refreshing the page.');
   return response;
@@ -280,22 +280,22 @@ async function sha256(text) {
 
 async function getKeys() {
   let { otrust_keys } = await chrome.storage.local.get('otrust_keys');
-  
+
   // Check if keys exist and have correct format (privateKey should be 64 hex chars = 32 bytes)
   if (otrust_keys && otrust_keys.privateKey && otrust_keys.privateKey.length === 64 && otrust_keys.pkcs8) {
     return otrust_keys;
   }
-  
+
   // Generate new keys (or regenerate if old format)
   console.log('[OTRUST] Generating new Ed25519 keypair...');
   const keyPair = await crypto.subtle.generateKey({ name: 'Ed25519' }, true, ['sign']);
   const pub = await crypto.subtle.exportKey('raw', keyPair.publicKey);
   const pkcs8 = await crypto.subtle.exportKey('pkcs8', keyPair.privateKey);
-  
+
   // Extract raw 32-byte seed from PKCS#8 (last 32 bytes of 48-byte PKCS#8)
   const pkcs8Bytes = new Uint8Array(pkcs8);
   const rawPriv = pkcs8Bytes.slice(-32);
-  
+
   otrust_keys = {
     publicKey: Array.from(new Uint8Array(pub)).map(b => b.toString(16).padStart(2, '0')).join(''),
     privateKey: Array.from(rawPriv).map(b => b.toString(16).padStart(2, '0')).join(''),
@@ -311,14 +311,14 @@ async function sign(hash, keys) {
   // Use PKCS#8 format for Web Crypto API
   const pkcs8Hex = keys.pkcs8 || keys.privateKey;
   const pkcs8Bytes = new Uint8Array(pkcs8Hex.match(/.{2}/g).map(b => parseInt(b, 16)));
-  
+
   // If it's 32 bytes (raw), we need to construct PKCS#8
   let keyData;
   if (pkcs8Bytes.length === 32) {
     // Build PKCS#8 wrapper for raw Ed25519 seed
     // PKCS#8 header for Ed25519: 302e020100300506032b6570042204 + 32 bytes
     const header = new Uint8Array([
-      0x30, 0x2e, 0x02, 0x01, 0x00, 0x30, 0x05, 0x06, 
+      0x30, 0x2e, 0x02, 0x01, 0x00, 0x30, 0x05, 0x06,
       0x03, 0x2b, 0x65, 0x70, 0x04, 0x22, 0x04, 0x20
     ]);
     keyData = new Uint8Array(48);
@@ -327,7 +327,7 @@ async function sign(hash, keys) {
   } else {
     keyData = pkcs8Bytes;
   }
-  
+
   const key = await crypto.subtle.importKey('pkcs8', keyData, { name: 'Ed25519' }, false, ['sign']);
   const hashBytes = new Uint8Array(hash.match(/.{2}/g).map(b => parseInt(b, 16)));
   const sig = await crypto.subtle.sign({ name: 'Ed25519' }, key, hashBytes);

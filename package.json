@@ -25,10 +25,14 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
+    "build:extension": "node scripts/build-extension.js",
     "build": "npm run build --workspace @otrust/sdk && npm run build --workspace @otrust/react",
+    "validate:openapi": "node scripts/validate-openapi.js",
     "test": "npm run test:core && npm run test --workspace @otrust/sdk && npm run build --workspace @otrust/sdk && npm run test --workspace @otrust/react",
     "test:core": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand test/crypto.test.js test/pow.test.js test/validation.test.js test/canonical-url.test.js",
+    "test:unit": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand test/crypto.test.js test/pow.test.js test/validation.test.js test/canonical-url.test.js",
     "test:integration": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand test/api.test.js",
+    "test:e2e": "playwright test",
     "test:server": "node --input-type=module -e \"process.env.NODE_ENV='test'; const { startServer } = await import('./src/server.js'); const server = await startServer(0); const port = server.address().port; const res = await fetch('http://127.0.0.1:' + port + '/health'); console.log(res.status); await new Promise(resolve => server.close(resolve)); if (!res.ok) process.exit(1);\"",
     "typecheck": "npm run typecheck --workspace @otrust/sdk && npm run typecheck --workspace @otrust/react",
     "circuits:test": "npm --prefix circuits test"

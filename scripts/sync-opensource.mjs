@@ -31,13 +31,20 @@ const SYNC_PATHS = [
   'test/email.test.js',
   'test/api.test.js',
   'test/canonical-url.test.js',
+  'test/e2e',
   'web',
+  'addons/browser-extension/background.js',
+  'addons/browser-extension/content.js',
+  'addons/browser-extension/manifest.json',
+  'addons/browser-extension/popup.html',
+  'addons/browser-extension/popup.js',
   'sdk-js',
   'sdk-python',
   'sdk-react',
   'cli',
   'circuits',
   'examples',
+  'scripts/build-extension.js',
   'scripts/quickstart.sh',
   'docker-compose.yml',
   'Dockerfile',
@@ -54,6 +61,7 @@ const SYNC_PATHS = [
   '.github/workflows/live-smoke.yml',
   '.github/workflows/e2e.yml',
   '.github/workflows/lighthouse.yml',
+  'playwright.config.js',
   'lighthouserc.json'
 ];
 

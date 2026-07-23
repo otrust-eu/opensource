@@ -2,6 +2,9 @@
 <html>
 <head>
   <meta charset="UTF-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #fafaf9;
@@ -260,6 +263,58 @@
     .pubkey-chip .key-icon {
       font-size: 0.7rem;
     }
+
+    .history-panel {
+      margin-top: 1rem;
+      padding: 0.75rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    .history-header {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      margin-bottom: 0.5rem;
+    }
+    .history-item {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 0.55rem 0.65rem;
+      margin-bottom: 0.35rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-card);
+      cursor: pointer;
+      font-family: inherit;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .history-item:hover {
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+    .history-title {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .history-meta {
+      display: block;
+      margin-top: 0.15rem;
+      font-size: 0.68rem;
+      font-family: monospace;
+      color: var(--text-dim);
+    }
+    .history-note {
+      margin-top: 0.5rem;
+      font-size: 0.68rem;
+      color: var(--text-dim);
+      line-height: 1.4;
+    }
   </style>
 </head>
 <body>
@@ -268,13 +323,18 @@
     <span class="badge">Extension</span>
   </div>
   <div class="content">
-    <div class="section-title">Timestamp current page</div>
+    <div class="section-title">Create timestamp</div>
+    <label class="notify-email-opt" style="display:flex;align-items:center;gap:0.4rem;font-size:0.72rem;margin-bottom:0.5rem;">
+      <input type="checkbox" id="notify-email-opt-in" checked>
+      <span>Email me when Bitcoin confirms</span>
+    </label>
+    <input type="email" id="notify-email" placeholder="you@example.com" style="width:100%;margin-bottom:0.65rem;padding:0.55rem 0.65rem;border:1px solid var(--border);border-radius:4px;font-size:0.8rem;">
     <button class="btn btn-primary" id="timestamp-btn">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="12" cy="12" r="10"/>
         <path d="M12 6v6l4 2"/>
       </svg>
-      Timestamp This Page
+      Create timestamp
     </button>
     <div class="btn-row">
       <button class="btn btn-secondary" id="verify-btn">Verify</button>
@@ -287,7 +347,10 @@
       <span class="key-icon">🔑</span>
       <span class="key-value"></span>
     </span>
-    <a href="https://www.otrust.eu" target="_blank">otrust.eu</a>
+    <div style="display:flex;gap:0.5rem;align-items:center;">
+      <button type="button" id="backup-export-btn" class="pubkey-chip" style="cursor:pointer;border:none;font:inherit;">Backup</button>
+      <a href="https://www.otrust.eu/timestamp" target="_blank">Open workspace</a>
+    </div>
   </div>
   <script src="popup.js"></script>
 </body>

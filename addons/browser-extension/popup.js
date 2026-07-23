@@ -2,6 +2,28 @@
 
 const API = 'https://www.otrust.eu';
 
+const NOTIFY_EMAIL_KEY = 'otrust_notify_email';
+const RECEIPTS_KEY = 'otrust_my_receipts';
+const MAX_RECEIPTS = 200;
+
+async function getMyReceipts() {
+  const stored = await chrome.storage.local.get(RECEIPTS_KEY);
+  return stored[RECEIPTS_KEY] || [];
+}
+
+async function addToMyReceipts(entry) {
+  if (!entry?.receipt_id || !entry?.hash) return;
+  const receipts = (await getMyReceipts()).filter((r) => r.receipt_id !== entry.receipt_id);
+  receipts.unshift({
+    receipt_id: entry.receipt_id,
+    hash: entry.hash,
+    filename: entry.filename || null,
+    timestamp: entry.timestamp || new Date().toISOString(),
+    blockchain_confirmed: !!entry.blockchain_confirmed
+  });
+  await chrome.storage.local.set({ [RECEIPTS_KEY]: receipts.slice(0, MAX_RECEIPTS) });
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   const timestampBtn = document.getElementById('timestamp-btn');
   const verifyBtn = document.getElementById('verify-btn');
@@ -9,6 +31,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   const resultEl = document.getElementById('result');
   const pubkeyDisplay = document.getElementById('pubkey-display');
   const keyValueEl = pubkeyDisplay.querySelector('.key-value');
+  const notifyEmailInput = document.getElementById('notify-email');
+  const notifyOptIn = document.getElementById('notify-email-opt-in');
+
+  const stored = await chrome.storage.local.get([NOTIFY_EMAIL_KEY]);
+  if (stored[NOTIFY_EMAIL_KEY] && notifyEmailInput) {
+    notifyEmailInput.value = stored[NOTIFY_EMAIL_KEY];
+  }
+  notifyOptIn?.addEventListener('change', () => {
+    if (notifyEmailInput) notifyEmailInput.disabled = !notifyOptIn.checked;
+  });
+  notifyEmailInput?.addEventListener('change', async () => {
+    const value = notifyEmailInput.value.trim();
+    if (value) await chrome.storage.local.set({ [NOTIFY_EMAIL_KEY]: value });
+  });
+  if (notifyEmailInput && notifyOptIn) notifyEmailInput.disabled = !notifyOptIn.checked;
 
   // Show abbreviated pubkey in footer
   const keys = await getKeys();
@@ -31,9 +68,55 @@ document.addEventListener('DOMContentLoaded', async () => {
     ).join('')}</div>`;
   }
 
-  // History button - open otrust.eu with this extension's pubkey
+  document.getElementById('backup-export-btn')?.addEventListener('click', async () => {
+    const password = prompt('Backup password (min 8 chars):');
+    if (!password) return;
+    try {
+      const backup = await exportEncryptedBackup(password);
+      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `otrust-extension-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      alert('Backup failed: ' + e.message);
+    }
+  });
+
   historyBtn.addEventListener('click', async () => {
-    chrome.tabs.create({ url: `${API}/#history=${keys.publicKey}` });
+    const receipts = await getMyReceipts();
+    if (!receipts.length) {
+      resultEl.innerHTML = `
+        <div class="result">
+          <h4>Receipt history</h4>
+          <p style="font-size:0.8rem;color:var(--text-dim);margin-top:0.35rem;">
+            No receipts in this extension yet. Timestamps you create here are saved locally in this browser profile only.
+          </p>
+        </div>`;
+      return;
+    }
+
+    resultEl.innerHTML = `
+      <div class="history-panel">
+        <div class="history-header">
+          <strong>${receipts.length} timestamp${receipts.length !== 1 ? 's' : ''} in this extension</strong>
+        </div>
+        ${receipts.map((r) => `
+          <button type="button" class="history-item" data-receipt="${r.receipt_id}" data-hash="${r.hash}">
+            <span class="history-title">${escapeHtml(r.filename || r.receipt_id)}</span>
+            <span class="history-meta">${r.hash.slice(0, 12)}... · ${new Date(r.timestamp).toLocaleDateString()}</span>
+          </button>
+        `).join('')}
+        <p class="history-note">Saved in this browser only — not shared via URL or server lookup.</p>
+      </div>`;
+
+    resultEl.querySelectorAll('.history-item').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        chrome.tabs.create({ url: `${API}/proof/${btn.dataset.receipt}` });
+      });
+    });
   });
 
   timestampBtn.addEventListener('click', async () => {
@@ -58,6 +141,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       const response = await getPageContent(tab.id);
       if (!response?.content) throw new Error('Could not read page');
       const hash = await sha256(response.content);
+      fetch(`${API}/api/usage/event`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ event: 'hash_computed', count: 1 })
+      }).catch(() => {});
 
       steps[0].status = 'done';
       steps[1].status = 'active';
@@ -86,7 +174,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       steps[3].status = 'active';
       resultEl.innerHTML = showProgress(steps);
 
-      // Submit
+      const notifyEmail = notifyOptIn?.checked ? notifyEmailInput?.value?.trim() : '';
+      if (notifyEmail) await chrome.storage.local.set({ [NOTIFY_EMAIL_KEY]: notifyEmail });
+
       const res = await fetch(`${API}/claim`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -95,7 +185,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           signature: sig,
           pubkey: keys.publicKey,
           pow: { challenge: challenge.challenge, nonce },
-          filename: response.title || 'Web page'
+          filename: response.title || 'Web page',
+          notify_email: notifyEmail || undefined
         })
       });
 
@@ -104,12 +195,36 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (data.error) throw new Error(data.error);
 
       const isExisting = data.status === 'already_registered';
+      if (!isExisting && data.receipt_id) {
+        await addToMyReceipts({
+          receipt_id: data.receipt_id,
+          hash,
+          filename: response.title || 'Web page',
+          timestamp: new Date().toISOString()
+        });
+      }
+      const emailNote = notifyEmail && !isExisting
+        ? `<p style="font-size:0.72rem;color:var(--text-dim);margin-top:0.5rem;">We'll email you when Bitcoin confirms.</p>`
+        : '';
+      const verifyUrl = `${API}/proof/${data.receipt_id}`;
       resultEl.innerHTML = `
         <div class="result ${isExisting ? 'warning' : 'success'}">
-          <h4>${isExisting ? '⚠️ Already Timestamped' : '✓ Timestamped!'}</h4>
+          <h4>${isExisting ? '⚠️ Already Timestamped' : '✓ Timestamp created'}</h4>
           <div class="result-row"><span class="label">Receipt</span><span class="value">${data.receipt_id}</span></div>
           <div class="result-row"><span class="label">Hash</span><span class="value">${hash.slice(0,16)}...</span></div>
+          ${emailNote}
+          <div class="btn-row" style="margin-top:0.65rem;">
+            <button type="button" class="btn btn-secondary" id="ext-open-proof">Open proof</button>
+            <button type="button" class="btn btn-secondary" id="ext-copy-share">Copy share</button>
+          </div>
         </div>`;
+      document.getElementById('ext-open-proof')?.addEventListener('click', () => {
+        chrome.tabs.create({ url: verifyUrl });
+      });
+      document.getElementById('ext-copy-share')?.addEventListener('click', async () => {
+        const text = ['OTRUST timestamp', `Receipt: ${data.receipt_id}`, `Hash: ${hash}`, `Verify: ${verifyUrl}`].join('\n');
+        await navigator.clipboard.writeText(text);
+      });
     } catch (e) {
       resultEl.innerHTML = `<div class="result error"><h4>❌ Error</h4><p style="font-size:0.8rem;margin-top:0.25rem;">${e.message}</p></div>`;
     }
@@ -217,6 +332,65 @@ async function sign(hash, keys) {
   const hashBytes = new Uint8Array(hash.match(/.{2}/g).map(b => parseInt(b, 16)));
   const sig = await crypto.subtle.sign({ name: 'Ed25519' }, key, hashBytes);
   return Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function deriveBackupKey(password, salt) {
+  const enc = new TextEncoder();
+  const material = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt, iterations: 120000, hash: 'SHA-256' },
+    material,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['encrypt', 'decrypt']
+  );
+}
+
+function b64(bytes) {
+  return btoa(String.fromCharCode(...bytes));
+}
+
+function fromB64(str) {
+  const bin = atob(str);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes;
+}
+
+async function exportEncryptedBackup(password) {
+  if (!password || password.length < 8) throw new Error('Password must be at least 8 characters');
+  const stored = await chrome.storage.local.get(['otrust_keys', RECEIPTS_KEY, NOTIFY_EMAIL_KEY]);
+  const payload = {
+    version: 1,
+    exported_at: new Date().toISOString(),
+    source: 'extension',
+    keys: stored.otrust_keys || null,
+    receipts: stored[RECEIPTS_KEY] || [],
+    notify_email: stored[NOTIFY_EMAIL_KEY] || null
+  };
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const key = await deriveBackupKey(password, salt);
+  const ciphertext = await crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv },
+    key,
+    new TextEncoder().encode(JSON.stringify(payload))
+  );
+  return {
+    format: 'otrust-local-backup',
+    version: 1,
+    salt: b64(salt),
+    iv: b64(iv),
+    ciphertext: b64(new Uint8Array(ciphertext))
+  };
+}
+
+function escapeHtml(text) {
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
 async function solvePoW(challenge, difficulty) {

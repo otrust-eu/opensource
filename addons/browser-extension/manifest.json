@@ -1,8 +1,14 @@
 {
   "manifest_version": 3,
   "name": "OTRUST - Blockchain Timestamp",
-  "version": "1.0.0",
-  "description": "Timestamp any webpage content on blockchain via OpenTimestamps",
+  "version": "1.2.0",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "otrust@otrust.eu",
+      "strict_min_version": "109.0"
+    }
+  },
+  "description": "Create a Bitcoin-anchored timestamp for any webpage via OpenTimestamps",
   "permissions": [
     "activeTab",
     "contextMenus",
@@ -18,6 +24,6 @@
   },
   "action": {
     "default_popup": "popup.html",
-    "default_title": "OTRUST - Timestamp this page"
+    "default_title": "OTRUST - Create timestamp"
   }
 }
