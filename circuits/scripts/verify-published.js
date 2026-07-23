@@ -33,6 +33,17 @@ function hashFile(filePath, algorithm) {
   return createHash(algorithm).update(fs.readFileSync(filePath)).digest('hex');
 }
 
+function canonicalBytes(filePath, descriptor) {
+  const bytes = fs.readFileSync(filePath);
+  if (!descriptor.normalization) {
+    return bytes;
+  }
+  if (descriptor.normalization !== 'lf') {
+    fail(`Unsupported normalization: ${descriptor.normalization}`);
+  }
+  return Buffer.from(bytes.toString('utf8').replace(/\r\n/g, '\n'), 'utf8');
+}
+
 function verifyFile(root, descriptor, label) {
   if (!descriptor || typeof descriptor !== 'object') {
     fail(`Missing descriptor for ${label}`);
@@ -43,12 +54,12 @@ function verifyFile(root, descriptor, label) {
     fail(`Missing ${label}: ${descriptor.file}`);
   }
 
-  const stats = fs.statSync(filePath);
-  if (stats.size !== descriptor.bytes) {
-    fail(`${label} size mismatch: expected ${descriptor.bytes}, got ${stats.size}`);
+  const bytes = canonicalBytes(filePath, descriptor);
+  if (bytes.length !== descriptor.bytes) {
+    fail(`${label} size mismatch: expected ${descriptor.bytes}, got ${bytes.length}`);
   }
 
-  const actualHash = hashFile(filePath, 'sha256');
+  const actualHash = createHash('sha256').update(bytes).digest('hex');
   if (actualHash !== descriptor.sha256) {
     fail(`${label} checksum mismatch: expected ${descriptor.sha256}, got ${actualHash}`);
   }

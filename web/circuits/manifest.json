@@ -24,8 +24,9 @@
     "ageProof": {
       "source": {
         "file": "circuits/ageProof.circom",
-        "bytes": 3187,
-        "sha256": "b04d4591feeb07667ca8fe939cb6e8c6507baed9c7ad210e231f43c92161cc15"
+        "normalization": "lf",
+        "bytes": 3104,
+        "sha256": "5db6325d936595edaf0ffa15b797db39347ae2c209d0cee258d9738b566d586e"
       },
       "r1cs": null,
       "artifacts": {
@@ -41,16 +42,18 @@
         },
         "vkey": {
           "file": "ageProof_vkey.json",
-          "bytes": 4252,
-          "sha256": "377a325f4a747b0ae95eb0e6ad53567e78c8fdba5fa5cf2a63a73102f52845a1"
+          "normalization": "lf",
+          "bytes": 4134,
+          "sha256": "ce82e0ed86b37343bc652d0ae72f09822e6ad22889085ed02cdde4453265cc4a"
         }
       }
     },
     "incomeProof": {
       "source": {
         "file": "circuits/incomeProof.circom",
-        "bytes": 1700,
-        "sha256": "6742c4d4ea15802f28d306def1bb3463aa2dddc5f7d7dfb2709ef39ef555d36b"
+        "normalization": "lf",
+        "bytes": 1650,
+        "sha256": "f3a2a1959c16b9d84e38cfca3067e14464b35f96cab43195a37f2c893b4c12bc"
       },
       "r1cs": null,
       "artifacts": {
@@ -66,8 +69,9 @@
         },
         "vkey": {
           "file": "incomeProof_vkey.json",
-          "bytes": 3852,
-          "sha256": "b6d72d0622b3fe80be5880b72937fdd829127c3d0a4ddd10449ab84191e0156e"
+          "normalization": "lf",
+          "bytes": 3744,
+          "sha256": "ccdeed6934c5e356a764bd5cc17f4b5922cff87911e7a21035f245de976f4e09"
         }
       }
     }
