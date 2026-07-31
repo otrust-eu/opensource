@@ -23,6 +23,7 @@ const ttlIndexes = new Map();
 const DATE_MARKER = '__otrust_date';
 const BUFFER_MARKER = '__otrust_buffer';
 const FIELD_PATTERN = /^[A-Za-z0-9_]+$/;
+const LEGACY_MONGO_ENV = ['MONGODB_URL', 'MONGODB_URI', 'MONGO_URL'];
 
 function encodeValue(value) {
   if (value instanceof Date) {
@@ -750,7 +751,24 @@ export async function createDb() {
     : config.database.path || path.join(process.cwd(), 'data', 'otrust.sqlite'));
 
   if (databasePath !== ':memory:') {
-    fs.mkdirSync(path.dirname(path.resolve(databasePath)), { recursive: true });
+    const resolvedPath = path.resolve(databasePath);
+    const railwayRuntime = Boolean(
+      process.env.RAILWAY_PROJECT_ID ||
+      process.env.RAILWAY_ENVIRONMENT_ID ||
+      process.env.RAILWAY_SERVICE_ID
+    );
+    const legacyMongoConfigured = LEGACY_MONGO_ENV.some((name) => process.env[name]?.trim());
+    if (
+      process.env.NODE_ENV === 'production' &&
+      railwayRuntime &&
+      legacyMongoConfigured &&
+      !fs.existsSync(resolvedPath)
+    ) {
+      throw new Error(
+        'MongoDB migration required: refusing to create an empty SQLite database on Railway'
+      );
+    }
+    fs.mkdirSync(path.dirname(resolvedPath), { recursive: true });
   }
 
   sqlite = new DatabaseSync(databasePath);

@@ -7,12 +7,24 @@ import { closeDb, createDb } from '../src/db.js';
 describe('SQLite database', () => {
   const originalNodeEnv = process.env.NODE_ENV;
   const originalDatabasePath = process.env.OTRUST_DB_PATH;
+  const guardedEnvironmentNames = [
+    'MONGODB_URL',
+    'MONGODB_URI',
+    'MONGO_URL',
+    'RAILWAY_PROJECT_ID',
+    'RAILWAY_ENVIRONMENT_ID',
+    'RAILWAY_SERVICE_ID'
+  ];
+  const originalGuardedEnvironment = Object.fromEntries(
+    guardedEnvironmentNames.map((name) => [name, process.env[name]])
+  );
   let temporaryDirectory = null;
 
   beforeEach(async () => {
     await closeDb();
     process.env.NODE_ENV = 'test';
     delete process.env.OTRUST_DB_PATH;
+    guardedEnvironmentNames.forEach((name) => delete process.env[name]);
   });
 
   afterEach(async () => {
@@ -21,6 +33,10 @@ describe('SQLite database', () => {
     else process.env.NODE_ENV = originalNodeEnv;
     if (originalDatabasePath === undefined) delete process.env.OTRUST_DB_PATH;
     else process.env.OTRUST_DB_PATH = originalDatabasePath;
+    for (const [name, value] of Object.entries(originalGuardedEnvironment)) {
+      if (value === undefined) delete process.env[name];
+      else process.env[name] = value;
+    }
     if (temporaryDirectory) {
       fs.rmSync(temporaryDirectory, { recursive: true, force: true });
       temporaryDirectory = null;
@@ -133,5 +149,16 @@ describe('SQLite database', () => {
     await expect(database.collection('proofs').findOne({ id: 'proof_one' }))
       .resolves.toMatchObject({ id: 'proof_one', verified: true });
     expect(fs.existsSync(process.env.OTRUST_DB_PATH)).toBe(true);
+  });
+
+  test('refuses an empty Railway database while legacy MongoDB is configured', async () => {
+    temporaryDirectory = fs.mkdtempSync(path.join(os.tmpdir(), 'otrust-railway-'));
+    process.env.NODE_ENV = 'production';
+    process.env.OTRUST_DB_PATH = path.join(temporaryDirectory, 'otrust.sqlite');
+    process.env.RAILWAY_ENVIRONMENT_ID = 'production';
+    process.env.MONGODB_URL = 'mongodb://legacy.invalid/otrust';
+
+    await expect(createDb()).rejects.toThrow('MongoDB migration required');
+    expect(fs.existsSync(process.env.OTRUST_DB_PATH)).toBe(false);
   });
 });
