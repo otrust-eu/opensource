@@ -1,8 +1,14 @@
 #!/usr/bin/env node
 
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import readline from 'node:readline';
+import { DatabaseSync } from 'node:sqlite';
+
+const MIGRATION_SCHEMA = 'otrust-mongodb-sqlite-migration/v1';
+const DATE_MARKER = '__otrust_date';
+const BUFFER_MARKER = '__otrust_buffer';
 
 function usage() {
   console.log(`Usage:
@@ -53,8 +59,49 @@ function decodeExtendedJson(value) {
   );
 }
 
+function canonicalize(value) {
+  if (value instanceof Date) return { [DATE_MARKER]: value.toISOString() };
+  if (Buffer.isBuffer(value)) return { [BUFFER_MARKER]: value.toString('base64') };
+  if (Array.isArray(value)) return value.map(canonicalize);
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.keys(value)
+        .sort()
+        .map((key) => [key, canonicalize(value[key])])
+    );
+  }
+  return value;
+}
+
+function documentDigest(document) {
+  return crypto.createHash('sha256')
+    .update(JSON.stringify(canonicalize(document)))
+    .digest('hex');
+}
+
+function collectionDigest(documentDigests) {
+  const hash = crypto.createHash('sha256');
+  for (const digest of [...documentDigests].sort()) hash.update(digest).update('\n');
+  return hash.digest('hex');
+}
+
+async function fileDigest(filePath) {
+  const hash = crypto.createHash('sha256');
+  for await (const chunk of fs.createReadStream(filePath)) hash.update(chunk);
+  return hash.digest('hex');
+}
+
+async function firstNonWhitespaceCharacter(filePath) {
+  for await (const chunk of fs.createReadStream(filePath, { encoding: 'utf8' })) {
+    for (const character of chunk) {
+      if (!/\s/.test(character)) return character;
+    }
+  }
+  return null;
+}
+
 async function *readDocuments(filePath) {
-  const firstCharacter = fs.readFileSync(filePath, { encoding: 'utf8', flag: 'r' }).trimStart()[0];
+  const firstCharacter = await firstNonWhitespaceCharacter(filePath);
   if (firstCharacter === '[') {
     const documents = JSON.parse(fs.readFileSync(filePath, 'utf8'));
     if (!Array.isArray(documents)) throw new Error(`${filePath} must contain a JSON array`);
@@ -77,14 +124,65 @@ async function *readDocuments(filePath) {
 }
 
 function exportFiles(sourceDirectory) {
-  return fs.readdirSync(sourceDirectory, { withFileTypes: true })
+  const files = fs.readdirSync(sourceDirectory, { withFileTypes: true })
     .filter((entry) => entry.isFile() && /\.jsonl?$/i.test(entry.name))
     .map((entry) => ({
       collection: entry.name.replace(/\.jsonl?$/i, ''),
       filePath: path.join(sourceDirectory, entry.name)
-    }))
-    .filter(({ collection }) => /^[A-Za-z0-9_]+$/.test(collection))
-    .sort((left, right) => left.collection.localeCompare(right.collection));
+    }));
+  const invalid = files.find(({ collection }) => !/^[A-Za-z0-9_]+$/.test(collection));
+  if (invalid) {
+    throw new Error(`Unsupported collection filename: ${path.basename(invalid.filePath)}`);
+  }
+  return files.sort((left, right) => left.collection.localeCompare(right.collection));
+}
+
+function verifyDatabase(databasePath, expectedCollections) {
+  const verification = new DatabaseSync(databasePath, { readOnly: true });
+  const actualCollections = new Map();
+
+  try {
+    const integrityRow = verification.prepare('PRAGMA integrity_check').get();
+    const integrityResult = integrityRow && Object.values(integrityRow)[0];
+    if (integrityResult !== 'ok') {
+      throw new Error(`SQLite integrity check failed: ${integrityResult || 'unknown result'}`);
+    }
+
+    const rows = verification.prepare(`
+      SELECT collection_name, body
+      FROM documents
+      ORDER BY collection_name, row_id
+    `).iterate();
+    for (const row of rows) {
+      if (!actualCollections.has(row.collection_name)) actualCollections.set(row.collection_name, []);
+      actualCollections.get(row.collection_name).push(documentDigest(JSON.parse(row.body)));
+    }
+  } finally {
+    verification.close();
+  }
+
+  const expectedNames = new Set(expectedCollections.map(({ collection }) => collection));
+  const unexpected = [...actualCollections.keys()].filter((name) => !expectedNames.has(name));
+  if (unexpected.length > 0) {
+    throw new Error(`SQLite contains unexpected collections: ${unexpected.join(', ')}`);
+  }
+
+  return expectedCollections.map((expected) => {
+    const actualDigests = actualCollections.get(expected.collection) || [];
+    const actualDigest = collectionDigest(actualDigests);
+    if (actualDigests.length !== expected.documents) {
+      throw new Error(
+        `${expected.collection}: expected ${expected.documents} documents, found ${actualDigests.length}`
+      );
+    }
+    if (actualDigest !== expected.source_logical_sha256) {
+      throw new Error(`${expected.collection}: logical checksum mismatch after SQLite import`);
+    }
+    return {
+      ...expected,
+      sqlite_logical_sha256: actualDigest
+    };
+  });
 }
 
 async function main() {
@@ -106,10 +204,17 @@ async function main() {
   if (!options.dryRun && fs.existsSync(destination)) {
     throw new Error(`Destination already exists: ${destination}`);
   }
+  const manifestPath = `${destination}.migration.json`;
+  if (!options.dryRun && fs.existsSync(manifestPath)) {
+    throw new Error(`Migration manifest already exists: ${manifestPath}`);
+  }
 
   const temporaryDatabase = `${destination}.importing-${process.pid}`;
+  const temporaryManifest = `${temporaryDatabase}.migration.json`;
   let imported = 0;
   let database = null;
+  let published = false;
+  const collectionReports = [];
 
   try {
     if (!options.dryRun) {
@@ -122,14 +227,25 @@ async function main() {
 
     for (const { collection, filePath } of files) {
       let collectionCount = 0;
+      const sourceDocumentDigests = [];
       for await (const document of readDocuments(filePath)) {
         if (!document || typeof document !== 'object' || Array.isArray(document)) {
           throw new Error(`${filePath} contains a non-document value`);
         }
+        if (!Object.prototype.hasOwnProperty.call(document, '_id')) {
+          throw new Error(`${filePath} contains a document without _id`);
+        }
         if (!options.dryRun) await database.collection(collection).insertOne(document);
+        sourceDocumentDigests.push(documentDigest(document));
         collectionCount += 1;
         imported += 1;
       }
+      collectionReports.push({
+        collection,
+        documents: collectionCount,
+        export_sha256: await fileDigest(filePath),
+        source_logical_sha256: collectionDigest(sourceDocumentDigests)
+      });
       console.log(`${collection}: ${collectionCount}`);
     }
 
@@ -137,8 +253,26 @@ async function main() {
       const { closeDb } = await import('../src/db.js');
       await closeDb();
       database = null;
+      const verifiedCollections = verifyDatabase(temporaryDatabase, collectionReports);
+      const manifest = {
+        schema: MIGRATION_SCHEMA,
+        created_at: new Date().toISOString(),
+        verified: true,
+        total_documents: imported,
+        collections: verifiedCollections,
+        sqlite: {
+          file: path.basename(destination),
+          sha256: await fileDigest(temporaryDatabase),
+          integrity_check: 'ok'
+        }
+      };
+      fs.writeFileSync(temporaryManifest, `${JSON.stringify(manifest, null, 2)}\n`, { flag: 'wx' });
       fs.renameSync(temporaryDatabase, destination);
+      published = true;
+      fs.renameSync(temporaryManifest, manifestPath);
+      console.log(`Verified ${imported} documents across ${collectionReports.length} collections`);
       console.log(`Imported ${imported} documents to ${destination}`);
+      console.log(`Migration manifest: ${manifestPath}`);
     } else {
       console.log(`Validated ${imported} documents`);
     }
@@ -149,6 +283,11 @@ async function main() {
     }
     for (const suffix of ['', '-wal', '-shm']) {
       fs.rmSync(`${temporaryDatabase}${suffix}`, { force: true });
+    }
+    fs.rmSync(temporaryManifest, { force: true });
+    if (published) {
+      fs.rmSync(destination, { force: true });
+      fs.rmSync(manifestPath, { force: true });
     }
     throw error;
   }

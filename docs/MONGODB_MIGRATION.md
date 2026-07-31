@@ -28,7 +28,9 @@ contain email addresses, API-key hashes, signing files, and other private data.
 ## 3. Validate and import
 
 The destination must not already exist. The importer writes to a temporary
-file and renames it only after every collection succeeds.
+file and renames it only after every collection succeeds. It refuses invalid
+collection filenames and documents without MongoDB's `_id`, so an export
+cannot be silently skipped or lose identity parity.
 
 On Railway, production startup refuses to create an empty SQLite file by
 default. Upload the migrated database to the mounted volume before deploying
@@ -46,6 +48,12 @@ npm run migrate:mongodb-export -- \
   --db ./data/otrust.sqlite
 ```
 
+The successful import also writes `otrust.sqlite.migration.json`. Keep this
+file with the database backup. It records per-collection document counts,
+source-file SHA-256 checksums, logical source and SQLite checksums, the final
+SQLite checksum, and the result of `PRAGMA integrity_check`. The import is not
+published unless all logical checksums and counts match.
+
 ## 4. Start and verify
 
 ```bash
@@ -55,5 +63,5 @@ curl -fsS http://localhost:3000/health
 
 Verify representative timestamp receipts, proofs, signing requests, platform
 organizations, and API keys before deleting the old database service. Keep the
-original export in encrypted backup until the new deployment has been observed
-through at least one backup and restore cycle.
+original export and migration manifest in encrypted backup until the new
+deployment has been observed through at least one backup and restore cycle.
