@@ -12,6 +12,7 @@
     "coordinator": null,
     "finalizedAt": null,
     "transcriptUrl": null,
+    "initialKeys": {},
     "contributions": [],
     "beacon": null,
     "note": "These artifacts predate the documented multi-party ceremony and cannot be reproduced from the pinned compiler."

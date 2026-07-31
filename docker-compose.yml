@@ -1,6 +1,5 @@
-# OTRUST — production self-host in one command:
-#   ADMIN_KEY=$(openssl rand -hex 32) docker compose up -d --build
-# Or: ./scripts/quickstart.sh
+# OTRUST production self-host in one command:
+#   ADMIN_KEY=$(openssl rand -hex 32) AUTH_SECRET=$(openssl rand -hex 32) docker compose up -d --build
 
 services:
   app:
@@ -10,14 +9,12 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
-      - MONGODB_URL=mongodb://mongodb:27017
-      - MONGODB_DB=otrust
+      - OTRUST_DB_PATH=/app/data/otrust.sqlite
       - ADMIN_KEY=${ADMIN_KEY:-}
       - AUTH_SECRET=${AUTH_SECRET:-}
       - BASE_URL=${BASE_URL:-http://localhost:3000}
-    depends_on:
-      mongodb:
-        condition: service_healthy
+    volumes:
+      - otrust_data:/app/data
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
       interval: 15s
@@ -26,29 +23,5 @@ services:
       start_period: 20s
     restart: unless-stopped
 
-  mongodb:
-    image: mongo:7
-    volumes:
-      - mongodb_data:/data/db
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.runCommand({ ping: 1 })"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
-
-  mongo-express:
-    image: mongo-express:latest
-    ports:
-      - "8081:8081"
-    environment:
-      - ME_CONFIG_MONGODB_URL=mongodb://mongodb:27017
-      - ME_CONFIG_BASICAUTH=false
-    depends_on:
-      mongodb:
-        condition: service_healthy
-    profiles:
-      - debug
-
 volumes:
-  mongodb_data:
+  otrust_data:

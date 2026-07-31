@@ -9,8 +9,8 @@ production gate below passes.
 
 - Assign one coordinator who never contributes entropy.
 - Use at least two independent contributors on separate machines.
-- Publish contributor identifiers, input and output SHA-256 checksums, UTC
-  timestamps, and signed attestations.
+- Publish unique contributor identifiers, per-circuit input and output SHA-256
+  checksums, UTC timestamps, and signed HTTPS attestations.
 - Choose a public beacon value from an unpredictable event announced before
   contributions close and observed only after they close.
 - Keep the complete transcript and attestations in a durable public release.
@@ -22,7 +22,7 @@ independent contributions.
 ## 1. Freeze the build
 
 1. Create a ceremony branch from a reviewed commit.
-2. Pin Node.js, Circom, `snarkjs`, `circomlib`, and `circomlibjs` to exact
+2. Pin Node.js, Circom, `snarkjs`, `circomlib`, and `poseidon-lite` to exact
    versions. Do not use version ranges.
 3. Build in a clean environment with Circom 2.2.3.
 4. Record SHA-256 checksums for every `.circom`, `.r1cs`, and `.wasm` file.
@@ -85,6 +85,11 @@ contribution window closes.
 2. Update `web/circuits/manifest.json` with exact compiler provenance, source and
    R1CS checksums, contributor attestations, beacon source/value, coordinator,
    and finalization time.
+   Record each initial zkey under `ceremony.initialKeys`. For each contribution,
+   add `contributedAt`, `attestationUrl`, and a `circuits` object containing
+   `inputSha256` and `outputSha256` for every circuit. Record the same per-circuit
+   chain under `ceremony.beacon.circuits`; each beacon output must equal the
+   published final zkey checksum.
 3. Set `ceremony.status` to `complete` and `ceremony.productionReady` to `true`
    only after the public transcript is available.
 4. Run:
@@ -99,3 +104,10 @@ npm run verify:production
 
 Never overwrite a production ceremony in place. A circuit or toolchain change
 requires a new version and a new ceremony.
+
+## Scope of the current circuits
+
+The age and income circuits prove knowledge of values that satisfy a range and
+match a commitment. They do not bind those values to a government, employer, or
+other credential issuer. OTRUST labels these proofs as self-attested. A ceremony
+protects the proving keys; it does not make the underlying private value true.

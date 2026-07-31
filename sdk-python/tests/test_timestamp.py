@@ -1,6 +1,5 @@
 """Tests for the OTRUST timestamp service."""
 
-import pytest
 from otrust import timestamp
 
 

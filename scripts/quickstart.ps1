@@ -39,7 +39,7 @@ if ([string]::IsNullOrWhiteSpace($env:AUTH_SECRET)) {
 }
 $env:PORT = [string]$Port
 
-Write-Host "Starting OTRUST (MongoDB + app) on http://localhost:$Port"
+Write-Host "Starting OTRUST on http://localhost:$Port"
 docker compose up -d --build
 if ($LASTEXITCODE -ne 0) {
   throw 'Docker Compose failed to start OTRUST.'

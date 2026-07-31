@@ -11,7 +11,7 @@
  * import { admin, configure } from '@otrust/sdk';
  * 
  * configure({
- *   baseUrl: 'https://otrust.eu',
+ *   baseUrl: 'https://www.otrust.eu',
  *   headers: {
  *     'Authorization': `Bearer ${process.env.OTRUST_ADMIN_KEY}`,
  *   },

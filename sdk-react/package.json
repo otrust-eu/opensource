@@ -1,7 +1,7 @@
 {
   "name": "@otrust/react",
   "version": "1.0.0",
-  "description": "React components for OTRUST - Login, Proof badges, Timestamp widgets",
+  "description": "React components for OTRUST timestamping, proof verification, and issuer-gated Auth",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -62,7 +62,7 @@
     "overrides": {
       "esbuild": "^0.28.1",
       "picomatch": "^4.0.4",
-      "postcss": "^8.5.10",
+      "postcss": "8.5.25",
       "rollup": "^4.60.4",
       "vite": "^8.0.16",
       "ws": "^8.21.0"
@@ -82,7 +82,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/otrust/sdk-react"
+    "url": "https://github.com/otrust-eu/opensource.git",
+    "directory": "sdk-react"
   },
-  "homepage": "https://otrust.eu/docs/react"
+  "homepage": "https://www.otrust.eu/docs#sdk",
+  "bugs": {
+    "url": "https://github.com/otrust-eu/opensource/issues"
+  }
 }

@@ -48,9 +48,9 @@ test.describe('Homepage', () => {
 
     const entries = [
       { label: 'Timestamp', href: '/timestamp' },
-      { label: 'ID', href: '/proof' },
+      { label: 'Proof lab', href: '/proof' },
       { label: 'Sign', href: '/sign' },
-      { label: 'Auth', href: '/sign-in' }
+      { label: 'Auth preview', href: '/sign-in' }
     ];
 
     await expect(page.locator('.bento-function-card')).toHaveCount(entries.length);
@@ -77,9 +77,9 @@ test.describe('Homepage', () => {
     await expect(grid).toBeVisible();
     await expect(page.getByRole('heading', { name: /Trust,\s*without permission\./i })).toBeVisible();
     await expect(page.locator('.bento-function-card').getByRole('heading', { name: 'Timestamp', exact: true })).toBeVisible();
-    await expect(page.locator('.bento-function-card').getByRole('heading', { name: 'ID', exact: true })).toBeVisible();
+    await expect(page.locator('.bento-function-card').getByRole('heading', { name: 'Proof lab', exact: true })).toBeVisible();
     await expect(page.locator('.bento-function-card').getByRole('heading', { name: 'Sign', exact: true })).toBeVisible();
-    await expect(page.locator('.bento-function-card').getByRole('heading', { name: 'Auth', exact: true })).toBeVisible();
+    await expect(page.locator('.bento-function-card').getByRole('heading', { name: 'Auth preview', exact: true })).toBeVisible();
 
     const layout = await page.evaluate(() => {
       const grid = document.querySelector('.bento-grid');
@@ -168,9 +168,10 @@ test.describe('Public navigation', () => {
   test('auth page explains the auth flow', async ({ page }) => {
     await page.goto('/sign-in');
     await expect(page).toHaveTitle(/OTRUST Auth/);
-    await expect(page.getByRole('heading', { name: /Hosted Auth for partners/i })).toBeVisible();
-    await expect(page.getByRole('heading', { name: /Create a partner Auth challenge/i })).toBeVisible();
-    await expect(page.getByText('/auth/login')).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Issuer-bound Auth design/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Trusted issuer required/i })).toBeVisible();
+    await expect(page.getByText(/503 trusted_identity_issuer_required/i)).toBeVisible();
+    await expect(page.locator('#workspace-auth-submit')).toBeDisabled();
     await expect(page.getByRole('link', { name: /Read Auth Docs/i })).toHaveAttribute('href', '/docs#proofauth');
   });
 
@@ -178,9 +179,9 @@ test.describe('Public navigation', () => {
     await page.goto('/partners/hemsted');
     await expect(page).toHaveTitle(/Hemsted OTRUST Auth Flow/);
     await expect(page.getByRole('heading', { name: /Branded Auth handoff/i })).toBeVisible();
-    await expect(page.getByRole('heading', { name: /Verify access to Hemsted/i })).toBeVisible();
-    await expect(page.getByText('Identity flow secured by OTRUST')).toBeVisible();
-    await expect(page.getByText('/proof?auth_challenge=...')).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Review access flow for Hemsted/i })).toBeVisible();
+    await expect(page.getByText('Integration preview by OTRUST')).toBeVisible();
+    await expect(page.getByRole('button', { name: /Trusted issuer required/i })).toBeDisabled();
   });
 });
 
@@ -265,22 +266,20 @@ test.describe('Auth Partner Branding', () => {
     await expect(page.getByRole('heading', { name: /Hosted Auth/i })).toBeVisible();
     await expect(page.getByText('e2e_partner')).toBeVisible();
     await expect(page.getByText('dpo@otrust.eu')).toBeVisible();
-    await expect(page.getByText('Identity verification')).toBeVisible();
+    await expect(page.getByText('Issuer-bound identity', { exact: true })).toBeVisible();
     await expect(page.getByText('Profile access')).toBeVisible();
-    await expect(page.locator('#createProofLink')).toHaveAttribute('href', `/proof?auth_challenge=${challengeBody.challengeId}`);
+    await expect(page.locator('#createProofLink')).toHaveAttribute('href', '/sign-in');
 
     let overflow = await page.evaluate(() =>
       Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - document.documentElement.clientWidth
     );
     expect(overflow).toBeLessThanOrEqual(2);
 
-    await page.goto(`/proof?auth_challenge=${challengeBody.challengeId}`);
+    await page.goto('/proof');
 
-    await expect(page.getByRole('heading', { name: /Create your ID for e2e_partner/i })).toBeVisible();
-    await expect(page.getByText('Secure identity setup via OTRUST')).toBeVisible();
-    await expect(page.getByText('dpo@otrust.eu')).toBeVisible();
-    await expect(page.getByText(/Create a privacy-preserving ID package/i)).toBeVisible();
-    await expect(page.locator('#tab-button-create')).toContainText('Create ID');
+    await expect(page.getByRole('heading', { name: /Generate a private range proof/i })).toBeVisible();
+    await expect(page.getByText(/does not prove the input came from a government/i)).toBeVisible();
+    await expect(page.locator('#zk-generate')).toBeVisible();
 
     overflow = await page.evaluate(() =>
       Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - document.documentElement.clientWidth
@@ -294,10 +293,7 @@ test.describe('Auth Partner Branding', () => {
 
 test.describe('Verify Page', () => {
   test('verify page loads', async ({ page }) => {
-    await page.goto('/');
-
-    // Navigate to ID verification
-    await page.getByRole('link', { name: 'ID' }).first().click();
+    await page.goto('/proof');
 
     // Should show verify section or input
     await expect(page.getByText(/verify/i).first()).toBeVisible();

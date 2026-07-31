@@ -14,19 +14,13 @@ jobs:
   lighthouse:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    services:
-      mongodb:
-        image: mongo:7
-        ports:
-          - 27017:27017
-
     steps:
       - uses: actions/checkout@v6
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
 
       - name: Install dependencies
@@ -42,8 +36,6 @@ jobs:
           done
         env:
           PORT: 8080
-          MONGODB_URL: mongodb://localhost:27017
-          MONGODB_DB: otrust_lhci
           NODE_ENV: test
 
       - name: Run Lighthouse

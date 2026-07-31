@@ -5,12 +5,17 @@ Handles configuration, retry logic, and response parsing.
 """
 
 from __future__ import annotations
+
 import asyncio
+import uuid
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
+from email.utils import parsedate_to_datetime
 from typing import Any, TypeVar
+
 import httpx
 
-from .result import Result, Ok, Err, OTrustError
+from .result import Err, Ok, OTrustError, Result
 
 T = TypeVar("T")
 
@@ -19,7 +24,7 @@ T = TypeVar("T")
 class ClientConfig:
     """Configuration for the OTRUST client."""
 
-    base_url: str = "https://otrust.eu"
+    base_url: str = "https://www.otrust.eu"
     api_key: str | None = None
     environment: str = "live"
     timeout: float = 30.0
@@ -45,7 +50,7 @@ def configure(
     Configure the OTRUST SDK.
 
     Args:
-        base_url: API base URL (default: https://otrust.eu)
+        base_url: API base URL (default: https://www.otrust.eu)
         timeout: Request timeout in seconds (default: 30)
         retries: Number of retry attempts (default: 3)
         retry_delay: Delay between retries in seconds (default: 1.0)
@@ -135,7 +140,13 @@ class OTrustClient:
     ) -> Result[dict[str, Any], OTrustError]:
         """Make an HTTP request with retry logic."""
         client = await self._get_client()
-        last_error: Exception | None = None
+        last_error: Exception | OTrustError | None = None
+        request_headers = dict(headers or {})
+        has_idempotency_key = any(
+            key.lower() == "idempotency-key" for key in request_headers
+        )
+        if method.upper() in {"POST", "PUT", "PATCH"} and not has_idempotency_key:
+            request_headers["Idempotency-Key"] = f"sdk_{uuid.uuid4()}"
 
         for attempt in range(self.config.retries):
             try:
@@ -144,7 +155,7 @@ class OTrustClient:
                     url=path,
                     json=json,
                     params=params,
-                    headers=headers,
+                    headers=request_headers,
                 )
 
                 # Parse response
@@ -157,14 +168,25 @@ class OTrustClient:
                 if response.status_code >= 400:
                     error_msg = data.get("error", data.get("message", "Unknown error"))
                     error_code = data.get("code", f"http_{response.status_code}")
-                    return Err(
-                        OTrustError(
-                            code=error_code,
-                            message=error_msg,
-                            status=response.status_code,
-                            details=data,
+                    response_error = OTrustError(
+                        code=error_code,
+                        message=error_msg,
+                        status=response.status_code,
+                        details=data,
+                    )
+                    retryable = (
+                        response.status_code == 429
+                        or response.status_code >= 500
+                        or (
+                            response.status_code == 409
+                            and data.get("error") == "idempotency_in_progress"
                         )
                     )
+                    if retryable and attempt < self.config.retries - 1:
+                        last_error = response_error
+                        await asyncio.sleep(self._retry_delay(response, attempt))
+                        continue
+                    return Err(response_error)
 
                 return Ok(data)
 
@@ -180,12 +202,30 @@ class OTrustClient:
                     await asyncio.sleep(self.config.retry_delay * (attempt + 1))
                 continue
 
-        return Err(
-            OTrustError(
-                code="network_error",
-                message=f"Request failed after {self.config.retries} attempts: {last_error}",
-            )
-        )
+        if isinstance(last_error, OTrustError):
+            return Err(last_error)
+        return Err(OTrustError(
+            code="network_error",
+            message=f"Request failed after {self.config.retries} attempts: {last_error}",
+        ))
+
+    def _retry_delay(self, response: httpx.Response, attempt: int) -> float:
+        retry_after = response.headers.get("Retry-After")
+        if retry_after:
+            try:
+                return min(max(float(retry_after), 0.0), 60.0)
+            except ValueError:
+                try:
+                    retry_at = parsedate_to_datetime(retry_after)
+                    if retry_at.tzinfo is None:
+                        retry_at = retry_at.replace(tzinfo=timezone.utc)
+                    return min(max(
+                        (retry_at - datetime.now(timezone.utc)).total_seconds(),
+                        0.0,
+                    ), 60.0)
+                except (TypeError, ValueError):
+                    pass
+        return min(self.config.retry_delay * (attempt + 1), 10.0)
 
     async def get(
         self,

@@ -1,6 +1,5 @@
 """Tests for the OTRUST sign service."""
 
-import pytest
 from otrust import sign
 
 

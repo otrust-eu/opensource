@@ -22,7 +22,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
       
       - name: Install dependencies
@@ -42,7 +42,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
       
       - name: Install dependencies
@@ -60,16 +60,6 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: read
-    services:
-      mongodb:
-        image: mongo:7
-        ports:
-          - 27017:27017
-        options: >-
-          --health-cmd "mongosh --eval 'db.runCommand({ ping: 1 })'"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
     
     steps:
       - uses: actions/checkout@v6
@@ -77,7 +67,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
       
       - name: Install dependencies
@@ -87,8 +77,6 @@ jobs:
         run: npm run test:integration -- --forceExit --detectOpenHandles
         timeout-minutes: 8
         env:
-          MONGODB_URL: mongodb://localhost:27017
-          MONGODB_DB: otrust_test
           NODE_ENV: test
           TEST_MODE: 'true'
 
@@ -103,7 +91,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Install circuit dependencies
         run: npm ci --prefix circuits
@@ -124,6 +112,47 @@ jobs:
       - name: Verify published browser artifacts
         run: npm run verify:published --prefix circuits
 
+  sdk-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: sdk-python/pyproject.toml
+
+      - name: Test JavaScript SDK
+        run: |
+          npm ci --prefix sdk-js
+          npm run typecheck --prefix sdk-js
+          npm run test:run --prefix sdk-js
+          npm run build --prefix sdk-js
+
+      - name: Test React SDK
+        run: |
+          npm ci --prefix sdk-react
+          npm run typecheck --prefix sdk-react
+          npm test --prefix sdk-react -- --run
+          npm run build --prefix sdk-react
+
+      - name: Test Python SDK
+        run: |
+          python -m pip install -e "./sdk-python[dev]"
+          python -m ruff check sdk-python
+          python -m mypy sdk-python/src
+          python -m pytest sdk-python/tests
+
   security:
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -135,7 +164,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
       
       - name: Install dependencies
@@ -153,6 +182,9 @@ jobs:
             npm audit --prefix sdk-js --audit-level=high --package-lock-only
             npm audit --prefix sdk-react --audit-level=high --package-lock-only
           fi
+
+      - name: Audit circuit dependencies
+        run: npm audit --prefix circuits --audit-level=low --package-lock-only
 
       - name: Audit addon dependencies
         run: |

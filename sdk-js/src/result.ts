@@ -104,6 +104,11 @@ export type OTrustErrorCode =
   | 'invalid_pin'
   | 'invalid_proof_id'
   | 'verification_failed'
+  | 'feature_unavailable'
+  | 'browser_proof_required'
+  | 'trusted_identity_issuer_required'
+  | 'legacy_feature_retired'
+  | 'server_challenge_required'
   // Sign errors
   | 'invalid_id'
   | 'invalid_hash'

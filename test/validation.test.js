@@ -223,7 +223,7 @@ describe('Validation Logic', () => {
       return str.replace(/[${}]/g, '').trim();
     };
 
-    test('removes MongoDB operators', () => {
+    test('removes document-query operators', () => {
       expect(sanitizeString('$gt')).toBe('gt');
       expect(sanitizeString('${injection}')).toBe('injection');
     });

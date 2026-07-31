@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OTRUST ID - Identity packages with selective disclosure</title>
-  <meta name="description" content="Create commitment-based ID packages. Verify age or unique identity with local document checks while verifiers see only the claim.">
+  <title>OTRUST Proof Lab - Local zero-knowledge range proofs</title>
+  <meta name="description" content="Generate and export self-attested Groth16 age and income range proofs locally. Production publication remains gated by a public key ceremony.">
   
   <!-- SEO Meta Tags -->
-  <meta name="keywords" content="commitment proof, age verification, unique identity, privacy, identity verification, OTRUST, selective disclosure">
+  <meta name="keywords" content="zero-knowledge proof, Groth16, age range proof, income range proof, privacy, OTRUST, self-attested">
   <meta name="author" content="Kristian Ledel">
   <meta name="creator" content="Kris Ledel">
   <link rel="author" href="https://www.otrust.eu/about">
@@ -18,8 +18,8 @@
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://www.otrust.eu/proof">
-  <meta property="og:title" content="OTRUST ID - Identity packages with selective disclosure">
-  <meta property="og:description" content="Create privacy-preserving ID packages using commitments and selective disclosure.">
+  <meta property="og:title" content="OTRUST Proof Lab - Local zero-knowledge proofs">
+  <meta property="og:description" content="Generate self-attested range proofs locally with explicit artifact provenance.">
   <meta property="og:image" content="https://www.otrust.eu/og-image.svg">
   <meta property="og:site_name" content="OTRUST by Kristian Ledel">
   <meta property="article:author" content="Kristian Ledel">
@@ -28,8 +28,8 @@
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://www.otrust.eu/proof">
-  <meta name="twitter:title" content="OTRUST ID - Identity packages with selective disclosure">
-  <meta name="twitter:description" content="Prove things about yourself without revealing the underlying data.">
+  <meta name="twitter:title" content="OTRUST Proof Lab - Local zero-knowledge proofs">
+  <meta name="twitter:description" content="Generate self-attested Groth16 range proofs locally.">
   <meta name="twitter:image" content="https://www.otrust.eu/og-image.svg">
   <meta name="twitter:creator" content="@kledel">
   
@@ -38,9 +38,9 @@
   {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    "name": "OTRUST ID",
+    "name": "OTRUST Proof Lab",
     "url": "https://www.otrust.eu/proof",
-    "description": "Commitment-based ID packages. Verify age or unique identity without exposing underlying documents to verifiers.",
+    "description": "Generate and export self-attested Groth16 age and income range proofs locally. Production publication requires a completed public key ceremony.",
     "applicationCategory": "SecurityApplication",
     "author": {
       "@type": "Person",
@@ -460,6 +460,134 @@
       display: flex;
       flex-direction: column;
       contain: layout;
+    }
+
+    .zk-proof-lab {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .zk-lab-body {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(16rem, 0.8fr);
+      gap: 0;
+    }
+
+    .zk-lab-form,
+    .zk-lab-output {
+      padding: 1.5rem;
+      min-width: 0;
+    }
+
+    .zk-lab-output {
+      border-left: 1px solid var(--border);
+      background: var(--bg-muted);
+    }
+
+    .zk-mode-control {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.25rem;
+      padding: 0.25rem;
+      margin-bottom: 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-muted);
+    }
+
+    .zk-mode-control button {
+      min-height: 2.5rem;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--text-dim);
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .zk-mode-control button[aria-selected="true"] {
+      background: var(--bg-card);
+      color: var(--text);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    .zk-field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+    }
+
+    .zk-action-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .zk-boundary {
+      margin: 0 0 1rem;
+      padding: 0.75rem;
+      border-left: 3px solid var(--orange);
+      background: #fff7ed;
+      color: #7c2d12;
+      font-size: 0.8rem;
+      line-height: 1.5;
+    }
+
+    .zk-result {
+      min-height: 12rem;
+      font-size: 0.8rem;
+    }
+
+    .zk-result pre {
+      max-height: 17rem;
+      overflow: auto;
+      margin: 0.75rem 0 0;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg-card);
+      color: var(--text);
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .zk-status-line {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+    }
+
+    .zk-status-dot {
+      width: 0.625rem;
+      height: 0.625rem;
+      border-radius: 50%;
+      background: var(--orange);
+      flex: 0 0 auto;
+    }
+
+    .zk-status-dot.ready {
+      background: var(--success);
+    }
+
+    @media (max-width: 760px) {
+      .zk-lab-body {
+        grid-template-columns: 1fr;
+      }
+
+      .zk-lab-output {
+        border-top: 1px solid var(--border);
+        border-left: 0;
+      }
+
+      .zk-field-grid {
+        grid-template-columns: 1fr;
+      }
     }
     
     .tabs {
@@ -1361,16 +1489,16 @@
     <div class="auth-partner-inner">
       <img id="authPartnerLogo" class="auth-partner-logo" alt="" crossorigin="anonymous" referrerpolicy="no-referrer" hidden>
       <div class="auth-partner-copy">
-        <p class="auth-partner-eyebrow">Hosted identity setup</p>
-        <h2 id="authPartnerHeadline">Create your OTRUST ID</h2>
-        <p id="authPartnerSubhead">Create a reusable ID package, then return to the partner login flow.</p>
-        <p class="auth-partner-disclosure">Secure identity setup via OTRUST. GDPR and DPO contact: <a href="mailto:dpo@otrust.eu">dpo@otrust.eu</a>.</p>
+        <p class="auth-partner-eyebrow">Proof Lab</p>
+        <h2 id="authPartnerHeadline">Issuer credential required</h2>
+        <p id="authPartnerSubhead">Self-attested range proofs cannot be used for partner login.</p>
+        <p class="auth-partner-disclosure">Credential issuance is not currently available. GDPR and DPO contact: <a href="mailto:dpo@otrust.eu">dpo@otrust.eu</a>.</p>
       </div>
     </div>
   </section>
   
   <main id="main-content" role="main">
-  <section class="dashboard-home" aria-label="OTRUST ID workspace">
+  <section class="dashboard-home" aria-label="OTRUST proof workspace">
     <article class="dashboard-panel dashboard-landing">
       <header class="dashboard-site-nav" aria-label="Dashboard navigation">
         <a href="/" class="dashboard-logo">OTRUST</a>
@@ -1386,77 +1514,77 @@
 
       <section class="dashboard-hero-block">
         <div class="dashboard-hero-copy">
-          <span class="dashboard-kicker">ID</span>
-          <h1>ID,<br><span>without revealing.</span></h1>
-          <p>Prove a scoped identity claim while keeping the underlying evidence outside the public record.</p>
-          <p class="id-terminology-hint">ID packages are proof records — share the <code>/proof</code> URL or record ID so verifiers can check claims without seeing raw identity data.</p>
+          <span class="dashboard-kicker">Proof lab</span>
+          <h1>Private<br><span>range proofs.</span></h1>
+          <p>Generate a self-attested age or income range proof while keeping the private input in your browser.</p>
+          <p class="id-terminology-hint">The proof establishes circuit consistency, not the source or truth of the private input.</p>
         </div>
         <div class="dashboard-orbit dashboard-orbit-hero" aria-hidden="true"></div>
       </section>
 
       <section class="dashboard-steps" id="flow" aria-labelledby="dashboard-steps-heading">
-        <span class="dashboard-kicker" id="dashboard-steps-heading">ID flow</span>
+        <span class="dashboard-kicker" id="dashboard-steps-heading">Proof flow</span>
         <div class="dashboard-step-grid">
           <article>
             <div class="dashboard-step-icon dashboard-step-hash" aria-hidden="true"></div>
             <span>01</span>
-            <h2>Check</h2>
-            <p>Document and liveness checks run in your browser.</p>
+            <h2>Enter</h2>
+            <p>The private value is entered and processed in your browser.</p>
           </article>
           <article>
             <div class="dashboard-step-icon dashboard-step-sign" aria-hidden="true"></div>
             <span>02</span>
             <h2>Commit</h2>
-            <p>The claim is bound to a commitment instead of raw identity fields.</p>
+            <p>Poseidon binds the private value to a public commitment.</p>
           </article>
           <article>
             <div class="dashboard-step-icon dashboard-step-anchor" aria-hidden="true"></div>
             <span>03</span>
             <h2>Verify</h2>
-            <p>Anyone can verify without seeing data.</p>
+            <p>Groth16 proves the public range statement without the private value.</p>
           </article>
           <article>
             <div class="dashboard-step-icon dashboard-step-prove" aria-hidden="true"></div>
             <span>04</span>
             <h2>Share</h2>
-            <p>Share your ID URL with verifiers.</p>
+            <p>Export locally, or publish after the production key ceremony.</p>
           </article>
         </div>
       </section>
 
       <section class="dashboard-principles-panel" aria-labelledby="dashboard-principles-heading">
         <div class="dashboard-principles-copy">
-          <span class="dashboard-kicker">Boundaries</span>
-          <h2 id="dashboard-principles-heading">Prove the claim,<br>not the document.</h2>
-          <p>Verifiers receive a commitment ID package and metadata - not your passport scan or selfie.</p>
+          <span class="dashboard-kicker">Current boundaries</span>
+          <h2 id="dashboard-principles-heading">Cryptographic proof,<br>explicit provenance.</h2>
+          <p>Published proving keys remain development artifacts until independent contributors and a public beacon complete the ceremony.</p>
         </div>
         <div class="dashboard-principles-list">
           <article>
             <span class="dashboard-principle-icon dashboard-principle-local" aria-hidden="true"></span>
             <div>
-              <h3>Local checks</h3>
-              <p>OCR and face matching run in your browser before any ID is created.</p>
+              <h3>Local inputs</h3>
+              <p>Birth date and income values are never included in the submission payload.</p>
             </div>
           </article>
           <article>
             <span class="dashboard-principle-icon dashboard-principle-zero" aria-hidden="true"></span>
             <div>
-              <h3>Commitments</h3>
-              <p>Claims are bound to cryptographic commitments, not raw identity fields.</p>
+              <h3>Self-attested</h3>
+              <p>No issuer currently verifies the private input.</p>
             </div>
           </article>
           <article>
             <span class="dashboard-principle-icon dashboard-principle-lock" aria-hidden="true"></span>
             <div>
-              <h3>Reusable URL</h3>
-              <p>Share an ID link; verifiers check the package independently.</p>
+              <h3>Open circuits</h3>
+              <p>Circuit source, verification keys, and checksums are public.</p>
             </div>
           </article>
           <article>
             <span class="dashboard-principle-icon dashboard-principle-open" aria-hidden="true"></span>
             <div>
-              <h3>Scoped disclosure</h3>
-              <p>Each ID is purpose-bound - age, unique identity, or similar facts only.</p>
+              <h3>Ceremony pending</h3>
+              <p>Production publication fails closed until the public ceremony is complete.</p>
             </div>
           </article>
         </div>
@@ -1477,8 +1605,84 @@
         <a href="#main-content" class="dashboard-footer-dot" aria-label="Back to top"></a>
       </footer>
     </article>
-    <section class="dashboard-tool-slot" aria-label="OTRUST ID tool">
-<section class="claim-section">
+    <section class="dashboard-tool-slot" aria-label="OTRUST proof lab">
+      <section class="claim-section" aria-labelledby="zk-lab-title">
+        <div class="zk-proof-lab">
+          <div class="timestamp-dashboard-head">
+            <div>
+              <span class="workspace-topline">Local zero-knowledge proof lab</span>
+              <h2 id="zk-lab-title">Generate a private range proof.</h2>
+              <p>Your private value stays in this browser. The result proves only the public range statement and is self-attested.</p>
+            </div>
+            <div class="timestamp-live-meta" aria-label="Proof properties">
+              <span>Groth16</span>
+              <span>Local verification</span>
+              <span id="zk-ceremony-label">Checking ceremony</span>
+            </div>
+          </div>
+
+          <div class="zk-lab-body">
+            <div class="zk-lab-form">
+              <div class="zk-boundary">
+                <strong>Trust boundary:</strong> this proves that one hidden input satisfies the circuit. It does not prove the input came from a government, employer, bank, or other trusted issuer.
+              </div>
+
+              <div class="zk-mode-control" role="tablist" aria-label="Proof type">
+                <button type="button" id="zk-mode-age" role="tab" aria-selected="true" aria-controls="zk-age-fields">Age range</button>
+                <button type="button" id="zk-mode-income" role="tab" aria-selected="false" aria-controls="zk-income-fields">Income range</button>
+              </div>
+
+              <div id="zk-age-fields" role="tabpanel" aria-labelledby="zk-mode-age">
+                <div class="zk-field-grid">
+                  <div class="form-group">
+                    <label for="zk-birth-date">Birth date</label>
+                    <input type="date" id="zk-birth-date" autocomplete="bday">
+                  </div>
+                  <div class="form-group">
+                    <label for="zk-min-age">Minimum age</label>
+                    <input type="number" id="zk-min-age" value="18" min="0" max="150" step="1">
+                  </div>
+                </div>
+              </div>
+
+              <div id="zk-income-fields" role="tabpanel" aria-labelledby="zk-mode-income" hidden>
+                <div class="zk-field-grid">
+                  <div class="form-group">
+                    <label for="zk-income-value">Private annual value</label>
+                    <input type="number" id="zk-income-value" min="0" max="4294967295" step="1" inputmode="numeric">
+                  </div>
+                  <div class="form-group">
+                    <label for="zk-income-min">Public minimum</label>
+                    <input type="number" id="zk-income-min" value="30000" min="0" max="4294967295" step="1" inputmode="numeric">
+                  </div>
+                  <div class="form-group">
+                    <label for="zk-income-max">Public maximum</label>
+                    <input type="number" id="zk-income-max" value="10000000" min="0" max="4294967295" step="1" inputmode="numeric">
+                  </div>
+                </div>
+              </div>
+
+              <div class="zk-action-row">
+                <button type="button" class="btn btn-primary" id="zk-generate">Generate locally</button>
+                <button type="button" class="btn btn-secondary" id="zk-export" disabled>Export JSON</button>
+                <button type="button" class="btn btn-secondary" id="zk-publish" disabled>Publish proof</button>
+              </div>
+            </div>
+
+            <aside class="zk-lab-output" aria-live="polite">
+              <div class="zk-status-line">
+                <span class="zk-status-dot" id="zk-status-dot" aria-hidden="true"></span>
+                <span id="zk-status">Loading local proving engine</span>
+              </div>
+              <div class="zk-result" id="zk-result">
+                <p>The first proof can take several seconds. Only the proof and its public signals are eligible for publication.</p>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+<section class="claim-section" hidden aria-hidden="true">
     <div class="claim-card service-workspace-card proof-workspace-card">
       <div class="timestamp-dashboard-head">
         <div>
@@ -1512,15 +1716,15 @@
       <div id="tab-create" class="tab-content active timestamp-panel" role="tabpanel" aria-labelledby="tab-button-create" tabindex="0">
         <div class="timestamp-panel-heading">
           <span>01 / Create ID</span>
-          <h3>ID package</h3>
-          <p>Create a privacy-preserving ID package from local document checks and scoped disclosure.</p>
+          <h3>Issuer-bound identity</h3>
+          <p>Trusted credential issuance is not available yet. Legacy self-attested registration is retired.</p>
         </div>
 
         <div class="proof-types">
           <div class="proof-type selected" data-type="identity" id="proof-type-identity">
             <div class="icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="12" r="2"/><path d="M14 10h4M14 14h4"/></svg></div>
-            <h3>Unique Identity</h3>
-            <p>Create a reusable identity package for one person.</p>
+            <h3>Trusted Identity</h3>
+            <p>A supported credential issuer is required.</p>
           </div>
           
           <div class="proof-type" data-type="age" id="proof-type-age" style="display:none;">
@@ -1538,7 +1742,11 @@
         
         <!-- Identity ID Form -->
         <div id="form-identity" class="proof-form" style="display:block;">
-          <h3>Unique identity package</h3>
+          <h3>Trusted identity credential</h3>
+          <div class="warning-box">
+            <strong>Issuance unavailable</strong>
+            OTRUST no longer treats local document checks or client-reported liveness as verified identity.
+          </div>
           
           <!-- Step 1: Upload ID -->
           <div id="age-step-1" class="verification-step active">
@@ -1551,7 +1759,7 @@
               <p><strong>Upload ID Document</strong></p>
               <p class="upload-hint">Passport, driver's license, or national ID card</p>
               <p class="upload-hint">Drag & drop or click to browse</p>
-              <input type="file" id="age-file-input" accept="image/*" hidden>
+              <input type="file" id="age-file-input" accept="image/*" hidden disabled>
             </div>
             
             <div id="age-preview" class="document-preview" style="display: none;">
@@ -1661,7 +1869,7 @@
             
             <div class="privacy-notice">
               <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span>
-              <p><strong>Privacy:</strong> Your document and face data are processed locally. Your personnummer is hashed (one-way) to prevent duplicates - we cannot see or store it.</p>
+              <p><strong>Unavailable:</strong> This legacy flow is disabled and does not submit your personnummer or document.</p>
             </div>
             
             <div class="form-group" style="margin-top: 1rem;">
@@ -1670,8 +1878,8 @@
               <p class="hint" style="font-size: 0.8rem; color: var(--text-dim); margin-top: 0.5rem;">PIN used to unlock your identity when logging in. Choose something memorable!</p>
             </div>
             
-            <button class="btn btn-primary" id="btn-generate-age" style="margin-top: 1rem;">
-              Create Unique Identity Package
+            <button class="btn btn-primary" id="btn-generate-age" style="margin-top: 1rem;" disabled>
+              Trusted issuer required
             </button>
           </div>
           
@@ -1766,14 +1974,10 @@
     </section>
   </section></main>
   
-  <!-- Load Document OCR Library -->
-  <script src="/js/document-ocr.js?v=4"></script>
-  <!-- Load Face Verification Library -->
-  <script src="/js/face-verify.js?v=4"></script>
   <!-- Load ZK Proof Library -->
+  <script src="/js/poseidon-lite.js"></script>
   <script src="/js/zkproof.js"></script>
-  <!-- Load Proof Page JavaScript -->
-  <script src="/js/proof-page.js?v=5"></script>
+  <script src="/js/zkproof-page.js"></script>
 
   <div class="footer-wrapper">
   <footer role="contentinfo">
@@ -1791,7 +1995,7 @@
       <a href="/about">About</a>
     </div>
     <div class="footer-copy">OTRUST - MIT License</div>
-    <div class="footer-copy" style="font-size: 0.7rem; opacity: 0.6; margin-top: 0.5rem;">Cryptographic ID claims. Raw identity data is not shown to verifiers. <a href="/terms" style="color: inherit;">Terms</a></div>
+    <div class="footer-copy" style="font-size: 0.7rem; opacity: 0.6; margin-top: 0.5rem;">Self-attested zero-knowledge range proofs. Trusted issuer credentials are not currently available. <a href="/terms" style="color: inherit;">Terms</a></div>
   </footer>
   </div>
   <script src="/otrust-polish.js?v=20260734" defer></script>

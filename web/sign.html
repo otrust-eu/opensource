@@ -1310,7 +1310,7 @@
         <div class="timestamp-panel-heading">
           <span>01 / Signing request</span>
           <h3>New request</h3>
-          <p>Create a signing package, choose delivery mode, and invite parties with optional OTRUST ID verification.</p>
+          <p>Create a signing package, choose delivery mode, and invite parties to sign cryptographically.</p>
         </div>
 
         <div id="form-section">
@@ -1401,7 +1401,7 @@
             <h3>Signing Parties</h3>
             <button class="add-party-btn" id="add-party">+ Add Party</button>
           </div>
-          <p class="hint" style="margin-bottom: 0.5rem;">Click ID to require OTRUST ID verification (verified human identity)</p>
+          <p class="hint" style="margin-bottom: 0.5rem;">Trusted identity requirements are unavailable until issuer integration is enabled.</p>
           
           <div class="party-list" id="party-list">
             <div class="party-item">
@@ -1411,8 +1411,8 @@
                 <option value="approver">Approver</option>
                 <option value="viewer">Viewer (CC)</option>
               </select>
-              <label class="proof-required-label" title="Require this party to verify with OTRUST ID">
-                <input type="checkbox" class="party-require-proof">
+              <label class="proof-required-label" title="Trusted issuer integration unavailable">
+                <input type="checkbox" class="party-require-proof" disabled>
                 <span class="proof-badge">ID</span>
               </label>
               <button class="remove-party" aria-label="Remove">&times;</button>
@@ -1867,8 +1867,8 @@
           <option value="approver">Approver</option>
           <option value="viewer">Viewer (CC)</option>
         </select>
-        <label class="proof-required-label" title="Require this party to verify with OTRUST ID">
-          <input type="checkbox" class="party-require-proof">
+        <label class="proof-required-label" title="Trusted issuer integration unavailable">
+          <input type="checkbox" class="party-require-proof" disabled>
           <span class="proof-badge">ID</span>
         </label>
         <button class="remove-party" aria-label="Remove">&times;</button>

@@ -6,7 +6,7 @@
     "description": "Free, zero-knowledge REST API for blockchain-anchored timestamping. Prove data existed at a specific time using Bitcoin blockchain and OpenTimestamps.",
     "contact": {
       "name": "OTRUST",
-      "url": "https://otrust.eu",
+      "url": "https://www.otrust.eu",
       "email": "hello@otrust.eu"
     },
     "license": {
@@ -16,7 +16,7 @@
   },
   "servers": [
     {
-      "url": "https://otrust.eu"
+      "url": "https://www.otrust.eu"
     }
   ],
   "paths": {
@@ -61,6 +61,7 @@
         "summary": "Submit a timestamp claim",
         "description": "Submit a hash with proof-of-work solution to create a timestamped claim on the blockchain.",
         "tags": ["Timestamps"],
+        "parameters": [{"$ref": "#/components/parameters/IdempotencyKey"}],
         "requestBody": {
           "required": true,
           "content": {
@@ -141,6 +142,7 @@
         "summary": "Submit claim from email or web form (no PoW required)",
         "description": "Submit a timestamp claim without solving PoW. Used by email timestamper and web UI.",
         "tags": ["Timestamps"],
+        "parameters": [{"$ref": "#/components/parameters/IdempotencyKey"}],
         "requestBody": {
           "required": true,
           "content": {
@@ -194,6 +196,7 @@
         "summary": "Submit multiple claims with single PoW",
         "description": "Batch submit up to 100 claims with a single proof-of-work solution (more efficient).",
         "tags": ["Timestamps"],
+        "parameters": [{"$ref": "#/components/parameters/IdempotencyKey"}],
         "requestBody": {
           "required": true,
           "content": {
@@ -561,6 +564,7 @@
         "summary": "Create a signing request",
         "description": "Create a new multi-party document signing request. Invitations are sent via email.",
         "tags": ["Signing"],
+        "parameters": [{"$ref": "#/components/parameters/IdempotencyKey"}],
         "requestBody": {
           "required": true,
           "content": {
@@ -637,7 +641,8 @@
         "description": "Cancel a pending signing request. Requires the cancel_token from creation.",
         "tags": ["Signing"],
         "parameters": [
-          {"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}
+          {"name": "id", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"$ref": "#/components/parameters/IdempotencyKey"}
         ],
         "requestBody": {
           "required": true,
@@ -660,9 +665,10 @@
     },
     "/api/proof/age": {
       "post": {
-        "summary": "Create zero-knowledge age proof",
-        "description": "Prove you are at least N years old without revealing your actual age or birth date.",
+        "summary": "Retired server-side age proof endpoint",
+        "description": "Private inputs must stay in the browser. Generate a Groth16 proof locally and submit it to /api/proof/submit.",
         "tags": ["ZK Proofs"],
+        "deprecated": true,
         "requestBody": {
           "required": true,
           "content": {
@@ -679,20 +685,66 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "Age proof created",
+          "410": {
+            "description": "Server-side proof generation is retired",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {"type": "boolean"},
-                    "proofId": {"type": "string"},
-                    "viewToken": {"type": "string"},
-                    "shareUrl": {"type": "string"},
-                    "verifyUrl": {"type": "string"}
-                  }
+                  "$ref": "#/components/schemas/Error"
                 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/proof/submit": {
+      "post": {
+        "summary": "Verify and store a browser-generated Groth16 proof",
+        "description": "Cryptographically verifies a locally generated age or income proof before storing it. Production submission remains unavailable until the published ceremony manifest is production-ready.",
+        "tags": ["ZK Proofs"],
+        "parameters": [{"$ref": "#/components/parameters/IdempotencyKey"}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["proofType", "version", "proof", "publicSignals", "commitment"],
+                "properties": {
+                  "proofType": {"type": "string", "enum": ["age", "income"]},
+                  "version": {"type": "string", "enum": ["groth16-v3"]},
+                  "proof": {"type": "object"},
+                  "publicSignals": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "maxItems": 64
+                  },
+                  "commitment": {"type": "string"}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {"description": "Proof verified and stored"},
+          "400": {"description": "Invalid or unverifiable proof"},
+          "503": {"description": "Production ceremony is not complete"}
+        }
+      }
+    },
+    "/api/proof/identity": {
+      "post": {
+        "summary": "Retired self-attested identity registration",
+        "description": "Local document checks and client-reported liveness are not accepted as verified identity. A trusted issuer credential is required.",
+        "tags": ["ZK Proofs"],
+        "deprecated": true,
+        "responses": {
+          "410": {
+            "description": "Trusted issuer credential required",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/Error"}
               }
             }
           }
@@ -751,6 +803,122 @@
         }
       }
     },
+    "/api/v1/auth/challenge": {
+      "post": {
+        "summary": "Create a registered hosted Auth challenge",
+        "description": "Creates a short-lived challenge only when trusted issuer support is enabled and redirectUri exactly matches the registered client allowlist.",
+        "tags": ["Auth"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["clientId", "redirectUri", "state"],
+                "properties": {
+                  "clientId": {"type": "string"},
+                  "redirectUri": {"type": "string", "format": "uri"},
+                  "scope": {
+                    "type": "array",
+                    "items": {"type": "string", "enum": ["identity", "email", "verification"]}
+                  },
+                  "state": {"type": "string", "minLength": 16, "maxLength": 500}
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {"description": "Challenge created with challengeId, challenge, loginUrl, and expiresIn"},
+          "400": {"description": "Invalid request, unregistered client, or redirect mismatch"},
+          "503": {"description": "Trusted issuer or Auth client registration is not ready"}
+        }
+      }
+    },
+    "/api/v1/auth/challenge/{challengeId}": {
+      "get": {
+        "summary": "Get safe hosted Auth challenge metadata",
+        "tags": ["Auth"],
+        "parameters": [
+          {"name": "challengeId", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "responses": {
+          "200": {"description": "Safe challenge and branding metadata"},
+          "404": {"description": "Challenge not found or expired"}
+        }
+      }
+    },
+    "/api/v1/auth/prove": {
+      "post": {
+        "summary": "Present issuer-bound credential ownership",
+        "description": "Used by the hosted OTRUST page. Accepts only a current trusted issuer-bound identity credential.",
+        "tags": ["Auth"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["challengeId", "proofId"],
+                "properties": {
+                  "challengeId": {"type": "string"},
+                  "proofId": {"type": "string"},
+                  "pin": {"type": "string", "pattern": "^[0-9]{6}$"},
+                  "secret": {"type": "string"}
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {"description": "Signed Auth token and registered callback URL"},
+          "400": {"description": "Invalid, expired, or used challenge"},
+          "403": {"description": "Trusted issuer credential required"},
+          "503": {"description": "Trusted issuer or Auth client registration is not ready"}
+        }
+      }
+    },
+    "/api/v1/auth/verify": {
+      "post": {
+        "summary": "Verify an Auth token",
+        "description": "Verifies token integrity, expiry, audience data, and the current trusted issuer binding.",
+        "tags": ["Auth"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["token"],
+                "properties": {"token": {"type": "string"}},
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {"description": "Verified token details"},
+          "401": {"description": "Invalid or expired token"},
+          "403": {"description": "Current trusted issuer credential required"},
+          "503": {"description": "Trusted issuer or Auth client registration is not ready"}
+        }
+      }
+    },
+    "/api/v1/auth/userinfo": {
+      "get": {
+        "summary": "Get current issuer-bound identity information",
+        "tags": ["Auth"],
+        "security": [{"BearerAuth": []}],
+        "responses": {
+          "200": {"description": "Trusted issuer-bound user information"},
+          "401": {"description": "Missing, invalid, or expired token"},
+          "403": {"description": "Current trusted issuer credential required"},
+          "503": {"description": "Trusted issuer or Auth client registration is not ready"}
+        }
+      }
+    },
     "/stats": {
       "get": {
         "summary": "Get service statistics",
@@ -803,6 +971,25 @@
                     },
                     "claims": {
                       "type": "integer"
+                    },
+                    "version": {
+                      "type": "string"
+                    },
+                    "commit_sha": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "features": {
+                      "type": "object",
+                      "additionalProperties": {"type": "boolean"}
+                    },
+                    "zk_artifacts": {
+                      "type": "object",
+                      "properties": {
+                        "status": {"type": "string"},
+                        "production_ready": {"type": "boolean"},
+                        "compiler_version": {"type": "string", "nullable": true}
+                      }
                     }
                   }
                 }
@@ -837,12 +1024,24 @@
       "post": {
         "summary": "Create organization (admin)",
         "tags": ["Platform"],
-        "responses": { "201": { "description": "Organization created" } }
+        "parameters": [{"$ref": "#/components/parameters/IdempotencyKey"}],
+        "responses": {
+          "201": { "description": "Organization created" },
+          "409": { "description": "Idempotency key conflict" }
+        }
       },
       "get": {
         "summary": "List organizations (admin)",
         "tags": ["Platform"],
-        "responses": { "200": { "description": "Organization list" } }
+        "parameters": [
+          {"$ref": "#/components/parameters/PageLimit"},
+          {"$ref": "#/components/parameters/PageCursor"}
+        ],
+        "responses": {
+          "200": {
+            "description": "Organization list with an optional next_cursor"
+          }
+        }
       }
     },
     "/api/v1/platform/webhooks/endpoints": {
@@ -850,6 +1049,7 @@
         "summary": "Register webhook endpoint",
         "tags": ["Platform"],
         "security": [{ "ApiKeyAuth": [] }],
+        "parameters": [{"$ref": "#/components/parameters/IdempotencyKey"}],
         "responses": { "201": { "description": "Endpoint created" } }
       },
       "get": {
@@ -864,16 +1064,57 @@
         "summary": "Webhook delivery log",
         "tags": ["Platform"],
         "security": [{ "ApiKeyAuth": [] }],
+        "parameters": [
+          {"$ref": "#/components/parameters/PageLimit"},
+          {"$ref": "#/components/parameters/PageCursor"}
+        ],
         "responses": { "200": { "description": "Deliveries" } }
       }
     }
   },
   "components": {
+    "parameters": {
+      "IdempotencyKey": {
+        "name": "Idempotency-Key",
+        "in": "header",
+        "required": false,
+        "description": "Unique key for safely retrying a write request for 24 hours. Reusing a key with a different payload returns 409.",
+        "schema": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9._-]+$"
+        }
+      },
+      "PageLimit": {
+        "name": "limit",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 50
+        }
+      },
+      "PageCursor": {
+        "name": "cursor",
+        "in": "query",
+        "required": false,
+        "description": "Opaque next_cursor value returned by the previous page.",
+        "schema": {"type": "string"}
+      }
+    },
     "securitySchemes": {
       "ApiKeyAuth": {
         "type": "http",
         "scheme": "bearer",
         "description": "Bearer otrust_live_... or X-OTRUST-Key header"
+      },
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Short-lived issuer-bound Auth token"
       }
     },
     "schemas": {
@@ -885,6 +1126,10 @@
           },
           "message": {
             "type": "string"
+          },
+          "request_id": {
+            "type": "string",
+            "format": "uuid"
           }
         }
       }
@@ -909,7 +1154,11 @@
     },
     {
       "name": "ZK Proofs",
-      "description": "Zero-knowledge identity and attribute proofs"
+      "description": "Self-attested age and income range proofs"
+    },
+    {
+      "name": "Auth",
+      "description": "Registered challenges for trusted issuer-bound identity credentials"
     },
     {
       "name": "Info",

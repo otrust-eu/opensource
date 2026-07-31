@@ -1,39 +1,34 @@
-# Dockerfile for otrust
-# Zero-knowledge blind notary service
+# Build generated browser assets from locked dependencies.
+FROM node:24-alpine AS build
 
-FROM node:20-alpine
-
-# Set working directory
 WORKDIR /app
 
-# Copy package files
 COPY package*.json ./
-
-# Install dependencies
-RUN npm ci --omit=dev
-
-# Copy source code
+RUN npm ci --ignore-scripts
 COPY . .
+RUN npm run build:extension && npm run build:poseidon
+RUN npm prune --omit=dev && npm rebuild --omit=dev
 
-# Build generated assets (e.g. browser extension.zip) so they are present in image
-RUN npm run build:extension
+FROM node:24-alpine AS runtime
 
-# Set environment
+WORKDIR /app
+COPY --from=build --chown=1001:1001 /app /app
+
 ENV NODE_ENV=production
 ENV PORT=3000
+ENV OTRUST_DB_PATH=/app/data/otrust.sqlite
 
-# Expose port
 EXPOSE 3000
+VOLUME ["/app/data"]
 
-# Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
 
-# Run as non-root user
 RUN addgroup -g 1001 -S nodejs && \
-    adduser -S otrust -u 1001 -G nodejs
+    adduser -S otrust -u 1001 -G nodejs && \
+    mkdir -p /app/data && \
+    chown -R otrust:nodejs /app/data
 
 USER otrust
 
-# Start server
 CMD ["node", "src/server.js"]

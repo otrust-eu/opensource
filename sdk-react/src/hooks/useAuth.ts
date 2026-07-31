@@ -32,6 +32,11 @@ export interface UseAuthReturn {
 interface UserInfo {
   proofId: string;
   verified: boolean;
+  credentialBinding: 'trusted_issuer';
+  issuer?: {
+    id?: string;
+    name?: string;
+  } | null;
   identityHash?: string;
   verification?: {
     faceMatch?: boolean;
@@ -109,6 +114,8 @@ export function useAuth(): UseAuthReturn {
         setUser({
           proofId: userResult.value.proofId,
           verified: userResult.value.verified,
+          credentialBinding: userResult.value.credentialBinding,
+          issuer: userResult.value.issuer,
           identityHash: userResult.value.identityHash,
           verification: userResult.value.verification,
           createdAt: userResult.value.createdAt,
@@ -140,7 +147,7 @@ export function useAuth(): UseAuthReturn {
     try {
       const authState = options?.state ?? auth.generateState();
       
-      const result = await auth.loginUrl({
+      const result = await auth.createChallenge({
         clientId: config.clientId,
         redirectUri: config.redirectUri,
         scope: (options?.scope ?? ['identity']) as ('identity' | 'email' | 'verification')[],
@@ -150,8 +157,8 @@ export function useAuth(): UseAuthReturn {
       if (result.ok) {
         // Store state for CSRF protection
         sessionStorage.setItem(STATE_KEY, authState);
-        // Redirect to login
-        window.location.href = result.value;
+        // Redirect only to the URL returned by the registered server challenge.
+        window.location.href = result.value.loginUrl;
       } else {
         throw new Error(result.error.message);
       }

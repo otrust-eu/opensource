@@ -3,7 +3,7 @@
  */
 
 import * as snarkjs from 'snarkjs';
-import { buildPoseidon } from 'circomlibjs';
+import { poseidon1, poseidon2, poseidon4 } from 'poseidon-lite';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -14,8 +14,6 @@ const BUILD_DIR = path.join(__dirname, 'build');
 async function testAgeProof() {
   console.log('\n🧪 Testing Age Proof Circuit');
   console.log('=' .repeat(50));
-  
-  const poseidon = await buildPoseidon();
   
   // Test case: Born 1990-05-15, proving age >= 18
   const birthYear = 1990;
@@ -29,8 +27,7 @@ async function testAgeProof() {
   const minAge = 18;
   
   // Calculate commitment
-  const commitment = poseidon([birthYear, birthMonth, birthDay, secret]);
-  const commitmentStr = poseidon.F.toString(commitment);
+  const commitmentStr = poseidon4([birthYear, birthMonth, birthDay, secret]).toString();
   
   console.log('📋 Input:');
   console.log(`   Birth: ${birthYear}-${birthMonth}-${birthDay}`);
@@ -77,8 +74,12 @@ async function testAgeProof() {
   // Test invalid case (too young)
   console.log('\n🧪 Testing INVALID case (age 15 < 18)...');
   const invalidInput = { ...input, birthYear: 2011 }; // Would be 15 years old
-  const invalidCommitment = poseidon([2011, birthMonth, birthDay, secret]);
-  invalidInput.identityCommitment = poseidon.F.toString(invalidCommitment);
+  invalidInput.identityCommitment = poseidon4([
+    2011,
+    birthMonth,
+    birthDay,
+    secret
+  ]).toString();
   
   try {
     await snarkjs.groth16.fullProve(invalidInput, wasmPath, zkeyPath);
@@ -94,15 +95,12 @@ async function testIncomeProof() {
   console.log('\n🧪 Testing Income Proof Circuit');
   console.log('=' .repeat(50));
   
-  const poseidon = await buildPoseidon();
-  
   const income = 75000;
   const minIncome = 50000;
   const maxIncome = 100000;
   const secret = BigInt('987654321098765432109876543210');
   
-  const commitment = poseidon([BigInt(income), secret]);
-  const commitmentStr = poseidon.F.toString(commitment);
+  const commitmentStr = poseidon2([BigInt(income), secret]).toString();
   
   console.log('📋 Input:');
   console.log(`   Income: $${income.toLocaleString()}`);
@@ -144,25 +142,24 @@ async function testMembershipProof() {
   console.log('\nTesting Membership Proof Circuit');
   console.log('=' .repeat(50));
 
-  const poseidon = await buildPoseidon();
   const secret = BigInt('112233445566778899');
   const externalNullifier = BigInt('20260723');
   const pathElements = Array.from({ length: 20 }, (_, index) => BigInt(index + 1));
   const pathIndices = Array.from({ length: 20 }, (_, index) => index % 2);
 
-  let root = poseidon([secret]);
+  let root = poseidon1([secret]);
   for (let index = 0; index < pathElements.length; index++) {
     root = pathIndices[index] === 0
-      ? poseidon([root, pathElements[index]])
-      : poseidon([pathElements[index], root]);
+      ? poseidon2([root, pathElements[index]])
+      : poseidon2([pathElements[index], root]);
   }
 
   const input = {
     secret: secret.toString(),
     pathElements: pathElements.map(String),
     pathIndices,
-    merkleRoot: poseidon.F.toString(root),
-    nullifierHash: poseidon.F.toString(poseidon([secret, externalNullifier])),
+    merkleRoot: root.toString(),
+    nullifierHash: poseidon2([secret, externalNullifier]).toString(),
     externalNullifier: externalNullifier.toString()
   };
 

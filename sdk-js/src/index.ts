@@ -1,14 +1,14 @@
 /**
  * OTRUST SDK
  * 
- * Official SDK for OTRUST - Zero-knowledge timestamping, signing, identity proofs, and authentication.
+ * Official SDK for OTRUST timestamping, signing, public proof submission, and gated authentication.
  * 
  * @example
  * ```ts
  * import { timestamp, sign, proof, auth, configure } from '@otrust/sdk';
  * 
- * // Configure (optional - defaults to https://otrust.eu)
- * configure({ baseUrl: 'https://otrust.eu' });
+ * // Configure (optional - defaults to https://www.otrust.eu)
+ * configure({ baseUrl: 'https://www.otrust.eu' });
  * 
  * // Timestamp a file
  * const result = await timestamp.create(file);
@@ -23,13 +23,16 @@
  *   parties: [{ email: 'bob@example.com', role: 'signer' }],
  * });
  * 
- * // Create identity proof
- * const proofResult = await proof.identity({
- *   personnummer: '19900101-1234',
- *   birthDate: '1990-01-01',
+ * // Submit a Groth16 proof generated in a trusted local environment
+ * const proofResult = await proof.submitBrowserProof({
+ *   proofType: 'age',
+ *   version: 'groth16-v3',
+ *   proof: groth16Proof,
+ *   publicSignals,
+ *   commitment: publicSignals[5],
  * });
  * 
- * // Login with OTRUST
+ * // Create an Auth challenge only after health reports a trusted issuer
  * const authResult = await auth.createChallenge({
  *   clientId: 'my-app',
  *   redirectUri: 'https://my-app.com/callback',
@@ -44,11 +47,10 @@ import { timestamp } from './timestamp.js';
 import { sign } from './sign.js';
 import { proof } from './proof.js';
 import { auth } from './auth.js';
-import { face } from './face.js';
 import { admin } from './admin.js';
 
 // Re-export all services
-export { timestamp, sign, proof, auth, face, admin };
+export { timestamp, sign, proof, auth, admin };
 
 // Re-export types
 export type {
@@ -99,13 +101,6 @@ export type {
   VerifiedIdentity,
   UserInfo,
 } from './auth.js';
-
-export type {
-  FaceDetection,
-  FaceVerificationResult,
-  LivenessStatus,
-  VerifySelfieOptions,
-} from './face.js';
 
 export type {
   SystemStats,

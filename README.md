@@ -8,8 +8,8 @@ Zero-knowledge timestamping and document signing. We only see hashes — never y
 
 [![CI](https://github.com/otrust-eu/core/actions/workflows/ci.yml/badge.svg)](https://github.com/otrust-eu/core/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Node.js](https://img.shields.io/badge/Node.js-18+-brightgreen.svg)](https://nodejs.org/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-6.0+-green.svg)](https://www.mongodb.com/)
+[![Node.js](https://img.shields.io/badge/Node.js-24_LTS-brightgreen.svg)](https://nodejs.org/)
+[![SQLite](https://img.shields.io/badge/storage-SQLite-0f80cc.svg)](https://www.sqlite.org/)
 
 ## Run your own — 60 seconds
 
@@ -109,7 +109,21 @@ curl -X POST https://www.otrust.eu/claim \
   -d '{"hash":"...","signature":"...","pubkey":"..."}'
 ```
 
-See [API Documentation](https://www.otrust.eu/api-docs.html) for full reference.
+See [API Documentation](https://www.otrust.eu/api-docs.html) for the full
+reference and [API Policy](docs/API_POLICY.md) for compatibility, retries,
+idempotency, pagination, and error handling.
+
+### ZK range-proof status
+
+Age and income range proofs are generated and verified locally in the browser.
+They prove knowledge of a committed value in a range, but currently have no
+government or employer credential binding and are labeled **self-attested**.
+Production proof publication stays disabled until the documented multi-party
+ceremony is complete. See [the ceremony runbook](circuits/CEREMONY.md).
+
+Self-attested identity registration is retired. Login with OTRUST accepts only
+records explicitly bound to a trusted credential issuer; no public issuer
+integration is enabled yet.
 
 ## Self-Hosting (detailed)
 
@@ -128,7 +142,7 @@ Or use `./scripts/quickstart.sh` on Linux/macOS or `.\scripts\quickstart.ps1` on
 
 ```bash
 npm ci
-cp .env.example .env   # set MONGODB_URL, ADMIN_KEY, AUTH_SECRET
+cp .env.example .env   # set ADMIN_KEY and AUTH_SECRET
 npm run dev
 ```
 
@@ -136,15 +150,24 @@ npm run dev
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `MONGODB_URL` | MongoDB connection string | `mongodb://localhost:27017` |
-| `MONGODB_DB` | Database name | `otrust` |
+| `OTRUST_DB_PATH` | Persistent SQLite database file | `./data/otrust.sqlite` |
 | `PORT` | Server port | `3000` |
 | `ADMIN_KEY` | Platform admin (`X-Admin-Key`) | — **required in prod** |
 | `AUTH_SECRET` | Stable signing secret for hosted auth tokens | — **required in prod** |
+| `TRUSTED_IDENTITY_ISSUER_ENABLED` | Enables issuer-bound identity capability | unset = disabled |
+| `AUTH_CLIENTS_JSON` | Exact Auth client and redirect URI registry | — **required for Auth** |
 | `BASE_URL` | Public URL for links/webhooks | `http://localhost:3000` |
 | `HOSTED_MODE` | Plan limits on otrust.eu hosted service | unset = unlimited |
 
 **Do not set `HOSTED_MODE` on self-host.** Plan limits apply only to the hosted service at otrust.eu, not your deployment.
+
+Docker Compose stores the SQLite database in the named `otrust_data` volume.
+Back up that volume, or stop writes and copy the database file together with
+its `-wal` and `-shm` files. Hosted deployments must mount durable storage at
+the directory containing `OTRUST_DB_PATH`.
+
+Existing installations can move their records with the
+[MongoDB export migration](docs/MONGODB_MIGRATION.md).
 
 ## How It Works
 
@@ -175,7 +198,7 @@ otrust-core/
 ├── src/                      # Core application
 │   ├── server.js             # Express app, routes, middleware
 │   ├── crypto.js             # Ed25519/secp256k1 signatures
-│   ├── db.js                 # MongoDB connection & queries
+│   ├── db.js                 # Transactional SQLite document storage
 │   └── pow.js                # Proof-of-work challenges
 ├── cli/
 │   └── otrust.js             # CLI tool (npm install -g)

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OTRUST API Reference | Timestamping, ID, Signing & Auth</title>
-  <meta name="description" content="REST API for OTRUST timestamping, signature verification, ID packages, and hosted partner Auth challenges.">
+  <title>OTRUST API Reference | Timestamping, Proofs, Signing & Auth</title>
+  <meta name="description" content="REST API for OTRUST timestamping, signature verification, browser-generated proofs, and issuer-gated partner Auth.">
   <meta name="keywords" content="timestamp API, ID API, hosted auth API, blockchain API, OpenTimestamps API, evidence of existence API, REST API, OTRUST">
   <meta name="author" content="Kristian Ledel">
   <meta name="creator" content="Kris Ledel">
@@ -17,7 +17,7 @@
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://www.otrust.eu/api-docs.html">
   <meta property="og:title" content="OTRUST API Reference">
-  <meta property="og:description" content="REST API for timestamping, ID, signing, and hosted partner Auth challenges.">
+  <meta property="og:description" content="REST API for timestamping, browser-generated proofs, signing, and issuer-gated partner Auth.">
   <meta property="og:image" content="https://www.otrust.eu/og-image.svg">
   <meta property="og:site_name" content="OTRUST">
   <meta property="article:author" content="Kristian Ledel">
@@ -25,7 +25,7 @@
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="OTRUST API Reference">
-  <meta name="twitter:description" content="APIs for timestamping, ID, signing, and partner Auth.">
+  <meta name="twitter:description" content="APIs for timestamping, browser-generated proofs, signing, and issuer-gated partner Auth.">
   <meta name="twitter:image" content="https://www.otrust.eu/og-image.svg">
   <meta name="twitter:creator" content="@kledel">
   
@@ -36,7 +36,7 @@
     "@type": "TechArticle",
     "name": "OTRUST API Reference",
     "url": "https://www.otrust.eu/api-docs.html",
-    "description": "REST API for timestamping, signature verification, ID packages, and hosted partner Auth challenges.",
+    "description": "REST API for timestamping, signature verification, browser-generated proofs, and issuer-gated partner Auth.",
     "author": {
       "@type": "Person",
       "name": "Kristian Ledel",
@@ -695,7 +695,7 @@
           <div class="dashboard-subpage-headcopy">
             <span class="dashboard-kicker">Developers</span>
           <h1>API,<br><span>for verifiable trust.</span></h1>
-          <p>Reference endpoints for timestamping, signature verification, ID checks, and hosted partner Auth challenges.</p>
+          <p>Reference endpoints for timestamping, signature verification, range-proof verification, and issuer-gated partner Auth.</p>
           </div>
         </section>
 
@@ -706,7 +706,7 @@
     <div class="left-col">
       <span class="hero-badge">API</span>
       <h1>API Reference</h1>
-      <p>Integrate timestamping, ID, signing, and hosted partner Auth. Public timestamp endpoints remain account-free; partner Auth uses short-lived challenges.</p>
+      <p>Integrate timestamping, browser-generated proofs, signing, and issuer-gated partner Auth. Public timestamp endpoints remain account-free.</p>
       
       <div class="base-url">https://www.otrust.eu</div>
       
@@ -778,7 +778,7 @@
     
     <div class="content-card">
       <h2>Access Model</h2>
-      <p>Public timestamp endpoints do not require accounts or API keys. Claim creation requires an Ed25519 signature plus a challenge proof-of-work, and rate limits apply. Partner Auth endpoints are challenge-based and intended for server-side integrations.</p>
+      <p>Public timestamp endpoints do not require accounts or API keys. Claim creation requires an Ed25519 signature plus a challenge proof-of-work, and rate limits apply. Production Auth challenge creation is unavailable until a trusted issuer and an exact client redirect allowlist are configured.</p>
       <p style="margin-top:0.75rem;font-size:0.9rem;color:var(--text-dim);"><strong>Receipt lists are client-side.</strong> Persist receipts in your app (<code>localStorage</code>, extension storage, or your database). <code>GET /receipts/:pubkey</code> returns <code>410 Gone</code>. Use <code>GET /proof/:receiptId</code> for individual verification.</p>
 
       <div class="endpoint" id="partner-auth">
@@ -787,7 +787,7 @@
           <span class="path">/api/v1/auth/challenge</span>
         </div>
         <div class="endpoint-body">
-          <p>Create a short-lived hosted Auth challenge for a partner application. The response includes the OTRUST Auth URL; if a <code>clientId</code> has approved branding, the hosted Auth and ID creation screens use that theme.</p>
+          <p>Create a short-lived hosted Auth challenge after trusted issuer support and the client are configured. <code>redirectUri</code> must exactly match the client's server-side allowlist. Redirect only to the <code>loginUrl</code> returned by this endpoint.</p>
           <h3>Request Body</h3>
           <pre><code>{
   <span class="property">"clientId"</span>: <span class="string">"hemsted_prod"</span>,

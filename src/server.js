@@ -28,7 +28,7 @@ import validator from 'validator';
 import { v4 as uuidv4 } from 'uuid';
 import os from 'os';
 import { createDb, getDb, closeDb, logSecurityEvent as logAuditEvent } from './db.js';
-import archiver from 'archiver';
+import { ZipArchive } from 'archiver';
 import QRCode from 'qrcode';
 import * as zkproof from './zkproof.js';
 import { config, saveConfig, needsSetup, logFeatures } from './config.js';
@@ -45,7 +45,8 @@ import { createIdempotencyMiddleware } from './platform/idempotency.js';
 import { registerPlatformRoutes } from './platform/routes.js';
 import { checkClaimAllowance, incrementOrgClaimUsage } from './hosted/billing.js';
 import { sendEmail } from './email.js';
-import { getProductionRedirectUrl } from './canonical-url.js';
+import { getProductionRedirectStatus, getProductionRedirectUrl } from './canonical-url.js';
+import { getBuildMetadata } from './version.js';
 import {
   emailTemplate,
   emailButton,
@@ -81,9 +82,73 @@ const CORS_HOSTS = CORS_ORIGINS.flatMap(origin => {
   }
 });
 const AUTH_TOKEN_SECRET = process.env.AUTH_SECRET || crypto.randomBytes(32).toString('hex');
+const BUILD_METADATA = getBuildMetadata();
 
-if (!process.env.AUTH_SECRET && IS_PRODUCTION) {
-  console.warn('[Security] AUTH_SECRET is not set; using a process-local auth token secret. Tokens will be invalid after restart.');
+function parseAuthClientRegistry(raw = process.env.AUTH_CLIENTS_JSON) {
+  if (!raw) return new Map();
+
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    throw new Error('AUTH_CLIENTS_JSON must be valid JSON');
+  }
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new Error('AUTH_CLIENTS_JSON must be an object keyed by client ID');
+  }
+
+  const registry = new Map();
+  for (const [clientId, value] of Object.entries(parsed)) {
+    const redirectUris = Array.isArray(value) ? value : value?.redirectUris;
+    if (!Array.isArray(redirectUris) || redirectUris.length === 0) {
+      throw new Error(`AUTH_CLIENTS_JSON entry ${clientId} needs redirectUris`);
+    }
+    const normalized = new Set(redirectUris.map(uri => {
+      const parsedUri = new URL(String(uri));
+      parsedUri.hash = '';
+      return parsedUri.href;
+    }));
+    registry.set(clientId, normalized);
+  }
+  return registry;
+}
+
+const AUTH_CLIENTS = parseAuthClientRegistry();
+const AUTH_CAPABILITY_READY = (
+  process.env.TRUSTED_IDENTITY_ISSUER_ENABLED === 'true' &&
+  AUTH_CLIENTS.size > 0
+);
+
+function isRegisteredAuthRedirect(clientId, redirectUri) {
+  try {
+    const parsed = new URL(redirectUri);
+    parsed.hash = '';
+    return AUTH_CLIENTS.get(clientId)?.has(parsed.href) === true;
+  } catch {
+    return false;
+  }
+}
+
+function requireProductionAuthCapability(res) {
+  if (process.env.NODE_ENV !== 'production' || AUTH_CAPABILITY_READY) {
+    return true;
+  }
+
+  res.status(503).json({
+    error: 'auth_capability_unavailable',
+    message: 'Hosted Auth requires a trusted identity issuer and registered clients'
+  });
+  return false;
+}
+
+if (AUTH_CAPABILITY_READY && !process.env.AUTH_SECRET) {
+  throw new Error('AUTH_SECRET is required when issuer-bound Auth is enabled');
+}
+if (
+  process.env.TRUSTED_IDENTITY_ISSUER_ENABLED === 'true' &&
+  AUTH_CLIENTS.size === 0
+) {
+  console.warn('[Security] Trusted identity issuer is enabled without registered Auth clients; Auth remains unavailable.');
 }
 
 const timingSafeEqual = (a, b) => {
@@ -127,6 +192,24 @@ app.use((req, res, next) => {
   next();
 });
 
+// Keep the existing error contract and add a stable correlation field.
+app.use((req, res, next) => {
+  const originalJson = res.json.bind(res);
+  res.json = function(data) {
+    if (
+      res.statusCode >= 400 &&
+      data &&
+      typeof data === 'object' &&
+      !Array.isArray(data) &&
+      !data.request_id
+    ) {
+      return originalJson({ ...data, request_id: req.requestId });
+    }
+    return originalJson(data);
+  };
+  next();
+});
+
 // Force HTTPS and collapse the public apex domain to the canonical www host.
 const IS_DESKTOP = process.env.OTRUST_DESKTOP === 'true';
 if (IS_PRODUCTION && !IS_DESKTOP) {
@@ -140,7 +223,9 @@ if (IS_PRODUCTION && !IS_DESKTOP) {
       isProduction: true,
       canonicalHost: process.env.CANONICAL_HOST || 'www.otrust.eu'
     });
-    if (redirectUrl) return res.redirect(301, redirectUrl);
+    if (redirectUrl) {
+      return res.redirect(getProductionRedirectStatus(req.method), redirectUrl);
+    }
 
     next();
   });
@@ -198,9 +283,9 @@ app.use(helmet({
 
 // Additional security headers
 app.use((req, res, next) => {
-  // Permissions Policy - restrict browser features (but allow camera for identity verification)
+  // No active OTRUST flow needs device sensors or camera access.
   res.setHeader('Permissions-Policy', 
-    'accelerometer=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=(), interest-cohort=(), camera=(self)'
+    'accelerometer=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=(), interest-cohort=(), camera=()'
   );
   // Prevent caching of sensitive data
   if (req.path.startsWith('/claim') || req.path.startsWith('/verify')) {
@@ -221,7 +306,7 @@ app.use(hpp());
 
 // Resolve organization from API key (optional — anonymous requests keep IP rate limits)
 app.use(createApiKeyMiddleware({ getDb }));
-app.use(createIdempotencyMiddleware({ getDb }));
+const idempotencyMiddleware = createIdempotencyMiddleware({ getDb });
 
 // Custom key generator for rate limiting — org when API key present, else IP
 const getRateLimitKey = (req) => {
@@ -394,9 +479,12 @@ const verifyLimiter = rateLimit({
 app.use(globalLimiter);
 
 // Different JSON limits for different routes
-const smallJson = express.json({ limit: '1kb', strict: true });
-const bulkJson = express.json({ limit: '1mb', strict: true });
-const documentJson = express.json({ limit: '25mb', strict: true }); // For email webhook with document attachments
+const withIdempotency = (parser) => [parser, idempotencyMiddleware];
+const smallJson = withIdempotency(express.json({ limit: '1kb', strict: true }));
+const bulkJson = withIdempotency(express.json({ limit: '1mb', strict: true }));
+const documentJson = withIdempotency(
+  express.json({ limit: '25mb', strict: true })
+); // For email webhook with document attachments
 
 // CSRF Protection - validate Origin header for state-changing requests
 const csrfProtection = (req, res, next) => {
@@ -467,8 +555,15 @@ app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', origin);
   }
   
-  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Content-Type, Authorization, X-OTRUST-Key, Idempotency-Key'
+  );
+  res.header(
+    'Access-Control-Expose-Headers',
+    'X-Request-ID, Idempotency-Replayed, RateLimit, RateLimit-Policy, Retry-After'
+  );
   if (req.method === 'OPTIONS') return res.sendStatus(204);
   next();
 });
@@ -502,15 +597,15 @@ app.get('/api/v1', (req, res) => {
         ]
       },
       proof: {
-        description: 'ZK identity and attribute proofs',
+        description: 'Browser-generated self-attested range proofs; issuer-bound identity is pending',
         endpoints: [
-          'POST /api/v1/proof/identity',
-          'POST /api/v1/proof/age',
-          'GET /api/v1/proof/:id'
+          'POST /api/proof/submit',
+          'GET /api/proof/:id',
+          'POST /api/proof/:id/verify'
         ]
       },
       auth: {
-        description: 'Login with OTRUST - identity-based authentication',
+        description: 'Issuer-bound identity authentication (unavailable until a trusted issuer is configured)',
         endpoints: [
           'POST /api/v1/auth/challenge',
           'GET /api/v1/auth/challenge/:id',
@@ -2057,7 +2152,7 @@ app.post('/sign/upload', signCreateLimiter, fileUploadLimit, async (req, res) =>
       logSecurityEvent('blocked_file_upload', req, { filename, extension: ext });
       return res.status(400).json({ 
         error: 'invalid_file_type', 
-        message: `File type ${ext} is not allowed. Blocked types: .exe, .dll, .bat, .sh, .php, .asp, .jsp, .cgi, .htaccess, etc. See https://otrust.eu/api-docs.html#file-types for details.`
+        message: `File type ${ext} is not allowed. Blocked types: .exe, .dll, .bat, .sh, .php, .asp, .jsp, .cgi, .htaccess, etc. See https://www.otrust.eu/api-docs.html#file-types for details.`
       });
     }
     
@@ -2076,7 +2171,7 @@ app.post('/sign/upload', signCreateLimiter, fileUploadLimit, async (req, res) =>
     const fileId = 'sf_' + crypto.randomBytes(16).toString('base64url');
     const fileToken = crypto.randomBytes(32).toString('base64url');
     
-    // Store in MongoDB (we handle expiry manually to send notifications)
+    // Store in SQLite. Expiry is handled manually so notifications can be sent.
     const db = getDb();
     // Security: Validate content-type header is string
     const mimeType = typeof req.headers['content-type'] === 'string' 
@@ -2098,8 +2193,8 @@ app.post('/sign/upload', signCreateLimiter, fileUploadLimit, async (req, res) =>
       purge_notified: false
     });
     
-    // Note: We don't use MongoDB TTL index - we handle expiry manually
-    // to send purge notifications and create purge proofs
+    // File expiry remains application-managed so purge notifications and
+    // deletion proofs are created before the encrypted bytes are removed.
     
     res.status(201).json({
       file_id: fileId,
@@ -2277,7 +2372,7 @@ app.get('/sign/purge-proof/:proofHash', async (req, res) => {
       return res.status(404).json({ error: 'proof_not_found' });
     }
     
-    // Return proof without internal MongoDB _id
+    // Return proof without the internal storage identifier.
     res.json({
       file_id: proof.file_id,
       filename: proof.filename,
@@ -2474,7 +2569,7 @@ app.post('/sign/:id/verify', signActLimiter, smallJson, async (req, res) => {
 app.post('/sign/:id/complete', signActLimiter, smallJson, async (req, res) => {
   try {
     const { id } = req.params;
-    const { token, document_hash, action, signature, pubkey, otrustProof } = req.body;
+    const { token, document_hash, action, signature, pubkey } = req.body;
     
     if (!id || !id.startsWith('sr_')) {
       return res.status(400).json({ error: 'invalid_id' });
@@ -2517,8 +2612,7 @@ app.post('/sign/:id/complete', signActLimiter, smallJson, async (req, res) => {
       signature,
       pubkey,
       ip,
-      userAgent,
-      otrustProof  // Optional: verified OTRUST Proof data for extra identity verification
+      userAgent
     });
 
     const db = getDb();
@@ -3272,16 +3366,28 @@ app.get('/health', async (req, res) => {
   try {
     const db = getDb();
     const count = await db.collection('claims').countDocuments();
+    const zkArtifacts = zkproof.getZkArtifactStatus();
     res.json({ 
       status: 'ok', 
       claims: count,
+      storage: {
+        engine: 'sqlite',
+        persistent: db.path !== ':memory:'
+      },
       features: {
         timestamp: config.features.timestamp,
         sign: config.features.sign,
         blockchain: config.features.blockchain,
         email: config.features.email,
+        trusted_identity_issuer: process.env.TRUSTED_IDENTITY_ISSUER_ENABLED === 'true',
+        identity_auth: AUTH_CAPABILITY_READY,
       },
-      version: '2.0.0'
+      zk_artifacts: {
+        status: zkArtifacts.status,
+        production_ready: zkArtifacts.productionReady,
+        compiler_version: zkArtifacts.compilerVersion
+      },
+      ...BUILD_METADATA
     });
   } catch (error) {
     res.status(500).json({ status: 'error', message: error.message });
@@ -3292,6 +3398,7 @@ app.get('/health', async (req, res) => {
 app.get('/status.json', async (req, res) => {
   try {
     const db = getDb();
+    const zkArtifacts = zkproof.getZkArtifactStatus();
     const claims = db.collection('claims');
     const signRequests = db.collection('sign_requests');
 
@@ -3310,13 +3417,21 @@ app.get('/status.json', async (req, res) => {
     res.json({
       status: 'operational',
       service: 'OTRUST',
-      version: '2.0.0',
+      ...BUILD_METADATA,
       updated_at: new Date().toISOString(),
       services: {
         api: 'ok',
         database: 'ok',
         email: config.features.email ? (sendEmail ? 'configured' : 'disabled') : 'off',
-        ots_processor: process.env.NODE_ENV === 'test' ? 'paused' : 'active'
+        ots_processor: process.env.NODE_ENV === 'test' ? 'paused' : 'active',
+        zk_proofs: zkArtifacts.productionReady ? 'ready' : 'ceremony_required',
+        identity_auth: AUTH_CAPABILITY_READY
+          ? 'ready'
+          : (
+              process.env.TRUSTED_IDENTITY_ISSUER_ENABLED === 'true'
+                ? 'client_registration_required'
+                : 'issuer_required'
+            )
       },
       metrics: {
         total_claims: totalClaims,
@@ -3689,16 +3804,16 @@ app.get('/email-status', (req, res) => {
 // Sanitize string input (prevent NoSQL injection)
 function sanitizeString(str) {
   if (typeof str !== 'string') return null;
-  // Remove any MongoDB operators and control characters
+  // Remove document-query operators and control characters.
   return str.replace(/[${}]/g, '').trim();
 }
 
-// Ensure value is a string for safe database queries (prevents NoSQL injection via object payloads)
+// Ensure values are strings before they reach internal document queries.
 // CodeQL: "Database query built from user-controlled sources" - this function addresses that
 function ensureString(val, maxLen = 500) {
   if (val === null || val === undefined) return null;
   if (typeof val !== 'string') return null;  // Reject objects, arrays, numbers - prevents { $gt: '' } attacks
-  const sanitized = val.replace(/[${}]/g, '').trim();  // Remove MongoDB operators
+  const sanitized = val.replace(/[${}]/g, '').trim();
   return sanitized.substring(0, maxLen);
 }
 
@@ -4137,8 +4252,19 @@ function startFilePurgeProcessor(intervalMs = 60000) {
 // PROOF API ROUTES (Zero-Knowledge Proofs)
 // ============================================
 
-// POST /api/proof/identity - Generate unique identity proof (Sybil-resistant)
+// POST /api/proof/identity - Retired self-attested identity compatibility route
 app.post('/api/proof/identity', bulkJson, async (req, res) => {
+  if (
+    process.env.NODE_ENV === 'production' ||
+    process.env.ENABLE_LEGACY_SELF_ATTESTED_IDENTITY !== 'true'
+  ) {
+    return res.status(410).json({
+      success: false,
+      error: 'trusted_identity_credential_required',
+      message: 'Self-attested identity registration is retired; a trusted issuer credential is required'
+    });
+  }
+
   try {
     const { personnummer, birthDate, pin, faceMatch, livenessVerified, recoveryToken } = req.body;
     
@@ -4196,8 +4322,8 @@ app.post('/api/proof/identity', bulkJson, async (req, res) => {
       });
     }
     
-    // Create hash of personnummer for duplicate detection (one-way, can't reverse)
-    const identityHash = crypto.createHash('sha256')
+    // Keyed duplicate token prevents offline enumeration if the database leaks.
+    const identityHash = crypto.createHmac('sha256', AUTH_TOKEN_SECRET)
       .update(`otrust-identity-v1:${sanitizedPnr}`)
       .digest('hex');
     
@@ -4280,7 +4406,7 @@ app.post('/api/proof/identity', bulkJson, async (req, res) => {
     // Store identity proof with encrypted secret
     const identityProof = {
       proofId,
-      identityHash, // For duplicate detection (can't reverse to personnummer)
+      identityHash, // Keyed duplicate token for explicitly enabled legacy development
       commitment,
       // PIN-encrypted secret (server never stores PIN or plaintext secret)
       encryptedSecret,
@@ -4291,9 +4417,10 @@ app.post('/api/proof/identity', bulkJson, async (req, res) => {
       lockedUntil: null,
       proofType: 'identity',
       verification: {
-        faceMatch: faceMatch || false,
-        livenessVerified: livenessVerified || false,
-        documentVerified: true
+        clientReportedFaceMatch: faceMatch === true,
+        clientReportedLiveness: livenessVerified === true,
+        documentVerified: false,
+        credentialBinding: 'none'
       },
       createdAt: new Date(),
       expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000) // 1 year
@@ -4305,9 +4432,10 @@ app.post('/api/proof/identity', bulkJson, async (req, res) => {
     await db.collection('proofs').insertOne({
       id: proofId,
       type: 'identity',
+      credential_binding: 'none',
       commitment,
       identityHash, // Include for revocation lookup
-      statement: 'Unique verified human identity',
+      statement: 'Legacy self-attested identity record',
       verification: identityProof.verification,
       isRecovery, // Mark if this was created via recovery
       createdAt: identityProof.createdAt,
@@ -4322,7 +4450,8 @@ app.post('/api/proof/identity', bulkJson, async (req, res) => {
       commitment,
       secret, // Shown once - user should save this as backup
       pinProtected: true, // Indicates secret is also PIN-protected on server
-      statement: 'Unique verified human identity',
+      statement: 'Legacy self-attested identity record',
+      credentialBinding: 'none',
       verification: identityProof.verification,
       shareUrl: `/proof/${proofId}`,
       walletUrl: `/api/proof/${proofId}/wallet`,
@@ -4359,6 +4488,14 @@ app.post('/api/proof/verify', bulkJson, async (req, res) => {
     const identityProof = await db.collection('identity_proofs').findOne({ proofId });
     if (!identityProof) {
       return res.status(404).json({ success: false, message: 'OTRUST Proof not found' });
+    }
+    const publicProof = await db.collection('proofs').findOne({ id: proofId });
+    if (publicProof?.credential_binding !== 'trusted_issuer') {
+      return res.status(403).json({
+        success: false,
+        error: 'trusted_identity_credential_required',
+        message: 'This legacy record is not a trusted identity credential'
+      });
     }
     
     // Check if locked due to failed attempts
@@ -4407,7 +4544,8 @@ app.post('/api/proof/verify', bulkJson, async (req, res) => {
         proofId,
         verifiedAt: new Date().toISOString(),
         verification: identityProof.verification,
-        statement: 'Unique verified human identity'
+        statement: 'Trusted issuer-bound identity',
+        credentialBinding: 'trusted_issuer'
       });
       
     } catch (decryptError) {
@@ -4444,121 +4582,17 @@ app.post('/api/proof/verify', bulkJson, async (req, res) => {
   }
 });
 
-// POST /api/proof/age - Generate age proof
-app.post('/api/proof/age', bulkJson, async (req, res) => {
-  try {
-    const { birthDate, minAge } = req.body;
-    
-    if (!birthDate || !minAge) {
-      return res.status(400).json({ success: false, error: 'Missing birthDate or minAge' });
-    }
-    
-    // Generate proof
-    const birth = new Date(birthDate);
-    const result = await zkproof.createSimpleAgeProof(birth, parseInt(minAge));
-    
-    // Store and create shareable link
-    const proofPackage = await zkproof.createProofPackage({
-      proofType: 'age',
-      proof: result.proof,
-      publicSignals: [],
-      commitment: result.commitment,
-      generatedAt: new Date().toISOString()
-    }, { minAge: parseInt(minAge) });
-    
-    res.json({
-      success: true,
-      commitment: result.commitment,
-      secret: result.secret,
-      shareUrl: proofPackage.shareUrl,
-      verifyUrl: proofPackage.verifyUrl,
-      proofId: proofPackage.proofId
-    });
-  } catch (error) {
-    console.error('[Proof] Age proof error:', error);
-    res.status(400).json({ success: false, error: error.message });
-  }
-});
+function browserProofRequired(req, res) {
+  return res.status(410).json({
+    success: false,
+    error: 'browser_proof_required',
+    message: 'Server-side proof generation was retired because private inputs must stay on the client'
+  });
+}
 
-// POST /api/proof/income - Generate income proof
-app.post('/api/proof/income', bulkJson, async (req, res) => {
-  try {
-    const { income, minIncome } = req.body;
-    
-    if (!income || !minIncome) {
-      return res.status(400).json({ success: false, error: 'Missing income or minIncome' });
-    }
-    
-    const incomeNum = parseInt(income);
-    const minIncomeNum = parseInt(minIncome);
-    
-    if (incomeNum < minIncomeNum) {
-      return res.status(400).json({ 
-        success: false, 
-        error: `Income ${incomeNum} is less than required ${minIncomeNum}` 
-      });
-    }
-    
-    // Generate simple income proof
-    const result = await zkproof.createSimpleIncomeProof(incomeNum, minIncomeNum);
-    
-    // Create proof package
-    const proofPackage = await zkproof.createProofPackage({
-      proofType: 'income',
-      proof: result.proof,
-      publicSignals: [],
-      commitment: result.commitment,
-      generatedAt: new Date().toISOString()
-    }, { minIncome: minIncomeNum });
-    
-    res.json({
-      success: true,
-      commitment: result.commitment,
-      secret: result.secret,
-      shareUrl: proofPackage.shareUrl,
-      verifyUrl: proofPackage.verifyUrl,
-      proofId: proofPackage.proofId
-    });
-  } catch (error) {
-    console.error('[Proof] Income proof error:', error);
-    res.status(400).json({ success: false, error: error.message });
-  }
-});
-
-// POST /api/proof/membership - Generate membership proof
-app.post('/api/proof/membership', bulkJson, async (req, res) => {
-  try {
-    const { memberId, organizationId, organizationName } = req.body;
-    
-    if (!memberId || !organizationId) {
-      return res.status(400).json({ success: false, error: 'Missing memberId or organizationId' });
-    }
-    
-    // Generate simple membership proof
-    const result = await zkproof.createSimpleMembershipProof(memberId, organizationId);
-    
-    // Create proof package
-    const proofPackage = await zkproof.createProofPackage({
-      proofType: 'membership',
-      proof: result.proof,
-      publicSignals: [],
-      commitment: result.commitment,
-      generatedAt: new Date().toISOString()
-    }, { organizationName: organizationName || 'Organization' });
-    
-    res.json({
-      success: true,
-      commitment: result.commitment,
-      secret: result.secret,
-      shareUrl: proofPackage.shareUrl,
-      verifyUrl: proofPackage.verifyUrl,
-      proofId: proofPackage.proofId
-    });
-  } catch (error) {
-    console.error('[Proof] Membership proof error:', error);
-    res.status(400).json({ success: false, error: error.message });
-  }
-});
+app.post('/api/proof/age', bulkJson, browserProofRequired);
+app.post('/api/proof/income', bulkJson, browserProofRequired);
+app.post('/api/proof/membership', bulkJson, browserProofRequired);
 
 // POST /api/proof/submit - Submit a browser-generated proof for storage
 app.post('/api/proof/submit', bulkJson, async (req, res) => {
@@ -4568,56 +4602,72 @@ app.post('/api/proof/submit', bulkJson, async (req, res) => {
       version, 
       proof, 
       publicSignals, 
-      commitment, 
-      statement,
-      minAge,
-      minIncome,
-      maxIncome,
-      generatedAt,
-      generatedLocally 
+      commitment
     } = req.body;
     
-    if (!proofType || !proof || !commitment) {
-      return res.status(400).json({ 
-        success: false, 
-        error: 'Missing required fields: proofType, proof, commitment' 
+    if (
+      !['age', 'income'].includes(proofType) ||
+      version !== 'groth16-v3' ||
+      !proof ||
+      !Array.isArray(publicSignals) ||
+      !commitment
+    ) {
+      return res.status(400).json({
+        success: false,
+        error: 'invalid_proof_submission',
+        message: 'A supported groth16-v3 proof, public signals, and commitment are required'
       });
     }
-    
-    // Verify the proof if it's a Groth16 proof
-    if (version === 'groth16-v3' && publicSignals) {
-      try {
-        const isValid = await zkproof.verifyGroth16Proof(proofType, proof, publicSignals);
-        if (!isValid) {
-          return res.status(400).json({ 
-            success: false, 
-            error: 'Proof verification failed' 
-          });
-        }
-        console.log(`[Proof] Browser-generated ${proofType} proof verified successfully`);
-      } catch (verifyErr) {
-        console.warn('[Proof] Could not verify proof:', verifyErr.message);
-        // Continue anyway - the proof came from trusted client code
-      }
+
+    const publicData = zkproof.parseGroth16PublicSignals(proofType, publicSignals);
+    if (!publicData || publicData.commitment !== String(commitment)) {
+      return res.status(400).json({
+        success: false,
+        error: 'invalid_public_signals',
+        message: 'Public signals are malformed, stale, or inconsistent with the commitment'
+      });
     }
+
+    const artifactStatus = zkproof.getZkArtifactStatus();
+    if (process.env.NODE_ENV === 'production' && !artifactStatus.productionReady) {
+      return res.status(503).json({
+        success: false,
+        error: 'zk_ceremony_incomplete',
+        message: 'Production ZK proof publication is disabled until the public ceremony is complete'
+      });
+    }
+
+    let isValid = false;
+    try {
+      isValid = await zkproof.verifyGroth16Proof(proofType, proof, publicSignals);
+    } catch (error) {
+      console.warn(`[Proof] Groth16 verification rejected: ${error.message}`);
+    }
+    if (!isValid) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'proof_verification_failed'
+      });
+    }
+    console.log(`[Proof] Browser-generated ${proofType} proof verified successfully`);
     
     // Build metadata
-    const metadata = {};
-    if (minAge) metadata.minAge = minAge;
-    if (minIncome) metadata.minIncome = minIncome;
-    if (maxIncome) metadata.maxIncome = maxIncome;
+    const metadata = {
+      ...publicData.metadata,
+      artifactStatus: artifactStatus.status,
+      compilerVersion: artifactStatus.compilerVersion,
+      submissionChannel: 'proof_submission_api'
+    };
     
     // Create proof package for storage
     const proofPackage = await zkproof.createProofPackage({
       proofType,
       proof,
-      publicSignals: publicSignals || [],
+      publicSignals,
       commitment,
-      statement,
-      version: version || 'groth16-v3',
-      generatedLocally: generatedLocally || false,
-      generatedAt: generatedAt || new Date().toISOString()
-    }, metadata);
+      statement: publicData.statement,
+      version
+    }, metadata, `${req.protocol}://${req.get('host')}`);
     
     console.log(`[Proof] Stored browser-generated ${proofType} proof: ${proofPackage.proofId}`);
     
@@ -4646,16 +4696,22 @@ app.get('/api/proof/:proofId', async (req, res) => {
     }
     
     // Return public info - handle both old format and new identity format
+    const legacyIdentity = proof.type === 'identity' && proof.credential_binding !== 'trusted_issuer';
     res.json({
       success: true,
       proof: {
         id: proof.id,
         type: proof.type || proof.proof_type || 'unknown',
-        statement: proof.statement || proof.proof?.statement,
+        statement: legacyIdentity
+          ? 'Legacy self-attested identity record'
+          : proof.statement || proof.proof?.statement,
         commitment: proof.commitment,
         claim: proof.claim || proof.metadata,
-        publicSignals: proof.publicSignals || [],
-        verification: proof.verification,
+        publicSignals: proof.publicSignals || proof.public_signals || [],
+        verification: legacyIdentity
+          ? { identityVerified: false, credentialBinding: 'none' }
+          : proof.verification,
+        credentialBinding: proof.credential_binding || 'none',
         identityHash: proof.identityHash ? proof.identityHash.substring(0, 16) + '...' : null,
         status: proof.status || 'active',
         createdAt: proof.createdAt || proof.created_at,
@@ -4682,6 +4738,14 @@ app.post('/api/proof/:proofId/verify', bulkJson, async (req, res) => {
       if (!proof) {
         return res.json({ valid: false, error: 'Proof not found' });
       }
+
+      if (proof.credential_binding !== 'trusted_issuer') {
+        return res.status(422).json({
+          valid: false,
+          error: 'trusted_identity_credential_required',
+          credentialBinding: proof.credential_binding || 'none'
+        });
+      }
       
       // Identity proofs are valid if they exist and aren't revoked
       if (proof.status === 'revoked') {
@@ -4698,6 +4762,8 @@ app.post('/api/proof/:proofId/verify', bulkJson, async (req, res) => {
       return res.json({ 
         valid: true, 
         proofType: 'identity',
+        credentialBinding: 'trusted_issuer',
+        issuer: proof.issuer || null,
         verification: proof.verification,
         createdAt: proof.createdAt
       });
@@ -4728,6 +4794,12 @@ app.get('/api/proof/:proofId/wallet', async (req, res) => {
     if (!proof) {
       return res.status(404).json({ error: 'Proof not found' });
     }
+    if (proof.type !== 'identity' || proof.credential_binding !== 'trusted_issuer') {
+      return res.status(410).json({
+        error: 'trusted_identity_credential_required',
+        message: 'Wallet export requires an issuer-bound identity credential'
+      });
+    }
     
     // Generate wallet-compatible data
     const walletData = {
@@ -4735,7 +4807,7 @@ app.get('/api/proof/:proofId/wallet', async (req, res) => {
       type: proof.type || 'identity',
       statement: proof.statement || 'Verified unique identity',
       commitment: proof.commitment?.substring(0, 16) + '...',
-      verifyUrl: `https://otrust.eu/proof/${proofId}`,
+      verifyUrl: `https://www.otrust.eu/proof/${proofId}`,
       createdAt: proof.createdAt || proof.created_at,
       expiresAt: proof.expiresAt
     };
@@ -4822,6 +4894,16 @@ app.get('/api/qr', async (req, res) => {
 
 // GET /api/proof/:id/wallet/pkpass - Generate actual .pkpass file for Apple Wallet
 app.get('/api/proof/:proofId/wallet/pkpass', async (req, res) => {
+  if (
+    process.env.NODE_ENV === 'production' ||
+    process.env.ENABLE_UNSIGNED_PKPASS_DEV !== 'true'
+  ) {
+    return res.status(501).json({
+      error: 'wallet_pass_signing_not_configured',
+      message: 'Apple Wallet export is unavailable until certificate-backed pass signing is implemented'
+    });
+  }
+
   try {
     const { proofId } = req.params;
     
@@ -4830,6 +4912,12 @@ app.get('/api/proof/:proofId/wallet/pkpass', async (req, res) => {
     
     if (!proof) {
       return res.status(404).json({ error: 'Proof not found' });
+    }
+    if (proof.type !== 'identity' || proof.credential_binding !== 'trusted_issuer') {
+      return res.status(410).json({
+        error: 'trusted_identity_credential_required',
+        message: 'Wallet export requires an issuer-bound identity credential'
+      });
     }
     
     // Generate the pass.json content
@@ -4898,7 +4986,7 @@ app.get('/api/proof/:proofId/wallet/pkpass', async (req, res) => {
     res.setHeader('Content-Type', 'application/vnd.apple.pkpass');
     res.setHeader('Content-Disposition', `attachment; filename="otrust-identity-${proofId}.pkpass"`);
     
-    const archive = archiver('zip', { zlib: { level: 9 } });
+    const archive = new ZipArchive({ zlib: { level: 9 } });
     
     archive.on('error', (err) => {
       console.error('[PKPass] Archive error:', err);
@@ -4949,6 +5037,16 @@ app.get('/api/proof/:proofId/wallet/pkpass', async (req, res) => {
 
 // Revoke identity proof (for lost/compromised cases)
 app.post('/api/proof/:proofId/revoke', bulkJson, async (req, res) => {
+  if (
+    process.env.NODE_ENV === 'production' ||
+    process.env.ENABLE_UNSAFE_LEGACY_IDENTITY_REVOCATION !== 'true'
+  ) {
+    return res.status(410).json({
+      error: 'issuer_revocation_required',
+      message: 'Credential revocation requires an authenticated issuer integration'
+    });
+  }
+
   try {
     const { proofId } = req.params;
     
@@ -4963,6 +5061,13 @@ app.post('/api/proof/:proofId/revoke', bulkJson, async (req, res) => {
     // Only identity proofs can be revoked
     if (proof.type !== 'identity') {
       return res.status(400).json({ success: false, error: 'Only identity proofs can be revoked' });
+    }
+
+    if (proof.credential_binding !== 'trusted_issuer') {
+      return res.status(403).json({
+        error: 'trusted_identity_credential_required',
+        message: 'This legacy record cannot be used for authentication'
+      });
     }
     
     // Check if already revoked
@@ -5016,6 +5121,16 @@ app.post('/api/proof/:proofId/revoke', bulkJson, async (req, res) => {
 
 // Email identity backup to user
 app.post('/api/proof/email-backup', bulkJson, async (req, res) => {
+  if (
+    process.env.NODE_ENV === 'production' ||
+    process.env.ENABLE_UNSAFE_LEGACY_IDENTITY_BACKUP !== 'true'
+  ) {
+    return res.status(410).json({
+      error: 'legacy_identity_backup_retired',
+      message: 'Client-supplied identity backup email is retired'
+    });
+  }
+
   try {
     const { email, proofId, secret, commitment, shareUrl } = req.body;
     
@@ -5143,8 +5258,8 @@ app.delete('/api/admin/clear-identities', async (req, res) => {
 });
 
 // ============================================
-// Auth Service - "Login with OTRUST"
-// Allows third-party apps to authenticate users via their OTRUST Identity Proof
+// Auth Service - issuer-bound partner authentication
+// Production challenges remain disabled until a trusted issuer is configured.
 // ============================================
 
 const AUTH_BRANDING_DEFAULTS = Object.freeze({
@@ -5160,7 +5275,7 @@ const AUTH_BRANDING_DEFAULTS = Object.freeze({
   borderRadius: 8,
   spacingScale: 'default',
   headline: 'Login with OTRUST',
-  subhead: 'Secure authentication with your OTRUST identity proof.',
+  subhead: 'Requires an issuer-bound OTRUST identity credential.',
   footerText: 'Powered by OTRUST',
   infoBlurb: '',
   cookieBannerText: '',
@@ -5185,9 +5300,9 @@ const HEMSTED_AUTH_THEME = Object.freeze({
   borderRadius: 8,
   spacingScale: 'default',
   headline: 'Logga in p\u00e5 Hemsted',
-  subhead: 'S\u00e4ker inloggning med OTRUST Proof',
-  footerText: '\u00a9 Hemsted AB \u00b7 Identity-fl\u00f6de s\u00e4krat av OTRUST',
-  infoBlurb: 'Verifieringen sker p\u00e5 otrust.eu. OTRUST hanterar identity-fl\u00f6det och skickar dig tillbaka till Hemsted efter verifiering.',
+  subhead: 'Kr\u00e4ver en utf\u00e4rdarbunden OTRUST-legitimation',
+  footerText: '\u00a9 Hemsted AB \u00b7 Integrationsf\u00f6rhandsvisning fr\u00e5n OTRUST',
+  infoBlurb: 'Integrationen kan granskas p\u00e5 otrust.eu. Utf\u00e4rdning av betrodda identitetsuppgifter \u00e4r inte tillg\u00e4nglig \u00e4nnu.',
   cookieBannerText: '',
   allowedIdentityMethods: ['proof'],
   autoRedirectSeconds: 3,
@@ -5200,7 +5315,7 @@ const BUILTIN_AUTH_BRANDING = Object.freeze({
     hemsted_dark_staging: Object.freeze({
       ...HEMSTED_AUTH_THEME,
       themeId: 'hemsted_dark_staging',
-      infoBlurb: 'Staging theme. Verifieringen sker p\u00e5 otrust.eu och skickar dig tillbaka till Hemsted efter verifiering.'
+      infoBlurb: 'Stagingtema f\u00f6r integrationsgranskning. Utf\u00e4rdning av betrodda identitetsuppgifter \u00e4r inte tillg\u00e4nglig \u00e4nnu.'
     })
   }
 });
@@ -5484,6 +5599,8 @@ authChallengeCleanupTimer.unref?.();
 
 // POST /api/v1/auth/challenge - Create login challenge for third-party app
 app.post('/api/v1/auth/challenge', bulkJson, async (req, res) => {
+  if (!requireProductionAuthCapability(res)) return;
+
   try {
     const { clientId, redirectUri, scope, state } = req.body;
     const safeClientId = sanitizeClientId(clientId);
@@ -5492,10 +5609,11 @@ app.post('/api/v1/auth/challenge', bulkJson, async (req, res) => {
     const safeState = state ? ensureString(state, 500) : null;
     let safeThemeId;
     
-    if (!safeClientId || !safeRedirectUri || (state && safeState === null)) {
+    const missingRequiredState = process.env.NODE_ENV === 'production' && !safeState;
+    if (!safeClientId || !safeRedirectUri || (state && !safeState) || missingRequiredState) {
       return res.status(400).json({ 
         error: 'invalid_request',
-        message: 'Missing or invalid required fields: clientId, redirectUri'
+        message: 'Missing or invalid required fields: clientId, redirectUri, state'
       });
     }
 
@@ -5567,6 +5685,13 @@ app.post('/api/v1/auth/challenge', bulkJson, async (req, res) => {
       return res.status(400).json({ 
         error: 'invalid_redirect_uri',
         message: 'redirectUri must be a valid URL'
+      });
+    }
+
+    if (!isRegisteredAuthRedirect(safeClientId, safeRedirectUri)) {
+      return res.status(400).json({
+        error: 'unauthorized_client',
+        message: 'The client and redirect URI are not registered'
       });
     }
     
@@ -5752,6 +5877,8 @@ app.put([
 
 // POST /api/v1/auth/prove - User proves identity ownership
 app.post('/api/v1/auth/prove', bulkJson, async (req, res) => {
+  if (!requireProductionAuthCapability(res)) return;
+
   try {
     const { challengeId, proofId, pin, secret } = req.body;
     
@@ -5812,6 +5939,13 @@ app.post('/api/v1/auth/prove', bulkJson, async (req, res) => {
       return res.status(400).json({ 
         error: 'invalid_proof_type',
         message: 'Only identity proofs can be used for authentication'
+      });
+    }
+
+    if (proof.credential_binding !== 'trusted_issuer') {
+      return res.status(403).json({
+        error: 'trusted_identity_credential_required',
+        message: 'This record is not backed by a trusted identity issuer'
       });
     }
     
@@ -5926,7 +6060,9 @@ app.post('/api/v1/auth/prove', bulkJson, async (req, res) => {
       scope: challenge.scope,
       iat: Math.floor(Date.now() / 1000),
       exp: Math.floor(Date.now() / 1000) + 3600, // 1 hour
-      nonce: challenge.challenge
+      nonce: challenge.challenge,
+      credential_binding: 'trusted_issuer',
+      issuer: proof.issuer || null
     };
     
     // Create a signed token (HMAC with server secret)
@@ -5974,6 +6110,8 @@ app.post('/api/v1/auth/prove', bulkJson, async (req, res) => {
 
 // POST /api/v1/auth/verify - Third-party verifies auth token
 app.post('/api/v1/auth/verify', bulkJson, async (req, res) => {
+  if (!requireProductionAuthCapability(res)) return;
+
   try {
     const { token } = req.body;
     
@@ -6031,6 +6169,12 @@ app.post('/api/v1/auth/verify', bulkJson, async (req, res) => {
     // SECURITY: payload.sub comes from signed JWT, sanitize for defense in depth
     const safeProofId = sanitizeProofId(payload.sub);
     const proof = safeProofId ? await db.collection('proofs').findOne({ id: safeProofId }) : null;
+    if (!proof || proof.credential_binding !== 'trusted_issuer') {
+      return res.status(403).json({
+        error: 'trusted_identity_credential_required',
+        message: 'The token is not backed by a trusted issuer credential'
+      });
+    }
     
     console.log(`[Auth] Token verified for proof: ${safeProofId || 'invalid'}`);
     
@@ -6044,7 +6188,9 @@ app.post('/api/v1/auth/verify', bulkJson, async (req, res) => {
       issuedAt: new Date(payload.iat * 1000).toISOString(),
       expiresAt: new Date(payload.exp * 1000).toISOString(),
       identity: proof ? {
-        verified: true,
+        verified: proof.credential_binding === 'trusted_issuer',
+        credentialBinding: proof.credential_binding || 'none',
+        issuer: proof.issuer || null,
         verification: proof.verification,
         createdAt: proof.createdAt
       } : null
@@ -6058,6 +6204,8 @@ app.post('/api/v1/auth/verify', bulkJson, async (req, res) => {
 
 // GET /api/v1/auth/userinfo - Get authenticated user info (with valid token in header)
 app.get('/api/v1/auth/userinfo', async (req, res) => {
+  if (!requireProductionAuthCapability(res)) return;
+
   try {
     // Extract token from Authorization header
     const authHeader = req.headers.authorization;
@@ -6103,12 +6251,20 @@ app.get('/api/v1/auth/userinfo', async (req, res) => {
     if (!proof) {
       return res.status(404).json({ error: 'proof_not_found' });
     }
+    if (proof.credential_binding !== 'trusted_issuer') {
+      return res.status(403).json({
+        error: 'trusted_identity_credential_required',
+        message: 'This legacy record is not a trusted identity credential'
+      });
+    }
     
     await incrementUsageCounter('auth_userinfo_verifications');
 
     res.json({
       proofId: safeProofId,
       verified: true,
+      credentialBinding: 'trusted_issuer',
+      issuer: proof.issuer || null,
       identityHash: proof.identityHash ? proof.identityHash.substring(0, 16) + '...' : null,
       verification: proof.verification,
       createdAt: proof.createdAt,
@@ -6132,7 +6288,7 @@ app.use((req, res) => {
 // Start server (can be imported for testing)
 export async function startServer(port = PORT) {
   await createDb();
-  console.log('[DB] MongoDB initialized');
+  console.log('[DB] SQLite initialized');
 
   // Set up email notification callback for confirmed timestamps
   setOnConfirmationCallback(notifyClaimConfirmed);
@@ -6183,7 +6339,7 @@ export async function startServer(port = PORT) {
         console.log(`[otrust] Local: http://localhost:${address.port}`);
       }
 
-      console.log('[otrust] No IP logging. Zero-knowledge architecture.');
+      console.log('[otrust] Request IPs are not written to application logs.');
       if (config.features.blockchain) console.log('[otrust] OpenTimestamps Bitcoin anchoring enabled.');
       if (config.features.sign) console.log('[otrust] Document signing enabled.');
       if (config.features.email && sendEmail) console.log('[otrust] Email notifications enabled.');

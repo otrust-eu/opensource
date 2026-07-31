@@ -97,6 +97,10 @@ export async function createSignRequest({
   if (parties.length > 20) {
     throw new Error('Maximum 20 parties allowed');
   }
+
+  if (parties.some((party) => party.requireOtrustProof)) {
+    throw new Error('Trusted issuer-bound identity proof requirements are not available yet');
+  }
   
   // Create party entries with unique tokens
   const partyEntries = parties.map((party, index) => ({
@@ -550,7 +554,7 @@ export async function verifyDocumentHash(signId, token, providedHash) {
 /**
  * Complete a signature/approval
  */
-export async function completeSignature({ signId, token, documentHash, action, signature, pubkey, ip, userAgent, otrustProof }) {
+export async function completeSignature({ signId, token, documentHash, action, signature, pubkey, ip, userAgent }) {
   const db = getDb();
   const now = new Date();
   
@@ -605,9 +609,7 @@ export async function completeSignature({ signId, token, documentHash, action, s
   
   // Check if OTRUST Proof is required for this party (set by sender)
   if (party.requireOtrustProof && action !== 'declined') {
-    if (!otrustProof || !otrustProof.valid || !otrustProof.proofId) {
-      throw new Error('OTRUST Proof verification is required by the sender. Please verify with your Proof ID and PIN.');
-    }
+    throw new Error('Trusted issuer-bound identity verification is required but unavailable');
   }
   
   // Verify cryptographic signature for signers and approvers
@@ -621,17 +623,6 @@ export async function completeSignature({ signId, token, documentHash, action, s
     throw new Error('Cryptographic signature required for signing/approving');
   }
   
-  // Prepare OTRUST Proof data if provided (sanitize - only include safe fields)
-  let otrustProofData = null;
-  if (otrustProof && otrustProof.valid && otrustProof.proofId) {
-    otrustProofData = {
-      proofId: otrustProof.proofId,
-      verifiedAt: otrustProof.verifiedAt,
-      verification: otrustProof.verification || {},
-      statement: 'Unique verified human identity'
-    };
-  }
-  
   // Update the party's status with cryptographic proof
   await db.collection('sign_requests').updateOne(
     { id: signId, 'parties.token': token },
@@ -642,8 +633,7 @@ export async function completeSignature({ signId, token, documentHash, action, s
         'parties.$.signature': signature || null,
         'parties.$.pubkey': pubkey || null,
         'parties.$.ip_hash': ip ? privacyHash(ip) : null,
-        'parties.$.user_agent_hash': userAgent ? privacyHash(userAgent) : null,
-        'parties.$.otrustProof': otrustProofData  // Optional: verified OTRUST Proof
+        'parties.$.user_agent_hash': userAgent ? privacyHash(userAgent) : null
       } 
     }
   );

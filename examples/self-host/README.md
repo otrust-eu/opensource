@@ -25,7 +25,7 @@ Open `http://localhost:3000/developers.html` — create org, API key, webhook.
 ## Production checklist
 
 1. Set `ADMIN_KEY` and `AUTH_SECRET` to separate strong random secrets (32+ bytes)
-2. Use managed MongoDB or a replicated cluster
+2. Back up the `otrust_data` Docker volume and test restores
 3. Set `BASE_URL` to your public HTTPS URL
 4. **Do not** set `HOSTED_MODE` — plan limits apply only on otrust.eu hosted service
 5. Point CI at your instance (`secrets.OTRUST_API` + `secrets.OTRUST_API_KEY`)

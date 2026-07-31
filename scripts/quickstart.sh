@@ -15,7 +15,7 @@ if ! command -v docker >/dev/null 2>&1; then
   exit 1
 fi
 
-echo "→ Starting OTRUST (MongoDB + app) on http://localhost:${PORT}"
+echo "→ Starting OTRUST on http://localhost:${PORT}"
 ADMIN_KEY="$ADMIN_KEY" AUTH_SECRET="$AUTH_SECRET" PORT="$PORT" docker compose up -d --build
 
 echo "→ Waiting for health check..."

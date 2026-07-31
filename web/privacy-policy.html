@@ -162,28 +162,28 @@
 
     <section class="section">
       <h2>Data Collection - ID</h2>
-      <p>ID creates commitment-based identity packages with local-first checks.</p>
+      <p>The Proof Lab creates self-attested age and income range proofs locally. It does not inspect identity documents or issue identity credentials.</p>
       <div class="comparison">
         <div class="box box-red">
           <h3>We do not receive</h3>
           <ul>
-            <li>Raw ID images or selfies as permanent server records</li>
-            <li>Your full ID number in plain text</li>
+            <li>The private date of birth or exact income used in a range proof</li>
+            <li>Raw ID images or selfies through the active Proof Lab flow</li>
             <li>Reusable biometric templates</li>
           </ul>
         </div>
         <div class="box box-green">
           <h3>We store</h3>
           <ul>
-            <li>Commitment-bound ID package</li>
-            <li>Verification metadata and ID identifiers</li>
-            <li>One-way uniqueness hash when required for anti-sybil checks</li>
+            <li>The Groth16 proof and its public signals</li>
+            <li>The public commitment and proof type</li>
+            <li>Server-derived verification and submission metadata</li>
           </ul>
         </div>
       </div>
       <div class="info-card">
         <h4>Local processing model</h4>
-        <p>Sensitive checks run in your browser before the ID package is assembled. Server-side storage focuses on verifiable commitments and metadata.</p>
+        <p>The private value is used by the browser to generate a proof and is excluded from the publish request. A valid proof does not establish that the private value came from a trusted issuer.</p>
       </div>
     </section>
 
@@ -191,7 +191,8 @@
       <h2>Data Collection - Auth</h2>
       <ul class="rights-list">
         <li><strong>Challenge data:</strong> client identifier, redirect URI, state, and expiry for short-lived Auth sessions.</li>
-        <li><strong>Verification result:</strong> ID outcome and callback tokens bound to the challenge, state, redirect URI, and expiry.</li>
+        <li><strong>Verification result:</strong> trusted issuer credential status and callback tokens bound to the challenge, state, redirect URI, and expiry.</li>
+        <li><strong>Availability:</strong> production Auth challenges remain disabled until a trusted issuer is configured.</li>
         <li><strong>Partner context:</strong> approved branding fields for hosted pages, without arbitrary partner scripts.</li>
       </ul>
     </section>

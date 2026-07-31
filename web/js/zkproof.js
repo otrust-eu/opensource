@@ -10,8 +10,7 @@
  * - WASM circuits compiled from Circom
  */
 
-// CDN for snarkjs - loaded dynamically
-const SNARKJS_CDN = 'https://cdn.jsdelivr.net/npm/snarkjs@0.7.4/build/snarkjs.min.js';
+const SNARKJS_PATH = '/js/snarkjs.min.js';
 
 // Circuit paths (relative to web root)
 const CIRCUITS = {
@@ -30,7 +29,7 @@ const CIRCUITS = {
 // Global state
 let snarkjsLoaded = false;
 let poseidonLoaded = false;
-let poseidonFunc = null;
+let poseidonFunctions = null;
 let circuitsLoaded = {
   age: { vkey: null },
   income: { vkey: null }
@@ -51,7 +50,7 @@ async function loadSnarkJS() {
     }
     
     const script = document.createElement('script');
-    script.src = SNARKJS_CDN;
+    script.src = SNARKJS_PATH;
     script.onload = () => {
       snarkjsLoaded = true;
       console.log('✅ snarkjs loaded');
@@ -66,50 +65,13 @@ async function loadSnarkJS() {
  * Load Poseidon hash function
  */
 async function loadPoseidon() {
-  if (poseidonLoaded && poseidonFunc) return poseidonFunc;
-  
-  // Try loading from esm.sh (supports dynamic import)
-  try {
-    console.log(' Loading circomlibjs via esm.sh...');
-    const circomlibjs = await import('https://esm.sh/circomlibjs@0.1.7');
-    poseidonFunc = await circomlibjs.buildPoseidon();
-    poseidonLoaded = true;
-    console.log('✅ Poseidon loaded from esm.sh');
-    return poseidonFunc;
-  } catch (e1) {
-    console.warn('Failed to load from esm.sh:', e1.message);
+  if (poseidonLoaded && poseidonFunctions) return poseidonFunctions;
+  if (!window.PoseidonLite?.poseidon2 || !window.PoseidonLite?.poseidon4) {
+    throw new Error('Failed to load the local Poseidon implementation');
   }
-  
-  // Fallback: try loading as script from CDN
-  const cdnUrls = [
-    'https://unpkg.com/circomlibjs@0.1.7/build/circomlibjs.umd.js',
-    'https://cdn.jsdelivr.net/npm/circomlibjs@0.1.7/build/circomlibjs.umd.js'
-  ];
-  
-  for (const url of cdnUrls) {
-    try {
-      await new Promise((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = url;
-        script.onload = resolve;
-        script.onerror = reject;
-        document.head.appendChild(script);
-      });
-      
-      // Check various possible global names
-      const circom = window.circomlibjs || window.CircomLib || window.circomlib;
-      if (circom && circom.buildPoseidon) {
-        poseidonFunc = await circom.buildPoseidon();
-        poseidonLoaded = true;
-        console.log('✅ Poseidon loaded from', url);
-        return poseidonFunc;
-      }
-    } catch (e) {
-      console.warn('Failed to load from', url);
-    }
-  }
-  
-  throw new Error('Failed to load Poseidon - ensure circomlibjs is available');
+  poseidonFunctions = window.PoseidonLite;
+  poseidonLoaded = true;
+  return poseidonFunctions;
 }
 
 /**
@@ -117,8 +79,10 @@ async function loadPoseidon() {
  */
 async function poseidonHash(...inputs) {
   const poseidon = await loadPoseidon();
-  const hash = poseidon(inputs.map(x => BigInt(x)));
-  return poseidon.F.toString(hash);
+  const values = inputs.map(x => BigInt(x));
+  if (values.length === 2) return poseidon.poseidon2(values).toString();
+  if (values.length === 4) return poseidon.poseidon4(values).toString();
+  throw new Error(`Unsupported Poseidon input count: ${values.length}`);
 }
 
 /**
@@ -180,18 +144,32 @@ function generateSecret() {
  */
 async function generateAgeProofBrowser(birthDate, minAge) {
   const snarkjs = await loadSnarkJS();
-  
-  // Parse birth date
-  const birth = new Date(birthDate);
-  const birthYear = birth.getFullYear();
-  const birthMonth = birth.getMonth() + 1;
-  const birthDay = birth.getDate();
+
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(birthDate))) {
+    throw new Error('Birth date must use YYYY-MM-DD');
+  }
+  if (!Number.isInteger(minAge) || minAge < 0 || minAge > 150) {
+    throw new Error('Minimum age must be an integer between 0 and 150');
+  }
+
+  const birth = new Date(`${birthDate}T00:00:00Z`);
+  const birthYear = birth.getUTCFullYear();
+  const birthMonth = birth.getUTCMonth() + 1;
+  const birthDay = birth.getUTCDate();
+  if (
+    Number.isNaN(birth.getTime()) ||
+    birthYear !== Number(birthDate.slice(0, 4)) ||
+    birthMonth !== Number(birthDate.slice(5, 7)) ||
+    birthDay !== Number(birthDate.slice(8, 10))
+  ) {
+    throw new Error('Birth date is invalid');
+  }
   
   // Calculate current age
   const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth() + 1;
-  const currentDay = now.getDate();
+  const currentYear = now.getUTCFullYear();
+  const currentMonth = now.getUTCMonth() + 1;
+  const currentDay = now.getUTCDate();
   
   let currentAge = currentYear - birthYear;
   if (currentMonth < birthMonth || (currentMonth === birthMonth && currentDay < birthDay)) {
@@ -247,9 +225,8 @@ async function generateAgeProofBrowser(birthDate, minAge) {
     
     console.log('✅ Local verification passed');
     
-    // Extract commitment from public signals
-    // Public signals: [commitment, minAge, currentYear, currentMonth, currentDay]
-    const commitment = publicSignals[0];
+    // Public signals: [valid, currentYear, currentMonth, currentDay, minAge, commitment]
+    const commitment = publicSignals[5];
     
     return {
       success: true,
@@ -258,8 +235,8 @@ async function generateAgeProofBrowser(birthDate, minAge) {
       proof: proof,
       publicSignals: publicSignals,
       commitment: commitment,
-      statement: `Age ≥ ${minAge}`,
-      secret: secret.toString(16), // Hex for display
+      statement: `Self-attested age ≥ ${minAge}`,
+      selfAttested: true,
       minAge: minAge,
       generatedAt: new Date().toISOString(),
       generatedLocally: true
@@ -267,10 +244,9 @@ async function generateAgeProofBrowser(birthDate, minAge) {
   } catch (err) {
     console.error('Proof generation error:', err);
     
-    // Fall back to server-side generation if circuit files not available
     if (err.message.includes('fetch') || err.message.includes('Failed') || err.message.includes('404')) {
-      console.log('⚠️ Falling back to server-side proof generation...');
-      return null; // Signal to use server
+      console.log('⚠️ Local proof generation is unavailable');
+      return null;
     }
     
     throw err;
@@ -287,8 +263,19 @@ async function generateAgeProofBrowser(birthDate, minAge) {
  */
 async function generateIncomeProofBrowser(income, minIncome, maxIncome = 10000000) {
   const snarkjs = await loadSnarkJS();
-  
-  // Validate
+
+  if (
+    !Number.isSafeInteger(income) ||
+    !Number.isSafeInteger(minIncome) ||
+    !Number.isSafeInteger(maxIncome) ||
+    income < 0 ||
+    minIncome < 0 ||
+    maxIncome < minIncome ||
+    maxIncome > 4294967295
+  ) {
+    throw new Error('Income values must be whole numbers in a valid 32-bit range');
+  }
+
   if (income < minIncome) {
     throw new Error(`Income ${income} is less than required ${minIncome}`);
   }
@@ -299,13 +286,15 @@ async function generateIncomeProofBrowser(income, minIncome, maxIncome = 1000000
   
   // Generate cryptographic secret
   const secret = generateSecret();
+  const commitment = await poseidonHash(income, secret);
   
   // Create input for circuit
   const input = {
     income: income,
     minIncome: minIncome,
     maxIncome: maxIncome,
-    secret: secret.toString()
+    secret: secret.toString(),
+    commitment: commitment
   };
   
   console.log(' Generating income proof in browser...');
@@ -328,8 +317,8 @@ async function generateIncomeProofBrowser(income, minIncome, maxIncome = 1000000
       throw new Error('Local verification failed');
     }
     
-    // Public signals: [commitment, minIncome, maxIncome]
-    const commitment = publicSignals[0];
+    // Public signals: [valid, minIncome, maxIncome, commitment]
+    const publicCommitment = publicSignals[3];
     
     return {
       success: true,
@@ -337,9 +326,9 @@ async function generateIncomeProofBrowser(income, minIncome, maxIncome = 1000000
       version: 'groth16-v3',
       proof: proof,
       publicSignals: publicSignals,
-      commitment: commitment,
-      statement: `Income ≥ $${minIncome.toLocaleString()}`,
-      secret: secret.toString(16),
+      commitment: publicCommitment,
+      statement: `Self-attested committed value between $${minIncome.toLocaleString()} and $${maxIncome.toLocaleString()}`,
+      selfAttested: true,
       minIncome: minIncome,
       maxIncome: maxIncome,
       generatedAt: new Date().toISOString(),
@@ -349,7 +338,7 @@ async function generateIncomeProofBrowser(income, minIncome, maxIncome = 1000000
     console.error('Income proof error:', err);
     
     if (err.message.includes('fetch') || err.message.includes('Failed')) {
-      console.log('⚠️ Falling back to server-side proof...');
+      console.log('⚠️ Local proof generation is unavailable');
       return null;
     }
     
@@ -379,10 +368,22 @@ async function verifyProofBrowser(proofType, proof, publicSignals) {
  * @returns {Object} - Server response with proof ID and share URL
  */
 async function submitProofToServer(proofData) {
+  if (!proofData || typeof proofData !== 'object') {
+    throw new Error('Proof data is required');
+  }
+
+  const publicProof = {
+    proofType: proofData.proofType,
+    version: proofData.version,
+    proof: proofData.proof,
+    publicSignals: proofData.publicSignals,
+    commitment: proofData.commitment
+  };
+
   const response = await fetch('/api/proof/submit', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(proofData)
+    body: JSON.stringify(publicProof)
   });
   
   const data = await response.json();

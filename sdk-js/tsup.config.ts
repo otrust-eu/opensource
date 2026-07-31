@@ -7,7 +7,6 @@ export default defineConfig({
     sign: 'src/sign.ts',
     proof: 'src/proof.ts',
     auth: 'src/auth.ts',
-    face: 'src/face.ts',
     admin: 'src/admin.ts',
   },
   format: ['esm', 'cjs'],

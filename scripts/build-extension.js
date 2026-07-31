@@ -7,7 +7,7 @@
 import { createWriteStream, existsSync, mkdirSync, copyFileSync, rmSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import archiver from 'archiver';
+import { ZipArchive } from 'archiver';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -44,7 +44,7 @@ for (const file of EXTENSION_FILES) {
 console.log('📦 Creating extension.zip...');
 await new Promise((resolve, reject) => {
   const output = createWriteStream(ZIP);
-  const archive = archiver('zip', { zlib: { level: 9 } });
+  const archive = new ZipArchive({ zlib: { level: 9 } });
   output.on('close', resolve);
   archive.on('error', reject);
   archive.pipe(output);

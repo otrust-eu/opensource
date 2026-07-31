@@ -1,435 +1,236 @@
-"""
-OTRUST Auth Service.
-
-OAuth2/OpenID Connect authentication with zero-knowledge proofs.
-"""
+"""Issuer-bound OTRUST partner authentication."""
 
 from __future__ import annotations
-from dataclasses import dataclass, field
-from typing import Literal
-from urllib.parse import urlencode
+
 import secrets
+from dataclasses import dataclass
+from typing import Any, Literal, cast
+from urllib.parse import parse_qs, urlparse
 
 from .client import get_client
-from .result import Result, OTrustError, ok, err
+from .result import OTrustError, Result, err, ok
 
-
-Scope = Literal["identity", "age:18", "age:21", "membership"]
+AuthScope = Literal["identity", "email", "verification"]
 
 
 @dataclass
-class Challenge:
-    """Challenge for passwordless auth."""
+class AuthChallenge:
+    """Short-lived hosted Auth challenge."""
 
     challenge_id: str
-    """Unique challenge ID"""
-
     challenge: str
-    """Challenge string to sign"""
-
-    created_at: str
-    """When created"""
-
-    expires_at: str
-    """When expires"""
-
-
-@dataclass
-class AuthConfig:
-    """Configuration for OAuth flow."""
-
-    client_id: str
-    """OAuth client ID"""
-
-    redirect_uri: str
-    """OAuth redirect URI"""
-
-    scopes: list[Scope] = field(default_factory=lambda: ["identity"])
-    """Requested scopes"""
-
-
-@dataclass
-class TokenResponse:
-    """OAuth token response."""
-
-    access_token: str
-    """Access token"""
-
-    token_type: str
-    """Token type (usually "Bearer")"""
-
+    login_url: str
     expires_in: int
-    """Seconds until expiry"""
 
-    id_token: str | None = None
-    """OpenID Connect ID token"""
 
-    refresh_token: str | None = None
-    """Refresh token"""
+@dataclass
+class AuthToken:
+    """Token returned after credential ownership is proven."""
+
+    token: str
+    redirect_url: str
+    expires_in: int
+
+
+@dataclass
+class VerifiedIdentity:
+    """Verified trusted issuer-bound Auth token."""
+
+    valid: bool
+    proof_id: str
+    client_id: str
+    scope: list[AuthScope]
+    issued_at: str
+    expires_at: str
+    identity: dict[str, Any] | None = None
 
 
 @dataclass
 class UserInfo:
-    """User info from OIDC userinfo endpoint."""
+    """Current issuer-bound identity information."""
 
-    sub: str
-    """Subject identifier"""
-
-    proof_type: str | None = None
-    """Type of proof (identity, age, membership)"""
-
-    commitment: str | None = None
-    """Proof commitment"""
-
-    verified_at: str | None = None
-    """When identity was verified"""
-
-    age_verified: bool | None = None
-    """Whether age was verified"""
-
-    min_age: int | None = None
-    """Minimum age proven"""
-
-    member_of: str | None = None
-    """Organization membership"""
+    proof_id: str
+    verified: bool
+    credential_binding: Literal["trusted_issuer"]
+    created_at: str
+    issuer: dict[str, Any] | None = None
+    identity_hash: str | None = None
+    verification: dict[str, Any] | None = None
+    expires_at: str | None = None
 
 
-_state_store: dict[str, str] = {}
+def generate_state() -> str:
+    """Generate a 128-bit state value for storage in the caller's session."""
+    return secrets.token_hex(16)
 
 
-def create_challenge() -> str:
+async def create_challenge(
+    client_id: str,
+    redirect_uri: str,
+    scope: list[AuthScope] | None = None,
+    state: str | None = None,
+) -> Result[AuthChallenge, OTrustError]:
     """
-    Create a cryptographic challenge for auth.
+    Create a registered server challenge.
 
-    Returns:
-        Random challenge string
-
-    Example:
-        >>> challenge = auth.create_challenge()
-        >>> print(f"Challenge: {challenge}")
+    Production returns an error until a trusted issuer and an exact client
+    redirect allowlist are configured.
     """
-    return secrets.token_hex(32)
+    if not client_id or not redirect_uri:
+        return err(OTrustError(
+            "validation_error",
+            "client_id and redirect_uri are required",
+        ))
+
+    client = get_client()
+    effective_state = state or generate_state()
+    result = await client.post("/api/v1/auth/challenge", {
+        "clientId": client_id,
+        "redirectUri": redirect_uri,
+        "scope": scope or ["identity"],
+        "state": effective_state,
+    })
+    if not result.ok:
+        return result
+
+    data = result.value
+    return ok(AuthChallenge(
+        challenge_id=data["challengeId"],
+        challenge=data["challenge"],
+        login_url=data["loginUrl"],
+        expires_in=data["expiresIn"],
+    ))
 
 
 def login_url(
     client_id: str,
     redirect_uri: str,
-    scope: Scope | list[Scope] = "identity",
+    scope: AuthScope | list[AuthScope] = "identity",
     state: str | None = None,
-) -> str:
-    """
-    Generate OAuth login URL.
-
-    Args:
-        client_id: OAuth client ID
-        redirect_uri: Callback URL
-        scope: Requested scope(s)
-        state: Optional state parameter (auto-generated if not provided)
-
-    Returns:
-        Login URL to redirect user to
-
-    Example:
-        >>> url = auth.login_url(
-        ...     client_id="my-app",
-        ...     redirect_uri="https://myapp.com/callback",
-        ...     scope="identity",
-        ... )
-        >>> print(f"Redirect to: {url}")
-    """
-    from .client import get_client
-    client = get_client()
-
-    if state is None:
-        state = secrets.token_urlsafe(32)
-
-    # Store state for verification
-    _state_store[state] = state
-
-    scopes = [scope] if isinstance(scope, str) else scope
-    scope_str = " ".join(scopes)
-
-    params = {
-        "client_id": client_id,
-        "redirect_uri": redirect_uri,
-        "response_type": "code",
-        "scope": scope_str,
-        "state": state,
-    }
-
-    return f"{client.base_url}/oauth/authorize?{urlencode(params)}"
+) -> Result[str, OTrustError]:
+    """Return a local error because only create_challenge can issue a valid URL."""
+    _ = (client_id, redirect_uri, scope, state)
+    return err(OTrustError(
+        "server_challenge_required",
+        "Create a server challenge and use its login_url",
+    ))
 
 
 async def prove(
-    code: str,
-    client_id: str,
-    client_secret: str,
-    redirect_uri: str,
-) -> Result[TokenResponse, OTrustError]:
-    """
-    Exchange authorization code for tokens.
+    challenge_id: str,
+    proof_id: str,
+    *,
+    secret: str | None = None,
+    pin: str | None = None,
+) -> Result[AuthToken, OTrustError]:
+    """Present ownership material for a trusted issuer-bound credential."""
+    if not challenge_id or not proof_id:
+        return err(OTrustError(
+            "validation_error",
+            "challenge_id and proof_id are required",
+        ))
+    if not secret and not pin:
+        return err(OTrustError(
+            "validation_error",
+            "A credential secret or PIN is required",
+        ))
 
-    Args:
-        code: Authorization code from callback
-        client_id: OAuth client ID
-        client_secret: OAuth client secret
-        redirect_uri: Same redirect URI used in login_url
-
-    Returns:
-        Result with TokenResponse on success
-
-    Example:
-        >>> result = await auth.prove(
-        ...     code=code_from_callback,
-        ...     client_id="my-app",
-        ...     client_secret="secret",
-        ...     redirect_uri="https://myapp.com/callback",
-        ... )
-        >>> if result.ok:
-        ...     print(f"Access token: {result.value.access_token}")
-    """
     client = get_client()
+    result = await client.post("/api/v1/auth/prove", {
+        "challengeId": challenge_id,
+        "proofId": proof_id,
+        "secret": secret,
+        "pin": pin,
+    })
+    if not result.ok:
+        return result
 
-    # Use form data for token endpoint
-    import httpx
-    try:
-        response = await client._client.post(
-            f"{client.base_url}/oauth/token",
-            data={
-                "grant_type": "authorization_code",
-                "code": code,
-                "client_id": client_id,
-                "client_secret": client_secret,
-                "redirect_uri": redirect_uri,
-            },
-        )
-        response.raise_for_status()
-        data = response.json()
-    except httpx.HTTPStatusError as e:
-        return err(OTrustError(
-            code="token_error",
-            message=str(e),
-            status=e.response.status_code,
-        ))
-    except Exception as e:
-        return err(OTrustError(
-            code="token_error",
-            message=str(e),
-        ))
-
-    return ok(TokenResponse(
-        access_token=data["access_token"],
-        token_type=data.get("token_type", "Bearer"),
-        expires_in=data.get("expires_in", 3600),
-        id_token=data.get("id_token"),
-        refresh_token=data.get("refresh_token"),
+    data = result.value
+    return ok(AuthToken(
+        token=data["token"],
+        redirect_url=data["redirectUrl"],
+        expires_in=data["expiresIn"],
     ))
 
 
-async def verify(
-    token: str,
-) -> Result[dict, OTrustError]:
-    """
-    Verify an access token.
+async def verify(token: str) -> Result[VerifiedIdentity, OTrustError]:
+    """Verify an Auth token and its current trusted issuer binding."""
+    if not token:
+        return err(OTrustError("validation_error", "token is required"))
 
-    Args:
-        token: Access token to verify
-
-    Returns:
-        Result with token info
-
-    Example:
-        >>> result = await auth.verify(access_token)
-        >>> if result.ok:
-        ...     print(f"Token valid: {result.value.get('active')}")
-    """
     client = get_client()
+    result = await client.post("/api/v1/auth/verify", {"token": token})
+    if not result.ok:
+        return result
 
-    import httpx
-    try:
-        response = await client._client.post(
-            f"{client.base_url}/oauth/introspect",
-            data={"token": token},
-        )
-        response.raise_for_status()
-        return ok(response.json())
-    except httpx.HTTPStatusError as e:
-        return err(OTrustError(
-            code="verify_error",
-            message=str(e),
-            status=e.response.status_code,
-        ))
-    except Exception as e:
-        return err(OTrustError(
-            code="verify_error",
-            message=str(e),
-        ))
+    data = result.value
+    return ok(VerifiedIdentity(
+        valid=bool(data["valid"]),
+        proof_id=data["proofId"],
+        client_id=data["clientId"],
+        scope=cast("list[AuthScope]", data.get("scope", [])),
+        issued_at=data["issuedAt"],
+        expires_at=data["expiresAt"],
+        identity=data.get("identity"),
+    ))
 
 
-async def userinfo(
-    access_token: str,
-) -> Result[UserInfo, OTrustError]:
-    """
-    Get user information from access token.
+async def userinfo(token: str) -> Result[UserInfo, OTrustError]:
+    """Fetch current issuer-bound user information with a Bearer token."""
+    if not token:
+        return err(OTrustError("validation_error", "token is required"))
 
-    Args:
-        access_token: Valid access token
-
-    Returns:
-        Result with UserInfo on success
-
-    Example:
-        >>> result = await auth.userinfo(access_token)
-        >>> if result.ok:
-        ...     print(f"Subject: {result.value.sub}")
-    """
     client = get_client()
+    result = await client.get(
+        "/api/v1/auth/userinfo",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    if not result.ok:
+        return result
 
-    import httpx
-    try:
-        response = await client._client.get(
-            f"{client.base_url}/oauth/userinfo",
-            headers={"Authorization": f"Bearer {access_token}"},
-        )
-        response.raise_for_status()
-        data = response.json()
-    except httpx.HTTPStatusError as e:
+    data = result.value
+    if data.get("credentialBinding") != "trusted_issuer":
         return err(OTrustError(
-            code="userinfo_error",
-            message=str(e),
-            status=e.response.status_code,
-        ))
-    except Exception as e:
-        return err(OTrustError(
-            code="userinfo_error",
-            message=str(e),
+            "trusted_identity_credential_required",
+            "Auth userinfo is not backed by a trusted issuer",
         ))
 
     return ok(UserInfo(
-        sub=data["sub"],
-        proof_type=data.get("proof_type"),
-        commitment=data.get("commitment"),
-        verified_at=data.get("verified_at"),
-        age_verified=data.get("age_verified"),
-        min_age=data.get("min_age"),
-        member_of=data.get("member_of"),
+        proof_id=data["proofId"],
+        verified=bool(data["verified"]),
+        credential_binding="trusted_issuer",
+        issuer=data.get("issuer"),
+        identity_hash=data.get("identityHash"),
+        verification=data.get("verification"),
+        created_at=data["createdAt"],
+        expires_at=data.get("expiresAt"),
     ))
 
 
-async def refresh(
-    refresh_token: str,
-    client_id: str,
-    client_secret: str,
-) -> Result[TokenResponse, OTrustError]:
+def parse_callback(url: str) -> dict[str, str]:
     """
-    Refresh an access token.
+    Parse token and state without deciding whether state is valid.
 
-    Args:
-        refresh_token: Refresh token
-        client_id: OAuth client ID
-        client_secret: OAuth client secret
-
-    Returns:
-        Result with new TokenResponse on success
+    Compare the returned state with the value stored in the caller's own
+    browser or server session.
     """
-    client = get_client()
-
-    import httpx
     try:
-        response = await client._client.post(
-            f"{client.base_url}/oauth/token",
-            data={
-                "grant_type": "refresh_token",
-                "refresh_token": refresh_token,
-                "client_id": client_id,
-                "client_secret": client_secret,
-            },
-        )
-        response.raise_for_status()
-        data = response.json()
-    except httpx.HTTPStatusError as e:
-        return err(OTrustError(
-            code="refresh_error",
-            message=str(e),
-            status=e.response.status_code,
-        ))
-    except Exception as e:
-        return err(OTrustError(
-            code="refresh_error",
-            message=str(e),
-        ))
-
-    return ok(TokenResponse(
-        access_token=data["access_token"],
-        token_type=data.get("token_type", "Bearer"),
-        expires_in=data.get("expires_in", 3600),
-        id_token=data.get("id_token"),
-        refresh_token=data.get("refresh_token"),
-    ))
+        params = parse_qs(urlparse(url).query)
+        return {
+            key: value[0]
+            for key in ("token", "state", "error", "error_description")
+            if (value := params.get(key)) and value[0]
+        }
+    except (TypeError, ValueError):
+        return {}
 
 
-def parse_callback(url: str) -> dict | None:
-    """
-    Parse OAuth callback URL.
-
-    Args:
-        url: Full callback URL with query parameters
-
-    Returns:
-        Dict with code and state, or None if invalid
-
-    Example:
-        >>> params = auth.parse_callback(request.url)
-        >>> if params and params.get("code"):
-        ...     result = await auth.prove(params["code"], ...)
-    """
-    from urllib.parse import urlparse, parse_qs
-
-    try:
-        parsed = urlparse(url)
-        params = parse_qs(parsed.query)
-
-        code = params.get("code", [None])[0]
-        state = params.get("state", [None])[0]
-        error = params.get("error", [None])[0]
-
-        if error:
-            return {"error": error, "error_description": params.get("error_description", [None])[0]}
-
-        if not code:
-            return None
-
-        # Verify state
-        if state and state not in _state_store:
-            return {"error": "invalid_state"}
-
-        # Clean up used state
-        if state:
-            _state_store.pop(state, None)
-
-        return {"code": code, "state": state}
-    except Exception:
-        return None
+def verify_state(expected: str, received: str) -> bool:
+    """Compare callback state values in constant time."""
+    if not expected or not received:
+        return False
+    return secrets.compare_digest(expected, received)
 
 
-def verify_state(state: str) -> bool:
-    """
-    Verify OAuth state parameter.
-
-    Args:
-        state: State from callback
-
-    Returns:
-        True if state is valid
-    """
-    return state in _state_store
-
-
-def clear_state(state: str) -> None:
-    """
-    Clear used state parameter.
-
-    Args:
-        state: State to clear
-    """
-    _state_store.pop(state, None)
+def clear_state(_state: str) -> None:
+    """Compatibility no-op; state storage belongs to the calling application."""

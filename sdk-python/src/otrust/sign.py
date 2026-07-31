@@ -1,18 +1,18 @@
 """
 OTRUST Sign Service.
 
-Multi-party document signing with zero-knowledge proofs.
+Multi-party document signing with Ed25519 attestations.
 """
 
 from __future__ import annotations
-from dataclasses import dataclass, field
+
+from dataclasses import dataclass
 from pathlib import Path
-from typing import BinaryIO, Literal
+from typing import Any, BinaryIO, Literal
 
 from .client import get_client
-from .result import Result, Ok, Err, OTrustError, ok, err
-from .crypto import sha256, hash_file, is_valid_hash
-
+from .crypto import hash_file, is_valid_hash, sha256
+from .result import OTrustError, Result, ok
 
 PartyRole = Literal["signer", "approver", "viewer"]
 PartyAction = Literal["signed", "approved", "viewed", "declined"] | None
@@ -148,10 +148,7 @@ async def create(
     if isinstance(document, Path):
         doc_hash = hash_file(document)
     elif isinstance(document, str):
-        if is_valid_hash(document):
-            doc_hash = document.lower()
-        else:
-            doc_hash = sha256(document)
+        doc_hash = document.lower() if is_valid_hash(document) else sha256(document)
     elif isinstance(document, bytes):
         doc_hash = sha256(document)
     else:
@@ -178,12 +175,15 @@ async def create(
     })
 
     if not result.ok:
-        return result  # type: ignore
+        return result
 
     return _parse_sign_request(result.value)
 
 
-async def status(request_id: str, view_token: str | None = None) -> Result[SignRequest, OTrustError]:
+async def status(
+    request_id: str,
+    view_token: str | None = None,
+) -> Result[SignRequest, OTrustError]:
     """
     Get the status of a signing request.
 
@@ -207,12 +207,12 @@ async def status(request_id: str, view_token: str | None = None) -> Result[SignR
     result = await client.get(path)
 
     if not result.ok:
-        return result  # type: ignore
+        return result
 
     return _parse_sign_request(result.value)
 
 
-async def cancel(request_id: str, cancel_token: str) -> Result[dict, OTrustError]:
+async def cancel(request_id: str, cancel_token: str) -> Result[dict[str, Any], OTrustError]:
     """
     Cancel a signing request.
 
@@ -231,7 +231,7 @@ async def cancel(request_id: str, cancel_token: str) -> Result[dict, OTrustError
     return result
 
 
-async def remind(request_id: str, cancel_token: str) -> Result[dict, OTrustError]:
+async def remind(request_id: str, cancel_token: str) -> Result[dict[str, Any], OTrustError]:
     """
     Send reminder to pending parties.
 
@@ -253,7 +253,7 @@ async def remind(request_id: str, cancel_token: str) -> Result[dict, OTrustError
 async def verify_document(
     request_id: str,
     document: str | bytes | Path | BinaryIO,
-) -> Result[dict, OTrustError]:
+) -> Result[dict[str, Any], OTrustError]:
     """
     Verify that a document matches the signed document.
 
@@ -268,10 +268,7 @@ async def verify_document(
     if isinstance(document, Path):
         doc_hash = hash_file(document)
     elif isinstance(document, str):
-        if is_valid_hash(document):
-            doc_hash = document.lower()
-        else:
-            doc_hash = sha256(document)
+        doc_hash = document.lower() if is_valid_hash(document) else sha256(document)
     elif isinstance(document, bytes):
         doc_hash = sha256(document)
     else:
@@ -285,7 +282,7 @@ async def verify_document(
     return result
 
 
-async def get_package(request_id: str) -> Result[dict, OTrustError]:
+async def get_package(request_id: str) -> Result[dict[str, Any], OTrustError]:
     """
     Get the complete signature package (all signatures, timestamps, etc).
 
@@ -301,7 +298,7 @@ async def get_package(request_id: str) -> Result[dict, OTrustError]:
     return result
 
 
-def _parse_sign_request(data: dict) -> Result[SignRequest, OTrustError]:
+def _parse_sign_request(data: dict[str, Any]) -> Result[SignRequest, OTrustError]:
     """Parse API response into SignRequest."""
     parties = []
     for p in data.get("parties", []):

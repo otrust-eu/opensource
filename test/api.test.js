@@ -6,6 +6,7 @@
 import { jest } from '@jest/globals';
 import { createDb, getDb, closeDb } from '../src/db.js';
 import { generateKeypair, sign, hash, solvePow } from '../src/crypto.js';
+import { APP_VERSION } from '../src/version.js';
 
 // We'll test the actual server - need to import and start it
 let server;
@@ -46,8 +47,6 @@ describe('API Integration Tests', () => {
     // Set test environment
     process.env.NODE_ENV = 'test';
     process.env.PORT = '0'; // Random port
-    process.env.MONGODB_URL = process.env.TEST_MONGODB_URL || 'mongodb://localhost:27017';
-    process.env.MONGODB_DB = 'otrust_test';
     
     // Start database
     await createDb();
@@ -81,6 +80,7 @@ describe('API Integration Tests', () => {
       await db.collection('claims').deleteMany({});
       await db.collection('pow_challenges').deleteMany({});
       await db.collection('email_notifications').deleteMany({});
+      await db.collection('proofs').deleteMany({});
     } catch (e) {
       console.error('Database cleanup error:', e.message);
     }
@@ -99,6 +99,13 @@ describe('API Integration Tests', () => {
       expect(res.status).toBe(200);
       expect(res.body.status).toBe('ok');
       expect(res.body.claims).toBeDefined();
+      expect(res.body.storage).toEqual({ engine: 'sqlite', persistent: false });
+      expect(res.body.version).toBe(APP_VERSION);
+      expect(res.body).toHaveProperty('commit_sha');
+      expect(res.body.zk_artifacts).toEqual(expect.objectContaining({
+        status: 'legacy-development',
+        production_ready: false
+      }));
     });
   });
 
@@ -686,24 +693,111 @@ describe('API Integration Tests', () => {
     });
   });
 
-  describe('GET /proof/:id (continued)', () => {
-    test('returns proof-view HTML for prf_* attribute proof share URLs', async () => {
+  describe('ZK proof safety', () => {
+    test('never sends private age inputs to a server-side proof generator', async () => {
       const ageRes = await request('/api/proof/age', {
         method: 'POST',
         body: { birthDate: '1990-06-15', minAge: 18 }
       });
 
-      expect(ageRes.status).toBe(200);
-      expect(ageRes.body.success).toBe(true);
-      expect(ageRes.body.proofId).toMatch(/^prf_/);
+      expect(ageRes.status).toBe(410);
+      expect(ageRes.body.error).toBe('browser_proof_required');
+    });
 
-      const viewRes = await request(`/proof/${ageRes.body.proofId}`, {
+    test('rejects a browser proof that cannot be cryptographically verified', async () => {
+      const now = new Date();
+      const submitRes = await request('/api/proof/submit', {
+        method: 'POST',
+        body: {
+          proofType: 'age',
+          version: 'groth16-v3',
+          proof: { pi_a: ['1', '2', '1'] },
+          publicSignals: [
+            '1',
+            String(now.getUTCFullYear()),
+            String(now.getUTCMonth() + 1),
+            String(now.getUTCDate()),
+            '18',
+            '1'
+          ],
+          commitment: '1'
+        }
+      });
+
+      expect(submitRes.status).toBe(400);
+      expect(submitRes.body.error).toBe('proof_verification_failed');
+    });
+
+    test('fails closed in production until the public ceremony is complete', async () => {
+      const previousNodeEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'production';
+      const now = new Date();
+
+      try {
+        const submitRes = await request('/api/proof/submit', {
+          method: 'POST',
+          body: {
+            proofType: 'age',
+            version: 'groth16-v3',
+            proof: { pi_a: ['1', '2', '1'] },
+            publicSignals: [
+              '1',
+              String(now.getUTCFullYear()),
+              String(now.getUTCMonth() + 1),
+              String(now.getUTCDate()),
+              '18',
+              '1'
+            ],
+            commitment: '1'
+          }
+        });
+
+        expect(submitRes.status).toBe(503);
+        expect(submitRes.body.error).toBe('zk_ceremony_incomplete');
+      } finally {
+        process.env.NODE_ENV = previousNodeEnv;
+      }
+    });
+
+    test('returns proof-view HTML for stored prf_* share URLs', async () => {
+      const proofId = `prf_test_${Date.now()}`;
+      await getDb().collection('proofs').insertOne({
+        id: proofId,
+        proof_type: 'age',
+        statement: 'Age >= 18',
+        commitment: 'test',
+        created_at: new Date()
+      });
+
+      const viewRes = await request(`/proof/${proofId}`, {
         headers: { Accept: 'text/html' }
       });
 
       expect(viewRes.status).toBe(200);
       expect(viewRes.text).toContain('<!DOCTYPE html>');
       expect(viewRes.text).toContain('OTRUST');
+    });
+
+    test('retires unauthenticated legacy identity recovery surfaces', async () => {
+      const [revokeRes, backupRes, walletRes] = await Promise.all([
+        request('/api/proof/id_legacy/revoke', { method: 'POST', body: {} }),
+        request('/api/proof/email-backup', {
+          method: 'POST',
+          body: {
+            email: 'test@example.com',
+            proofId: 'id_legacy',
+            secret: 'not-sent'
+          }
+        }),
+        request('/api/proof/id_legacy/wallet/pkpass')
+      ]);
+
+      expect(revokeRes.status).toBe(410);
+      expect(revokeRes.body.error).toBe('issuer_revocation_required');
+      expect(backupRes.status).toBe(410);
+      expect(backupRes.body.error).toBe('legacy_identity_backup_retired');
+      expect(walletRes.status).toBe(501);
+      expect(walletRes.body.error).toBe('wallet_pass_signing_not_configured');
     });
   });
 });

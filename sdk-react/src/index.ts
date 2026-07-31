@@ -3,7 +3,7 @@
  * 
  * Components:
  * - <LoginWithOTrust /> - "Login with OTRUST" button
- * - <ProofBadge /> - Display verified proof status
+ * - <ProofBadge /> - Display checked or unchecked proof status
  * - <TimestampWidget /> - Timestamp file upload widget
  * - <SignatureStatus /> - Display signature request status
  * - <OTrustErrorBoundary /> - Error boundary for graceful error handling

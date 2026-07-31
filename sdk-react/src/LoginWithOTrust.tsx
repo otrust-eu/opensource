@@ -86,7 +86,7 @@ export function LoginWithOTrust({
   const clientId = propClientId ?? config.clientId;
   const redirectUri = propRedirectUri ?? config.redirectUri;
 
-  const handleClick = useCallback(() => {
+  const handleClick = useCallback(async () => {
     if (!clientId || !redirectUri) {
       onError?.(new Error('clientId and redirectUri are required'));
       return;
@@ -98,8 +98,7 @@ export function LoginWithOTrust({
     try {
       const authState = state ?? auth.generateState();
       
-      // loginUrl is now synchronous
-      const result = auth.loginUrl({
+      const result = await auth.createChallenge({
         clientId,
         redirectUri,
         scope: scope as ('identity' | 'email' | 'verification')[],
@@ -109,8 +108,8 @@ export function LoginWithOTrust({
       if (result.ok) {
         // Store state in sessionStorage for CSRF protection
         sessionStorage.setItem('otrust_auth_state', authState);
-        // Redirect to login
-        window.location.href = result.value;
+        // Redirect only to the URL returned by the registered server challenge.
+        window.location.href = result.value.loginUrl;
       } else {
         throw new Error(result.error.message);
       }

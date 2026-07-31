@@ -1,7 +1,7 @@
 {
   "name": "@otrust/sdk",
   "version": "1.0.0",
-  "description": "Official SDK for OTRUST - Zero-knowledge timestamping, signing, identity proofs, and authentication",
+  "description": "Official SDK for OTRUST timestamping, signing, range-proof submission, and issuer-gated authentication",
   "author": "Kris Ledel <kris@otrust.eu>",
   "license": "MIT",
   "type": "module",
@@ -59,16 +59,6 @@
         "default": "./dist/auth.cjs"
       }
     },
-    "./face": {
-      "import": {
-        "types": "./dist/face.d.ts",
-        "default": "./dist/face.js"
-      },
-      "require": {
-        "types": "./dist/face.d.cts",
-        "default": "./dist/face.cjs"
-      }
-    },
     "./admin": {
       "import": {
         "types": "./dist/admin.d.ts",
@@ -110,11 +100,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/otrust-eu/sdk-js.git"
+    "url": "https://github.com/otrust-eu/opensource.git",
+    "directory": "sdk-js"
   },
-  "homepage": "https://otrust.eu",
+  "homepage": "https://www.otrust.eu",
   "bugs": {
-    "url": "https://github.com/otrust-eu/sdk-js/issues"
+    "url": "https://github.com/otrust-eu/opensource/issues"
   },
   "engines": {
     "node": ">=18.0.0"
@@ -128,13 +119,14 @@
   },
   "overrides": {
     "esbuild": "^0.28.1",
+    "postcss": "8.5.25",
     "vite": "^8.0.16"
   },
   "pnpm": {
     "overrides": {
       "esbuild": "^0.28.1",
       "picomatch": "^4.0.4",
-      "postcss": "^8.5.10",
+      "postcss": "8.5.25",
       "rollup": "^4.60.4",
       "vite": "^8.0.16"
     }

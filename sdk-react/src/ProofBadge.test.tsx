@@ -7,7 +7,8 @@ describe('ProofBadge', () => {
     it('renders with proof ID', () => {
       render(<ProofBadge proofId="id_abc123" />);
       
-      expect(screen.getByText(/Verified/i)).toBeInTheDocument();
+      expect(screen.getByText(/Identity credential/i)).toBeInTheDocument();
+      expect(screen.getByText(/unchecked/i)).toBeInTheDocument();
     });
 
     it('renders identity badge', () => {
@@ -25,8 +26,7 @@ describe('ProofBadge', () => {
     it('renders membership badge', () => {
       render(<ProofBadge proofId="id_abc123" type="membership" />);
       
-      // Component shows "Member" not "Membership"
-      expect(screen.getByText(/Member/i)).toBeInTheDocument();
+      expect(screen.getByText(/Membership/i)).toBeInTheDocument();
     });
 
     it('renders custom label', () => {
@@ -45,11 +45,10 @@ describe('ProofBadge', () => {
   });
 
   describe('status', () => {
-    it('shows verified status when not auto-verifying', () => {
+    it('shows unchecked status when not auto-verifying', () => {
       render(<ProofBadge proofId="id_abc123" showStatus />);
       
-      // When autoVerify=false, it defaults to verified
-      expect(screen.getByText(/Verified/i)).toBeInTheDocument();
+      expect(screen.getByText(/unchecked/i)).toBeInTheDocument();
     });
 
     it('shows loading when auto-verifying', () => {

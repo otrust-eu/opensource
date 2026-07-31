@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Documentation – OTRUST by Kristian Ledel (Kris Ledel)</title>
-  <meta name="description" content="Complete guide to blockchain timestamping, ID packages, multi-party document signing, and hosted Auth. Created by Kristian (Kris) Ledel.">
-  <meta name="keywords" content="blockchain timestamp, document signing, commitment ID packages, OTRUST docs, SDK, Kris Ledel, Kristian Ledel, privacy, blockchain developer">
+  <meta name="description" content="Complete guide to blockchain timestamping, multi-party document signing, browser-generated range proofs, and issuer-gated Auth. Created by Kristian (Kris) Ledel.">
+  <meta name="keywords" content="blockchain timestamp, document signing, zero-knowledge range proofs, OTRUST docs, SDK, Kris Ledel, Kristian Ledel, privacy, blockchain developer">
   <meta name="author" content="Kristian Ledel">
   <meta name="creator" content="Kris Ledel">
   <link rel="author" href="https://www.otrust.eu/about">
@@ -16,8 +16,8 @@
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://www.otrust.eu/docs.html">
-  <meta property="og:title" content="OTRUST Documentation - Timestamp, ID, Sign & Auth">
-  <meta property="og:description" content="Complete guide to timestamping, ID packages, document signing, and hosted Auth.">
+  <meta property="og:title" content="OTRUST Documentation - Timestamp, Proof, Sign & Auth">
+  <meta property="og:description" content="Complete guide to timestamping, browser-generated proofs, document signing, and issuer-gated Auth.">
   <meta property="og:image" content="https://www.otrust.eu/og-image.svg">
   <meta property="og:site_name" content="OTRUST by Kristian Ledel">
   <meta property="article:author" content="Kristian Ledel">
@@ -25,7 +25,7 @@
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="OTRUST Documentation">
-  <meta name="twitter:description" content="Complete guide to timestamping, ID packages, document signing, and hosted Auth.">
+  <meta name="twitter:description" content="Complete guide to timestamping, browser-generated proofs, document signing, and issuer-gated Auth.">
   <meta name="twitter:image" content="https://www.otrust.eu/og-image.svg">
   <meta name="twitter:creator" content="@kledel">
   
@@ -36,7 +36,7 @@
     "@type": "TechArticle",
     "name": "OTRUST Documentation",
     "url": "https://www.otrust.eu/docs.html",
-    "description": "Complete guide to blockchain timestamping, ID packages, multi-party document signing, and hosted Auth.",
+    "description": "Complete guide to blockchain timestamping, browser-generated range proofs, multi-party document signing, and issuer-gated Auth.",
     "author": {
       "@type": "Person",
       "name": "Kristian Ledel",
@@ -527,7 +527,7 @@
         <section id="overview" class="doc-section active">
           <div class="content-header">
             <h1>Documentation</h1>
-            <p>Learn how to use OTRUST for timestamping, document signing, ID packages, and partner-branded Auth flows.</p>
+            <p>Learn how to use OTRUST for timestamping, document signing, browser-generated range proofs, and issuer-gated Auth flows.</p>
           </div>
           
           <div class="grid-2">
@@ -540,16 +540,16 @@
               <p>Multi-party document signing with Ed25519 cryptographic signatures.</p>
             </div>
             <div class="feature-card">
-              <h4>ID</h4>
-              <p>Privacy-preserving ID packages using commitments and selective disclosure.</p>
+              <h4>Proof Lab</h4>
+              <p>Generate age and income range proofs locally, then verify them cryptographically.</p>
             </div>
             <div class="feature-card">
               <h4>Auth</h4>
-              <p>Hosted Auth challenges that let partner apps verify ID ownership without receiving raw identity data.</p>
+              <p>Issuer-gated hosted Auth. Production challenges stay disabled until a trusted credential issuer is configured.</p>
             </div>
             <div class="feature-card">
               <h4>Privacy-First</h4>
-              <p>Timestamp hashing happens in your browser. ID checks and signing use local-first flows where possible.</p>
+              <p>Timestamp hashing and private range-proof inputs stay in your browser. Signing uses local-first flows where possible.</p>
             </div>
           </div>
           
@@ -560,7 +560,7 @@
             <div class="grid-2" style="margin-top: 1rem;">
               <a href="#web" class="feature-card" style="text-decoration: none; color: inherit;" onclick="showSection('web')">
                 <h4>Web Tools</h4>
-                <p>Timestamp, Sign, and ID in your browser.</p>
+                <p>Timestamp, Sign, and Proof Lab in your browser.</p>
               </a>
               <a href="#sdk" class="feature-card" style="text-decoration: none; color: inherit;" onclick="showSection('sdk')">
                 <h4>SDK</h4>
@@ -586,7 +586,7 @@
         <section id="web" class="doc-section">
           <div class="content-header">
             <h1>Web Tools</h1>
-            <p>Use this section as the web entrypoint. Detailed flows live in the dedicated sections: Timestamp, ID, Sign, and Auth.</p>
+            <p>Use this section as the web entrypoint. Detailed flows live in the dedicated sections: Timestamp, Proof Lab, Sign, and Auth.</p>
           </div>
 
           <div class="card">
@@ -601,12 +601,12 @@
                 <p>Create multi-party signing records around document hashes.</p>
               </a>
               <a href="#proof" class="feature-card" style="text-decoration: none; color: inherit;" onclick="showSection('proof')">
-                <h4>ID</h4>
-                <p>Create commitment-based ID packages for selective disclosure.</p>
+                <h4>Proof Lab</h4>
+                <p>Generate range proofs locally without submitting the private input.</p>
               </a>
               <a href="#proofauth" class="feature-card" style="text-decoration: none; color: inherit;" onclick="showSection('proofauth')">
                 <h4>Auth</h4>
-                <p>Run hosted, challenge-bound Auth with callback verification.</p>
+                <p>Integrate issuer-bound Auth after the trusted issuer capability is enabled.</p>
               </a>
             </div>
           </div>
@@ -616,16 +616,16 @@
             <ul>
               <li><a href="/timestamp" style="color: var(--accent);">Timestamp Tool</a> for file and text claims, verify, compare, and <strong>browser-local</strong> receipt history.</li>
               <li><a href="/sign" style="color: var(--accent);">Sign Tool</a> for request creation, signer management, and signature status.</li>
-              <li><a href="/proof" style="color: var(--accent);">ID Tool</a> for ID creation and independent verifier checks.</li>
-              <li><a href="/sign-in" style="color: var(--accent);">Auth Tool</a> for hosted challenge and callback flow testing.</li>
+              <li><a href="/proof" style="color: var(--accent);">Proof Lab</a> for local proof generation and independent verifier checks.</li>
+              <li><a href="/sign-in" style="color: var(--accent);">Auth Preview</a> for the hosted issuer-bound integration surface.</li>
             </ul>
           </div>
 
           <div class="card">
             <h2>Shared privacy model</h2>
             <ul>
-              <li><strong>Local-first processing:</strong> hashing and sensitive checks run in the browser where possible.</li>
-              <li><strong>Minimal server data:</strong> store ID metadata needed for verification, not raw source content.</li>
+              <li><strong>Local-first processing:</strong> hashing and private proof inputs remain in the browser.</li>
+              <li><strong>Minimal server data:</strong> store proofs, public signals, commitments, and verification metadata, not private inputs.</li>
               <li><strong>Independent verification:</strong> records can be checked without trusting private backend state alone.</li>
             </ul>
           </div>
@@ -835,76 +835,70 @@ configure({
           </div>
         </section>
         
-        <!-- ID -->
+        <!-- Proof Lab -->
         <section id="proof" class="doc-section">
           <div class="content-header">
-            <h1>ID</h1>
-            <p>Privacy-preserving ID packages using commitments and selective disclosure.</p>
+            <h1>Proof Lab</h1>
+            <p>Generate Groth16 range proofs locally and submit only the proof, public signals, and commitment.</p>
           </div>
           
           <div class="card">
-            <h2>ID flow</h2>
+            <h2>Range-proof flow</h2>
             <div class="steps">
               <div class="step">
                 <span class="step-num">1</span>
                 <div class="step-content">
-                  <strong>Upload your ID</strong>
-                  <p>Passport, driver's license, or national ID. Scanned locally.</p>
+                  <strong>Choose a statement</strong>
+                  <p>Select an age or income range and enter the private value locally.</p>
                 </div>
               </div>
               <div class="step">
                 <span class="step-num">2</span>
                 <div class="step-content">
-                  <strong>Take a selfie</strong>
-                  <p>Liveness detection ensures you're the person on the ID.</p>
+                  <strong>Generate locally</strong>
+                  <p>The browser uses the published circuit artifacts to create a Groth16 proof.</p>
                 </div>
               </div>
               <div class="step">
                 <span class="step-num">3</span>
                 <div class="step-content">
-                  <strong>Generate ID package</strong>
-                  <p>A commitment record preserves the claim without revealing the underlying data.</p>
+                  <strong>Inspect or export</strong>
+                  <p>The result contains the proof, public signals, and commitment, never the private value.</p>
                 </div>
               </div>
               <div class="step">
                 <span class="step-num">4</span>
                 <div class="step-content">
-                  <strong>Get your ID</strong>
-                  <p>Receive a URL. Add to Apple Wallet where supported.</p>
+                  <strong>Publish when ready</strong>
+                  <p>The server verifies the proof before storing it and returning a public verification URL.</p>
                 </div>
               </div>
             </div>
-            <a href="/proof" class="btn" style="margin-top: 1rem;">Create ID &rarr;</a>
+            <a href="/proof" class="btn" style="margin-top: 1rem;">Open Proof Lab &rarr;</a>
           </div>
           
           <div class="card">
-            <h2>ID Types</h2>
-            <p class="text-dim" style="margin-bottom: 1rem;">The public web tool currently offers <strong>Unique Identity</strong> and <strong>Age 18+</strong>. Additional ID types below are documented for roadmap and API consumers.</p>
+            <h2>Supported proofs</h2>
             <table>
-              <tr><th>Type</th><th>What It Verifies</th><th>Status</th></tr>
-              <tr><td><strong>Unique Identity</strong></td><td>One reusable ID package per person where configured</td><td>Available in web tool</td></tr>
-              <tr><td><strong>Age (18+)</strong></td><td>You're at least 18</td><td>Available in web tool</td></tr>
-              <tr><td><strong>Income</strong></td><td>Income above threshold</td><td>Documented; not in public UI yet</td></tr>
-              <tr><td><strong>Membership</strong></td><td>Member of a group</td><td>Documented; not in public UI yet</td></tr>
+              <tr><th>Type</th><th>Public statement</th><th>Private input</th></tr>
+              <tr><td><strong>Age range</strong></td><td>The committed age is inside the selected range</td><td>Date of birth</td></tr>
+              <tr><td><strong>Income range</strong></td><td>The committed income is inside the selected range</td><td>Exact income</td></tr>
             </table>
             
             <div class="alert alert-info">
-              <strong>Privacy:</strong> Sensitive checks run in your browser. Stored data focuses on commitment packages and metadata, not raw ID images or selfies.
+              <strong>Meaning:</strong> A valid proof establishes consistency with a private value. It does not establish that the value came from a government, employer, bank, or other trusted issuer.
             </div>
           </div>
           
           <div class="card">
-            <h2>Technical Details</h2>
-            <h3>Commitment ID Packages</h3>
-            <p>The current public beta uses SHA-256 field commitments and ID packages instead of server-side Circom/SNARK dependencies. ID packages are designed to reveal the claim and verification metadata without exposing the raw input.</p>
+            <h2>Production readiness</h2>
+            <p>The circuits and browser artifacts are reproducible and the server performs Groth16 verification. Production publishing remains fail-closed until the public trusted-setup ceremony is complete.</p>
             <ul>
-              <li><strong>Age</strong> - verifies an age threshold without storing the birthdate</li>
-              <li><strong>Income</strong> - verifies a threshold without storing the exact income</li>
-              <li><strong>Membership</strong> - verifies membership metadata without exposing the raw member identifier</li>
+              <li>At least two independent ceremony contributors are required.</li>
+              <li>A public final beacon must be recorded.</li>
+              <li>The published artifact manifest and checksums must pass verification.</li>
             </ul>
-            
-            <h3>Verification</h3>
-            <p>Stored ID packages can be checked through the public verification endpoints. Advanced browser-generated IDs can still be submitted, but the backend no longer depends on a vulnerable server-side SNARK toolchain.</p>
+            <p>Until then, local generation and export remain available while the publish endpoint returns a service-unavailable response in production.</p>
           </div>
         </section>
         
@@ -912,12 +906,12 @@ configure({
         <section id="proofauth" class="doc-section">
           <div class="content-header">
             <h1>Auth</h1>
-            <p>Use hosted ID verification for challenge-bound partner Auth.</p>
+            <p>Use trusted issuer-bound credentials for challenge-bound partner Auth.</p>
           </div>
           
           <div class="card">
             <h2>Authentication flow</h2>
-            <p>OTRUST Auth lets users authenticate with an ID package without sharing raw identity documents with the partner.</p>
+            <p>OTRUST Auth is an integration preview until a trusted credential issuer is configured. Production challenge creation fails closed before that capability is enabled.</p>
             
             <div class="steps">
               <div class="step">
@@ -931,14 +925,14 @@ configure({
                 <span class="step-num">2</span>
                 <div class="step-content">
                   <strong>User opens the hosted Auth URL</strong>
-                  <p>The user is redirected to OTRUST to present or create an ID.</p>
+                  <p>The user is redirected to OTRUST to present an issuer-bound credential.</p>
                 </div>
               </div>
               <div class="step">
                 <span class="step-num">3</span>
                 <div class="step-content">
-                  <strong>ID package verified</strong>
-                  <p>OTRUST verifies ID ownership and challenge binding without exposing underlying identity documents.</p>
+                  <strong>Issuer credential verified</strong>
+                  <p>OTRUST verifies the current issuer binding, credential status, ownership, and challenge binding.</p>
                 </div>
               </div>
               <div class="step">
@@ -953,6 +947,9 @@ configure({
           
           <div class="card">
             <h2>SDK Integration</h2>
+            <div class="alert alert-info">
+              <strong>Availability:</strong> Do not enable a production login button until <code>/health</code> reports <code>identity_auth</code> as ready. This requires both a trusted issuer and an exact client redirect allowlist.
+            </div>
             <pre><code><span class="comment">// Create hosted Auth challenge</span>
 import { auth } from '@otrust/sdk'
 
@@ -992,12 +989,12 @@ X-Admin-Key: &lt;admin-key&gt;
   "borderRadius": 8,
   "spacingScale": "default",
   "headline": "Start Auth with Acme",
-  "subhead": "Secure verification with OTRUST ID",
-  "footerText": "Acme uses OTRUST as identity provider",
+  "subhead": "Issuer-bound verification with OTRUST",
+  "footerText": "Acme uses OTRUST as credential verifier",
   "autoRedirectSeconds": 3
 }</code></pre>
             <div class="alert alert-info">
-              <strong>Security:</strong> OTRUST disclosure, the OTRUST footer mark, and the DPO contact stay visible. The same theme follows <code>/proof?auth_challenge=...</code> when a user needs to create an ID first. Theme values are sanitized and all theme changes are written to the audit log.
+              <strong>Security:</strong> OTRUST disclosure, the OTRUST footer mark, and the DPO contact stay visible. Theme values are sanitized and all theme changes are written to the audit log.
             </div>
           </div>
 
@@ -1018,12 +1015,11 @@ X-Admin-Key: &lt;admin-key&gt;
             <h2>Available Claims</h2>
             <table>
               <tr><th>Claim</th><th>Description</th><th>Use Case</th></tr>
-              <tr><td><code>identity</code></td><td>User controls a verified ID package</td><td>One account per verified ID</td></tr>
-              <tr><td><code>adult</code></td><td>User satisfies an age threshold where available</td><td>Age-gated content</td></tr>
+              <tr><td><code>identity</code></td><td>User controls a current trusted issuer-bound credential</td><td>Issuer-backed account access</td></tr>
             </table>
             
             <div class="alert alert-info">
-              <strong>Privacy:</strong> Claims are verified without exposing raw identity documents to the partner application.
+              <strong>Privacy:</strong> Credential claims are verified without exposing raw identity documents to the partner application. Self-attested range proofs are not accepted as identity credentials.
             </div>
           </div>
         </section>
@@ -1291,10 +1287,10 @@ npm install</code></pre>
             <pre><code><span class="comment"># Configure local environment</span>
 cp .env.example .env
 
-<span class="comment"># Start MongoDB + OTRUST</span>
+<span class="comment"># Start OTRUST with persistent SQLite storage</span>
 docker compose up --build
 
-<span class="comment"># Or run Node directly after MongoDB is available</span>
+<span class="comment"># Or run Node directly; data is stored in ./data</span>
 npm run dev</code></pre>
           </div>
 

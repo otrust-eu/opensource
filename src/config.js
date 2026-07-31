@@ -91,8 +91,7 @@ export const config = {
   // Database
   // ===================
   database: {
-    uri: getConfig('MONGODB_URI', 'mongodb://localhost:27017'),
-    name: getConfig('MONGODB_DB', 'otrust'),
+    path: getConfig('OTRUST_DB_PATH', './data/otrust.sqlite'),
   },
   
   // ===================

@@ -1,8 +1,8 @@
 /**
  * OTRUST SDK - Auth Service
  * 
- * "Login with OTRUST" - Identity-based authentication.
- * Allow users to prove their identity using OTRUST Proof.
+ * Issuer-bound partner authentication.
+ * Production challenge creation is unavailable until a trusted issuer is configured.
  */
 
 import { getClient, ClientConfig } from './client.js';
@@ -37,7 +37,7 @@ export interface AuthToken {
   expiresIn: number;
 }
 
-/** Verified identity */
+/** Verified issuer-bound identity token */
 export interface VerifiedIdentity {
   /** Whether the token is valid */
   valid: boolean;
@@ -54,6 +54,11 @@ export interface VerifiedIdentity {
   /** Identity details */
   identity?: {
     verified: boolean;
+    credentialBinding: 'trusted_issuer';
+    issuer?: {
+      id?: string;
+      name?: string;
+    } | null;
     verification?: {
       faceMatch?: boolean;
       livenessVerified?: boolean;
@@ -69,6 +74,13 @@ export interface UserInfo {
   proofId: string;
   /** Whether identity is verified */
   verified: boolean;
+  /** Credential provenance accepted by Auth */
+  credentialBinding: 'trusted_issuer';
+  /** Trusted issuer metadata */
+  issuer?: {
+    id?: string;
+    name?: string;
+  } | null;
   /** Truncated identity hash */
   identityHash?: string;
   /** Verification details */
@@ -124,6 +136,7 @@ export async function createChallenge(options: {
     return err(new OTrustError('validation_error', 'redirectUri is required'));
   }
 
+  const state = options.state ?? generateState();
   const client = getClient();
   const result = await client.post<{
     success: boolean;
@@ -135,7 +148,7 @@ export async function createChallenge(options: {
     clientId: options.clientId,
     redirectUri: options.redirectUri,
     scope: options.scope ?? ['identity'],
-    state: options.state,
+    state,
   });
 
   if (!result.ok) {
@@ -150,22 +163,7 @@ export async function createChallenge(options: {
   });
 }
 
-/**
- * Generate a login URL for "Login with OTRUST" button.
- * This is a synchronous function that builds the URL client-side.
- * 
- * @example
- * ```ts
- * // Get login URL (synchronous)
- * const url = auth.loginUrl({
- *   clientId: 'my-app',
- *   redirectUri: 'https://my-app.com/callback',
- * });
- * 
- * // Use in HTML
- * // <a href={url}>Login with OTRUST</a>
- * ```
- */
+/** @deprecated A valid hosted URL is returned by createChallenge. */
 export function loginUrl(options: {
   clientId: string;
   redirectUri: string;
@@ -180,21 +178,10 @@ export function loginUrl(options: {
     return err(new OTrustError('validation_error', 'redirectUri is required'));
   }
 
-  const client = getClient();
-  const baseUrl = client.baseUrl || 'https://otrust.eu';
-  
-  const params = new URLSearchParams({
-    client_id: options.clientId,
-    redirect_uri: options.redirectUri,
-    scope: (options.scope ?? ['identity']).join(' '),
-    response_type: 'code',
-  });
-  
-  if (options.state) {
-    params.set('state', options.state);
-  }
-
-  return ok(`${baseUrl}/auth/login?${params.toString()}`);
+  return err(new OTrustError(
+    'server_challenge_required',
+    'Create a server challenge and use the loginUrl returned by createChallenge'
+  ));
 }
 
 /**
@@ -213,8 +200,22 @@ export function loginUrl(options: {
 export async function prove(options: {
   challengeId: string;
   proofId: string;
-  secret: string;
+  secret?: string;
+  pin?: string;
 }): Promise<Result<AuthToken>> {
+  if (!options.challengeId || !options.proofId) {
+    return err(new OTrustError(
+      'validation_error',
+      'challengeId and proofId are required'
+    ));
+  }
+  if (!options.secret && !options.pin) {
+    return err(new OTrustError(
+      'validation_error',
+      'A credential secret or PIN is required'
+    ));
+  }
+
   const client = getClient();
   const result = await client.post<{
     success: boolean;
@@ -273,6 +274,11 @@ export async function verify(token: string): Promise<Result<VerifiedIdentity>> {
     expiresAt: string;
     identity?: {
       verified: boolean;
+      credentialBinding: 'trusted_issuer';
+      issuer?: {
+        id?: string;
+        name?: string;
+      } | null;
       verification?: {
         faceMatch?: boolean;
         livenessVerified?: boolean;

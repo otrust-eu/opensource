@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import { timestamp, sign, proof, auth, configure, sha256, hashFile, generateEd25519Keypair, signEd25519, verifyEd25519 } from '@otrust/sdk'
 
-configure({ baseUrl: 'https://otrust.eu' })
+configure({ baseUrl: 'https://www.otrust.eu' })
 
 type Tab = 'timestamp' | 'sign' | 'proof' | 'auth' | 'crypto' | 'react'
 
@@ -84,7 +84,7 @@ function TimestampCreate() {
         <div className="result-box success">
           <div className="result-header"><span className="result-title">Timestamp Created</span></div>
           <div className="hash-result"><code>{result.id}</code><button className="copy-small" onClick={() => navigator.clipboard.writeText(result.id)}>Copy</button></div>
-          <a className="link-btn" href={`https://otrust.eu/proof/${result.id}`} target="_blank">View Proof</a>
+          <a className="link-btn" href={`https://www.otrust.eu/proof/${result.id}`} target="_blank">View Proof</a>
         </div>
       )}
       <div className="sdk-code">
@@ -884,17 +884,17 @@ export default function App() {
     <div className="app">
       <nav className="main-nav">
         <div className="nav-container">
-          <a href="https://otrust.eu" className="logo">OTRUST</a>
+          <a href="https://www.otrust.eu" className="logo">OTRUST</a>
           <div className="nav-links">
             <span className="nav-primary">
-              <a href="https://otrust.eu/">Timestamp</a>
-              <a href="https://otrust.eu/sign" className="signed-link">Signed</a>
-              <a href="https://otrust.eu/proof">Proof</a>
+              <a href="https://www.otrust.eu/">Timestamp</a>
+              <a href="https://www.otrust.eu/sign" className="signed-link">Signed</a>
+              <a href="https://www.otrust.eu/proof">Proof</a>
             </span>
             <span className="nav-secondary">
-              <a href="https://otrust.eu/sign-in">Sign in</a>
-              <a href="https://otrust.eu/docs" className="docs-trigger open">Docs</a>
-              <a href="https://otrust.eu/about">About</a>
+              <a href="https://www.otrust.eu/sign-in">Sign in</a>
+              <a href="https://www.otrust.eu/docs" className="docs-trigger open">Docs</a>
+              <a href="https://www.otrust.eu/about">About</a>
             </span>
           </div>
         </div>
@@ -902,9 +902,9 @@ export default function App() {
       
       <div className="docs-submenu-bar open">
         <div className="docs-submenu-container">
-          <a href="https://otrust.eu/docs">Documentation</a>
-          <a href="https://otrust.eu/api-docs">API Reference</a>
-          <a href="https://otrust.eu/playground/" className="active">SDK Playground</a>
+          <a href="https://www.otrust.eu/docs">Documentation</a>
+          <a href="https://www.otrust.eu/api-docs">API Reference</a>
+          <a href="https://www.otrust.eu/playground/" className="active">SDK Playground</a>
           <a href="https://github.com/otrust-eu/opensource" target="_blank">GitHub ↗</a>
         </div>
       </div>

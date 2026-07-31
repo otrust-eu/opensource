@@ -1,5 +1,11 @@
 # OTRUST SDK Design Document
 
+> Historical design draft. The implemented API is defined by
+> `web/openapi.json`, `docs/API_POLICY.md`, and the SDK package READMEs.
+> Proof-as-Auth based on document ownership was not shipped and must not be
+> implemented. Current Auth requires a registered challenge and a trusted
+> issuer-bound identity credential.
+
 **Author:** Kris Ledel
 **Version:** 1.0.0
 **Date:** January 2026
@@ -52,7 +58,7 @@ import { OTrust } from '@otrust/sdk';
 
 // Initialize client
 const otrust = new OTrust({
-  baseUrl: 'https://otrust.eu', // Default production URL
+  baseUrl: 'https://www.otrust.eu', // Default production URL
   apiVersion: 'v1',
 });
 
@@ -63,7 +69,7 @@ const claim = await otrust.timestamp.create({
 });
 
 console.log(claim.receipt_id); // ts_abc123...
-console.log(claim.proof_url);  // https://otrust.eu/proof/ts_abc123
+console.log(claim.proof_url);  // https://www.otrust.eu/proof/ts_abc123
 
 // Verify a hash
 const verification = await otrust.timestamp.verify({
@@ -199,7 +205,7 @@ from otrust import OTrust
 
 # Initialize client
 client = OTrust(
-    base_url="https://otrust.eu",
+    base_url="https://www.otrust.eu",
     api_version="v1"
 )
 
@@ -210,7 +216,7 @@ claim = client.timestamp.create(
 )
 
 print(claim.receipt_id)  # ts_abc123...
-print(claim.proof_url)   # https://otrust.eu/proof/ts_abc123
+print(claim.proof_url)   # https://www.otrust.eu/proof/ts_abc123
 
 # Verify a hash
 verification = client.timestamp.verify(hash="sha256-hash-of-document")
@@ -281,7 +287,7 @@ MIDDLEWARE = [
 ]
 
 OTRUST = {
-    'BASE_URL': 'https://otrust.eu',
+    'BASE_URL': 'https://www.otrust.eu',
     'VERIFY_ON_UPLOAD': True,
 }
 ```

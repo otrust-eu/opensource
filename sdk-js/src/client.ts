@@ -45,7 +45,7 @@ export function requireServer(feature: string): void {
 
 /** Client configuration */
 export interface ClientConfig {
-  /** Base URL for the OTRUST API (default: https://otrust.eu) */
+  /** Base URL for the OTRUST API (default: https://www.otrust.eu) */
   baseUrl?: string;
   /** API key (otrust_live_... or otrust_test_...) */
   apiKey?: string;
@@ -74,12 +74,39 @@ export interface RequestOptions {
 
 /** Default configuration */
 const DEFAULT_CONFIG = {
-  baseUrl: 'https://otrust.eu',
+  baseUrl: 'https://www.otrust.eu',
   timeout: 30000,
   retries: 3,
   apiKey: undefined as string | undefined,
   environment: 'live' as const,
 };
+
+function createIdempotencyKey(): string {
+  const cryptoApi = globalThis.crypto;
+  if (cryptoApi?.randomUUID) {
+    return `sdk_${cryptoApi.randomUUID()}`;
+  }
+  if (cryptoApi?.getRandomValues) {
+    const bytes = cryptoApi.getRandomValues(new Uint8Array(16));
+    return `sdk_${Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('')}`;
+  }
+  return `sdk_${Date.now().toString(36)}_${Math.random().toString(36).slice(2)}`;
+}
+
+function retryDelayMs(response: Response, attempt: number): number {
+  const retryAfter = response.headers.get('Retry-After');
+  if (retryAfter) {
+    const seconds = Number(retryAfter);
+    if (Number.isFinite(seconds) && seconds >= 0) {
+      return Math.min(seconds * 1000, 60000);
+    }
+    const retryAt = Date.parse(retryAfter);
+    if (Number.isFinite(retryAt)) {
+      return Math.min(Math.max(retryAt - Date.now(), 0), 60000);
+    }
+  }
+  return Math.min(1000 * Math.pow(2, attempt), 10000);
+}
 
 type ResolvedClientConfig = {
   baseUrl: string;
@@ -141,14 +168,21 @@ export class Client {
     if (options.idempotencyKey) {
       headers['Idempotency-Key'] = options.idempotencyKey;
     }
+    if (
+      (method === 'POST' || method === 'PUT' || method === 'PATCH') &&
+      !headers['Idempotency-Key']
+    ) {
+      headers['Idempotency-Key'] = createIdempotencyKey();
+    }
 
     let lastError: OTrustError | undefined;
     
     for (let attempt = 0; attempt <= this.config.retries; attempt++) {
+      let timeoutId: ReturnType<typeof setTimeout> | undefined;
       try {
         // Create abort controller for timeout
         const controller = new AbortController();
-        const timeoutId = setTimeout(
+        timeoutId = setTimeout(
           () => controller.abort(),
           options.timeout ?? this.config.timeout
         );
@@ -159,8 +193,6 @@ export class Client {
           body: options.body ? JSON.stringify(options.body) : undefined,
           signal: options.signal ?? controller.signal,
         });
-
-        clearTimeout(timeoutId);
 
         // Parse response
         const text = await response.text();
@@ -179,8 +211,15 @@ export class Client {
             data as Record<string, unknown>
           );
           
-          // Don't retry on client errors (4xx) except rate limiting
-          if (response.status >= 400 && response.status < 500 && response.status !== 429) {
+          const responseError = data as Record<string, unknown>;
+          const retryableConflict = (
+            response.status === 409 &&
+            responseError.error === 'idempotency_in_progress'
+          );
+          const retryableStatus = response.status === 429 || retryableConflict;
+
+          // Do not retry other client errors.
+          if (response.status >= 400 && response.status < 500 && !retryableStatus) {
             return err(error);
           }
           
@@ -188,7 +227,7 @@ export class Client {
           
           // Exponential backoff before retry
           if (attempt < this.config.retries) {
-            await this.sleep(Math.min(1000 * Math.pow(2, attempt), 10000));
+            await this.sleep(retryDelayMs(response, attempt));
           }
           continue;
         }
@@ -209,6 +248,10 @@ export class Client {
         // Exponential backoff before retry
         if (attempt < this.config.retries) {
           await this.sleep(Math.min(1000 * Math.pow(2, attempt), 10000));
+        }
+      } finally {
+        if (timeoutId !== undefined) {
+          clearTimeout(timeoutId);
         }
       }
     }

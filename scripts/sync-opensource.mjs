@@ -14,6 +14,7 @@ const targetRoot = path.resolve(process.argv[2] || process.env.OPENSOURCE_DIR ||
 const SYNC_PATHS = [
   'src/server.js',
   'src/canonical-url.js',
+  'src/version.js',
   'src/sign.js',
   'src/emailTemplate.js',
   'src/zkproof.js',
@@ -28,9 +29,20 @@ const SYNC_PATHS = [
   'src/wave4',
   'src/zkproofs.js',
   'src/platform',
+  'test/crypto.test.js',
+  'test/db.test.js',
+  'test/migration.test.js',
   'test/email.test.js',
+  'test/pow.test.js',
+  'test/security.test.js',
+  'test/validation.test.js',
   'test/api.test.js',
+  'test/auth.test.js',
   'test/canonical-url.test.js',
+  'test/platform.test.js',
+  'test/zkproof.test.js',
+  'test/all-live-test.mjs',
+  'test/full-service-test.mjs',
   'test/e2e',
   'web',
   'addons/browser-extension/background.js',
@@ -45,6 +57,9 @@ const SYNC_PATHS = [
   'circuits',
   'examples',
   'scripts/build-extension.js',
+  'scripts/build-poseidon.js',
+  'scripts/import-mongodb-export.mjs',
+  'scripts/poseidon-browser-entry.js',
   'scripts/quickstart.ps1',
   'scripts/quickstart.sh',
   '.dockerignore',
@@ -53,8 +68,13 @@ const SYNC_PATHS = [
   '.env.example',
   'scripts/sync-opensource.mjs',
   'scripts/validate-openapi.js',
+  'docs/API_POLICY.md',
+  'docs/MONGODB_MIGRATION.md',
+  'docs/sdk-design.md',
   'README.md',
   '.github/dependabot.yml',
+  '.github/SECURITY.md',
+  '.github/codeql-config.md',
   '.github/actions/otrust-timestamp',
   '.github/workflows/ci.yml',
   '.github/workflows/codeql.yml',
@@ -114,6 +134,39 @@ if (fs.existsSync(gitignorePath)) {
     fs.writeFileSync(gitignorePath, cleaned);
     console.log('  ✓ cleaned .gitignore (partners-hemsted)');
   }
+}
+
+// Keep the public workspace metadata independent while synchronizing runtime
+// dependencies, build steps, and the complete server test command.
+const corePackagePath = path.join(coreRoot, 'package.json');
+const targetPackagePath = path.join(targetRoot, 'package.json');
+if (fs.existsSync(targetPackagePath)) {
+  const corePackage = JSON.parse(fs.readFileSync(corePackagePath, 'utf8'));
+  const targetPackage = JSON.parse(fs.readFileSync(targetPackagePath, 'utf8'));
+
+  targetPackage.scripts['build:poseidon'] = corePackage.scripts['build:poseidon'];
+  targetPackage.scripts.build =
+    'npm run build:extension && npm run build:poseidon && npm run build --workspace @otrust/sdk && npm run build --workspace @otrust/react';
+  targetPackage.scripts['test:core'] = corePackage.scripts.test;
+  targetPackage.scripts['test:unit'] = targetPackage.scripts['test:core'];
+  targetPackage.scripts['test:integration'] =
+    'node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand test/api.test.js test/auth.test.js test/platform.test.js';
+  targetPackage.scripts['migrate:mongodb-export'] = corePackage.scripts['migrate:mongodb-export'];
+  targetPackage.engines = corePackage.engines;
+  delete targetPackage.dependencies.mongodb;
+
+  for (const dependency of ['archiver', 'poseidon-lite', 'snarkjs']) {
+    targetPackage.dependencies[dependency] = corePackage.dependencies[dependency];
+  }
+  targetPackage.devDependencies.esbuild = corePackage.devDependencies.esbuild;
+  targetPackage.overrides.bfj = corePackage.overrides.bfj;
+  targetPackage.overrides['brace-expansion'] = corePackage.overrides['brace-expansion'];
+  targetPackage.overrides.ejs = corePackage.overrides.ejs;
+  targetPackage.overrides.postcss = corePackage.overrides.postcss;
+  targetPackage.overrides.esbuild = corePackage.devDependencies.esbuild;
+
+  fs.writeFileSync(targetPackagePath, `${JSON.stringify(targetPackage, null, 2)}\n`);
+  console.log('  âœ“ synchronized public package build, test, and ZK dependencies');
 }
 
 // Ensure README in opensource points to the opensource repo for cloning (not core)

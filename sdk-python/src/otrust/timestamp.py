@@ -6,13 +6,14 @@ Prove that data existed at a specific point in time.
 """
 
 from __future__ import annotations
+
 from dataclasses import dataclass
 from pathlib import Path
-from typing import BinaryIO, Callable, Literal
+from typing import Any, BinaryIO, Callable, Literal
 
 from .client import get_client
-from .result import Result, Ok, Err, OTrustError, ok, err
-from .crypto import sha256, hash_file, hash_file_with_progress, is_valid_hash
+from .crypto import hash_file, hash_file_with_progress, is_valid_hash, sha256
+from .result import OTrustError, Result, err, ok
 
 
 @dataclass
@@ -56,7 +57,7 @@ class VerifyResult:
 class BulkVerifyResult:
     """Bulk verification result."""
 
-    results: list[dict]
+    results: list[dict[str, Any]]
     """Results for each hash"""
 
 
@@ -116,10 +117,7 @@ async def create(
             options.filename = filename
     elif isinstance(data, str):
         # Check if it's already a hash
-        if is_valid_hash(data):
-            hash_value = data.lower()
-        else:
-            hash_value = sha256(data)
+        hash_value = data.lower() if is_valid_hash(data) else sha256(data)
     elif isinstance(data, bytes):
         hash_value = sha256(data)
     else:
@@ -162,7 +160,7 @@ async def create_simple(
     })
 
     if not result.ok:
-        return result  # type: ignore
+        return result
 
     data = result.value
     return ok(TimestampClaim(
@@ -170,7 +168,9 @@ async def create_simple(
         hash=hash_value.lower(),
         created_at=data["timestamp"],
         proof_url=data["proof_url"],
-        blockchain_status="confirmed" if data.get("blockchain_status") == "confirmed" else "pending",
+        blockchain_status=(
+            "confirmed" if data.get("blockchain_status") == "confirmed" else "pending"
+        ),
         block_number=data.get("block_number"),
         tx_hash=data.get("tx_hash"),
     ))
@@ -197,10 +197,7 @@ async def verify(
     if isinstance(data, Path):
         hash_value = hash_file(data)
     elif isinstance(data, str):
-        if is_valid_hash(data):
-            hash_value = data.lower()
-        else:
-            hash_value = sha256(data)
+        hash_value = data.lower() if is_valid_hash(data) else sha256(data)
     elif isinstance(data, bytes):
         hash_value = sha256(data)
     else:
@@ -210,7 +207,7 @@ async def verify(
     result = await client.post("/api/verify", {"hash": hash_value})
 
     if not result.ok:
-        return result  # type: ignore
+        return result
 
     data_resp = result.value
     exists = data_resp.get("status") == "found" and len(data_resp.get("claims", [])) > 0
@@ -222,8 +219,12 @@ async def verify(
             receipt_id=first_claim["receipt_id"],
             hash=first_claim["hash"],
             created_at=first_claim["created_at"],
-            proof_url=f"https://otrust.eu/proof/{first_claim['receipt_id']}",
-            blockchain_status="confirmed" if first_claim.get("blockchain_status") == "confirmed" else "pending",
+            proof_url=f"https://www.otrust.eu/proof/{first_claim['receipt_id']}",
+            blockchain_status=(
+                "confirmed"
+                if first_claim.get("blockchain_status") == "confirmed"
+                else "pending"
+            ),
             block_number=first_claim.get("block_number"),
             tx_hash=first_claim.get("tx_hash"),
         )
@@ -266,7 +267,7 @@ async def verify_bulk(hashes: list[str]) -> Result[BulkVerifyResult, OTrustError
     })
 
     if not result.ok:
-        return result  # type: ignore
+        return result
 
     return ok(BulkVerifyResult(results=result.value.get("results", [])))
 
@@ -285,21 +286,23 @@ async def get_proof(receipt_id: str) -> Result[TimestampClaim, OTrustError]:
     result = await client.get(f"/api/proof/{receipt_id}")
 
     if not result.ok:
-        return result  # type: ignore
+        return result
 
     data = result.value
     return ok(TimestampClaim(
         receipt_id=data["receipt_id"],
         hash=data["hash"],
         created_at=data["created_at"],
-        proof_url=data.get("proof_url", f"https://otrust.eu/proof/{data['receipt_id']}"),
-        blockchain_status="confirmed" if data.get("blockchain_status") == "confirmed" else "pending",
+        proof_url=data.get("proof_url", f"https://www.otrust.eu/proof/{data['receipt_id']}"),
+        blockchain_status=(
+            "confirmed" if data.get("blockchain_status") == "confirmed" else "pending"
+        ),
         block_number=data.get("block_number"),
         tx_hash=data.get("tx_hash"),
     ))
 
 
-async def lookup(hash_value: str) -> Result[dict, OTrustError]:
+async def lookup(hash_value: str) -> Result[dict[str, Any], OTrustError]:
     """
     Quick lookup if a hash exists.
 
@@ -319,7 +322,7 @@ async def lookup(hash_value: str) -> Result[dict, OTrustError]:
     result = await client.get(f"/api/lookup/{hash_value.lower()}")
 
     if not result.ok:
-        return result  # type: ignore
+        return result
 
     data = result.value
     return ok({
@@ -351,9 +354,7 @@ def hash(
         if on_progress:
             return hash_file_with_progress(data, on_progress)
         return hash_file(data)
-    elif isinstance(data, str):
-        return sha256(data)
-    elif isinstance(data, bytes):
+    elif isinstance(data, (str, bytes)):
         return sha256(data)
     else:
         return hash_file(data)

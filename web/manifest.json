@@ -1,7 +1,7 @@
 {
   "name": "OTRUST",
   "short_name": "OTRUST",
-  "description": "Cryptographic trust infrastructure for timestamps, ID packages, signing and hosted Auth flows.",
+  "description": "Cryptographic trust infrastructure for timestamps, range proofs, signing, and issuer-gated Auth.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#2d5a3d",

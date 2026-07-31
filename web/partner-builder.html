@@ -31,7 +31,8 @@
           <p style="font-size:0.75rem;color:var(--text-dim);">${p.disclosure}</p>
           <h2 style="margin:0.75rem 0 0.25rem;">${p.headline}</h2>
           <p style="color:var(--text-dim);font-size:0.9rem;">${p.subhead}</p>
-          <button type="button" style="margin-top:1rem;padding:0.5rem 1rem;background:${p.accent};color:#fff;border:none;border-radius:6px;">Continue with OTRUST ID</button>
+          <button type="button" disabled style="margin-top:1rem;padding:0.5rem 1rem;background:${p.accent};color:#fff;border:none;border-radius:6px;">Issuer setup required</button>
+          <p style="margin-top:0.75rem;font-size:0.8rem;">Integration preview only. Production Auth requires a trusted credential issuer.</p>
         </div>`;
     }
     document.getElementById('theme-form').addEventListener('submit', async (e) => {

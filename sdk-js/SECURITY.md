@@ -1,115 +1,86 @@
 # Security Policy
 
-## Supported Versions
+## Supported versions
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.x.x   | :white_check_mark: |
+| Version | Supported |
+| --- | --- |
+| 1.x | Yes |
 
-## Reporting a Vulnerability
+## Report a vulnerability
 
-If you discover a security vulnerability in `@otrust/sdk`, please report it responsibly:
+Do not open a public issue for a suspected vulnerability. Email
+`security@otrust.eu` with the affected version, impact, and reproduction steps.
 
-1. **Do NOT** open a public GitHub issue
-2. Email security@otrust.eu with details
-3. Include steps to reproduce if possible
-4. We will respond within 48 hours
-
-## Security Features
+## Security boundaries
 
 ### Authentication
 
-- **CSRF Protection**: All auth flows use cryptographically random state parameters (128-bit via `crypto.getRandomValues()`)
-- **Token Storage**: Tokens stored in `sessionStorage` (not `localStorage`) - limited to browser session
-- **State Verification**: Callback handlers verify state matches to prevent CSRF attacks
+- Generate a cryptographically random state value for every Auth attempt.
+- Store browser-session state in `sessionStorage`, not `localStorage`.
+- Compare callback state before accepting or verifying a token.
+- Create challenges and verify tokens from a trusted server.
+- Check token expiry, redirect URI, challenge binding, credential binding, and
+  current trusted issuer status.
+- Production challenge creation remains unavailable until a trusted issuer is
+  configured.
 
-### Cryptography
+### Proofs
 
-- **Hashing**: SHA-256 via Web Crypto API
-- **Signatures**: Ed25519 via Web Crypto API
-- **Random Generation**: `crypto.getRandomValues()` for all security-sensitive randomness
-
-### Input Validation
-
-- **Hash Validation**: Strict regex `/^[a-f0-9]{64}$/i` for SHA-256 hashes
-- **URL Parsing**: Safe URL parsing with try/catch, no unsafe string concatenation
-
-### Error Handling
-
-- **No Sensitive Data Exposure**: Error messages do not leak internal server details
-- **Result Types**: Predictable error handling without exceptions
-
-## Best Practices for SDK Users
-
-### Secure Token Handling
+- Generate range proofs locally with the published OTRUST circuit artifacts.
+- Never add a date of birth, exact income, witness, randomness, or another
+  private circuit input to the submission payload.
+- Submit only `proofType`, `version`, `proof`, `publicSignals`, and `commitment`.
+- Treat range proofs as self-attested unless a separate trusted issuer binding is
+  explicitly present and verified.
+- Production publishing remains unavailable until the public trusted-setup
+  ceremony and artifact checks are complete.
 
 ```typescript
-// ✅ Good - tokens cleared on logout
-const { logout } = useAuth();
-logout(); // Clears sessionStorage
-
-// ❌ Bad - never log tokens
-console.log(token); // Don't do this!
+await proof.submitBrowserProof({
+  proofType: 'age',
+  version: 'groth16-v3',
+  proof: groth16Proof,
+  publicSignals,
+  commitment: publicSignals[5],
+});
 ```
 
-### Protect Your Secrets
+### Timestamping and signing
 
-```typescript
-// ✅ Good - store proof secrets securely
-const result = await proof.identity({ ... });
-if (result.ok) {
-  // Store secret in secure storage (e.g., encrypted database)
-  await secureStorage.set('proof_secret', result.value.secret);
-}
+- Hash documents locally and verify the hash immediately before signing.
+- Keep signing links, cancellation tokens, API keys, and private keys out of
+  logs and client bundles.
+- Distinguish an OpenTimestamps receipt that is pending from one independently
+  verified against Bitcoin.
+- OTRUST Sign creates Ed25519 attestations over document hashes; identity and
+  legal assurance depend on the surrounding workflow.
 
-// ❌ Bad - never expose secrets
-localStorage.setItem('secret', secret); // Don't do this!
-```
+### Transport and browser policy
 
-### CSRF Protection
+- Use HTTPS in production.
+- Restrict `connect-src` to the OTRUST origin you use.
+- Do not load proof artifacts or SDK bundles from unreviewed third-party origins.
+- Pin reviewed dependency and SDK versions.
 
-```typescript
-// ✅ Good - always verify state
-const { handleCallback } = useAuth();
-const success = await handleCallback(); // Verifies state automatically
+Example baseline:
 
-// ✅ Good - use provided state generator
-const state = auth.generateState();
-```
-
-### Content Security Policy
-
-Recommended CSP headers for your application:
-
-```
-Content-Security-Policy: 
+```text
+Content-Security-Policy:
   default-src 'self';
-  connect-src 'self' https://otrust.eu;
+  connect-src 'self' https://www.otrust.eu;
   script-src 'self';
-  style-src 'self' 'unsafe-inline';
+  object-src 'none';
+  base-uri 'self';
+  frame-ancestors 'none'
 ```
 
-## Dependency Security
+## Dependency checks
 
-We regularly audit dependencies using:
-- `pnpm audit` for JavaScript packages
-- Dependabot for automated security updates
+Run these checks before release:
 
-### Known Issues
-
-| Package | Severity | Status |
-|---------|----------|--------|
-| esbuild | Moderate | Dev dependency only - no production impact |
-
-## Security Audit History
-
-| Date | Auditor | Scope | Result |
-|------|---------|-------|--------|
-| 2026-01-08 | Internal | Full SDK review | ✅ Passed |
-
-## Changelog
-
-### v1.0.0
-- Replaced all `dangerouslySetInnerHTML` with safe React components
-- Implemented CSRF state verification in auth hooks
-- Added input validation for all user-provided data
+```bash
+npm audit
+npm run typecheck
+npm run test:run
+npm run build
+```

@@ -1,7 +1,7 @@
 /**
  * Proof Badge Component
  * 
- * Displays a verified proof badge with optional details.
+ * Displays a proof badge with optional server verification.
  */
 
 import { useEffect, useState, type CSSProperties } from 'react';
@@ -41,7 +41,8 @@ interface ProofData {
 }
 
 /**
- * Display a verified proof badge.
+ * Display a proof badge. With `autoVerify={false}`, the badge is explicitly
+ * shown as unchecked.
  * 
  * @example
  * ```tsx
@@ -64,12 +65,15 @@ export function ProofBadge({
   style,
   onClick,
 }: ProofBadgeProps) {
-  const [status, setStatus] = useState<'loading' | 'verified' | 'invalid' | 'error'>('loading');
+  const [status, setStatus] = useState<'unchecked' | 'loading' | 'verified' | 'invalid' | 'error'>(
+    autoVerify ? 'loading' : 'unchecked'
+  );
   const [proofData, setProofData] = useState<ProofData | null>(null);
 
   useEffect(() => {
     if (!autoVerify) {
-      setStatus('verified'); // Assume verified if not checking
+      setStatus('unchecked');
+      setProofData(null);
       return;
     }
 
@@ -99,13 +103,13 @@ export function ProofBadge({
 
   // Type labels
   const typeLabels: Record<string, string> = {
-    identity: 'Verified Identity',
-    age: 'Age Verified',
-    membership: 'Member',
-    custom: 'Verified',
+    identity: 'Identity credential',
+    age: 'Age range proof',
+    membership: 'Membership proof',
+    custom: 'Proof',
   };
 
-  const displayLabel = label ?? typeLabels[type] ?? 'Verified';
+  const displayLabel = label ?? typeLabels[type] ?? 'Proof';
 
   // Size styles
   const sizeStyles: Record<string, CSSProperties> = {
@@ -116,6 +120,7 @@ export function ProofBadge({
 
   // Status colors
   const statusColors: Record<string, { bg: string; text: string; border: string }> = {
+    unchecked: { bg: '#f3f4f6', text: '#4b5563', border: '#d1d5db' },
     loading: { bg: '#f3f4f6', text: '#6b7280', border: '#d1d5db' },
     verified: { bg: '#dcfce7', text: '#166534', border: '#86efac' },
     invalid: { bg: '#fee2e2', text: '#991b1b', border: '#fca5a5' },

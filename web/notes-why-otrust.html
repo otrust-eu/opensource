@@ -202,9 +202,9 @@
         <h2>Anchors and independence</h2>
         <p>OpenTimestamps gives OTRUST a path to external anchoring without pretending that a hosted service alone is the source of truth. A record can be useful immediately and stronger once it is anchored externally.</p>
 
-        <h2>ID-first identity</h2>
-        <p>Identity is not only login. In B2B flows, the important question is often narrower: does this user control an approved ID, and can the relying party verify that fact without seeing more personal data than needed?</p>
-        <p>That is why OTRUST ID and hosted Auth keep the provider boundary visible. The partner experience can be branded, but the ID processor should remain clear.</p>
+        <h2>Issuer-bound identity</h2>
+        <p>Identity is not only login. In B2B flows, the important question is narrower: does this user control a current credential from a trusted issuer, and can the relying party verify that fact without receiving the source document?</p>
+        <p>OTRUST therefore keeps Auth disabled until issuer provenance and exact partner redirects can be verified. The partner experience can be branded, but the credential verifier remains visible.</p>
 
         <h2>Why the boundary matters</h2>
         <p>A trust product should not hide who performs the trust-sensitive step. OTRUST keeps URLs, disclosures, ID links, and privacy notes explicit so users know when they are interacting with OTRUST and when they return to a partner.</p>
@@ -214,8 +214,8 @@
         <strong>Related surfaces</strong>
         <p>These are the product areas this note refers to.</p>
         <a href="/transparency">Transparency log</a>
-        <a href="/proof">OTRUST ID</a>
-        <a href="/sign-in">Hosted Auth</a>
+        <a href="/proof">Proof Lab</a>
+        <a href="/sign-in">Auth integration status</a>
         <a href="/docs#selfhost">Self-hosting docs</a>
       </aside>
     </div>

@@ -1,41 +1,87 @@
 # @otrust/sdk
 
-Official SDK for OTRUST - Zero-knowledge timestamping, signing, identity proofs, and authentication.
+Official TypeScript SDK for OTRUST timestamping, signing, browser-generated
+range-proof submission, and issuer-gated authentication.
 
-[![npm version](https://badge.fury.io/js/@otrust%2Fsdk.svg)](https://www.npmjs.com/package/@otrust/sdk)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+## Production status
 
-## Features
+- Timestamp and Sign are available.
+- Age and income proofs must be generated locally with OTRUST's published
+  Groth16 artifacts. The SDK accepts only the resulting proof, public signals,
+  and commitment.
+- Range-proof publishing fails closed in production until the public trusted
+  setup ceremony is complete.
+- Auth challenge creation fails closed until a trusted credential issuer is
+  configured.
+- Self-attested identity registration, server-side private proof generation,
+  membership proofs, client-driven revocation, and client-supplied backup email
+  are retired.
 
-- 🕐 **Timestamp** - Bitcoin-anchored timestamps via OpenTimestamps
-- ✍️ **Sign** - Multi-party document signing with zero-knowledge proofs
-- 🔐 **Proof** - Zero-knowledge identity and attribute proofs
-- 🚀 **Auth** - "Login with OTRUST" identity-based authentication
+Check `GET /health` before enabling proof publishing or Auth in a production UI.
 
 ## Installation
 
 ```bash
 npm install @otrust/sdk
-# or
-pnpm add @otrust/sdk
-# or
-yarn add @otrust/sdk
 ```
 
-## Quick Start
+Node.js 18 or newer is required.
+
+## Configuration
 
 ```typescript
-import { timestamp, sign, proof, auth } from '@otrust/sdk';
+import { configure } from '@otrust/sdk';
 
-// 🕐 Timestamp a file
+configure({
+  baseUrl: 'https://www.otrust.eu',
+});
+```
+
+The public service is the default. Configure another base URL for a self-hosted
+deployment.
+
+## Result values
+
+SDK operations return a `Result<T>` instead of throwing for expected API
+failures:
+
+```typescript
+import { timestamp } from '@otrust/sdk';
+
 const result = await timestamp.create(file);
-if (result.ok) {
-  console.log('Receipt:', result.value.receiptId);
-  console.log('Proof URL:', result.value.proofUrl);
-}
 
-// ✍️ Create a signing request
-const signResult = await sign.create(file, {
+if (result.ok) {
+  console.log(result.value.receiptId);
+} else {
+  console.error(result.error.code, result.error.message);
+}
+```
+
+Use `isOk`, `isErr`, `unwrap`, `unwrapOr`, `map`, and `mapErr` when they fit your
+application.
+
+## Timestamp
+
+```typescript
+import { timestamp } from '@otrust/sdk';
+
+const created = await timestamp.create(file);
+const verified = await timestamp.verify(file);
+const storedProof = await timestamp.getProof('ot_abc123');
+const lookup = await timestamp.lookup(
+  '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
+);
+```
+
+Receipt lists are intentionally client-side. Persist receipt IDs in your own
+browser storage or database. `GET /receipts/:pubkey` is retired.
+
+## Sign
+
+```typescript
+import { sign } from '@otrust/sdk';
+
+const result = await sign.create(file, {
   title: 'Contract Agreement',
   creatorEmail: 'alice@example.com',
   parties: [
@@ -45,300 +91,126 @@ const signResult = await sign.create(file, {
   deadline: '7d',
 });
 
-// 🔐 Create identity proof
-const proofResult = await proof.identity({
-  personnummer: '19900101-1234',
-  birthDate: '1990-01-01',
-  faceMatch: true,
-  livenessVerified: true,
-});
-
-// IMPORTANT: Store the secret securely!
-if (proofResult.ok) {
-  console.log('Save this secret:', proofResult.value.secret);
-}
-
-// 🚀 Login with OTRUST
-const authResult = await auth.createChallenge({
-  clientId: 'my-app',
-  redirectUri: 'https://my-app.com/callback',
-  scope: ['identity'],
-});
-
-if (authResult.ok) {
-  // Redirect user to login
-  window.location.href = authResult.value.loginUrl;
-}
-```
-
-## Result Types
-
-This SDK uses Result types instead of try/catch for better error handling:
-
-```typescript
-import { timestamp, isOk, isErr, unwrap, unwrapOr } from '@otrust/sdk';
-
-const result = await timestamp.create(file);
-
-// Check success
 if (result.ok) {
-  console.log(result.value.receiptId);
-} else {
-  console.error(result.error.message);
-}
-
-// Or use helper functions
-if (isOk(result)) {
-  const claim = unwrap(result);
-}
-
-// With default value
-const receiptId = unwrapOr(result, { receiptId: 'unknown' }).receiptId;
-```
-
-## Configuration
-
-```typescript
-import { configure } from '@otrust/sdk';
-
-// Configure the SDK (optional - defaults to production)
-configure({
-  baseUrl: 'https://otrust.eu',  // API base URL
-  timeout: 30000,                 // Request timeout in ms
-  retries: 3,                     // Number of retry attempts
-});
-```
-
-## API Reference
-
-### Timestamp Service
-
-```typescript
-import { timestamp } from '@otrust/sdk';
-
-// Create timestamp
-const result = await timestamp.create(file);
-const result = await timestamp.create('data to hash');
-const result = await timestamp.create(hash); // if already hashed
-
-// Verify
-const result = await timestamp.verify(file);
-const result = await timestamp.verify(hash);
-
-// Bulk verify (max 100)
-const result = await timestamp.verifyBulk([hash1, hash2, hash3]);
-
-// Get proof
-const result = await timestamp.getProof('ot_abc123');
-
-// Quick lookup
-const result = await timestamp.lookup(hash);
-
-// Hash with progress
-const hash = await timestamp.hash(file, (progress) => {
-  console.log(`${Math.round(progress * 100)}%`);
-});
-```
-
-#### Notifications & client-side receipt history
-
-Receipt lists are **browser-local** — `GET /receipts/:pubkey` returns `410 Gone`. Persist `receiptId` when you create a claim:
-
-```typescript
-// With PoW + signed claim (webhook on Bitcoin confirm):
-const result = await timestamp.createWithPoW(hash, signature, pubkey, pow, {
-  email: 'you@example.com',
-  notifyWebhook: 'https://app.example/hooks/otrust',
-  notifyWebhookSecret: 'your-hmac-secret',
-});
-
-if (result.ok) {
-  localStorage.setItem('last_receipt', result.value.receiptId);
+  console.log(result.value.requestId);
 }
 ```
 
-`timestamp.getReceiptsByPubkey()` is **deprecated** — use your own storage instead.
+OTRUST Sign records Ed25519 attestations over document hashes. It does not turn
+an unverified identity claim into a verified signer identity. Legal effect
+depends on the workflow and jurisdiction.
 
-Webhook payload on Bitcoin confirm:
+## Proof
 
-```json
-{
-  "event": "bitcoin_confirmed",
-  "receipt_id": "ot_abc123",
-  "hash": "sha256-hex",
-  "block_height": 912345,
-  "proof_url": "https://www.otrust.eu/proof/ot_abc123"
-}
-```
-
-Verify `X-OTRUST-Signature: sha256=<hmac>` when you set `notifyWebhookSecret`. Test at [/webhook-test](https://www.otrust.eu/webhook-test).
-
-Poll until Bitcoin confirms:
-
-```typescript
-const result = await timestamp.watchReceipt('ot_abc123', {
-  intervalMs: 30_000,
-  onPoll: (claim) => console.log(claim.blockchainStatus),
-});
-```
-
-Download evidence bundle: `GET /proof/:id/evidence.zip` or `otrust bundle <receipt-id>`.
-
-### Sign Service
-
-```typescript
-import { sign } from '@otrust/sdk';
-
-// Create sign request
-const result = await sign.create(file, {
-  title: 'Contract',
-  creatorEmail: 'alice@example.com',
-  parties: [
-    { email: 'bob@example.com', role: 'signer' },
-    { email: 'carol@example.com', role: 'approver' },
-  ],
-  signingOrder: 'sequential', // or 'parallel'
-  deadline: '7d',
-});
-
-// Get status
-const result = await sign.status('sr_xyz789');
-
-// Cancel
-const result = await sign.cancel('sr_xyz789', cancelToken);
-
-// Send reminder
-const result = await sign.remind('sr_xyz789', cancelToken);
-
-// Verify document
-const result = await sign.verifyDocument('sr_xyz789', file);
-
-// Get signature package
-const result = await sign.getPackage('sr_xyz789');
-```
-
-### Proof Service
+Generate the proof in the user's browser with the artifacts published by the
+OTRUST Proof Lab. Never send the date of birth, exact income, witness, randomness,
+or other private circuit input to the API.
 
 ```typescript
 import { proof } from '@otrust/sdk';
 
-// Create identity proof
-const result = await proof.identity({
-  personnummer: '19900101-1234',
-  birthDate: '1990-01-01',
-  faceMatch: true,
-  livenessVerified: true,
+const submitted = await proof.submitBrowserProof({
+  proofType: 'age',
+  version: 'groth16-v3',
+  proof: groth16Proof,
+  publicSignals,
+  commitment: publicSignals[5],
 });
 
-// Create age proof
-const result = await proof.age({
-  birthDate: '1990-01-01',
-  minAge: 18,
-});
+if (submitted.ok) {
+  console.log(submitted.value.proofId);
+  console.log(submitted.value.shareUrl);
+}
 
-// Create membership proof
-const result = await proof.membership({
-  memberId: 'M12345',
-  organizationId: 'org_abc',
-  organizationName: 'Example Club',
-});
-
-// Get proof
-const result = await proof.get('id_abc123');
-
-// Verify proof
-const result = await proof.verify('id_abc123');
-
-// Get wallet pass
-const result = await proof.wallet('id_abc123', 'apple');
-
-// Revoke (returns recovery token)
-const result = await proof.revoke('id_abc123');
-
-// Email backup
-await proof.emailBackup({
-  email: 'me@example.com',
-  proofId: 'id_abc123',
-  secret: 'your-secret',
-  commitment: 'commitment-hash',
-});
+const details = await proof.get('id_abc123');
+const verification = await proof.verify('id_abc123');
 ```
 
-### Auth Service (Login with OTRUST)
+The submission method uses a strict payload allowlist. A valid range proof
+establishes consistency with a committed private value; it does not establish
+that a government, employer, bank, or other trusted issuer checked that value.
+
+The following compatibility methods fail locally without sending their inputs:
+
+- `proof.identity()`
+- `proof.verifyIdentity()`
+- `proof.age()`
+- `proof.income()`
+- `proof.membership()`
+- `proof.revoke()`
+- `proof.emailBackup()`
+
+## Auth
+
+Create Auth challenges only from a trusted server and only after `/health`
+reports that trusted issuer support is ready.
 
 ```typescript
 import { auth } from '@otrust/sdk';
 
-// Create challenge (server-side)
-const result = await auth.createChallenge({
+const state = auth.generateState();
+const challenge = await auth.createChallenge({
   clientId: 'my-app',
-  redirectUri: 'https://my-app.com/callback',
+  redirectUri: 'https://my-app.example/auth/callback',
   scope: ['identity'],
-  state: auth.generateState(),
+  state,
 });
 
-// Generate login URL (client-side)
-const urlResult = await auth.loginUrl({
-  clientId: 'my-app',
-  redirectUri: 'https://my-app.com/callback',
-});
-
-// Verify token (in callback handler)
-const { token, state } = auth.parseCallback(window.location.href);
-const result = await auth.verify(token);
-
-if (result.ok && result.value.valid) {
-  console.log('User proof ID:', result.value.proofId);
+if (challenge.ok) {
+  // Redirect in the browser after the server has approved the response.
+  window.location.href = challenge.value.loginUrl;
 }
-
-// Get user info
-const result = await auth.userinfo(token);
 ```
 
-## Crypto Utilities
+On callback, compare the returned state with the value stored for the browser
+session, then verify the token server-side:
 
 ```typescript
-import { sha256, hashFile, isValidHash, randomHex, uuid } from '@otrust/sdk';
+const callback = auth.parseCallback(window.location.href);
 
-// Hash data
-const hash = await sha256('Hello, World!');
-const fileHash = await hashFile(file);
-
-// Validate hash
-if (isValidHash(hash)) {
-  // Valid 64-character hex string
+if (callback.token && callback.state === expectedState) {
+  const verified = await auth.verify(callback.token);
 }
-
-// Generate random values
-const random = randomHex(32); // 64 hex characters
-const id = uuid(); // UUID v4
 ```
 
-## Browser Support
+Auth accepts only current trusted issuer-bound identity credentials.
+Self-attested range proofs cannot be used for login.
 
-This SDK uses the Web Crypto API and works in:
+## Security
 
-- ✅ Node.js 18+
-- ✅ Deno
-- ✅ Bun
-- ✅ Modern browsers (Chrome, Firefox, Safari, Edge)
-- ✅ Edge runtimes (Cloudflare Workers, Vercel Edge)
+- Do not log tokens, proof witnesses, private inputs, signing links, or
+  cancellation tokens.
+- Keep API keys and Auth challenge creation on the server.
+- Verify callback state, redirect URI, token expiry, and issuer binding.
+- Verify document hashes locally before signing.
+- Treat a pending OpenTimestamps receipt differently from a Bitcoin-confirmed
+  receipt.
+- Pin a reviewed SDK version in production.
+
+Report vulnerabilities privately to `security@otrust.eu`.
 
 ## TypeScript
 
-Full TypeScript support with strict types:
+The package includes strict TypeScript declarations and both ESM and CommonJS
+builds.
 
 ```typescript
 import type {
   TimestampClaim,
   SignRequest,
-  IdentityProof,
+  ProofDetails,
+  BrowserProofOptions,
   AuthChallenge,
   Result,
   OTrustError,
 } from '@otrust/sdk';
 ```
 
+## Browser support
+
+The SDK uses Web Crypto and supports modern Chrome, Firefox, Safari, and Edge,
+plus Node.js 18+, Deno, Bun, and compatible edge runtimes.
+
 ## License
 
-MIT © [OTRUST](https://otrust.eu)
+MIT - [OTRUST](https://www.otrust.eu)

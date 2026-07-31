@@ -22,7 +22,6 @@
     '/swagger',
     '/install',
     '/setup',
-    '/camera-test',
     '/playground',
     '/auth-login'
   ]);
@@ -373,8 +372,8 @@
     {
       key: 'signin',
       href: '/sign-in',
-      label: 'Auth',
-      detail: 'Hosted auth challenge for partner apps.'
+      label: 'Auth preview',
+      detail: 'Issuer-bound integration contract; production is gated.'
     }
   ];
 
@@ -408,32 +407,32 @@
       actions: [['Create signing request', '/sign'], ['API reference', '/api-docs']]
     },
     proof: {
-      kicker: 'ID',
-      title: 'ID, without revealing.',
-      body: 'Prove a scoped identity claim while keeping the underlying evidence outside the public record.',
-      stepsTitle: 'ID flow',
-      stepLabels: ['Check', 'Commit', 'Verify', 'Share'],
-      steps: ['Run document and liveness checks in your browser.', 'Create a commitment-bound ID package.', 'Verifiers check the claim without receiving raw documents.', 'Share the ID URL only where the claim is needed.'],
-      trustTitle: 'Boundaries',
-      principlesHeading: 'Verify the claim,<br>not the document.',
-      principlesLead: 'Verifiers receive a commitment ID package and metadata - not your passport scan or selfie.',
-      trustLabels: ['Local checks', 'Commitments', 'Reusable URL', 'Scoped disclosure'],
-      trust: ['OCR and face matching run in your browser before any ID is created.', 'Claims are bound to cryptographic commitments, not raw identity fields.', 'Share an ID link; verifiers check the package independently.', 'Each ID is purpose-bound - age, unique identity, or similar facts only.'],
-      actions: [['Create ID', '/proof'], ['Partner Auth', '/sign-in']]
+      kicker: 'Proof lab',
+      title: 'Private range proofs.',
+      body: 'Generate self-attested age or income range proofs locally. They prove consistency with private inputs, not who issued or verified those inputs.',
+      stepsTitle: 'Proof flow',
+      stepLabels: ['Enter locally', 'Commit', 'Prove', 'Share'],
+      steps: ['Private values stay in the browser.', 'Poseidon binds the private values to a commitment.', 'Groth16 proves the requested range statement.', 'The server verifies the proof and stores only public signals after production keys are ready.'],
+      trustTitle: 'Current boundaries',
+      principlesHeading: 'Cryptographic proof,<br>explicit provenance.',
+      principlesLead: 'The circuits are open and testable. Published proving keys remain development artifacts until the public ceremony is complete.',
+      trustLabels: ['Local inputs', 'Self-attested', 'Open circuits', 'Ceremony pending'],
+      trust: ['Raw age and income values are not sent to the server.', 'The current proofs are not identity credentials.', 'Circuit source and artifact checksums are public.', 'Production submission stays disabled until independent contributors and a public beacon complete the ceremony.'],
+      actions: [['Open proof lab', '/proof'], ['Read ceremony status', 'https://github.com/otrust-eu/opensource/blob/main/circuits/CEREMONY.md']]
     },
     signin: {
-      kicker: 'Auth',
-      title: 'Hosted Auth for partners.',
-      body: 'Create a short-lived challenge, send the user to OTRUST for ID verification, then return to your registered callback with token and state.',
-      stepsTitle: 'Auth sequence',
-      stepLabels: ['Challenge', 'Redirect', 'Verify', 'Callback'],
-      steps: ['Partner creates a short-lived challenge through the API.', 'User completes the hosted Auth flow on otrust.eu.', 'OTRUST verifies ID ownership and challenge binding.', 'The user returns to the registered callback with token and state.'],
-      trustTitle: 'Production requirements',
-      principlesHeading: 'Partner-ready<br>hosted auth.',
-      principlesLead: 'Hosted Auth keeps verification on OTRUST while partners keep control of their app state.',
-      trustLabels: ['Visible domain', 'Safe branding', 'Bound callbacks'],
-      trust: ['The OTRUST domain remains visible during verification.', 'Partner branding cannot inject JavaScript.', 'Callbacks must preserve challenge, state, redirect URI, and expiry.'],
-      actions: [['View Auth flow', '/sign-in'], ['Hemsted example', '/partners/hemsted']]
+      kicker: 'Auth preview',
+      title: 'Issuer-bound Auth design.',
+      body: 'Review the challenge, branding, callback, and token contract. Production Auth is disabled until a trusted identity issuer is integrated.',
+      stepsTitle: 'Planned sequence',
+      stepLabels: ['Issue', 'Challenge', 'Verify', 'Callback'],
+      steps: ['A trusted issuer creates a bound identity credential.', 'A partner creates a short-lived challenge.', 'OTRUST verifies credential ownership and challenge binding.', 'A signed token returns to the registered callback with state.'],
+      trustTitle: 'Launch requirements',
+      principlesHeading: 'Designed,<br>not overstated.',
+      principlesLead: 'The integration surface is available for review, while token issuance remains closed without trusted credential provenance.',
+      trustLabels: ['Issuer required', 'Visible domain', 'Bound callbacks'],
+      trust: ['Self-attested identity records are rejected.', 'The OTRUST domain remains visible during verification.', 'Callbacks preserve challenge, state, redirect URI, and expiry.'],
+      actions: [['Review Auth design', '/sign-in'], ['Hemsted preview', '/partners/hemsted']]
     },
     docs: {
       shellMode: 'compact',
@@ -442,27 +441,27 @@
       body: 'The docs explain the product model, security boundaries, verification assumptions and integration steps behind the public tools.',
       stepsTitle: 'Start here',
       stepLabels: ['Functions', 'Local-first', 'API model', 'Playground'],
-      steps: ['Understand Timestamp, ID, Sign, and Auth.', 'Review local-first hashing and ID verification.', 'Connect API endpoints only after the verification model is clear.', 'Use the playground for request and response shape testing.'],
+      steps: ['Understand Timestamp, Sign, self-attested range proofs, and planned Auth.', 'Review local-first hashing and proof provenance.', 'Connect API endpoints only after the verification model is clear.', 'Use the playground for request and response shape testing.'],
       trustTitle: 'Included topics',
       principlesHeading: 'Docs that match<br>the product.',
       principlesLead: 'Implementation detail for the four public tools and their verification assumptions.',
-      trustLabels: ['Timestamps', 'Signing', 'ID Auth', 'Transparency'],
-      trust: ['OpenTimestamps anchoring.', 'Document signing records.', 'Hosted Auth callbacks.', 'Operational transparency and audit logs.'],
+      trustLabels: ['Timestamps', 'Signing', 'ZK proofs', 'Transparency'],
+      trust: ['OpenTimestamps anchoring.', 'Document signing records.', 'ZK ceremony and self-attestation boundaries.', 'Operational transparency and audit logs.'],
       actions: [['Open docs', '/docs'], ['API reference', '/api-docs']]
     },
     api: {
       shellMode: 'compact',
       kicker: 'API',
       title: 'API reference.',
-      body: 'The API surface is designed around explicit hashes, signed records, verification endpoints, and short-lived partner Auth challenges.',
+      body: 'The API surface is designed around explicit hashes, signed records, verification endpoints, and versioned operational contracts.',
       stepsTitle: 'Integration path',
       stepLabels: ['Hash in app', 'Create records', 'Store IDs', 'Verify server-side'],
-      steps: ['Generate or accept hashes in your application.', 'Create claims, signing requests or Auth challenges through the API.', 'Store returned ID links and verification URLs.', 'Verify callbacks and ID metadata server-side.'],
+      steps: ['Generate or accept hashes in your application.', 'Create timestamp or signing records through the API.', 'Store returned receipt IDs and verification URLs.', 'Check health capabilities before using gated ZK or Auth endpoints.'],
       trustTitle: 'Engineering notes',
       principlesHeading: 'Verify on<br>your server.',
-      principlesLead: 'The API is hash-first: claims, signatures, ID packages, and short-lived Auth challenges.',
-      trustLabels: ['Callbacks', 'State checks', 'Hash-first'],
-      trust: ['Never treat a client callback as final without server verification.', 'Preserve state and expiry checks for hosted Auth.', 'Prefer hash references over document uploads where possible.'],
+      principlesLead: 'The API is hash-first and reports build identity plus feature readiness explicitly.',
+      trustLabels: ['Idempotency', 'Request IDs', 'Hash-first'],
+      trust: ['Reuse idempotency keys when retrying writes.', 'Log request IDs and verify server responses.', 'Prefer hash references over document uploads where possible.'],
       actions: [['View endpoints', '/api-docs'], ['Open playground', '/playground/']]
     },
     founder: {
@@ -484,15 +483,15 @@
       shellMode: 'compact',
       kicker: 'About',
       title: 'Built for verifiable trust.',
-      body: 'OTRUST connects timestamping, signing, commitment ID packages, and hosted Auth through one local-first verification model.',
+      body: 'OTRUST connects production timestamping and signing with an open ZK proof lab and a gated issuer-bound Auth design.',
       stepsTitle: 'What it is',
       stepLabels: ['Timestamp', 'ID', 'Sign', 'Auth'],
-      steps: ['Timestamp files and claims with independently verifiable record metadata.', 'Collect signer attestations around document hashes.', 'Create commitment-based IDs for selective disclosure.', 'Run hosted Auth with challenge-bound callbacks.'],
+      steps: ['Timestamp files and claims with independently verifiable record metadata.', 'Collect signer attestations around document hashes.', 'Test self-attested range proofs with explicit provenance.', 'Review issuer-bound Auth contracts before the issuer integration launches.'],
       trustTitle: 'Design position',
       principlesHeading: 'Four tools,<br>one model.',
-      principlesLead: 'Timestamp, ID, Sign, and Auth share local-first hashing, visible processing boundaries, and independent verification.',
+      principlesLead: 'Each capability reports its trust boundary instead of borrowing assurance from a different feature.',
       trustLabels: ['Verifiable', 'Clear processor', 'Open source', 'Public boundaries'],
-      trust: ['Cryptographic records should remain independently verifiable over time.', 'Hosted identity moments must keep OTRUST visible as processor.', 'Open source should cover the core ID path and integrations.', 'Service boundaries should be explicit in docs, terms, and privacy language.'],
+      trust: ['Cryptographic records should remain independently verifiable over time.', 'Identity requires an accountable issuer, not client-reported checks.', 'Open source covers circuits and integration contracts.', 'Service boundaries stay explicit in docs, health status, terms, and privacy language.'],
       actions: [['Read technical note', '/notes/why-otrust'], ['Privacy policy', '/privacy-policy']]
     },
     transparency: {
@@ -512,7 +511,7 @@
       shellMode: 'compact',
       kicker: 'Technical note',
       title: 'Why OTRUST.',
-      body: 'The technical note explains the product philosophy: local computation, ID-first identity, auditable records and clear provider boundaries.',
+      body: 'The technical note explains the product philosophy: local computation, auditable records, explicit provenance, and clear provider boundaries.',
       stepsTitle: 'Core argument',
       stepLabels: ['Local data', 'Public records', 'Visible processor', 'Verify first'],
       steps: ['Keep files and sensitive data out of the service where possible.', 'Use public verification records for permanence.', 'Make the processor visible during identity moments.', 'Prefer verification over promises.'],
@@ -525,8 +524,8 @@
       shellMode: 'compact',
       kicker: 'ID',
       title: 'Verify ID.',
-      body: 'View and verify a shared ID package. Only the claim and cryptographic metadata are shown to verifiers.',
-      actions: [['Create ID', '/proof'], ['Documentation', '/docs']]
+      body: 'Inspect a shared proof package, its public signals, credential binding, and cryptographic verification status.',
+      actions: [['Open proof lab', '/proof'], ['Documentation', '/docs']]
     },
     signview: {
       shellMode: 'compact',
@@ -546,58 +545,58 @@
       shellMode: 'compact',
       kicker: 'Auth',
       title: 'Hosted Auth.',
-      body: 'Present your OTRUST ID to complete a partner challenge. Verification runs on otrust.eu with visible disclosure.',
+      body: 'Integration preview only. Production challenges require a trusted issuer-bound identity credential and are currently disabled.',
       actions: [['How it works', '/docs#proofauth'], ['Privacy', '/privacy-policy']]
     },
     partner: {
       shellMode: 'compact',
       kicker: 'Partner flow',
       title: 'Branded Auth handoff.',
-      body: 'Partner pages show how hosted ID verification can carry partner context while keeping the OTRUST domain and disclosure visible.',
+      body: 'Partner pages preview how future issuer-bound verification can carry partner context while keeping the OTRUST domain and disclosure visible.',
       stepsTitle: 'Handoff model',
       stepLabels: ['Challenge', 'Redirect', 'Branded UI', 'Callback'],
-      steps: ['Partner creates a challenge.', 'User redirects to OTRUST hosted Auth UI.', 'The screen uses approved partner context.', 'Verification returns to the registered callback.'],
+      steps: ['A trusted issuer integration is enabled.', 'The partner creates a short-lived challenge.', 'The screen uses approved partner context.', 'Credential verification returns to the registered callback.'],
       trustTitle: 'Must remain visible',
       trustLabels: ['OTRUST provider', 'otrust.eu domain', 'DPO links'],
-      trust: ['OTRUST as ID-processing provider.', 'The otrust.eu domain during verification.', 'DPO/GDPR and security disclosure links.'],
+      trust: ['Trusted credential provenance.', 'The otrust.eu domain during verification.', 'DPO/GDPR and security disclosure links.'],
       actions: [['View partner example', '/partners/hemsted'], ['Hosted Auth', '/sign-in']]
     },
     privacy: {
       shellMode: 'compact',
       kicker: 'Privacy',
       title: 'Privacy by design.',
-      body: 'The privacy policy explains which data stays local, which ID metadata is stored, and how hosted Auth and analytics are scoped.',
-      principlesLead: 'Privacy language mirrors actual data handling: local hashing where possible, commitment-bound ID packages, and challenge-bound hosted Auth callbacks.',
+      body: 'The privacy policy explains which data stays local, which proof metadata is stored, and which identity features are not currently active.',
+      principlesLead: 'Privacy language mirrors actual data handling: local hashing, public proof signals, and fail-closed identity endpoints.',
       stepsTitle: 'Data posture',
-      stepLabels: ['Local processing', 'ID package', 'Hosted auth', 'Analytics scope'],
-      steps: ['Hash files locally before timestamping or signing where possible.', 'Store commitment ID packages and verification metadata, not raw identity documents.', 'Bind hosted Auth callbacks to challenge, state, redirect URI, and expiry.', 'Use privacy-friendly analytics without cross-site profiling.'],
+      stepLabels: ['Local processing', 'Proof signals', 'Auth gate', 'Analytics scope'],
+      steps: ['Hash files locally before timestamping or signing where possible.', 'Submit only proofs, commitments, and public signals.', 'Keep production Auth disabled until trusted issuer integration.', 'Use privacy-friendly analytics without cross-site profiling.'],
       trustTitle: 'User expectation',
-      trustLabels: ['No raw files', 'Commitment model', 'Visible hosted flow', 'Clear retention'],
-      trust: ['Raw content is not required for timestamp verification.', 'ID claims are backed by commitments instead of exposing source identity fields.', 'Hosted Auth clearly shows when OTRUST processes partner verification.', 'Retention choices are documented per service so verification remains possible.'],
+      trustLabels: ['No raw files', 'Public signals', 'Identity gate', 'Clear retention'],
+      trust: ['Raw content is not required for timestamp verification.', 'Private range-proof inputs stay in the browser.', 'Self-attested records cannot become identity tokens.', 'Retention choices are documented per service so verification remains possible.'],
       actions: [['Read privacy policy', '/privacy-policy'], ['Transparency log', '/transparency']]
     },
     terms: {
       shellMode: 'compact',
       kicker: 'Terms',
       title: 'Terms of service.',
-      body: 'The terms describe service boundaries for timestamping, signing, ID packages, and hosted Auth, including practical liability limits.',
+      body: 'The terms describe service boundaries for timestamping, signing, self-attested proofs, and gated Auth, including practical liability limits.',
       principlesLead: 'The terms focus on verification boundaries, partner callback obligations, and third-party dependencies rather than marketing promises.',
       stepsTitle: 'Covered areas',
       stepLabels: ['Services', 'Hosted auth', 'No warranty', 'Dependencies'],
-      steps: ['Timestamp, ID, Sign, and Auth service behavior.', 'Partner callback verification and challenge-bound Auth expectations.', 'No-warranty limits for cryptographic records and operational availability.', 'Third-party anchoring and infrastructure assumptions.'],
+      steps: ['Timestamp, proof-lab, Sign, and gated Auth behavior.', 'Trusted issuer and partner callback requirements.', 'No-warranty limits for cryptographic records and operational availability.', 'Third-party anchoring and infrastructure assumptions.'],
       trustTitle: 'Important boundary',
       trustLabels: ['Evidence only', 'Verify inputs', 'External deps', 'Partner checks'],
-      trust: ['A record is evidence, not automatic legal advice.', 'Independent verification still requires original inputs.', 'Hosted availability and blockchain anchoring depend on external systems.', 'Partners must verify callback tokens, state, and expiry server-side.'],
+      trust: ['A record is evidence, not automatic legal advice.', 'Self-attested proofs do not establish identity or source truth.', 'Hosted availability and blockchain anchoring depend on external systems.', 'Partners must verify future callback tokens, state, and expiry server-side.'],
       actions: [['Read terms', '/terms'], ['Documentation', '/docs']]
     },
     site: {
       shellMode: 'compact',
       kicker: 'OTRUST',
       title: 'Trust infrastructure.',
-      body: 'Cryptographic timestamps, signing, ID packages and hosted verification on otrust.eu.',
+      body: 'Production timestamps and signing, plus an open self-attested ZK proof lab and gated issuer-bound Auth design.',
       stepsTitle: 'Core surfaces',
-      stepLabels: ['Timestamp', 'ID', 'Sign', 'Auth'],
-      steps: ['Timestamp files and claims locally.', 'Create privacy-preserving IDs.', 'Sign documents with verifiable hashes.', 'Use hosted Auth for partners.'],
+      stepLabels: ['Timestamp', 'Proof lab', 'Sign', 'Auth preview'],
+      steps: ['Timestamp files and claims locally.', 'Generate self-attested range proofs.', 'Sign documents with verifiable hashes.', 'Review the issuer-bound Auth contract.'],
       trustTitle: 'Principles',
       trustLabels: ['Local-first', 'Zero-knowledge', 'Verifiable', 'Open source'],
       trust: ['Everything possible stays on the device.', 'Raw content is not required for verification.', 'Records should be independently auditable.', 'The core path is open source.'],
@@ -666,7 +665,6 @@
     if (normalized === '/install') return 'install';
     if (normalized === '/setup') return 'setup';
     if (normalized === '/swagger') return 'api';
-    if (normalized === '/camera-test') return 'site';
     if (normalized === '/proof-view' || (normalized.startsWith('/proof/') && normalized !== '/proof')) {
       return 'proofview';
     }
@@ -861,14 +859,14 @@
     const key = currentBriefingKey() || root.dataset.otrustPage;
     const promptMap = {
       timestamp: ['DRAG & DROP A FILE', 'OR CLICK TO SELECT', 'Max size 5GB  &middot;  Any file type'],
-      proof: ['PASTE ID', 'OR CREATE A CLAIM', 'ID package  &middot;  Commitment'],
+      proof: ['ENTER A PRIVATE VALUE', 'GENERATE LOCALLY', 'Groth16  &middot;  Self-attested'],
       sign: ['SELECT A DOCUMENT', 'OR START WITH A HASH', 'Local hash  &middot;  Invite signers'],
-      signin: ['CREATE CHALLENGE', 'OR VERIFY CALLBACK', 'Hosted auth  &middot;  Partner flow'],
+      signin: ['REVIEW THE CONTRACT', 'TRUSTED ISSUER REQUIRED', 'Auth preview  &middot;  Fail closed'],
       docs: ['READ THE MODEL', 'OR OPEN API DOCS', 'Security  &middot;  Verification'],
       api: ['EXPLORE ENDPOINTS', 'OR OPEN PLAYGROUND', 'JSON  &middot;  Server verify'],
       about: ['FOUR TOOLS', 'ONE VERIFICATION MODEL', 'Local-first  &middot;  Open source'],
       founder: ['PRIOR ART', 'WITHOUT DISCLOSURE', 'Hash locally  &middot;  Verify later'],
-      privacy: ['LOCAL-FIRST DATA', 'CLEAR RETENTION', 'No raw files  &middot;  Scoped IDs'],
+      privacy: ['LOCAL-FIRST DATA', 'CLEAR RETENTION', 'Public signals  &middot;  Explicit gates'],
       terms: ['SERVICE BOUNDARIES', 'VERIFICATION DUTIES', 'Evidence  &middot;  Dependencies']
     };
     return promptMap[key] || [
@@ -1644,7 +1642,6 @@
       normalized === '/setup' ? 'setup' :
       normalized === '/report-abuse' ? 'support' :
       normalized === '/swagger' ? 'swagger' :
-      normalized === '/camera-test' ? 'camera' :
       'page';
 
     root.dataset.otrustPage = page;
@@ -2274,11 +2271,11 @@
       checks: ['Local SHA-256 hash', 'Ed25519 signature', 'OpenTimestamps receipt']
     },
     proof: {
-      label: 'ID',
+      label: 'Proof',
       number: '02',
-      title: 'Create or verify ID packages.',
-      body: 'Verify an existing ID or issue a purpose-bound identity package.',
-      checks: ['ID lookup', 'PIN-protected identity package', 'Shareable verification URL']
+      title: 'Generate a local range proof.',
+      body: 'Create a self-attested Groth16 range proof without sending its private input to the service.',
+      checks: ['Local proving', 'Public signals only', 'Ceremony-gated publication']
     },
     sign: {
       label: 'Sign',
@@ -2290,9 +2287,9 @@
     signin: {
       label: 'Auth',
       number: '04',
-      title: 'Start hosted Auth.',
-      body: 'Create a challenge-bound hosted login URL for ID-based partner Auth.',
-      checks: ['Short-lived challenge', 'Callback state preserved', 'Visible OTRUST hosted flow']
+      title: 'Review issuer-bound Auth.',
+      body: 'Production challenges are disabled until a trusted identity issuer is integrated.',
+      checks: ['Issuer required', 'Self-attested IDs rejected', 'Fail-closed token issuance']
     }
   };
 
@@ -2335,25 +2332,11 @@
   function proofWorkspaceMarkup() {
     return `
       <article class="function-tool-card function-tool-card-proof">
-        <div class="workspace-topline"><span>02</span><strong>ID</strong></div>
-        <h2>Verify or create ID</h2>
-        <div class="workspace-two-column">
-          <div class="workspace-mini-panel">
-            <h3>Verify ID</h3>
-            <label><span>ID or URL</span><input id="workspace-proof-id" type="text" placeholder="id_... or /proof/id_..."></label>
-            <button type="button" id="workspace-proof-verify">Verify ID</button>
-            <p class="workspace-action-status" id="workspace-proof-status" aria-live="polite">Ready for ID lookup.</p>
-          </div>
-          <div class="workspace-mini-panel">
-            <h3>Create ID</h3>
-            <label><span>Personnummer</span><input id="workspace-proof-personnummer" type="text" inputmode="numeric" placeholder="YYYYMMDDXXXX"></label>
-            <div class="workspace-inline-fields">
-              <label><span>Birth date</span><input id="workspace-proof-birthdate" type="date"></label>
-              <label><span>PIN</span><input id="workspace-proof-pin" type="password" inputmode="numeric" maxlength="6" placeholder="000000"></label>
-            </div>
-            <button type="button" id="workspace-proof-create">Create ID</button>
-            <p class="workspace-action-status" id="workspace-proof-create-status" aria-live="polite">Sensitive data is used only to create the ID package.</p>
-          </div>
+        <div class="workspace-topline"><span>02</span><strong>PROOF LAB</strong></div>
+        <h2>Local range proofs</h2>
+        <p>Generate and export self-attested age or income range proofs. Trusted identity issuance is not available.</p>
+        <div class="workspace-actions">
+          <a class="button" href="/proof">Open proof lab</a>
         </div>
       </article>
     `;
@@ -2386,17 +2369,10 @@
   function signInWorkspaceMarkup() {
     return `
       <article class="function-tool-card">
-        <div class="workspace-topline"><span>04</span><strong>AUTH</strong></div>
-        <h2>Create Auth</h2>
-        <div class="workspace-form-grid">
-          <label><span>Client ID</span><input id="workspace-auth-client-id" type="text" value="otrust_dashboard"></label>
-          <label><span>Redirect URI</span><input id="workspace-auth-redirect-uri" type="url"></label>
-          <label><span>ID optional</span><input id="workspace-auth-proof-id" type="text" placeholder="id_..."></label>
-        </div>
-        <div class="workspace-actions">
-          <button type="button" id="workspace-auth-submit">Start Auth</button>
-        </div>
-        <p class="workspace-action-status" id="workspace-auth-status" aria-live="polite">Creates a short-lived hosted login challenge.</p>
+        <div class="workspace-topline"><span>04</span><strong>AUTH PREVIEW</strong></div>
+        <h2>Trusted issuer required</h2>
+        <p>Production challenge and token creation is disabled until issuer-bound credentials are available.</p>
+        <p class="workspace-action-status" aria-live="polite">Self-attested identity records are rejected.</p>
       </article>
     `;
   }

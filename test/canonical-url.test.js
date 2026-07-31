@@ -1,4 +1,7 @@
-import { getProductionRedirectUrl } from '../src/canonical-url.js';
+import {
+  getProductionRedirectStatus,
+  getProductionRedirectUrl
+} from '../src/canonical-url.js';
 
 describe('Production URL redirects', () => {
   test('redirects HTTP apex requests directly to the canonical HTTPS host', () => {
@@ -60,4 +63,15 @@ describe('Production URL redirects', () => {
       isProduction: false
     })).toBeNull();
   });
+
+  test.each(['GET', 'HEAD'])('uses permanent redirects for safe %s requests', (method) => {
+    expect(getProductionRedirectStatus(method)).toBe(301);
+  });
+
+  test.each(['POST', 'PUT', 'PATCH', 'DELETE'])(
+    'preserves the method for %s redirects',
+    (method) => {
+      expect(getProductionRedirectStatus(method)).toBe(308);
+    }
+  );
 });

@@ -34,7 +34,7 @@ export interface Party {
   role: PartyRole;
   /** Order for sequential signing */
   order?: number;
-  /** Require OTRUST Proof verification before signing */
+  /** @deprecated Trusted issuer integration is not available yet. */
   requireOtrustProof?: boolean;
 }
 
@@ -562,7 +562,7 @@ export async function status(requestId: string, viewToken?: string): Promise<Res
     status: result.value.status,
     deadline: result.value.deadline,
     createdAt: result.value.created_at,
-    statusUrl: `https://otrust.eu/sign/${result.value.id}`,
+    statusUrl: `https://www.otrust.eu/sign/${result.value.id}`,
   });
 }
 

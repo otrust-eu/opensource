@@ -6,6 +6,7 @@ on:
     paths:
       - 'web/**'
       - 'src/server.js'
+      - 'src/db.js'
       - 'test/e2e/**'
       - 'playwright.config.js'
   pull_request:
@@ -19,24 +20,13 @@ jobs:
   playwright:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    services:
-      mongodb:
-        image: mongo:7
-        ports:
-          - 27017:27017
-        options: >-
-          --health-cmd "mongosh --eval 'db.runCommand({ ping: 1 })'"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
       - uses: actions/checkout@v6
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
 
       - name: Install dependencies
@@ -45,6 +35,9 @@ jobs:
       - name: Build browser extension
         run: npm run build:extension
 
+      - name: Build local ZK browser dependencies
+        run: npm run build:poseidon
+
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium firefox webkit
 
@@ -52,6 +45,4 @@ jobs:
         run: npm run test:e2e
         env:
           CI: 'true'
-          MONGODB_URL: mongodb://localhost:27017
-          MONGODB_DB: otrust_e2e
           NODE_ENV: test

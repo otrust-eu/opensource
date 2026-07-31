@@ -44,6 +44,6 @@ describe('useOTrust', () => {
     render(<TestComponent />);
 
     expect(screen.getByTestId('configured')).toHaveTextContent('false');
-    expect(screen.getByTestId('baseUrl')).toHaveTextContent('https://otrust.eu');
+    expect(screen.getByTestId('baseUrl')).toHaveTextContent('https://www.otrust.eu');
   });
 });

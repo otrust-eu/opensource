@@ -5,10 +5,10 @@ build-backend = "hatchling.build"
 [project]
 name = "otrust"
 version = "1.0.0"
-description = "Official Python SDK for OTRUST - Zero-knowledge timestamps, signing, proofs, and authentication"
+description = "Official Python SDK for OTRUST timestamping, signing, range-proof submission, and issuer-gated authentication"
 readme = "README.md"
 license = "MIT"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 authors = [{ name = "OTRUST", email = "dev@otrust.eu" }]
 keywords = [
     "otrust",
@@ -28,7 +28,6 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -51,16 +50,16 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://otrust.eu"
-Documentation = "https://otrust.eu/docs/python"
-Repository = "https://github.com/otrust/sdk-python"
-Issues = "https://github.com/otrust/sdk-python/issues"
+Homepage = "https://www.otrust.eu"
+Documentation = "https://www.otrust.eu/docs#sdk"
+Repository = "https://github.com/otrust-eu/opensource/tree/main/sdk-python"
+Issues = "https://github.com/otrust-eu/opensource/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/otrust"]
 
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.10"
 strict = true
 warn_return_any = true
 warn_unused_ignores = true

@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { isDeepStrictEqual } from 'util';
 import { fileURLToPath } from 'url';
-import { buildPoseidon } from 'circomlibjs';
+import { poseidon2, poseidon4 } from 'poseidon-lite';
 import * as snarkjs from 'snarkjs';
 
 const circuitsDir = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -72,27 +72,100 @@ function validateProductionMetadata(manifest) {
   if (ceremony?.status !== 'complete' || ceremony.productionReady !== true) {
     fail('Published artifacts are not marked as production-ready');
   }
-  if (!manifest.compiler?.version || manifest.compiler.reproducible !== true) {
+  if (
+    manifest.compiler?.name !== 'circom' ||
+    !/^\d+\.\d+\.\d+$/.test(manifest.compiler?.version || '') ||
+    manifest.compiler.reproducible !== true
+  ) {
     fail('Production artifacts require a pinned, reproducible compiler');
   }
-  if (!ceremony.coordinator || !ceremony.finalizedAt || !ceremony.transcriptUrl) {
+  if (
+    !ceremony.coordinator ||
+    !Number.isFinite(Date.parse(ceremony.finalizedAt)) ||
+    !isHttpsUrl(ceremony.transcriptUrl)
+  ) {
     fail('Production ceremony coordinator, finalization time, and transcript URL are required');
+  }
+  const finalizedAt = Date.parse(ceremony.finalizedAt);
+  if (finalizedAt > Date.now()) {
+    fail('Production ceremony finalization time cannot be in the future');
   }
   if (!Array.isArray(ceremony.contributions) || ceremony.contributions.length < 2) {
     fail('Production ceremony requires at least two documented independent contributions');
   }
+
+  const circuitNames = Object.keys(manifest.circuits || {});
+  const contributorIds = new Set();
+  const previousHashes = new Map();
+  for (const circuitName of circuitNames) {
+    const initialHash = ceremony.initialKeys?.[circuitName]?.sha256;
+    if (!isSha256(initialHash)) {
+      fail(`Missing initial proving-key checksum for ${circuitName}`);
+    }
+    previousHashes.set(circuitName, initialHash);
+  }
+
   for (const contribution of ceremony.contributions) {
-    if (!contribution.id || !contribution.attestationUrl ||
-        !contribution.inputSha256 || !contribution.outputSha256) {
-      fail('Each production contribution requires an ID, attestation, and input/output checksums');
+    if (
+      !contribution.id ||
+      contributorIds.has(contribution.id) ||
+      !isHttpsUrl(contribution.attestationUrl) ||
+      !Number.isFinite(Date.parse(contribution.contributedAt)) ||
+      Date.parse(contribution.contributedAt) > finalizedAt
+    ) {
+      fail('Each production contribution requires a unique ID, timestamp, and HTTPS attestation');
+    }
+    contributorIds.add(contribution.id);
+
+    for (const circuitName of circuitNames) {
+      const record = contribution.circuits?.[circuitName];
+      if (!isSha256(record?.inputSha256) || !isSha256(record?.outputSha256)) {
+        fail(`Contribution ${contribution.id} is incomplete for ${circuitName}`);
+      }
+      if (record.inputSha256 !== previousHashes.get(circuitName)) {
+        fail(`Contribution chain is broken for ${circuitName} at ${contribution.id}`);
+      }
+      previousHashes.set(circuitName, record.outputSha256);
     }
   }
-  if (!ceremony.beacon?.value || !ceremony.beacon?.source) {
+
+  if (
+    !/^[a-fA-F0-9]{64,1024}$/.test(ceremony.beacon?.value || '') ||
+    !isHttpsUrl(ceremony.beacon?.source) ||
+    !Number.isFinite(Date.parse(ceremony.beacon?.appliedAt)) ||
+    Date.parse(ceremony.beacon.appliedAt) > finalizedAt
+  ) {
     fail('Production ceremony requires a documented public randomness beacon');
+  }
+
+  for (const circuitName of circuitNames) {
+    const record = ceremony.beacon.circuits?.[circuitName];
+    const finalHash = manifest.circuits[circuitName].artifacts?.zkey?.sha256;
+    if (
+      !isSha256(record?.inputSha256) ||
+      !isSha256(record?.outputSha256) ||
+      record.inputSha256 !== previousHashes.get(circuitName) ||
+      record.outputSha256 !== finalHash
+    ) {
+      fail(`Beacon chain does not match the published ${circuitName} proving key`);
+    }
   }
 }
 
-async function verifyCircuit(name, descriptor, poseidon, manifest) {
+function isSha256(value) {
+  return typeof value === 'string' && /^[a-f0-9]{64}$/.test(value);
+}
+
+function isHttpsUrl(value) {
+  if (typeof value !== 'string') return false;
+  try {
+    return new URL(value).protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
+async function verifyCircuit(name, descriptor, manifest) {
   const sourcePath = verifyFile(repoRoot, descriptor.source, `${name} source`);
   const wasmPath = verifyFile(artifactsDir, descriptor.artifacts?.wasm, `${name} WASM`);
   const zkeyPath = verifyFile(artifactsDir, descriptor.artifacts?.zkey, `${name} proving key`);
@@ -136,9 +209,12 @@ async function verifyCircuit(name, descriptor, poseidon, manifest) {
       currentMonth: 1,
       currentDay: 6,
       minAge: 18,
-      identityCommitment: poseidon.F.toString(
-        poseidon([birthYear, birthMonth, birthDay, secret])
-      )
+      identityCommitment: poseidon4([
+        birthYear,
+        birthMonth,
+        birthDay,
+        secret
+      ]).toString()
     };
   } else if (name === 'incomeProof') {
     const income = 75000;
@@ -148,7 +224,7 @@ async function verifyCircuit(name, descriptor, poseidon, manifest) {
       secret: secret.toString(),
       minIncome: 50000,
       maxIncome: 100000,
-      commitment: poseidon.F.toString(poseidon([BigInt(income), secret]))
+      commitment: poseidon2([BigInt(income), secret]).toString()
     };
   } else {
     fail(`No published proof smoke test defined for ${name}`);
@@ -174,9 +250,8 @@ async function main() {
     validateProductionMetadata(manifest);
   }
 
-  const poseidon = await buildPoseidon();
   for (const [name, descriptor] of Object.entries(manifest.circuits || {})) {
-    await verifyCircuit(name, descriptor, poseidon, manifest);
+    await verifyCircuit(name, descriptor, manifest);
   }
 
   if (!Object.keys(manifest.circuits || {}).length) {

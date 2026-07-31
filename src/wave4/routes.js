@@ -1,4 +1,4 @@
-import archiver from 'archiver';
+import { ZipArchive } from 'archiver';
 import { buildEvidenceBundleMeta, instructionsText } from './evidence-bundle.js';
 import { buildTransparencyRss } from './transparency-feed.js';
 import { createCeremony, getCeremony, joinCeremony, attestCeremony } from './ceremony.js';
@@ -25,7 +25,7 @@ export function registerWave4Routes(app, { getDb, getTimestampInfo, sanitizeStri
       res.setHeader('Content-Type', 'application/zip');
       res.setHeader('Content-Disposition', `attachment; filename="${receiptId}-evidence.zip"`);
 
-      const archive = archiver('zip', { zlib: { level: 9 } });
+      const archive = new ZipArchive({ zlib: { level: 9 } });
       archive.on('error', (err) => {
         console.error('[Evidence] ZIP error:', err.message);
         if (!res.headersSent) res.status(500).json({ error: 'zip_failed' });
@@ -157,8 +157,8 @@ export function registerWave4Routes(app, { getDb, getTimestampInfo, sanitizeStri
     res.json({
       preview: {
         partner_name: String(partner_name || 'Partner').slice(0, 64),
-        headline: String(headline || 'Sign in with OTRUST ID').slice(0, 120),
-        subhead: String(subhead || 'Secure verification via OTRUST').slice(0, 200),
+        headline: String(headline || 'Present your trusted credential').slice(0, 120),
+        subhead: String(subhead || 'Issuer-bound verification via OTRUST').slice(0, 200),
         accent: String(accent || '#2d5a3d').slice(0, 32),
         logo_text: String(logo_text || 'Partner').slice(0, 32),
         disclosure: 'Secure verification via OTRUST',

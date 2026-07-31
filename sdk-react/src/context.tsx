@@ -8,7 +8,7 @@ import { createContext, useContext, useEffect, type ReactNode } from 'react';
 import { configure } from '@otrust/sdk';
 
 export interface OTrustConfig {
-  /** API base URL (default: https://otrust.eu) */
+  /** API base URL (default: https://www.otrust.eu) */
   baseUrl?: string;
   /** Client ID for auth */
   clientId?: string;
@@ -74,7 +74,7 @@ export function useOTrust(): OTrustContextValue {
   if (!context) {
     // Return defaults if not wrapped in provider
     return {
-      baseUrl: 'https://otrust.eu',
+      baseUrl: 'https://www.otrust.eu',
       isConfigured: false,
     };
   }

@@ -4,7 +4,15 @@ import { hasScope } from './scopes.js';
 function extractRawApiKey(req) {
   const header = req.get('Authorization');
   if (typeof header === 'string' && header.toLowerCase().startsWith('bearer ')) {
-    return header.slice(7).trim();
+    const token = header.slice(7).trim();
+    const requestPath = String(req.originalUrl || req.path || '').split('?')[0];
+    if (
+      /^otrust_(?:live|test)_/.test(token) ||
+      requestPath.startsWith('/api/v1/platform')
+    ) {
+      return token;
+    }
+    return null;
   }
   const direct = req.get('X-OTRUST-Key');
   if (typeof direct === 'string' && direct.trim()) {

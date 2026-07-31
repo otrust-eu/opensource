@@ -68,8 +68,8 @@
   <main id="main-content" role="main">
     <section class="hero">
       <h1>Terms of Service</h1>
-      <p>Free, open-source timestamping, ID, signing, and hosted partner Auth.</p>
-      <p class="last-updated">Last updated: January 6, 2026</p>
+      <p>Free, open-source timestamping, range proofs, signing, and issuer-gated partner Auth.</p>
+      <p class="last-updated">Last updated: July 23, 2026</p>
     </section>
 
     <article class="content-card">
@@ -77,9 +77,9 @@
       <p>OTRUST provides four main services:</p>
       <ul>
         <li><strong>Timestamp:</strong> Blockchain timestamping using OpenTimestamps. We create cryptographic records that data existed at a specific point in time by anchoring SHA-256 hashes to the Bitcoin blockchain.</li>
-        <li><strong>ID:</strong> Commitment-based ID packages. Verify facts such as age or unique identity without exposing underlying documents to verifiers.</li>
+        <li><strong>Proof Lab:</strong> Browser-generated age and income range proofs that hide the private input. These proofs are self-attested and are not identity credentials.</li>
         <li><strong>Sign:</strong> Multi-party document signing with blockchain evidence. Signers verify document hashes and sign cryptographically, with the final signature package anchored to Bitcoin.</li>
-        <li><strong>Auth:</strong> Hosted Auth for partners. Short-lived challenges, branded login screens, and callback tokens bound to state and registered redirect URIs.</li>
+        <li><strong>Auth:</strong> Issuer-gated hosted Auth for partners. Production challenges remain disabled until a trusted credential issuer is configured.</li>
       </ul>
 
       <div class="highlight-box">
@@ -117,18 +117,18 @@
       </div>
 
       <h2>How ID Works</h2>
-      <p><strong>Identity Verification:</strong> You upload an ID document and take a selfie for liveness detection. Sensitive checks run in your browser before the ID package is produced.</p>
-      <p><strong>Commitment ID packages:</strong> The service stores a commitment-bound ID package and verification metadata, not your raw passport image or selfie.</p>
-      <p><strong>Sybil resistance:</strong> For unique identity IDs, a one-way hash of your ID number can limit one ID per person while keeping the actual ID private.</p>
-      <p><strong>Data handling:</strong> Only the ID package and public metadata needed for verification are stored server-side.</p>
+      <p><strong>Range proofs:</strong> The active Proof Lab generates age and income range proofs in your browser. The private value is not included in the publish request.</p>
+      <p><strong>Stored proof data:</strong> If publishing is available, the service stores the proof, public signals, commitment, and server-derived verification metadata.</p>
+      <p><strong>Identity credentials:</strong> Legacy self-attested identity registration is retired. OTRUST does not currently issue a government- or employer-verified identity credential.</p>
+      <p><strong>Production availability:</strong> Range-proof publishing remains disabled until the public trusted-setup ceremony is complete.</p>
 
       <div class="highlight-box">
-        <p><strong>Privacy note:</strong> Verifiers learn that the claim is satisfied (for example "18 or older"), not your underlying document fields.</p>
+        <p><strong>Meaning:</strong> Verifiers can check consistency with the committed private value. They cannot infer that the value was checked by a trusted issuer.</p>
       </div>
 
       <h2>How Auth Works</h2>
       <p><strong>Challenges:</strong> Partners create short-lived authentication challenges through the API with a registered redirect URI and state parameter.</p>
-      <p><strong>Hosted flow:</strong> Users complete ID verification on otrust.eu. Partner branding is limited to approved visual elements with visible OTRUST disclosure.</p>
+      <p><strong>Hosted flow:</strong> Once enabled, users present a current trusted issuer-bound credential on otrust.eu. Partner branding is limited to approved visual elements with visible OTRUST disclosure.</p>
       <p><strong>Callbacks:</strong> Your server must verify the returned token, challenge binding, state, and expiry before establishing a session.</p>
 
       <h2>Data and Content</h2>

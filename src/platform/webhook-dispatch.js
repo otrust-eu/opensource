@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { cursorQuery, pageResult, safePageLimit } from './pagination.js';
 import { buildWebhookEnvelope } from './webhook-events.js';
 import { findEndpointsForEvent, isValidWebhookUrl } from './webhook-endpoints.js';
 
@@ -242,24 +243,28 @@ export async function processWebhookRetries(db) {
   return processed;
 }
 
-export async function listDeliveries(db, orgId, { limit = 50 } = {}) {
-  const safeLimit = Math.min(Math.max(Number(limit) || 50, 1), 100);
+export async function listDeliveries(db, orgId, { limit = 50, cursor } = {}) {
+  const safeLimit = safePageLimit(limit);
   const rows = await db.collection('webhook_deliveries')
-    .find({ org_id: orgId })
-    .sort({ created_at: -1 })
-    .limit(safeLimit)
+    .find(cursorQuery(cursor, 'delivery_id', { org_id: orgId }))
+    .sort({ created_at: -1, delivery_id: -1 })
+    .limit(safeLimit + 1)
     .toArray();
 
-  return rows.map((r) => ({
-    delivery_id: r.delivery_id,
-    event_id: r.event_id,
-    event_type: r.event_type,
-    endpoint_id: r.endpoint_id,
-    status: r.status,
-    attempts: r.attempts,
-    response_code: r.response_code,
-    created_at: r.created_at,
-    delivered_at: r.delivered_at,
-    next_retry_at: r.next_retry_at
-  }));
+  const page = pageResult(rows, safeLimit, 'delivery_id');
+  return {
+    deliveries: page.items.map((r) => ({
+      delivery_id: r.delivery_id,
+      event_id: r.event_id,
+      event_type: r.event_type,
+      endpoint_id: r.endpoint_id,
+      status: r.status,
+      attempts: r.attempts,
+      response_code: r.response_code,
+      created_at: r.created_at,
+      delivered_at: r.delivered_at,
+      next_retry_at: r.next_retry_at
+    })),
+    nextCursor: page.nextCursor
+  };
 }

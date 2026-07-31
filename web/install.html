@@ -649,18 +649,18 @@
       </div>
       
       <div class="check-item">
-        <div class="check-icon pending" id="check-mongo"></div>
+        <div class="check-icon pending" id="check-storage"></div>
         <div class="check-info">
-          <div class="check-name">MongoDB</div>
-          <div class="check-status" id="status-mongo">Checking...</div>
+          <div class="check-name">SQLite storage</div>
+          <div class="check-status" id="status-storage">Checking...</div>
         </div>
       </div>
       
       <div class="info-box">
         <div class="info-box-icon"></div>
         <div class="info-box-content">
-          OTRUST requires <strong>Node.js 18+</strong> and <strong>MongoDB</strong> to function.
-          You can use a local MongoDB or a cloud service like MongoDB Atlas.
+          OTRUST requires <strong>Node.js 22.13+</strong>. SQLite is built into Node,
+          so no separate database service is required.
         </div>
       </div>
     </div>
@@ -681,13 +681,9 @@
       </div>
       
       <div class="form-group">
-        <label for="mongoUri">MongoDB URI</label>
-        <input type="text" id="mongoUri" value="mongodb://localhost:27017/otrust">
-      </div>
-      
-      <div class="form-group">
-        <label for="dbName">Database Name</label>
-        <input type="text" id="dbName" value="otrust">
+        <label for="dbPath">SQLite database file</label>
+        <input type="text" id="dbPath" value="./data/otrust.sqlite">
+        <span class="label-hint">Use a durable disk or mounted volume in production.</span>
       </div>
     </div>
     
@@ -845,12 +841,11 @@
     const state = {
       step: 1,
       maxStep: 5,
-      checks: { node: false, npm: false, mongo: false },
+      checks: { node: false, npm: false, storage: false },
       config: {
         port: 3000,
         baseUrl: 'http://localhost:3000',
-        mongoUri: 'mongodb://localhost:27017/otrust',
-        dbName: 'otrust',
+        dbPath: './data/otrust.sqlite',
         features: {
           timestamp: true,
           sign: true,
@@ -922,7 +917,7 @@
       const checks = [
         { id: 'node', name: 'Node.js', endpoint: '/health' },
         { id: 'npm', name: 'npm' },
-        { id: 'mongo', name: 'MongoDB' }
+        { id: 'storage', name: 'SQLite storage' }
       ];
       
       // Simulate checks (in reality, server would verify these)
@@ -951,20 +946,20 @@
             iconEl.className = 'check-icon success';
             iconEl.textContent = '✓';
             statusEl.textContent = 'Installed';
-          } else if (check.id === 'mongo') {
-            if (data.database === 'connected') {
-              state.checks.mongo = true;
+          } else if (check.id === 'storage') {
+            if (data.status === 'ok') {
+              state.checks.storage = true;
               iconEl.className = 'check-icon success';
               iconEl.textContent = '✓';
               statusEl.textContent = 'Connected';
             } else {
               iconEl.className = 'check-icon warning';
               iconEl.textContent = '⚠️';
-              statusEl.textContent = 'Not connected - check MongoDB';
+              statusEl.textContent = 'Storage unavailable';
             }
           }
         } catch (e) {
-          if (check.id === 'mongo') {
+          if (check.id === 'storage') {
             iconEl.className = 'check-icon warning';
             iconEl.textContent = '⚠️';
             statusEl.textContent = 'Could not verify';
@@ -1016,8 +1011,7 @@
     function collectFormData() {
       state.config.port = parseInt(document.getElementById('port').value) || 3000;
       state.config.baseUrl = document.getElementById('baseUrl').value || 'http://localhost:3000';
-      state.config.mongoUri = document.getElementById('mongoUri').value || 'mongodb://localhost:27017/otrust';
-      state.config.dbName = document.getElementById('dbName').value || 'otrust';
+      state.config.dbPath = document.getElementById('dbPath').value || './data/otrust.sqlite';
       state.config.email.resendKey = document.getElementById('resendKey')?.value || '';
       state.config.email.smtpHost = document.getElementById('smtpHost')?.value || '';
       state.config.email.smtpPort = parseInt(document.getElementById('smtpPort')?.value) || 587;

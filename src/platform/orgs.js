@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { cursorQuery, pageResult, safePageLimit } from './pagination.js';
 
 export function generateOrgId() {
   return `org_${crypto.randomBytes(12).toString('hex')}`;
@@ -31,12 +32,12 @@ export async function getOrganization(db, orgId) {
   return db.collection('organizations').findOne({ id: orgId });
 }
 
-export async function listOrganizations(db, { limit = 50 } = {}) {
-  const safeLimit = Math.min(Math.max(Number(limit) || 50, 1), 100);
+export async function listOrganizations(db, { limit = 50, cursor } = {}) {
+  const safeLimit = safePageLimit(limit);
   const orgs = await db.collection('organizations')
-    .find({})
-    .sort({ created_at: -1 })
-    .limit(safeLimit)
+    .find(cursorQuery(cursor, 'id'))
+    .sort({ created_at: -1, id: -1 })
+    .limit(safeLimit + 1)
     .toArray();
-  return orgs;
+  return pageResult(orgs, safeLimit, 'id');
 }

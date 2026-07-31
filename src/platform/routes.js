@@ -58,16 +58,23 @@ export function registerPlatformRoutes(app, { getDb, hasValidAdminKey, smallJson
   // GET /api/v1/platform/organizations
   app.get('/api/v1/platform/organizations', adminGuard, async (req, res) => {
     try {
-      const orgs = await listOrganizations(getDb(), { limit: req.query?.limit });
+      const page = await listOrganizations(getDb(), {
+        limit: req.query?.limit,
+        cursor: req.query?.cursor
+      });
       res.json({
-        organizations: orgs.map((o) => ({
+        organizations: page.items.map((o) => ({
           id: o.id,
           name: o.name,
           plan: o.plan || 'free',
           created_at: o.created_at
-        }))
+        })),
+        next_cursor: page.nextCursor
       });
     } catch (error) {
+      if (error.code === 'invalid_cursor') {
+        return res.status(400).json({ error: 'invalid_cursor' });
+      }
       console.error('[Platform] List orgs failed:', error.message);
       res.status(500).json({ error: 'server_error' });
     }
@@ -202,9 +209,18 @@ export function registerPlatformRoutes(app, { getDb, hasValidAdminKey, smallJson
   // GET /api/v1/platform/webhooks/deliveries
   app.get('/api/v1/platform/webhooks/deliveries', requireApiKey, requireScope('webhook:manage'), async (req, res) => {
     try {
-      const deliveries = await listDeliveries(getDb(), req.orgId, { limit: req.query?.limit });
-      res.json({ deliveries });
+      const page = await listDeliveries(getDb(), req.orgId, {
+        limit: req.query?.limit,
+        cursor: req.query?.cursor
+      });
+      res.json({
+        deliveries: page.deliveries,
+        next_cursor: page.nextCursor
+      });
     } catch (error) {
+      if (error.code === 'invalid_cursor') {
+        return res.status(400).json({ error: 'invalid_cursor' });
+      }
       console.error('[Platform] List deliveries failed:', error.message);
       res.status(500).json({ error: 'server_error' });
     }

@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Verify ID Package – OTRUST by Kris Ledel</title>
-  <meta name="description" content="Verify an OTRUST ID package without receiving the underlying private data. Created by Kris Ledel.">
-  <meta name="keywords" content="verify ID package, zero-knowledge, ZK proof, privacy, OTRUST, Kris Ledel">
+  <title>Verify Proof - OTRUST by Kris Ledel</title>
+  <meta name="description" content="Cryptographically verify an OTRUST proof and inspect its public statement. Created by Kris Ledel.">
+  <meta name="keywords" content="verify range proof, zero-knowledge, ZK proof, privacy, OTRUST, Kris Ledel">
   <meta name="author" content="Kris Ledel">
   <meta name="robots" content="noindex">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -645,7 +645,7 @@
         <div class="badge-share" id="badge-share" style="display: none;">
           <div class="badge-preview" id="badge-preview">
             <span class="badge-mark">OTRUST</span>
-            <span>Verified proof</span>
+            <span>Unchecked proof</span>
           </div>
           <label for="badge-embed">Embeddable badge</label>
           <textarea id="badge-embed" readonly rows="4"></textarea>
@@ -660,7 +660,7 @@
       
       <div class="privacy-notice">
         <span></span>
-        <p><strong>Privacy Preserved:</strong> This proof cryptographically verifies the claim without revealing any underlying personal data. The verifier cannot learn the actual age, income, or identity — only that the condition is satisfied.</p>
+        <p><strong>Privacy boundary:</strong> A valid range proof hides the private value, but that value is self-attested unless this page explicitly shows a trusted issuer binding.</p>
       </div>
     </div>
   </main>
@@ -717,10 +717,10 @@
     let proofData = null;
     
     const typeConfig = {
-      age: { icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M12 3v4M8 7V5M16 7V5"/></svg>', label: 'Age Verification' },
+      age: { icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M12 3v4M8 7V5M16 7V5"/></svg>', label: 'Self-attested Age Range' },
       income: { icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M9 9h6M9 15h6"/></svg>', label: 'Income Range' },
       membership: { icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><circle cx="19" cy="7" r="3"/><path d="M21 21v-2a3 3 0 00-2-2.8"/></svg>', label: 'Membership' },
-      identity: { icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="12" r="2"/><path d="M14 10h4M14 14h4"/></svg>', label: 'Unique Identity Proof' }
+      identity: { icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="12" r="2"/><path d="M14 10h4M14 14h4"/></svg>', label: 'Identity Credential' }
     };
     
     async function loadProof() {
@@ -763,15 +763,17 @@
       document.getElementById('detail-type').textContent = config.label;
       
       // Build statement
-      let statement = '';
+      let statement = proof.statement || '';
       if (proof.type === 'age') {
-        statement = `This person is at least ${proof.claim.minAge} years old`;
+        statement = statement || `Self-attested age ≥ ${proof.claim?.minAge}`;
       } else if (proof.type === 'income') {
-        statement = `Annual income ≥ $${proof.claim.minIncome.toLocaleString()}`;
+        statement = statement || `Self-attested committed value ≥ $${proof.claim?.minIncome?.toLocaleString()}`;
       } else if (proof.type === 'membership') {
-        statement = `Verified member of group`;
+        statement = statement || 'Legacy self-attested membership record';
       } else if (proof.type === 'identity') {
-        statement = `✓ Unique verified human identity`;
+        statement = proof.credentialBinding === 'trusted_issuer'
+          ? statement || 'Trusted issuer-bound identity'
+          : 'Legacy self-attested identity record — not a verified identity credential';
       }
       document.getElementById('proof-statement').textContent = statement;
       
@@ -784,9 +786,8 @@
       document.getElementById('crypto-signal').textContent = JSON.stringify(proof.publicSignals);
       
       // Show wallet buttons for identity proofs
-      if (proof.type === 'identity') {
+      if (proof.type === 'identity' && proof.credentialBinding === 'trusted_issuer') {
         document.getElementById('btn-apple-wallet').style.display = 'inline-block';
-        document.getElementById('identity-actions').style.display = 'block';
         
         // Add identity hash to details
         if (proof.identityHash) {
@@ -814,22 +815,28 @@
       
       // Setup wallet buttons
       document.getElementById('btn-apple-wallet').onclick = () => downloadWallet('apple');
-      renderVerificationBadge(proof);
+      renderVerificationBadge(proof, false);
       
       // Verify
       verifyProof();
     }
 
-    function renderVerificationBadge(proof) {
+    function renderVerificationBadge(proof, verified) {
       const share = document.getElementById('badge-share');
       const preview = document.getElementById('badge-preview');
       const embed = document.getElementById('badge-embed');
       if (!share || !preview || !embed) return;
+      if (!verified) {
+        share.style.display = 'none';
+        return;
+      }
 
       const proofUrl = window.location.href.split('?')[0];
       const typeLabel = typeConfig[proof.type]?.label || 'Proof';
       const proofId = String(proof.id || '').replace(/"/g, '&quot;');
-      const label = `Verified ${typeLabel}`;
+      const label = proof.type === 'identity' && proof.credentialBinding === 'trusted_issuer'
+        ? 'Verified issuer-bound identity credential'
+        : `Cryptographically verified ${typeLabel}`;
       preview.querySelector('span:last-child').textContent = label;
       embed.value = `<a href="${proofUrl}" data-otrust-proof="${proofId}" style="display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #d9dfdc;border-radius:8px;color:#151817;text-decoration:none;font:600 13px Inter,system-ui,sans-serif;background:#ffffff;"><span style="background:#16160f;color:#fff;border-radius:5px;padding:3px 5px;font-size:10px;letter-spacing:.05em;">OTRUST</span><span>${label}</span></a>`;
       share.style.display = 'block';
@@ -882,13 +889,13 @@
               </div>
               <div class="wallet-pass-brand">
                 <span class="wallet-pass-org">OTRUST</span>
-                <span class="wallet-pass-type">Identity Proof</span>
+                <span class="wallet-pass-type">Issuer Credential</span>
               </div>
             </div>
             
             <div class="wallet-pass-status">
               <div class="wallet-pass-status-indicator"></div>
-              <span>Verified Identity</span>
+              <span>Verified Issuer Credential</span>
             </div>
             
             <div class="wallet-pass-details">
@@ -1287,7 +1294,7 @@
         ];
       } else {
         steps = [
-          '<strong>Chrome:</strong> Click menu → "Install OTRUST ID..."',
+          '<strong>Chrome:</strong> Click menu → "Install OTRUST..."',
           '<strong>Edge:</strong> Click menu → "Apps" → "Install this site"',
           '<strong>Safari:</strong> File → "Add to Dock"'
         ];
@@ -1304,7 +1311,7 @@
               ${steps.map(step => `<li style="margin-bottom: 0.5rem;">${step}</li>`).join('')}
             </ol>
             <p style="color: var(--text-dim); font-size: 0.8rem; margin: 0 0 1.25rem; opacity: 0.7;">
-              Your OTRUST ID will appear as an app on your home screen.
+              OTRUST will appear as an app on your home screen.
             </p>
             <button class="wallet-btn wallet-btn-primary" onclick="this.closest('.wallet-modal-overlay').remove()">
               Got it
@@ -1448,9 +1455,11 @@
         if (data.valid) {
           badge.className = 'status-badge valid';
           badge.innerHTML = '✓ Cryptographically Verified';
+          renderVerificationBadge(proofData, true);
         } else {
           badge.className = 'status-badge invalid';
           badge.innerHTML = '✗ Verification Failed';
+          renderVerificationBadge(proofData, false);
         }
       } catch (err) {
         badge.className = 'status-badge invalid';

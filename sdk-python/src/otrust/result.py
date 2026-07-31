@@ -5,8 +5,9 @@ Provides Ok/Err types for explicit error handling without exceptions.
 """
 
 from __future__ import annotations
+
 from dataclasses import dataclass
-from typing import TypeVar, Generic, Union, Callable, Any
+from typing import Any, Callable, Generic, Literal, TypeVar, Union
 
 T = TypeVar("T")
 E = TypeVar("E")
@@ -16,7 +17,13 @@ U = TypeVar("U")
 class OTrustError(Exception):
     """Base error class for OTRUST SDK."""
 
-    def __init__(self, code: str, message: str, status: int = 0, details: dict[str, Any] | None = None):
+    def __init__(
+        self,
+        code: str,
+        message: str,
+        status: int = 0,
+        details: dict[str, Any] | None = None,
+    ):
         super().__init__(message)
         self.code = code
         self.message = message
@@ -32,7 +39,7 @@ class Ok(Generic[T]):
     """Represents a successful result."""
 
     value: T
-    ok: bool = True
+    ok: Literal[True] = True
 
     def __bool__(self) -> bool:
         return True
@@ -43,7 +50,7 @@ class Err(Generic[E]):
     """Represents an error result."""
 
     error: E
-    ok: bool = False
+    ok: Literal[False] = False
 
     def __bool__(self) -> bool:
         return False
@@ -108,7 +115,7 @@ def map_result(result: Result[T, E], fn: Callable[[T], U]) -> Result[U, E]:
     """
     if isinstance(result, Ok):
         return Ok(fn(result.value))
-    return result  # type: ignore
+    return result
 
 
 def and_then(result: Result[T, E], fn: Callable[[T], Result[U, E]]) -> Result[U, E]:
@@ -127,7 +134,7 @@ def and_then(result: Result[T, E], fn: Callable[[T], Result[U, E]]) -> Result[U,
     """
     if isinstance(result, Ok):
         return fn(result.value)
-    return result  # type: ignore
+    return result
 
 
 def ok(value: T) -> Ok[T]:

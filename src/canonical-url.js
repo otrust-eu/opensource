@@ -60,3 +60,8 @@ export function getProductionRedirectUrl({
   const redirectHost = needsCanonicalHost ? normalizedCanonicalHost : host;
   return `https://${redirectHost}${originalUrl}`;
 }
+
+export function getProductionRedirectStatus(method) {
+  const normalizedMethod = String(method || 'GET').toUpperCase();
+  return normalizedMethod === 'GET' || normalizedMethod === 'HEAD' ? 301 : 308;
+}

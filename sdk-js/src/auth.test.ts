@@ -1,8 +1,13 @@
-import { describe, it, expect } from 'vitest';
-import { auth } from './index';
+import { afterEach, describe, it, expect, vi } from 'vitest';
+import { auth, configure } from './index';
 
 describe('auth service', () => {
-  describe('loginUrl', () => {
+  afterEach(() => {
+    configure({ baseUrl: 'https://www.otrust.eu' });
+    vi.restoreAllMocks();
+  });
+
+  describe('loginUrl compatibility method', () => {
     it('should validate required clientId', () => {
       const result = auth.loginUrl({
         clientId: '',
@@ -27,7 +32,7 @@ describe('auth service', () => {
       }
     });
 
-    it('should generate valid login URL', () => {
+    it('requires a server-created challenge instead of inventing a URL', () => {
       const result = auth.loginUrl({
         clientId: 'my-app',
         redirectUri: 'https://myapp.com/callback',
@@ -35,12 +40,9 @@ describe('auth service', () => {
         state: 'test-state',
       });
 
-      expect(result.ok).toBe(true);
-      if (result.ok) {
-        expect(result.value).toContain('client_id=my-app');
-        expect(result.value).toContain('redirect_uri=');
-        expect(result.value).toContain('scope=identity+email');
-        expect(result.value).toContain('state=test-state');
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error.code).toBe('server_challenge_required');
       }
     });
   });
@@ -98,6 +100,40 @@ describe('auth service', () => {
       if (!result.ok) {
         expect(result.error.code).toBe('validation_error');
       }
+    });
+
+    it('uses the server-issued login URL and generates state when omitted', async () => {
+      const fetchMock = vi.fn().mockResolvedValue(new Response(
+        JSON.stringify({
+          success: true,
+          challengeId: 'ch_test',
+          challenge: 'a'.repeat(64),
+          loginUrl: 'https://www.otrust.eu/auth/login?challenge=ch_test',
+          expiresIn: 300,
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } }
+      ));
+      configure({
+        baseUrl: 'https://www.otrust.eu',
+        fetch: fetchMock as typeof fetch,
+        retries: 0,
+      });
+
+      const result = await auth.createChallenge({
+        clientId: 'my-app',
+        redirectUri: 'https://my-app.example/auth/callback',
+      });
+
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        expect(result.value.loginUrl).toBe(
+          'https://www.otrust.eu/auth/login?challenge=ch_test'
+        );
+      }
+      const body = JSON.parse(String(fetchMock.mock.calls[0][1]?.body));
+      expect(body.clientId).toBe('my-app');
+      expect(body.redirectUri).toBe('https://my-app.example/auth/callback');
+      expect(body.state).toMatch(/^[a-f0-9]{32}$/);
     });
   });
 });

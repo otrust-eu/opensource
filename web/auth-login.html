@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OTRUST Auth - Secure Authentication</title>
-  <meta name="description" content="Secure login with OTRUST. Privacy-first authentication without passwords.">
+  <title>OTRUST Auth - Issuer-bound credential verification</title>
+  <meta name="description" content="Hosted verification for issuer-bound OTRUST credentials. Production challenges require a configured trusted issuer.">
   <meta name="author" content="Kris Ledel">
   <meta name="robots" content="noindex, nofollow">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -580,8 +580,8 @@
           <span>OTRUST</span>
         </div>
         <h1 id="headline">OTRUST Auth</h1>
-        <p id="subhead">Secure authentication with your OTRUST ID.</p>
-        <p class="otrust-disclosure" id="otrustDisclosure">Secure login via OTRUST. You are on otrust.eu because OTRUST handles the identity flow.</p>
+        <p id="subhead">An issuer-bound OTRUST credential is required.</p>
+        <p class="otrust-disclosure" id="otrustDisclosure">You are on otrust.eu because OTRUST verifies the partner challenge and credential binding.</p>
         <p id="infoBlurb" class="info-blurb" hidden></p>
       </header>
 
@@ -601,31 +601,31 @@
         <p class="eyebrow">Identity method</p>
         <div class="method-grid">
           <button type="button" class="method-choice selected" data-proof-method="otrust-proof">
-            <strong>OTRUST ID</strong>
-            <span>Use your verified ID and PIN.</span>
+            <strong>Issuer credential</strong>
+            <span>Use an issuer-bound credential and its unlock secret.</span>
           </button>
         </div>
         <div class="method-disclosure" id="methodDisclosure" hidden>
-          <span class="method-logo">OTRUST ID</span>
-          <span>Primary identity method for this partner theme.</span>
+          <span class="method-logo">Issuer credential</span>
+          <span>Requires trusted issuer provenance.</span>
         </div>
       </section>
 
       <div class="loading" id="loading" hidden>
         <div class="spinner" aria-hidden="true"></div>
-        <p>Verifying your identity...</p>
+        <p>Verifying credential binding...</p>
       </div>
 
       <form id="loginForm">
         <div class="form-group">
-          <label for="proofId">Your ID</label>
+          <label for="proofId">Credential ID</label>
           <input type="text" id="proofId" name="proofId" placeholder="id_abc123..." autocomplete="username" required>
         </div>
 
         <div class="form-group">
-          <label for="pin">Your PIN Code</label>
+          <label for="pin">Credential PIN</label>
           <input class="pin-input" type="password" id="pin" name="pin" inputmode="numeric" maxlength="6" placeholder="PIN" autocomplete="current-password" required>
-          <span class="hint">The 4-6 digit PIN you chose when creating your identity.</span>
+          <span class="hint">The PIN associated with the issuer-bound credential.</span>
         </div>
 
         <details>
@@ -639,23 +639,23 @@
         <button type="submit" class="btn" id="submitBtn">Verify and Continue</button>
       </form>
 
-      <div class="divider"><span>Do not have an ID?</span></div>
+      <div class="divider"><span>No supported credential?</span></div>
 
       <div class="no-proof">
-        <p>Create a verified ID to use OTRUST Auth.</p>
-        <a href="/proof.html" id="createProofLink">Create ID</a>
+        <p>OTRUST does not currently issue trusted identity credentials.</p>
+        <a href="/sign-in" id="createProofLink">Read integration status</a>
       </div>
 
       <footer class="footer">
         <p id="partnerFooter">Powered by OTRUST</p>
-        <div class="footer-brand" aria-label="OTRUST identity provider">
+        <div class="footer-brand" aria-label="OTRUST credential verifier">
           <svg viewBox="0 0 100 100" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
             <circle cx="50" cy="50" r="45" fill="currentColor"/>
             <path d="M30 55 L45 70 L75 35" stroke="white" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
           <span>OTRUST</span>
         </div>
-        <p>Identity flow secured by <a href="/">OTRUST</a> | GDPR and DPO contact: <a href="mailto:dpo@otrust.eu">dpo@otrust.eu</a></p>
+        <p>Issuer-bound credential flow secured by <a href="/">OTRUST</a> | GDPR and DPO contact: <a href="mailto:dpo@otrust.eu">dpo@otrust.eu</a></p>
       </footer>
     </section>
   </main>
@@ -678,7 +678,7 @@
       borderRadius: 8,
       spacingScale: 'default',
       headline: 'OTRUST Auth',
-      subhead: 'Secure authentication with your OTRUST ID.',
+      subhead: 'An issuer-bound OTRUST credential is required.',
       footerText: 'Powered by OTRUST',
       infoBlurb: '',
       allowedIdentityMethods: ['proof'],
@@ -765,7 +765,7 @@
       setText('partnerFooter', theme.footerText || DEFAULT_BRANDING.footerText);
       setText('otrustDisclosure', themeId.startsWith('hemsted_')
         ? 'Identity-fl\u00f6de s\u00e4krat av OTRUST. Verifieringen sker p\u00e5 otrust.eu.'
-        : 'Secure login via OTRUST. You are on otrust.eu because OTRUST handles the identity flow.');
+        : 'You are on otrust.eu because OTRUST verifies the partner challenge and credential binding.');
       document.title = `${theme.headline || DEFAULT_BRANDING.headline} | OTRUST`;
       renderIdentityMethods(theme.allowedIdentityMethods || DEFAULT_BRANDING.allowedIdentityMethods, themeId);
 
@@ -812,7 +812,7 @@
       methodDisclosure.hidden = !usesProof;
 
       if (usesProof) {
-        document.getElementById('submitBtn').textContent = 'Verify with OTRUST ID';
+        document.getElementById('submitBtn').textContent = 'Verify issuer-bound credential';
         document.querySelectorAll('[data-proof-method]').forEach(button => button.classList.add('selected'));
       } else {
         document.getElementById('submitBtn').textContent = 'Verify and Continue';
@@ -834,7 +834,7 @@
 
     function readableScope(scope) {
       const labels = {
-        identity: 'Identity verification',
+        identity: 'Issuer-bound identity',
         profile: 'Profile access',
         email: 'Email verification',
         signing: 'Document signing'
@@ -889,7 +889,7 @@
           throw new Error('The application did not provide a return URL.');
         }
 
-        showSuccess('Identity verified. Redirecting back to the application...');
+        showSuccess('Issuer-bound credential verified. Redirecting back to the application...');
         document.getElementById('loading').hidden = true;
 
         const delaySeconds = Number(challengeData.branding?.autoRedirectSeconds ?? DEFAULT_BRANDING.autoRedirectSeconds);
@@ -925,14 +925,8 @@
 
     function updateCreateProofLink() {
       const link = document.getElementById('createProofLink');
-      if (!link || !challengeId) return;
-
-      const proofUrl = new URL('/proof', window.location.origin);
-      proofUrl.searchParams.set('auth_challenge', challengeId);
-      if (requestedThemeId && THEME_ID_RE.test(requestedThemeId)) {
-        proofUrl.searchParams.set('theme_id', requestedThemeId);
-      }
-      link.href = `${proofUrl.pathname}${proofUrl.search}`;
+      if (!link) return;
+      link.href = '/sign-in';
     }
 
     function prefillReturnedProof() {

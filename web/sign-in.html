@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OTRUST Auth | Hosted Auth for partners</title>
-  <meta name="description" content="Hosted Auth for partner apps: short-lived challenges, visible OTRUST verification, branded login screens, and callback tokens bound to state.">
+  <title>OTRUST Auth Preview | Issuer-bound partner authentication</title>
+  <meta name="description" content="Review the OTRUST Auth challenge, branding, callback, and token design. Production Auth is disabled until a trusted identity issuer is integrated.">
   <meta name="keywords" content="OTRUST Auth, hosted auth, partner login, OAuth-style callback, identity ID, challenge binding">
   <meta name="author" content="Kristian Ledel">
   <meta name="creator" content="Kris Ledel">
@@ -15,15 +15,15 @@
 
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://www.otrust.eu/sign-in">
-  <meta property="og:title" content="OTRUST Auth | Hosted Auth">
-  <meta property="og:description" content="Hosted Auth for partners: challenges, branded login, and verified callbacks.">
+  <meta property="og:title" content="OTRUST Auth Preview | Issuer-bound authentication">
+  <meta property="og:description" content="Integration preview. Production Auth requires a trusted identity issuer and is currently disabled.">
   <meta property="og:image" content="https://www.otrust.eu/og-image.svg">
   <meta property="og:site_name" content="OTRUST by Kristian Ledel">
   <meta property="article:author" content="Kristian Ledel">
 
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="OTRUST Auth | Hosted Auth">
-  <meta name="twitter:description" content="Hosted Auth for partners with challenge binding and branded callbacks.">
+  <meta name="twitter:title" content="OTRUST Auth Preview">
+  <meta name="twitter:description" content="Issuer-bound partner Auth design; production token issuance is currently disabled.">
   <meta name="twitter:image" content="https://www.otrust.eu/og-image.svg">
   <meta name="twitter:creator" content="@kledel">
 
@@ -33,7 +33,7 @@
     "@type": "WebPage",
     "name": "OTRUST Auth",
     "url": "https://www.otrust.eu/sign-in",
-    "description": "Public guide for OTRUST Auth, a hosted partner Auth flow based on verified IDs, short-lived challenges, and callback verification.",
+    "description": "Integration preview for an issuer-bound hosted partner Auth flow. Production token issuance is disabled until a trusted identity issuer is integrated.",
     "author": {
       "@type": "Person",
       "name": "Kristian Ledel",
@@ -67,7 +67,7 @@
         "name": "How does hosted Auth work?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Your app creates a short-lived challenge through the API, redirects the user to OTRUST for ID verification, and receives a callback with token and state when the challenge is satisfied. OTRUST remains visible as the verification domain."
+          "text": "The planned flow creates a short-lived challenge, verifies an issuer-bound credential on OTRUST, and returns a token with state to a registered callback. Production challenges are currently disabled."
         }
       },
       {
@@ -75,7 +75,7 @@
         "name": "Can OTRUST work with regulated identity providers?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "OTRUST uses a provider-agnostic ID and challenge model, so partner flows can be designed around approved identity methods while keeping OTRUST visible as the verification provider."
+          "text": "The integration contract is provider-agnostic, but OTRUST does not currently issue trusted identity credentials. A supported issuer integration is required before launch."
         }
       },
       {
@@ -116,11 +116,11 @@
 
       <section class="dashboard-hero-block">
         <div class="dashboard-hero-copy">
-          <span class="dashboard-kicker">Auth</span>
-          <h1>Hosted Auth<br><span>for partners.</span></h1>
-          <p>Create a short-lived challenge, send users to OTRUST for ID verification, then return to your registered callback with token and state.</p>
+          <span class="dashboard-kicker">Auth preview</span>
+          <h1>Issuer-bound<br><span>Auth design.</span></h1>
+          <p>Review the partner challenge and callback contract. Production token issuance is disabled until a trusted identity issuer is integrated.</p>
           <div class="dashboard-actions">
-            <a href="/proof" class="dashboard-primary-action">Create ID</a>
+            <a href="/api-docs" class="dashboard-primary-action">Review API</a>
             <a href="/docs#proofauth" class="dashboard-text-action">Auth docs</a>
           </div>
         </div>
@@ -128,25 +128,25 @@
       </section>
 
       <section class="dashboard-steps" id="flow" aria-labelledby="dashboard-steps-heading">
-        <span class="dashboard-kicker" id="dashboard-steps-heading">Auth sequence</span>
+        <span class="dashboard-kicker" id="dashboard-steps-heading">Planned sequence</span>
         <div class="dashboard-step-grid">
           <article>
             <div class="dashboard-step-icon dashboard-step-hash" aria-hidden="true"></div>
             <span>01</span>
-            <h2>Challenge</h2>
-            <p>Partner creates a short-lived challenge through the API.</p>
+            <h2>Issue</h2>
+            <p>A trusted issuer creates a credential bound to its provenance.</p>
           </article>
           <article>
             <div class="dashboard-step-icon dashboard-step-sign" aria-hidden="true"></div>
             <span>02</span>
-            <h2>Hosted flow</h2>
-            <p>User completes the hosted Auth flow on otrust.eu.</p>
+            <h2>Challenge</h2>
+            <p>The partner creates a short-lived challenge through the API.</p>
           </article>
           <article>
             <div class="dashboard-step-icon dashboard-step-anchor" aria-hidden="true"></div>
             <span>03</span>
             <h2>Verify</h2>
-            <p>OTRUST verifies ID ownership and challenge binding.</p>
+            <p>OTRUST verifies credential ownership and challenge binding.</p>
           </article>
           <article>
             <div class="dashboard-step-icon dashboard-step-prove" aria-hidden="true"></div>
@@ -160,8 +160,8 @@
       <section class="dashboard-principles-panel" aria-labelledby="dashboard-principles-heading">
         <div class="dashboard-principles-copy">
           <span class="dashboard-kicker">Production requirements</span>
-          <h2 id="dashboard-principles-heading">Partner-ready<br>hosted auth.</h2>
-          <p>Hosted Auth keeps verification on OTRUST while partners keep control of their app state, redirects and sessions.</p>
+          <h2 id="dashboard-principles-heading">Designed,<br>not launched.</h2>
+          <p>The interface is reviewable, while production challenges fail closed without trusted credential provenance.</p>
         </div>
         <div class="dashboard-principles-list">
           <article>
@@ -208,43 +208,43 @@
       <div class="sign-card dashboard-signin-tool auth-panel service-workspace-card signin-workspace-card" aria-label="Login with OTRUST flow">
           <div class="timestamp-dashboard-head">
             <div>
-              <span class="workspace-topline">Hosted auth workspace</span>
-              <h2>Create a partner Auth challenge.</h2>
-              <p>Start the same challenge-bound flow an app would create server-side and redirect users to hosted verification.</p>
+              <span class="workspace-topline">Integration status</span>
+              <h2>Trusted issuer required.</h2>
+              <p>The challenge endpoint returns a service-unavailable response in production until issuer integration is enabled.</p>
             </div>
             <div class="timestamp-live-meta" aria-label="Auth guarantees">
-              <span>Challenge-bound callback</span>
-              <span>ID ownership verified</span>
-              <span>Partner-branded redirect</span>
+              <span>Self-attested IDs rejected</span>
+              <span>Fail-closed tokens</span>
+              <span>Issuer pending</span>
             </div>
           </div>
           <div class="timestamp-dashboard-body">
             <div class="timestamp-panel-stage">
               <div class="timestamp-panel active">
                 <div class="timestamp-panel-heading">
-                  <span>01 / Hosted Auth</span>
-                  <h3>Start redirect challenge</h3>
-                  <p>Create a short-lived challenge and open the hosted verification URL.</p>
+                  <span>01 / Integration preview</span>
+                  <h3>Challenge creation unavailable</h3>
+                  <p>These fields show the planned contract. They cannot start a production identity session.</p>
                 </div>
                 <div class="auth-action-panel">
                   <label for="workspace-auth-client-id" class="auth-field">
                     <span>Client ID</span>
-                    <input id="workspace-auth-client-id" type="text" value="otrust_dashboard" autocomplete="off" spellcheck="false">
+                    <input id="workspace-auth-client-id" type="text" value="otrust_dashboard" autocomplete="off" spellcheck="false" disabled>
                   </label>
                   <label for="workspace-auth-redirect-uri" class="auth-field">
                     <span>Redirect URI</span>
-                    <input id="workspace-auth-redirect-uri" type="url" placeholder="https://app.example/auth/callback" inputmode="url" spellcheck="false">
+                    <input id="workspace-auth-redirect-uri" type="url" placeholder="https://app.example/auth/callback" inputmode="url" spellcheck="false" disabled>
                   </label>
                   <label for="workspace-auth-proof-id" class="auth-field">
-                    <span>ID optional</span>
-                    <input id="workspace-auth-proof-id" type="text" placeholder="id_..." autocomplete="off" spellcheck="false">
+                    <span>Issuer-bound credential</span>
+                    <input id="workspace-auth-proof-id" type="text" placeholder="Not currently issued" autocomplete="off" spellcheck="false" disabled>
                   </label>
-                  <button type="button" id="workspace-auth-submit">Start hosted Auth</button>
+                  <button type="button" id="workspace-auth-submit" disabled>Trusted issuer required</button>
                   <div class="auth-demo-actions">
-                    <button type="button" id="workspace-auth-demo" class="btn btn-secondary">Try demo flow</button>
+                    <button type="button" id="workspace-auth-demo" class="btn btn-secondary" disabled>Demo unavailable</button>
                     <a href="/partners/hemsted" class="auth-branded-example">See branded example</a>
                   </div>
-                  <p id="workspace-auth-status" class="workspace-action-status" aria-live="polite">Creates a short-lived hosted login challenge.</p>
+                  <p id="workspace-auth-status" class="workspace-action-status" aria-live="polite">Production Auth is fail-closed until a trusted issuer is configured.</p>
                 </div>
               </div>
             </div>
@@ -258,26 +258,26 @@
 
     <section aria-labelledby="swedish-eid-heading">
       <div class="section-title">
-        <h2 id="swedish-eid-heading">Provider-neutral hosted verification</h2>
-        <p>OTRUST is the visible ID and callback layer. Upstream identity methods stay explicit in your product; OTRUST handles challenge binding, hosted verification, and the verified return to your app.</p>
+        <h2 id="swedish-eid-heading">Provider-neutral integration contract</h2>
+        <p>OTRUST can become the visible credential and callback layer after a trusted issuer is integrated. The issuer, credential binding, and OTRUST processing boundary must remain explicit.</p>
       </div>
       <div class="eid-grid">
         <div class="card eid-lead">
-          <h3>Works alongside regulated identity flows</h3>
-          <p>Use OTRUST when partners need a branded hosted step for ID creation or verification, without replacing regulated identity providers in your architecture.</p>
+          <h3>Issuer integration comes first</h3>
+          <p>Challenge binding and branding do not establish identity. A production launch requires credential issuance from an accountable external provider.</p>
         </div>
         <div class="card eid-provider-list">
           <div class="eid-provider">
-            <strong>Identity-provider ready architecture</strong>
-            <p>Use OTRUST as the branded hosted ID layer for partners that already rely on high-trust identity checks.</p>
+            <strong>Planned identity-provider boundary</strong>
+            <p>The credential issuer must be identified and preserved through token verification.</p>
           </div>
           <div class="eid-provider">
-            <strong>Provider-agnostic model</strong>
-            <p>Support partner onboarding and ID creation without forcing every customer into a single identity provider model.</p>
+            <strong>Provider-agnostic contract</strong>
+            <p>The API does not assume one issuer, but it rejects records without trusted issuer binding.</p>
           </div>
           <div class="eid-provider">
-            <strong>Independent disclosure</strong>
-            <p>OTRUST remains visible as the ID and identity-processing layer, with DPO contact and auditability intact.</p>
+            <strong>Visible processing boundary</strong>
+            <p>OTRUST remains visible during hosted processing, with DPO contact and auditability intact.</p>
           </div>
           <a href="/docs#proofauth" class="btn btn-secondary">Read Auth Docs</a>
         </div>
@@ -287,7 +287,7 @@
     <section>
       <div class="section-title">
         <h2>Developer integration</h2>
-        <p>Add an OTRUST Auth button by creating a challenge server-side, redirecting to the returned Auth URL, then verifying the callback token before creating a session.</p>
+        <p>This is the planned server-side integration. Do not ship it until health reports the trusted issuer capability as enabled.</p>
       </div>
       <div class="code-card">
         <div class="card">
@@ -318,14 +318,14 @@ if (result.ok && result.value.valid) {
         </div>
       </div>
       <div class="note">
-        Direct visits to <code>/auth/login</code> are intentionally not useful. That URL needs a short-lived challenge from your application.
+        Production challenge creation currently returns <code>503 trusted_identity_issuer_required</code>. Direct login visits cannot bypass that gate.
       </div>
     </section>
 
     <section>
       <div class="section-title">
         <h2>Partner branding</h2>
-        <p>Hosted Auth and ID creation can inherit approved partner colors and copy per <code>clientId</code> while keeping OTRUST disclosure, the OTRUST footer mark, and DPO contact visible.</p>
+        <p>The preview supports review of approved partner colors and copy per <code>clientId</code>. Branding does not activate credential issuance or token creation.</p>
       </div>
       <div class="code-card">
         <div class="card">
@@ -342,8 +342,8 @@ X-Admin-Key: &lt;admin-key&gt;
   "borderRadius": 8,
   "spacingScale": "default",
   "headline": "Sign in to Hemsted",
-  "subhead": "Secure sign-in with OTRUST ID",
-  "footerText": "Hemsted AB med OTRUST som identity provider",
+  "subhead": "Issuer-bound credential required",
+  "footerText": "Hemsted AB integration preview by OTRUST",
   "autoRedirectSeconds": 3
 }</code></pre>
         </div>
@@ -353,7 +353,7 @@ X-Admin-Key: &lt;admin-key&gt;
             <li>Logo must be served over HTTPS and stay below 200KB.</li>
             <li>Colors are validated as hex, rgb, or rgba values.</li>
             <li>Copy is rendered as text only, never as injected HTML.</li>
-            <li>The same theme follows users to <code>/proof?auth_challenge=...</code> if they need to create an ID first.</li>
+            <li>The theme follows a future hosted credential flow after issuer integration.</li>
             <li>Every change is written to the OTRUST audit log with <code>client_id</code>, actor, fields, and timestamp.</li>
           </ul>
         </div>
