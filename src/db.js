@@ -761,11 +761,13 @@ export async function createDb() {
     if (
       process.env.NODE_ENV === 'production' &&
       railwayRuntime &&
-      legacyMongoConfigured &&
-      !fs.existsSync(resolvedPath)
+      !fs.existsSync(resolvedPath) &&
+      process.env.OTRUST_ALLOW_EMPTY_DB !== 'true'
     ) {
       throw new Error(
-        'MongoDB migration required: refusing to create an empty SQLite database on Railway'
+        legacyMongoConfigured
+          ? 'MongoDB migration required: refusing to create an empty SQLite database on Railway'
+          : 'Railway storage initialization required: refusing to create an empty SQLite database'
       );
     }
     fs.mkdirSync(path.dirname(resolvedPath), { recursive: true });

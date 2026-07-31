@@ -30,10 +30,10 @@ contain email addresses, API-key hashes, signing files, and other private data.
 The destination must not already exist. The importer writes to a temporary
 file and renames it only after every collection succeeds.
 
-On Railway, production startup also refuses to create an empty SQLite file
-while a legacy `MONGODB_URL`, `MONGODB_URI`, or `MONGO_URL` variable remains.
-Upload the migrated database to the mounted volume before deploying the
-SQLite release.
+On Railway, production startup refuses to create an empty SQLite file by
+default. Upload the migrated database to the mounted volume before deploying
+the SQLite release. `OTRUST_ALLOW_EMPTY_DB=true` is only for a deliberately
+new installation with no records to migrate.
 
 ```bash
 npm run migrate:mongodb-export -- \

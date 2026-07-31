@@ -11,6 +11,7 @@ describe('SQLite database', () => {
     'MONGODB_URL',
     'MONGODB_URI',
     'MONGO_URL',
+    'OTRUST_ALLOW_EMPTY_DB',
     'RAILWAY_PROJECT_ID',
     'RAILWAY_ENVIRONMENT_ID',
     'RAILWAY_SERVICE_ID'
@@ -160,5 +161,17 @@ describe('SQLite database', () => {
 
     await expect(createDb()).rejects.toThrow('MongoDB migration required');
     expect(fs.existsSync(process.env.OTRUST_DB_PATH)).toBe(false);
+  });
+
+  test('requires an explicit opt-in for a fresh Railway database', async () => {
+    temporaryDirectory = fs.mkdtempSync(path.join(os.tmpdir(), 'otrust-railway-new-'));
+    process.env.NODE_ENV = 'production';
+    process.env.OTRUST_DB_PATH = path.join(temporaryDirectory, 'otrust.sqlite');
+    process.env.RAILWAY_ENVIRONMENT_ID = 'production';
+
+    await expect(createDb()).rejects.toThrow('Railway storage initialization required');
+    process.env.OTRUST_ALLOW_EMPTY_DB = 'true';
+    await expect(createDb()).resolves.toMatchObject({ adapter: 'sqlite' });
+    expect(fs.existsSync(process.env.OTRUST_DB_PATH)).toBe(true);
   });
 });

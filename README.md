@@ -151,6 +151,7 @@ npm run dev
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `OTRUST_DB_PATH` | Persistent SQLite database file | `./data/otrust.sqlite` |
+| `OTRUST_ALLOW_EMPTY_DB` | Permit a deliberately new, empty Railway database | unset = blocked |
 | `PORT` | Server port | `3000` |
 | `ADMIN_KEY` | Platform admin (`X-Admin-Key`) | — **required in prod** |
 | `AUTH_SECRET` | Stable signing secret for hosted auth tokens | — **required in prod** |
