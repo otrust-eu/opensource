@@ -14,10 +14,17 @@ import { execFile } from 'child_process';
 import fs from 'fs/promises';
 import os from 'os';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import { getDb } from './db.js';
 
 const MOCK_OTS_PREFIX = 'OTRUST_TEST_OTS:';
 const DEFAULT_OTS_TIMEOUT_MS = 120_000;
+const DIGEST_STAMPER_PATH = fileURLToPath(new URL('../scripts/ots-stamp-digest.py', import.meta.url));
+
+let runtimeStatus = {
+  available: false,
+  mode: 'unchecked'
+};
 
 function shouldMockOts() {
   return process.env.NODE_ENV === 'test' || process.env.OTRUST_MOCK_OTS === 'true';
@@ -43,6 +50,10 @@ function otsCommand() {
   return process.env.OTS_CLI_COMMAND || process.env.OTS_CLI_PATH || 'ots';
 }
 
+function otsPythonCommand() {
+  return process.env.OTS_PYTHON_COMMAND || 'python3';
+}
+
 function otsTimeoutMs() {
   const timeout = Number(process.env.OTS_CLI_TIMEOUT_MS || DEFAULT_OTS_TIMEOUT_MS);
   return Number.isFinite(timeout) && timeout > 0 ? timeout : DEFAULT_OTS_TIMEOUT_MS;
@@ -57,8 +68,7 @@ async function withTempDir(callback) {
   }
 }
 
-function runOtsCli(args, options = {}) {
-  const configuredCommand = otsCommand();
+function runCommand(configuredCommand, args, options = {}) {
   const isNodeScript = configuredCommand.toLowerCase().endsWith('.js');
   const command = isNodeScript ? process.execPath : configuredCommand;
   const commandArgs = isNodeScript ? [configuredCommand, ...args] : args;
@@ -73,7 +83,7 @@ function runOtsCli(args, options = {}) {
       if (error) {
         const reason = stderr?.trim() || stdout?.trim() || error.message;
         const hint = error.code === 'ENOENT'
-          ? `OpenTimestamps CLI not found. Install opentimestamps-client or set OTS_CLI_COMMAND.`
+          ? `OpenTimestamps runtime not found. Install opentimestamps-client or configure its executable paths.`
           : reason;
         reject(new Error(hint));
         return;
@@ -84,18 +94,51 @@ function runOtsCli(args, options = {}) {
   });
 }
 
-async function firstSuccessfulOtsRun(commandVariants, options = {}) {
-  let lastError;
+function runOtsCli(args, options = {}) {
+  return runCommand(otsCommand(), args, options);
+}
 
-  for (const args of commandVariants) {
-    try {
-      return await runOtsCli(args, options);
-    } catch (error) {
-      lastError = error;
-    }
+function runDigestStamper(args, options = {}) {
+  return runCommand(otsPythonCommand(), [DIGEST_STAMPER_PATH, ...args], options);
+}
+
+export async function checkOtsRuntime() {
+  if (shouldMockOts()) {
+    runtimeStatus = { available: true, mode: 'mock' };
+    return { ...runtimeStatus };
   }
 
-  throw lastError || new Error('OpenTimestamps CLI failed');
+  if (isBlockchainDisabled()) {
+    runtimeStatus = { available: false, mode: 'disabled' };
+    return { ...runtimeStatus };
+  }
+
+  try {
+    const [cli, stamper] = await Promise.all([
+      runOtsCli(['--version']),
+      runDigestStamper(['--check'])
+    ]);
+    runtimeStatus = {
+      available: true,
+      mode: 'cli',
+      cliVersion: cli.stdout.trim() || cli.stderr.trim(),
+      stamperVersion: stamper.stdout.trim() || stamper.stderr.trim()
+    };
+  } catch (error) {
+    runtimeStatus = {
+      available: false,
+      mode: 'unavailable',
+      error: error.message
+    };
+  }
+
+  return { ...runtimeStatus };
+}
+
+export function getOtsRuntimeStatus() {
+  if (shouldMockOts()) return { available: true, mode: 'mock' };
+  if (isBlockchainDisabled()) return { available: false, mode: 'disabled' };
+  return { ...runtimeStatus };
 }
 
 async function readFirstOtsFile(tmpDir, preferredName) {
@@ -170,12 +213,13 @@ export async function createTimestamp(hashHex) {
     return { pending: false, ots: null };
   }
 
+  if (!/^[a-f0-9]{64}$/i.test(hashHex)) {
+    throw new Error('OpenTimestamps requires a SHA-256 hex digest');
+  }
+
   return withTempDir(async (tmpDir) => {
-    await firstSuccessfulOtsRun([
-      ['stamp', '-d', hashHex, '-a', 'sha256'],
-      ['stamp', '--digest', hashHex, '--algorithm', 'sha256'],
-      ['stamp', '-d', hashHex]
-    ], { cwd: tmpDir });
+    const proofPath = path.join(tmpDir, `${hashHex}.ots`);
+    await runDigestStamper([hashHex, proofPath], { cwd: tmpDir });
 
     const otsBytes = await readFirstOtsFile(tmpDir, `${hashHex}.ots`);
     return {
@@ -236,11 +280,7 @@ export async function verifyTimestamp(hashHex, otsBase64) {
   try {
     return await withTempDir(async (tmpDir) => {
       const proofPath = await writeProofFile(tmpDir, otsBase64);
-      const result = await firstSuccessfulOtsRun([
-        ['verify', proofPath, '-d', hashHex, '-a', 'sha256'],
-        ['verify', proofPath, '--digest', hashHex, '--algorithm', 'sha256'],
-        ['verify', proofPath, '-d', hashHex]
-      ], { cwd: tmpDir });
+      const result = await runOtsCli(['verify', proofPath, '-d', hashHex], { cwd: tmpDir });
 
       const output = `${result.stdout}\n${result.stderr}`;
       const attestations = parseVerifyAttestations(output);

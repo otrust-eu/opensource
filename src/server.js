@@ -37,7 +37,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 import { verifySignature, verifyPow } from './crypto.js';
 import { generateChallenge, consumeChallenge } from './pow.js';
-import { startOtsProcessor, verifyTimestamp, getTimestampInfo, createTimestamp, setOnConfirmationCallback, setOnSignatureConfirmationCallback, processPendingTimestamps } from './opentimestamps.js';
+import { checkOtsRuntime, getOtsRuntimeStatus, startOtsProcessor, verifyTimestamp, getTimestampInfo, createTimestamp, setOnConfirmationCallback, setOnSignatureConfirmationCallback, processPendingTimestamps } from './opentimestamps.js';
 import { isValidWebhookUrl, storeWebhookNotification, dispatchConfirmationWebhook, emitWebhookEvent, processWebhookRetries } from './webhooks.js';
 import { registerWave4Routes } from './wave4/routes.js';
 import { createApiKeyMiddleware } from './platform/middleware.js';
@@ -3378,6 +3378,7 @@ app.get('/health', async (req, res) => {
         timestamp: config.features.timestamp,
         sign: config.features.sign,
         blockchain: config.features.blockchain,
+        blockchain_runtime: getOtsRuntimeStatus().mode,
         email: config.features.email,
         trusted_identity_issuer: process.env.TRUSTED_IDENTITY_ISSUER_ENABLED === 'true',
         identity_auth: AUTH_CAPABILITY_READY,
@@ -3423,7 +3424,9 @@ app.get('/status.json', async (req, res) => {
         api: 'ok',
         database: 'ok',
         email: config.features.email ? (sendEmail ? 'configured' : 'disabled') : 'off',
-        ots_processor: process.env.NODE_ENV === 'test' ? 'paused' : 'active',
+        ots_processor: process.env.NODE_ENV === 'test'
+          ? 'paused'
+          : (getOtsRuntimeStatus().available ? 'active' : 'unavailable'),
         zk_proofs: zkArtifacts.productionReady ? 'ready' : 'ceremony_required',
         identity_auth: AUTH_CAPABILITY_READY
           ? 'ready'
@@ -6287,6 +6290,14 @@ app.use((req, res) => {
 
 // Start server (can be imported for testing)
 export async function startServer(port = PORT) {
+  let otsRuntime = getOtsRuntimeStatus();
+  if (config.features.blockchain && process.env.NODE_ENV !== 'test') {
+    otsRuntime = await checkOtsRuntime();
+    if (!otsRuntime.available && config.isProduction) {
+      throw new Error(`OpenTimestamps runtime unavailable: ${otsRuntime.error}`);
+    }
+  }
+
   await createDb();
   console.log('[DB] SQLite initialized');
 
@@ -6298,7 +6309,9 @@ export async function startServer(port = PORT) {
 
   // Start OpenTimestamps background processor (skip in test)
   if (process.env.NODE_ENV !== 'test') {
-    startOtsProcessor(Number(process.env.OTS_BATCH_INTERVAL_MS || 5 * 60 * 1000));
+    if (config.features.blockchain && otsRuntime.available) {
+      startOtsProcessor(Number(process.env.OTS_BATCH_INTERVAL_MS || 5 * 60 * 1000));
+    }
     startFilePurgeProcessor(Number(process.env.FILE_PURGE_INTERVAL_MS || 60 * 1000));
     setInterval(() => {
       processWebhookRetries(getDb()).catch((err) => {

@@ -32,6 +32,8 @@ const SYNC_PATHS = [
   'test/crypto.test.js',
   'test/db.test.js',
   'test/migration.test.js',
+  'test/opentimestamps.test.js',
+  'test/fixtures',
   'test/email.test.js',
   'test/pow.test.js',
   'test/security.test.js',
@@ -59,6 +61,7 @@ const SYNC_PATHS = [
   'scripts/build-extension.js',
   'scripts/build-poseidon.js',
   'scripts/import-mongodb-export.mjs',
+  'scripts/ots-stamp-digest.py',
   'scripts/poseidon-browser-entry.js',
   'scripts/quickstart.ps1',
   'scripts/quickstart.sh',
@@ -66,6 +69,7 @@ const SYNC_PATHS = [
   'docker-compose.yml',
   'Dockerfile',
   '.env.example',
+  'requirements-ots.txt',
   'scripts/sync-opensource.mjs',
   'scripts/validate-openapi.js',
   'docs/API_POLICY.md',
@@ -92,6 +96,28 @@ function shouldCopy(sourceRoot, sourcePath) {
   return !relativePath.split(path.sep).includes('node_modules');
 }
 
+function removeStaleEntries(sourceDir, destinationDir) {
+  if (!fs.existsSync(destinationDir)) return;
+
+  for (const entry of fs.readdirSync(destinationDir, { withFileTypes: true })) {
+    if (entry.name === 'node_modules') continue;
+
+    const sourcePath = path.join(sourceDir, entry.name);
+    const destinationPath = path.join(destinationDir, entry.name);
+    if (!fs.existsSync(sourcePath)) {
+      fs.rmSync(destinationPath, { recursive: true, force: true });
+      continue;
+    }
+
+    const sourceStat = fs.statSync(sourcePath);
+    if (sourceStat.isDirectory() && entry.isDirectory()) {
+      removeStaleEntries(sourcePath, destinationPath);
+    } else if (sourceStat.isDirectory() !== entry.isDirectory()) {
+      fs.rmSync(destinationPath, { recursive: true, force: true });
+    }
+  }
+}
+
 if (!fs.existsSync(targetRoot)) {
   console.error(`Target not found: ${targetRoot}`);
   console.error('Set OPENSOURCE_DIR or pass the opensource clone path as the first argument.');
@@ -109,8 +135,8 @@ for (const rel of SYNC_PATHS) {
   }
   fs.mkdirSync(path.dirname(dest), { recursive: true });
   const stat = fs.statSync(src);
-  fs.rmSync(dest, { recursive: true, force: true });
   if (stat.isDirectory()) {
+    removeStaleEntries(src, dest);
     fs.cpSync(src, dest, {
       recursive: true,
       force: true,

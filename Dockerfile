@@ -17,6 +17,13 @@ COPY --from=build --chown=1001:1001 /app /app
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV OTRUST_DB_PATH=/app/data/otrust.sqlite
+ENV PATH="/opt/ots/bin:$PATH"
+
+RUN apk add --no-cache ca-certificates python3 py3-pip && \
+    python3 -m venv /opt/ots && \
+    /opt/ots/bin/pip install --no-cache-dir --no-compile -r /app/requirements-ots.txt && \
+    /opt/ots/bin/ots --version && \
+    /opt/ots/bin/python3 /app/scripts/ots-stamp-digest.py --check
 
 EXPOSE 3000
 
