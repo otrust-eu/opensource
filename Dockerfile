@@ -1,5 +1,5 @@
 # Build generated browser assets from locked dependencies.
-FROM node:24-alpine AS build
+FROM node:25-alpine AS build
 
 WORKDIR /app
 
@@ -9,7 +9,7 @@ COPY . .
 RUN npm run build:extension && npm run build:poseidon
 RUN npm prune --omit=dev && npm rebuild --omit=dev
 
-FROM node:24-alpine AS runtime
+FROM node:25-alpine AS runtime
 
 WORKDIR /app
 COPY --from=build --chown=1001:1001 /app /app
