@@ -19,7 +19,6 @@ ENV PORT=3000
 ENV OTRUST_DB_PATH=/app/data/otrust.sqlite
 
 EXPOSE 3000
-VOLUME ["/app/data"]
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
