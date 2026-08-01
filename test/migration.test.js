@@ -101,6 +101,33 @@ describe('MongoDB export migration', () => {
     expect(fs.readFileSync(destination, 'utf8')).toBe('keep');
   });
 
+  test('verifies a production-sized export without corrupting SQLite row data', () => {
+    const source = path.join(directory, 'export');
+    const destination = path.join(directory, 'otrust.sqlite');
+    fs.mkdirSync(source);
+    const documents = Array.from({ length: 1600 }, (_, index) => JSON.stringify({
+      _id: { $oid: index.toString(16).padStart(24, '0') },
+      sequence: { $numberInt: String(index) },
+      payload: {
+        $binary: {
+          base64: Buffer.alloc(512, index % 256).toString('base64'),
+          subType: '00'
+        }
+      }
+    }));
+    fs.writeFileSync(path.join(source, 'proofs.json'), `${documents.join('\n')}\n`);
+
+    const migration = spawnSync(process.execPath, [
+      'scripts/import-mongodb-export.mjs', '--source', source, '--db', destination
+    ], { cwd: process.cwd(), encoding: 'utf8' });
+    expect(migration.status).toBe(0);
+    expect(migration.stdout).toContain('Verified 1600 documents');
+    const manifest = JSON.parse(fs.readFileSync(`${destination}.migration.json`, 'utf8'));
+    expect(manifest.total_documents).toBe(1600);
+    expect(manifest.collections[0].source_logical_sha256)
+      .toBe(manifest.collections[0].sqlite_logical_sha256);
+  });
+
   test('removes partial output when an export document is invalid', () => {
     const source = path.join(directory, 'export');
     const destination = path.join(directory, 'otrust.sqlite');

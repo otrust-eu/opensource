@@ -152,10 +152,17 @@ function verifyDatabase(databasePath, expectedCollections) {
       SELECT collection_name, body
       FROM documents
       ORDER BY collection_name, row_id
-    `).iterate();
+    `).all();
     for (const row of rows) {
+      let document;
+      try {
+        document = JSON.parse(row.body);
+      } catch (error) {
+        const storageType = Buffer.isBuffer(row.body) ? 'buffer' : typeof row.body;
+        throw new Error(`${row.collection_name}: invalid SQLite body (${storageType}): ${error.message}`);
+      }
       if (!actualCollections.has(row.collection_name)) actualCollections.set(row.collection_name, []);
-      actualCollections.get(row.collection_name).push(documentDigest(JSON.parse(row.body)));
+      actualCollections.get(row.collection_name).push(documentDigest(document));
     }
   } finally {
     verification.close();
