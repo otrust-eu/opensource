@@ -37,6 +37,7 @@ const log = {
 
 // Test results
 const results = { passed: 0, failed: 0, skipped: 0 };
+let identityAuthAvailable = true;
 
 async function test(name, fn) {
   try {
@@ -88,6 +89,7 @@ async function testHealth() {
     const { status, data } = await fetchJSON('/health');
     if (status !== 200) throw new Error(`Expected 200, got ${status}`);
     if (!data.status) throw new Error('Missing status field');
+    identityAuthAvailable = data.features?.identity_auth !== false;
   });
 
   await test('GET /api/v1 returns service list', async () => {
@@ -215,6 +217,28 @@ async function testProof() {
 
 async function testAuth() {
   log.section('Auth Service (Login with OTRUST)');
+
+  if (!identityAuthAvailable) {
+    await test('Hosted Auth fails closed without a trusted issuer', async () => {
+      const { status, data } = await fetchJSON('/api/v1/auth/challenge', {
+        method: 'POST',
+        body: JSON.stringify({
+          clientId: 'test-client',
+          redirectUri: `${BASE_URL}/callback`,
+          scope: 'identity'
+        })
+      });
+      if (status !== 503 || data?.error !== 'auth_capability_unavailable') {
+        throw new Error(`Expected auth_capability_unavailable, got ${status}`);
+      }
+    });
+
+    await test('GET /auth/login page loads', async () => {
+      const res = await fetch(`${BASE_URL}/auth/login?clientId=test&redirectUri=${encodeURIComponent(BASE_URL)}`);
+      if (!res.ok) throw new Error(`Expected 200, got ${res.status}`);
+    });
+    return;
+  }
 
   await test('POST /api/v1/auth/challenge creates challenge', async () => {
     const { status, data } = await fetchJSON('/api/v1/auth/challenge', {

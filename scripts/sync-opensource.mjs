@@ -44,6 +44,7 @@ const SYNC_PATHS = [
   'test/platform.test.js',
   'test/zkproof.test.js',
   'test/all-live-test.mjs',
+  'test/deep-live-test.mjs',
   'test/full-service-test.mjs',
   'test/e2e',
   'web',

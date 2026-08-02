@@ -81,6 +81,7 @@ describe('API Integration Tests', () => {
       await db.collection('pow_challenges').deleteMany({});
       await db.collection('email_notifications').deleteMany({});
       await db.collection('proofs').deleteMany({});
+      await db.collection('sign_files').deleteMany({});
     } catch (e) {
       console.error('Database cleanup error:', e.message);
     }
@@ -798,6 +799,38 @@ describe('API Integration Tests', () => {
       expect(backupRes.body.error).toBe('legacy_identity_backup_retired');
       expect(walletRes.status).toBe(501);
       expect(walletRes.body.error).toBe('wallet_pass_signing_not_configured');
+    });
+  });
+
+  describe('Sign file storage', () => {
+    test('round-trips the exact uploaded bytes from SQLite', async () => {
+      const content = Buffer.from('OTRUST SQLite file round-trip\n0123456789abcdef\n', 'utf8');
+      const upload = await fetch(`${baseUrl}/sign/upload`, {
+        method: 'POST',
+        headers: {
+          Origin: baseUrl,
+          'Content-Type': 'text/plain',
+          'X-Filename': 'round-trip.txt',
+          'X-TTL-Hours': '1'
+        },
+        body: content
+      });
+      const uploaded = await upload.json();
+
+      expect(upload.status).toBe(201);
+      expect(uploaded.file_id).toMatch(/^sf_/);
+      expect(uploaded.file_token).toBeTruthy();
+
+      const download = await fetch(
+        `${baseUrl}/sign/file/${uploaded.file_id}?file_token=${uploaded.file_token}`,
+        { headers: { Origin: baseUrl } }
+      );
+      const downloaded = Buffer.from(await download.arrayBuffer());
+
+      expect(download.status).toBe(200);
+      expect(download.headers.get('content-length')).toBe(String(content.length));
+      expect(download.headers.get('content-disposition')).toContain('attachment');
+      expect(downloaded.equals(content)).toBe(true);
     });
   });
 });

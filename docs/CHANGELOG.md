@@ -27,6 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Restored real OpenTimestamps proof creation; the previous integration called unsupported CLI digest flags and the production image did not include the CLI.
+- SQLite-backed signing downloads now return the exact uploaded byte range instead of a Buffer's pooled backing memory.
+- Scheduled live tests now treat fail-closed hosted Auth as healthy when no trusted issuer is configured.
 - Railway Docker builds now support mounted volumes without declaring an image-level `VOLUME` instruction.
 - Migration verification handles production-sized Extended JSON exports without SQLite iterator corruption.
 - SDK playground builds are isolated from local workspace dependency trees.

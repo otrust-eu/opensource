@@ -2347,8 +2347,13 @@ app.get('/sign/file/:fileId', async (req, res) => {
     res.setHeader('X-Document-Hash', file.hash);
     res.setHeader('X-Expires-At', file.expires_at.toISOString());
     
-    // Send file
-    res.send(file.data.buffer);
+    // SQLite returns a Buffer directly; MongoDB's Binary wrapper exposes one
+    // through `.buffer`. Sending a Buffer's backing ArrayBuffer can include
+    // unrelated pooled bytes when the Buffer has a non-zero byte offset.
+    const fileBuffer = Buffer.isBuffer(file.data)
+      ? file.data
+      : Buffer.from(file.data?.buffer ?? file.data);
+    res.send(fileBuffer);
     
   } catch (error) {
     console.error('File download error:', error.message);
