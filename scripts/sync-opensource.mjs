@@ -73,6 +73,7 @@ const SYNC_PATHS = [
   'scripts/sync-opensource.mjs',
   'scripts/validate-openapi.js',
   'docs/API_POLICY.md',
+  'docs/CHANGELOG.md',
   'docs/MONGODB_MIGRATION.md',
   'docs/sdk-design.md',
   'README.md',
