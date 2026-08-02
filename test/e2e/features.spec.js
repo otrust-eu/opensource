@@ -63,4 +63,17 @@ test.describe('Feature pack pages', () => {
     await page.goto('/partner-builder.html');
     await expect(page.getByRole('heading', { name: /Partner theme builder/i })).toBeVisible();
   });
+
+  test('published changelog includes the SQLite release', async ({ page }) => {
+    await page.goto('/changelog');
+    await expect(page.getByRole('heading', { name: /Persistent SQLite storage/i })).toBeVisible();
+    await expect(page.getByText(/1,425 records across 19 collections/i)).toBeVisible();
+  });
+
+  test('self-host docs include storage and migration guidance', async ({ page }) => {
+    await page.goto('/docs#selfhost');
+    await expect(page.getByRole('heading', { name: /Persistent Storage/i })).toBeVisible();
+    await expect(page.getByText('OTRUST_DB_PATH', { exact: true }).first()).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Migrate from MongoDB/i })).toBeVisible();
+  });
 });

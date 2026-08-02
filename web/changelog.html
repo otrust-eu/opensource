@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OTRUST Changelog</title>
-  <meta name="description" content="Recent OTRUST product updates: bento redesign, Bitcoin anchoring UX, live transparency, and self-host improvements.">
+  <meta name="description" content="Recent OTRUST product updates: persistent SQLite storage, OpenTimestamps anchoring, API hardening, and self-host improvements.">
   <link rel="canonical" href="https://www.otrust.eu/changelog">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="stylesheet" href="/otrust-redesign.css?v=20260734">
@@ -36,8 +36,21 @@
     <header class="changelog-head">
       <a href="/" class="dashboard-logo">OTRUST</a>
       <h1>What&rsquo;s new</h1>
-      <p>Product updates for otrust.eu and the open-source self-host stack.</p>
+      <p>Product updates for otrust.eu and the open-source self-host stack. See the <a href="https://github.com/otrust-eu/opensource/blob/main/docs/CHANGELOG.md" target="_blank" rel="noopener noreferrer">technical changelog</a> for the complete release history.</p>
     </header>
+
+    <article class="changelog-entry">
+      <time datetime="2026-08-02">August 2, 2026</time>
+      <h2>Persistent SQLite storage and production Bitcoin anchoring</h2>
+      <ul>
+        <li>Production storage moved from MongoDB to embedded SQLite on a durable volume</li>
+        <li>1,425 records across 19 collections migrated with count, identity, checksum, and integrity verification</li>
+        <li>Self-hosted installations no longer require a separate database server</li>
+        <li>OpenTimestamps 0.7.2 is bundled in the Docker image and submits existing SHA-256 digests to four public calendars</li>
+        <li>The health endpoint now reports persistent storage and blockchain runtime status</li>
+        <li>API redirects, pagination, idempotency, Auth issuer checks, SDK contracts, and reproducible builds were hardened</li>
+      </ul>
+    </article>
 
     <article class="changelog-entry">
       <time datetime="2026-07-04">July 4, 2026</time>

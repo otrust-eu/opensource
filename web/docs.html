@@ -1268,6 +1268,8 @@ curl -s "https://www.otrust.eu/proof/ot_abc123?format=json"</code></pre>
               <li>React components and hooks</li>
               <li>CLI for hashing, timestamping, and verification</li>
               <li>Circom circuits and browser extension source</li>
+              <li>Embedded SQLite storage with no separate database server</li>
+              <li>OpenTimestamps runtime bundled in the Docker image</li>
             </ul>
           </div>
           
@@ -1278,7 +1280,7 @@ git clone https://github.com/otrust-eu/opensource.git
 cd opensource
 
 <span class="comment"># Install workspace dependencies</span>
-npm install</code></pre>
+npm ci</code></pre>
             <p>The repository is self-hostable. Private OTRUST production infrastructure, partner themes, and service secrets are not included.</p>
           </div>
           
@@ -1288,10 +1290,51 @@ npm install</code></pre>
 cp .env.example .env
 
 <span class="comment"># Start OTRUST with persistent SQLite storage</span>
-docker compose up --build
+docker compose up -d --build
+
+<span class="comment"># Confirm storage and blockchain runtime status</span>
+curl -fsS http://localhost:3000/health
 
 <span class="comment"># Or run Node directly; data is stored in ./data</span>
 npm run dev</code></pre>
+          </div>
+
+          <div class="card">
+            <h2>Persistent Storage</h2>
+            <p>OTRUST stores application data in SQLite. <code>OTRUST_DB_PATH</code> defaults to <code>./data/otrust.sqlite</code>. Docker Compose mounts the <code>otrust_data</code> volume at <code>/app/data</code>, so container rebuilds do not remove the database.</p>
+            <ul>
+              <li>Back up the SQLite file or Docker volume before upgrades</li>
+              <li>Keep the database and <code>otrust.sqlite.migration.json</code> manifest together after a MongoDB migration</li>
+              <li>On Railway, production startup refuses to create an empty SQLite database by default</li>
+              <li>Set <code>OTRUST_ALLOW_EMPTY_DB=true</code> only for a deliberate fresh production installation</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h2>Migrate from MongoDB</h2>
+            <p>Stop writes, export each MongoDB collection as Extended JSON, and run a dry run before creating the SQLite database. The destination database must not already exist.</p>
+            <pre><code><span class="comment"># Validate the export without writing a database</span>
+npm run migrate:mongodb-export -- \
+  --source ./mongo-export \
+  --db ./data/otrust.sqlite \
+  --dry-run
+
+<span class="comment"># Create and verify the SQLite database</span>
+npm run migrate:mongodb-export -- \
+  --source ./mongo-export \
+  --db ./data/otrust.sqlite</code></pre>
+            <p>The migration compares collection counts, record identities, canonical checksums, and SQLite integrity before writing the completion manifest. Follow the <a href="https://github.com/otrust-eu/opensource/blob/main/docs/MONGODB_MIGRATION.md" target="_blank" rel="noopener noreferrer">MongoDB migration guide</a> for export, cutover, rollback, and backup steps.</p>
+          </div>
+
+          <div class="card">
+            <h2>OpenTimestamps Runtime</h2>
+            <p>The Docker image includes the pinned OpenTimestamps 0.7.2 client and the digest bridge used to timestamp existing SHA-256 hashes. Native Node installations require the <code>ots</code> command and its Python package on <code>PATH</code>.</p>
+            <ul>
+              <li><code>ENABLE_BLOCKCHAIN=false</code> disables blockchain submission</li>
+              <li><code>OTS_CLI_COMMAND</code> and <code>OTS_PYTHON_COMMAND</code> override runtime command paths</li>
+              <li>Calendar, quorum, and timeout settings are documented in <code>.env.example</code></li>
+              <li>Check <code>/health</code> after startup to verify that the runtime is available</li>
+            </ul>
           </div>
 
           <div class="card">
@@ -1320,7 +1363,8 @@ node cli/otrust.js verify 000000000000000000000000000000000000000000000000000000
           <div class="card">
             <h2>Repository</h2>
             <p>The clean open source repository is maintained separately from private production infrastructure.</p>
-            <a href="https://github.com/otrust-eu/opensource" class="btn" target="_blank">Open GitHub</a>
+            <a href="https://github.com/otrust-eu/opensource" class="btn" target="_blank" rel="noopener noreferrer">Open GitHub</a>
+            <a href="https://github.com/otrust-eu/opensource/blob/main/docs/CHANGELOG.md" class="btn" target="_blank" rel="noopener noreferrer">Technical Changelog</a>
           </div>
         </section>
       </div>
