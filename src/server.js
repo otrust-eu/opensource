@@ -28,6 +28,7 @@ import validator from 'validator';
 import { v4 as uuidv4 } from 'uuid';
 import os from 'os';
 import { createDb, getDb, closeDb, logSecurityEvent as logAuditEvent } from './db.js';
+import { getBackupStatus, startBackupProcessor, stopBackupProcessor } from './backup.js';
 import { ZipArchive } from 'archiver';
 import QRCode from 'qrcode';
 import * as zkproof from './zkproof.js';
@@ -3377,7 +3378,8 @@ app.get('/health', async (req, res) => {
       claims: count,
       storage: {
         engine: 'sqlite',
-        persistent: db.path !== ':memory:'
+        persistent: db.path !== ':memory:',
+        backup: getBackupStatus()
       },
       features: {
         timestamp: config.features.timestamp,
@@ -6314,6 +6316,7 @@ export async function startServer(port = PORT) {
 
   // Start OpenTimestamps background processor (skip in test)
   if (process.env.NODE_ENV !== 'test') {
+    startBackupProcessor(getDb().path);
     if (config.features.blockchain && otsRuntime.available) {
       startOtsProcessor(Number(process.env.OTS_BATCH_INTERVAL_MS || 5 * 60 * 1000));
     }
@@ -6367,6 +6370,7 @@ export async function startServer(port = PORT) {
 
     process.on('SIGTERM', async () => {
       console.log('[otrust] Shutting down...');
+      stopBackupProcessor();
       server.close();
       await closeDb();
       process.exit(0);
@@ -6383,6 +6387,7 @@ if (process.argv[1] && process.argv[1].includes('server.js')) {
     // Keep the process running
     process.on('SIGINT', async () => {
       console.log('[otrust] Shutting down...');
+      stopBackupProcessor();
       server.close();
       await closeDb();
       process.exit(0);

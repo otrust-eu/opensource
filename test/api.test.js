@@ -100,7 +100,17 @@ describe('API Integration Tests', () => {
       expect(res.status).toBe(200);
       expect(res.body.status).toBe('ok');
       expect(res.body.claims).toBeDefined();
-      expect(res.body.storage).toEqual({ engine: 'sqlite', persistent: false });
+      expect(res.body.storage).toEqual({
+        engine: 'sqlite',
+        persistent: false,
+        backup: {
+          enabled: false,
+          state: 'disabled',
+          last_backup_at: null,
+          next_backup_at: null,
+          last_error_at: null
+        }
+      });
       expect(res.body.version).toBe(APP_VERSION);
       expect(res.body).toHaveProperty('commit_sha');
       expect(res.body.zk_artifacts).toEqual(expect.objectContaining({

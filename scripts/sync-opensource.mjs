@@ -13,6 +13,7 @@ const targetRoot = path.resolve(process.argv[2] || process.env.OPENSOURCE_DIR ||
 
 const SYNC_PATHS = [
   'src/server.js',
+  'src/backup.js',
   'src/canonical-url.js',
   'src/version.js',
   'src/sign.js',
@@ -31,6 +32,7 @@ const SYNC_PATHS = [
   'src/platform',
   'test/crypto.test.js',
   'test/db.test.js',
+  'test/backup.test.js',
   'test/migration.test.js',
   'test/opentimestamps.test.js',
   'test/fixtures',
@@ -183,7 +185,7 @@ if (fs.existsSync(targetPackagePath)) {
   targetPackage.engines = corePackage.engines;
   delete targetPackage.dependencies.mongodb;
 
-  for (const dependency of ['archiver', 'poseidon-lite', 'snarkjs']) {
+  for (const dependency of ['@aws-sdk/client-s3', 'archiver', 'poseidon-lite', 'snarkjs']) {
     targetPackage.dependencies[dependency] = corePackage.dependencies[dependency];
   }
   targetPackage.devDependencies.esbuild = corePackage.devDependencies.esbuild;

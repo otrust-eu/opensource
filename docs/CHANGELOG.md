@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Embedded SQLite storage with MongoDB-compatible collection semantics and persistent Railway volume support.
+- Daily SQLite snapshots to private S3-compatible storage with integrity checks, SHA-256 metadata, retention, and public health status.
 - Verified MongoDB export importer with Extended JSON support, dry-run mode, integrity checks, collection counts, document identity parity, and migration manifests.
 - Explicit API policy covering stable response envelopes, idempotency, cursor pagination, deprecation, and version metadata.
 - Browser-local receipt history, bulk verification, usage badges, embed widget, bookmarklet, webhook notifications, and CLI history and IPFS export commands.

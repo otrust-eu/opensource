@@ -65,3 +65,17 @@ Verify representative timestamp receipts, proofs, signing requests, platform
 organizations, and API keys before deleting the old database service. Keep the
 original export and migration manifest in encrypted backup until the new
 deployment has been observed through at least one backup and restore cycle.
+
+## Ongoing backups
+
+Set `OTRUST_BACKUP_ENABLED=true` together with the `BUCKET_*` credentials for a
+private S3-compatible bucket. The service creates a consistent SQLite snapshot
+with `VACUUM INTO`, runs `PRAGMA integrity_check`, records SHA-256 checksums,
+compresses the snapshot, and uploads it under `sqlite/`. A recent snapshot is
+reused after a restart, and objects older than `OTRUST_BACKUP_RETENTION_DAYS`
+are removed after a successful upload.
+
+Backup status is exposed without credentials or object names in
+`GET /health` under `storage.backup`. Periodically download the newest archive,
+verify its archive checksum, decompress it, run `PRAGMA integrity_check`, and
+confirm representative record counts before considering the backup usable.
