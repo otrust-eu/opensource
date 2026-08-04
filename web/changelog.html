@@ -40,6 +40,18 @@
     </header>
 
     <article class="changelog-entry">
+      <time datetime="2026-08-04">August 4, 2026</time>
+      <h2>Verified automatic SQLite backups</h2>
+      <ul>
+        <li>Production now creates daily consistent SQLite snapshots in private object storage</li>
+        <li>Every snapshot passes SQLite integrity checks and records SHA-256 checksums before it is accepted</li>
+        <li>Backups are compressed, retained for 14 days, and protected against duplicate uploads after restarts</li>
+        <li>The public health endpoint reports backup state and timing without exposing credentials or object names</li>
+        <li>A production restore drill verified the downloaded archive independently from the live volume</li>
+      </ul>
+    </article>
+
+    <article class="changelog-entry">
       <time datetime="2026-08-02">August 2, 2026</time>
       <h2>Persistent SQLite storage and production Bitcoin anchoring</h2>
       <ul>

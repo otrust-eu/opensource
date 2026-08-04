@@ -1305,6 +1305,9 @@ npm run dev</code></pre>
             <ul>
               <li>Back up the SQLite file or Docker volume before upgrades</li>
               <li>Keep the database and <code>otrust.sqlite.migration.json</code> manifest together after a MongoDB migration</li>
+              <li>Set <code>OTRUST_BACKUP_ENABLED=true</code> with private <code>BUCKET_*</code> credentials for automatic S3-compatible backups</li>
+              <li>Automatic backups use <code>VACUUM INTO</code>, SQLite integrity checks, SHA-256 metadata, gzip compression, and configurable retention</li>
+              <li>Check <code>storage.backup</code> in <code>/health</code> and periodically perform an independent restore drill</li>
               <li>On Railway, production startup refuses to create an empty SQLite database by default</li>
               <li>Set <code>OTRUST_ALLOW_EMPTY_DB=true</code> only for a deliberate fresh production installation</li>
             </ul>

@@ -151,6 +151,12 @@ npm run dev
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `OTRUST_DB_PATH` | Persistent SQLite database file | `./data/otrust.sqlite` |
+| `OTRUST_BACKUP_ENABLED` | Enable automatic private bucket backups | `false` |
+| `BUCKET_ENDPOINT` | S3-compatible backup endpoint | - |
+| `BUCKET_ACCESS_KEY_ID` | Backup bucket access key | - |
+| `BUCKET_SECRET_ACCESS_KEY` | Backup bucket secret key | - |
+| `BUCKET_NAME` | Private backup bucket name | - |
+| `OTRUST_BACKUP_RETENTION_DAYS` | Number of days to retain snapshots | `14` |
 | `OTRUST_ALLOW_EMPTY_DB` | Permit a deliberately new, empty Railway database | unset = blocked |
 | `PORT` | Server port | `3000` |
 | `ADMIN_KEY` | Platform admin (`X-Admin-Key`) | — **required in prod** |
